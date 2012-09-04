@@ -1,0 +1,192 @@
+body {margin:0px; padding:5px; width:700px}
+
+h1 {
+    font-family: Pristina, fantasy, sans-serif;
+    font-size: xx-large;
+    margin: 0px;
+    margin-bottom: 15px;
+}
+
+h2 {
+    font-size: x-large;
+    text-decoration: underline;
+}
+
+a {text-decoration:none}
+
+a {color:black}
+a:hover {color:purple}
+
+#buttons {text-align:right; margin:5px; padding:5px}
+#content {margin:5px; padding:5px}
+#pages   {text-align:center; margin:5px; padding:5px}
+
+
+table.data {
+    border-collapse:collapse;
+    border-width:1px;
+    border-style:solid;
+    border-color:#cccccc;
+    text-align:center;
+    width: 100%;            /* added */
+    table-layout: fixed;    /* added */
+}
+
+.data th {
+	border-collapse:collapse;
+	border-width:1px;
+	border-style:solid;
+	border-color:#888888;
+	padding:2px;
+	background-color:#CCEECC;
+	width: 100px;    /* added */
+}
+
+.data td {
+	border-collapse:collapse;
+	border-width:1px;
+	border-style:solid;
+	border-color:#888888;
+	padding:2px;
+}
+
+.datum {
+	display:block;
+	border-style:ridge;
+	border-width:2px;
+	border-color:#AAFFAA;
+	margin:1px;
+	background-color:#EEFFEE;
+	text-align:center;
+	text-decoration:none;
+    width: 94px;
+}
+
+.datum th {
+	border-width:0px;
+}
+
+.datum td {
+	text-align:center;
+	border-width:0px;
+}
+
+.frame {
+	width:700px;
+	border-width:0px;
+	text-align:left
+}
+
+.frame th {
+	border-width:0px;
+}
+
+.frame td {
+	border-width:0px;
+}
+
+.frame thead {
+	text-align:right;
+	font-style:italic;
+}
+.frame tbody {}
+
+.frame tfoot {
+	padding-top:2cm;
+	text-align:center;
+	font-style:italic;
+}
+
+.frame th {text-align:left; background-color: #EECCCC}
+.frame th {
+    /* fallback (Opera) */
+    background: #EECCCC;
+    /* Mozilla: */
+    background: -moz-linear-gradient(left, #00FF00, #FFFFFF);
+    /* Chrome, Safari:*/
+    background: -webkit-gradient(linear,
+                left top, right top, from(#00FF00), to(#FFFFFF));
+    /* MSIE */
+    filter: progid:DXImageTransform.Microsoft.Gradient(
+                StartColorStr='#00FF00', EndColorStr='#FFFFFF', GradientType=1);
+}
+
+.list {
+    border-width: 1px;
+    border-spacing: 0px;
+    border-style: solid;
+    border-color: black;
+}
+
+.list th {
+    border: 1px solid black;
+    background: white;
+}
+
+.list td {
+    border: 1px solid black;
+    background: white;
+}
+
+div.atext {
+    width:800px;
+    line-height:120%
+}
+
+.Focus {
+    display:inline-block;
+    margin-top:1px;
+    margin-bottom:1px;
+    background-color:#EECCCC;
+}
+
+.BNC {
+    display:inline-block;
+    margin-top:1px;
+    margin-bottom:1px;
+    background-color:#EEEECC;
+}
+
+
+
+#config {background-color: #EEEEEE}
+
+/* drop領域 */
+th.dropArea {
+    width: 150px;
+}
+
+/* 削除ボタン */
+.removeBtn {
+    float: right;
+   /* border-width:1px;*/
+   /* border-style:solid; */
+	border-color:#888888;
+    padding: 0px;
+    width: 10px;
+    height: 10px;
+    position:relative; top:0%;
+}
+
+.removeBtn img {
+    padding: 0px;
+    /*position:relative; top:0%;*/
+    vertical-align: top;
+}
+
+/* postするときのvalue値 */
+.ontoUri {
+    display: none;
+}
+
+/* ドラッグ要素がover したとき */
+td.orange-hover  {background-color:darkorange;}
+
+
+.dragged {
+   opacity: 0.5;
+}
+
+.order {
+    display: none;
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>BioQA - SPARQL generation</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  <link href="css/ontofinder.css" media="screen" rel="stylesheet" type="text/css" />
+  <script type="text/javascript">
+    function setquery(query) {
+      document.getElementById("query").value = query;
+    }
+  </script>
+</head>
+<body>
+<h1>Natural Language Query Processing</h1>
+<h2>(SPARQL generation demo)</h2>
+
+<table class="frame">
+<thead>
+<tr><td>powered by <a href="http://www-tsujii.is.s.u-tokyo.ac.jp/enju/">Enju</a>, a HPSG parser.</tr>
+</thead>
+
+<form name="query" method="post"
+      action="bioqa-pipeline.cgi"
+      entype="multipart/form-data">
+<tr><th>Query</th></tr>
+<tr>
+<td><input id="query" name="query" type="text" size="80" required="required" placeholder="Enter a query." style="width:100%" /></td>
+</tr>
+
+<tr><td style="font-style:italic">Examples:</td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What antibodies have been used to detect TLR4?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What diseases are associated with lysosomal abnormalities in the nervous system?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">Find me the diseases that are associated with lysosomal abnormalities in the nervous system?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What tissue types express members of the mammalian TIM gene family?</a></td></tr>
+
+<tr>
+<td><input type="submit" value="submit" style="height:50px; width:100%" /></td>
+</tr>
+</form>
+
+<tfoot>
+<tr><td>&nbsp;</td></tr>
+<tr><td>Under development by <a href="http://dbcls.rois.ac.jp">DBCLS</a></td></tr>
+<tr><td><font color='red'>It is a prototype system for proof-of-concept, and should be treated as such.<br/>
+Your any suggestion is very welcome.<br/>
+Contact: jdkim (at) dbcls (dot) rois (dot) ac (dot) jp</font></td></tr>
+</tfoot>
+
+</table>
+
+</body>
+</html>
