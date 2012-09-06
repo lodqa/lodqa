@@ -10,7 +10,6 @@ require '/opt/services/ontotagger/nlptools/enju'
 cgi = CGI.new
 text = cgi.params['query'][0]
 
-
 enju = Enju.new("http://localhost:31200")
 enju.parse(text)
 
@@ -32,22 +31,19 @@ head.each do |h|
   v = v.next
 end
 
-qstatements = Array.new
-## instantiation
-head.each do |h|
-  qstatements.push(['?' + v_hash[h], rdf:type, "#{enju.idxv_get_word(bnp[h]).join(', ')"])
-end
-
-## relation
-rel.each do |s, p, o|
-  qstatements.push(['?' + v_hash[s], "[#{enju.idxv_get_word(p).join(', ')}]", v_hash[o]])
-end
-
-
 ## focusing
 psparql = ""
 psparql = "Select ?#{v_hash[focus]}\nWhere {\n"
 
+## instantiation
+head.each do |h|
+  psparql += "\t?#{v_hash[h]}\trdf:type\t[#{enju.idxv_get_word(bnp[h]).join(', ')}];\n"
+end
+
+## relation
+rel.each do |s, p, o|
+  psparql += "\t?#{v_hash[s]}\t[#{enju.idxv_get_word(p).join(', ')}]\t?#{v_hash[o]};\n"
+end
 
 psparql += "}"
 #####
