@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>BioQA - SPARQL generation</title>
+  <title>LODQA - SPARQL generation</title>
   <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
   <link href="css/ontofinder.css" media="screen" rel="stylesheet" type="text/css" />
   <script type="text/javascript">
@@ -11,8 +11,7 @@
   </script>
 </head>
 <body>
-<h1>Natural Language Query Processing</h1>
-<h2>(SPARQL generation demo)</h2>
+<h1>LODQA for SNOMED-CT@BioPortal</h1>
 
 <table class="frame">
 <thead>
@@ -20,18 +19,22 @@
 </thead>
 
 <form name="query" method="post"
-      action="bioqa-pipeline.cgi"
+      action="bioqa.cgi"
       entype="multipart/form-data">
 <tr><th>Query</th></tr>
 <tr>
 <td><input id="query" name="query" type="text" size="80" required="required" placeholder="Enter a query." style="width:100%" /></td>
 </tr>
 
-<tr><td style="font-style:italic">Examples:</td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What antibodies have been used to detect TLR4?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What diseases are associated with lysosomal abnormalities in the nervous system?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">Find me the diseases that are associated with lysosomal abnormalities in the nervous system?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What tissue types express members of the mammalian TIM gene family?</a></td></tr>
+<tr><td style="font-style:italic">Examples Queries:</td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What devices are used to treat heart failure?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What diseases are associated with nail clubbing?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">Which organs are located on the left abdominal cavity?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What disorders can a pacemaker be used to treat?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What surgical approaches are used to treat cholecystitis?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What are some causes of epilepsy?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What diseases are associated with acquired clubbing of nails?</a></td></tr>
+<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">Which organs are located on the left side of the abdominal cavity?</a></td></tr>
 
 <tr>
 <td><input type="submit" value="submit" style="height:50px; width:100%" /></td>
