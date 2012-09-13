@@ -1,5 +1,6 @@
-#!/opt/local/bin/ruby
-require '/opt/services/ontotagger/nlptools/enju'
+#!/usr/bin/ruby
+#encoding: UTF-8
+require './enju'
 
 class QueryParser
   def initialize (enju_url)

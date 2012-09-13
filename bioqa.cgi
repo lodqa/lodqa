@@ -1,4 +1,5 @@
-#!/opt/local/bin/ruby
+#!/usr/bin/ruby
+#encoding: UTF-8
 require 'cgi'
 require 'erb'
 require 'sparql/client'
