@@ -110,21 +110,21 @@ table.data {
                 StartColorStr='#00FF00', EndColorStr='#FFFFFF', GradientType=1);
 }
 
-.list {
-    border-width: 1px;
+table.list {
+    border: 1px solid gray;
     border-spacing: 0px;
-    border-style: solid;
-    border-color: black;
 }
 
 .list th {
-    border: 1px solid black;
+    border: 1px solid gray;
     background: white;
+    padding: 3px;
+    text-align: center;
 }
 
 .list td {
-    border: 1px solid black;
-    background: white;
+    border: 1px solid gray;
+    padding: 3px;
 }
 
 div.atext {

@@ -1,10 +1,13 @@
 #!/usr/bin/ruby
 #encoding: UTF-8
 require './enju'
+require 'net/http'
+require 'json'
 
 class QueryParser
-  def initialize (enju_url)
+  def initialize (enju_url, ontofinder_url)
     @enju = Enju.new(enju_url)
+    @ontofinder = ontofinder_url
   end
 
   # gsparql: generalized sparql
@@ -94,40 +97,46 @@ class QueryParser
 
 
   # sparql
-  def get_sparql
-    find_term_uri
+  def get_sparql(vid, acronym)
+    find_term_uris(vid) unless defined? @turis
 
     sparql = <<SPARQL
 SELECT ?#{@tvars[@focus]} ?l1
 WHERE {
-  GRAPH <http://bioportal.bioontology.org/ontologies/SNOMEDCT> {
+  GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {
 SPARQL
+
     v = 'd0'
+
+    # instantiation
     @head.each do |h|
       next if @turis[h].empty?
-#      if @turis[h].size > 1
-#      @turis[h].each do |uri|
-        sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h]}> .\n"
-#      end
-#      if @turis[h].size > 1
-
-    end # instantiation
+      
+      sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
+    end
 
     @rel.each {|s, p, o| sparql += "    ?#{@tvars[s]} ?#{@pvars[p]} ?#{@tvars[o]} .\n"} # relation
-    sparql += <<SPARQL
+
+    sparql += <<-SPARQL
     ?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1 .
   }
 }
 SPARQL
+
   end
 
-  def find_term_uri
-    @turis = Hash.new            # term URIs
-
-    @head.each do |h|
-      @turis[h] = `/opt/services/ontofinder/public_html/ontofinder-bioqa.rb -o 1353 "#{@texps[h]}"`.split
-      @turis[h] = @turis[h].first if @turis[h].respond_to?(:first)
-      @turis[h] = '' if @turis[h] == nil
+  def find_term_uris(vid)
+    terms = Array.new
+    @head.each {|h| terms.push @texps[h]}
+    rsc = "#{@ontofinder}/mappings.json"
+    RestClient.post rsc, {:data => terms.join("\n"), :vids => vid.to_s}, :content_type => 'multipart/form-data', :accept => :json do |response, request, result|
+      case response.code
+      when 200
+        uris = JSON.parse(response)
+        @turis = Hash[@head.zip(uris)]       # term URIs
+      else
+        @turis = nil
+      end
     end
   end
 
@@ -138,25 +147,22 @@ if __FILE__ == $0
 
   ## configuration
   require 'parseconfig'
-  config = ParseConfig.new('./bioqa.cfg')
-  endpoint_url = config['sparqlURL']
-  enju_url = config['enjuURL']
-  query = config['testQuery']
+  config = ParseConfig.new('./lodqa.cfg')
+  endpoint_url   = config['endpointURL']
+  enju_url       = config['enjuURL']
+  ontofinder_url = config['ontofinderURL']
+  query          = config['testQuery']
 
   ## query from the command line
   query = ARGV[0] unless ARGV.empty?
 
-  qp = QueryParser.new(enju_url)
+  qp = QueryParser.new(enju_url, ontofinder_url)
   qp.parse(query)
   psparql = qp.get_psparql
-  puts "-----"
   puts psparql
 
   sparql  = qp.get_sparql
-  puts "-----"
   puts sparql
-  puts "-----"
-
 
   ## result
   require 'sparql/client'

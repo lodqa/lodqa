@@ -8,7 +8,7 @@ require 'htmlentities'
 require 'graphviz'
 require 'diff/lcs'
 require 'diff/lcs/string'
-require '/opt/services/ontotagger/nlptools/graph'
+require './graph'
 
 class Enju
 
@@ -16,7 +16,7 @@ class Enju
   NP_CAT = ["DT", "NN", "NNP", "CD", "FW", "PRP", "JJ"]
   NP_HEAD_CAT = ["NN", "NNP", "CD", "FW", "PRP"]
 
-  # nounphrase elements
+  # noun-chunk elements
   NC_CAT      = ["NN", "NNP", "CD", "FW", "JJ"]
   NC_HEAD_CAT = ["NN", "NNP", "CD", "FW"]
 
@@ -53,13 +53,10 @@ class Enju
       position_map[h.old_position] = h.new_position
     end
 
-#    @pas.each {|p| p p}
-
-    @pas.collect! do |idx, s_beg, s_end, word, bword, pos, cat, ptype, arel|
-      [idx, position_map[s_beg], position_map[s_end], word, bword, pos, cat, ptype, arel]
+    @pas.each do |p|
+      p[:beg] = position_map[p[:beg]]
+      p[:end] = position_map[p[:end]]
     end
-#    puts "====="
-#    @pas.each {|p| p p}
   end
 
 
@@ -77,45 +74,48 @@ class Enju
       when 200
         pas = []                # predicate-argument structures
 
-        toks = response.split(/\r?\n/)
+        toks = response.split(/\r?\n/)  #tokens
         toks.each do |t|
-          anal = t.split(/\t/, 7)
-
-          ## index
-          idx = anal.shift.to_i
-          anal.unshift(idx)
-
-          if anal.size > 6
-            ## argument relations
-            arel = anal.pop
-            arel = arel.split.collect {|a| a.split(':')}
-            arel = arel.collect {|type, a| [type, a.to_i]}
-            anal.push(arel)
-          end
+          dat = t.split(/\t/, 7)
+          anal = Hash.new
+          anal[:idx] = dat[0].to_i
+          anal[:word] = dat[1]
+          anal[:base] = dat[2]
+          anal[:pos] = dat[3]
+          anal[:cat] = dat[4]
+          anal[:type] = dat[5]
+          anal[:arg] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i]} if dat[6]
           pas << anal
         end
 
-        span = get_tok_so
-        die "different number of PAS and spans" if (pas.length != span.length)
-
-        pas.zip(span).each do |p, s|
-          idx = p.shift
-          p.unshift(s[1])
-          p.unshift(s[0])
-          p.unshift(idx)
+        # get span offsets
+        i = 0
+        pas.each do |p|
+          if p[:idx] == 0
+            p[:beg] = -1
+            p[:end] = -1
+          else
+            i += 1 until sentence[i] !~ /[ \t\n]/
+            abort "span mismatch: #{i} #{p[:word]}" unless sentence.index(p[:word], i) == i
+            p[:beg] = i
+            p[:end] = i + p[:word].length
+            i = p[:end]
+          end
         end
-        
+
+        abort "span mismatch in the end" unless sentence.length - i < 2
+
         ## graph representation
         node = []
         edge = []
-        pas.each do |idx, s_beg, s_end, word, bword, pos, cat, ptype, arel|
-          next if idx == 0
-          node << [idx, word, pos, cat]
+        pas.each do |p|
+          next if p[:idx] == 0
+          node << [p[:idx], p[:word], p[:pos], p[:cat]]
 
-          next if arel.nil?
-          arel.each do |type, arg|
+          next unless p[:arg]
+          p[:arg].each do |type, arg|
             next if arg < 0
-            edge << [idx, arg, type]
+            edge << [p[:idx], arg, type]
           end
         end
 
@@ -126,29 +126,9 @@ class Enju
         @edge  = edge
         @g     = g
         @pas   = pas
-        @root  = pas[0][8][0][1]
+        @root  = pas[0][:arg][0][1]
       else
-        puts "Problem!!"
-      end
-    end
-  end
-
-
-  def get_tok_so
-    @enju_cgi.get :params => {:sentence=>@sentence, :format=>'so'} do |response, request, result|
-      case response.code
-      when 200
-        con = response.split(/\r?\n/)
-        tok = con.collect {|c| (c =~ /\ttok /)? c : nil}
-        tok.compact!
-        tok_so = [[-1, -1]]
-        tok.each do |t|
-          f = t.split
-          tok_so << [f[0].to_i, f[1].to_i]
-        end
-        tok_so
-      else
-        abort "Problem!!"
+        puts "Connection problem!!"
       end
     end
   end
@@ -180,7 +160,7 @@ class Enju
     ## add edges
     @edge.each {|pred, arg, type| g.add_edges(n[pred], n[arg], :label => type)}
 
-    g.output(:png => "temporary/#{filename}")
+    g.output(:png => "public/temporary/#{filename}")
   end
 
 
@@ -188,21 +168,21 @@ class Enju
     bnc = []                 # bnc word index (word offset)
     beg, lidx, lcat = -1, -1, ''
 
-    @pas.each do |idx, s_beg, s_end, word, bword, pos, cat|
-      next if idx < 0
+    @pas.each do |p|
+      next if p[:idx] < 0
 
-      if NC_CAT.include?(cat)
-        beg = idx if beg < 0
+      if NC_CAT.include?(p[:cat])
+        beg = p[:idx] if beg < 0
       else
         if beg >= 0
           if NC_HEAD_CAT.include?(lcat)
-            bnc << [beg, idx-1]
+            bnc << [beg, p[:idx]-1]
           end
           beg = -1
         end
       end
 
-      lidx, lcat = idx, cat
+      lidx, lcat = p[:idx], p[:cat]
     end
 
     if (beg >= 0) && NC_HEAD_CAT.include?(lcat)
@@ -218,7 +198,7 @@ class Enju
 
     bnc_so = []                # bnc stand-off (character offset)
     @bnc.each do |b, e|
-      bnc_so << [@pas.assoc(b)[1], @pas.assoc(e)[2]]
+      bnc_so << [@pas[b][:beg], @pas[e][:end]]
     end
     bnc_so.sort! {|a, b| a[0] <=> b[0] || b[1] <=> a[1]}
     bnc_so
@@ -239,8 +219,8 @@ class Enju
 
   def get_head
     head = []                 # head word index (word offset)
-    @pas.each do |idx, s_beg, s_end, word, bword, pos, cat, ptype, arel|
-      head << idx if arel.nil?
+    @pas.each do |p|
+      head << p[:idx] unless p[:arg]
     end
     @head = head
   end
@@ -255,7 +235,7 @@ class Enju
     end
 
     bnp.each do |k, b|
-      b.delete_if {|t| !NP_CAT.include?(@pas.assoc(t)[6])}
+      b.delete_if {|t| !NP_CAT.include?(@pas[t][:cat])}
     end
 
     bnp
@@ -282,9 +262,9 @@ class Enju
     focus = @head[0]
 
     wh = -1
-    @pas.each do |idx, s_beg, s_end, word, bword, pos, cat, ptype, arel|
-      if WH_CAT.include?(cat)
-        wh = idx
+    @pas.each do |p|
+      if WH_CAT.include?(p[:cat])
+        wh = p[:idx]
         break
       end
     end
@@ -295,30 +275,31 @@ class Enju
 
 
   def idx_get_word(i)
-    @pas.assoc(i)[3]
+    @pas[i][:word]
   end
 
 
   def idxv_get_word(v)
-    v.collect {|x| @pas.assoc(x)[3]}
+    v.collect {|x| @pas[x][:word]}
   end
 
 end
 
 
 if __FILE__ == $0
-  enju = Enju.new("http://localhost:31200");
+  enju = Enju.new("http://bionlp.dbcls.jp/enju");
 
   offset = 0
   ARGF.each do |line|
 #    bnc_so = enju.get_pasgraph(line.chomp)
-    enju.parse_utf8(line.chomp)
+#    enju.parse_utf8(line.chomp)
+    enju.parse(line.chomp)
     enju.get_bnp
     enju.get_rel
     bnc_so = enju.get_bnc_so
     bnc_so.each do |sbeg, send|
       puts("#{sbeg+offset}\t#{send+offset}\tBNC")
     end
-    offset += line.length
+#    offset += line.length
   end
 end
