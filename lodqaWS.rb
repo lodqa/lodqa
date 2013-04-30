@@ -35,6 +35,7 @@ post '/query' do
 	@endpoint = endpoint
 	@apikey   = apikey
 	@psparql  = qp.get_psparql
+	@texps    = qp.get_texps
 	@turis    = qp.find_term_uris(vid)
 	@sparql   = qp.get_sparql(vid, @oname)
 	@atext    = qp.get_query_with_bncs

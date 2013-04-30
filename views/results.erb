@@ -82,7 +82,7 @@
 <td>
 <ul>
 <% @turis.each do |term, uris| %>
-<li><%= term %></li>
+<li><%= @texps[term] %></li>
   <ul>
     <% uris.each do |uri| %>
       <li><a href="<%= uri %>"><%= uri %></a></uri>

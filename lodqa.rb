@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 #encoding: UTF-8
 require './enju'
 require 'net/http'
@@ -86,10 +86,15 @@ class QueryParser
   end
 
 
+  def get_texps
+    @texps
+  end
+
+
   ## pseudo sparql
   def get_psparql
     psparql = "SELECT ?#{@tvars[@focus]}\nWHERE {\n"
-    @head.each {|h| psparql += "   ?#{@tvars[h]} rdf:type [#{@texps[h]}] . \n"} # instantiation
+    @head.each {|h| psparql += "   ?#{@tvars[h]} [:isa] [#{@texps[h]}] . \n"} # instantiation
     @rel.each {|s, p, o| psparql += "   ?#{@tvars[s]} [#{@pexps[p]}] ?#{@tvars[o]} . \n"} # relation
     psparql += "}"
     @psparql = psparql

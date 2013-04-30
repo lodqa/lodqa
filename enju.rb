@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # encoding: UTF-8
 Encoding.default_external="UTF-8"
 Encoding.default_internal="UTF-8"
@@ -103,7 +103,7 @@ class Enju
           end
         end
 
-        abort "span mismatch in the end" unless sentence.length - i < 2
+        abort "span mismatch in the end (#{sentence.length} : #{i})\n[#{sentence[i..-1]}]" unless sentence.length - i < 2
 
         ## graph representation
         node = []
@@ -298,7 +298,12 @@ if __FILE__ == $0
     enju.get_rel
     bnc_so = enju.get_bnc_so
     bnc_so.each do |sbeg, send|
-      puts("#{sbeg+offset}\t#{send+offset}\tBNC")
+      puts("#{sbeg+offset}\t#{send+offset}\tBNC\t#{line[sbeg+offset...send+offset]}")
+    end
+    puts
+    pas = enju.get_pas
+    pas.each do |p|
+      p p
     end
 #    offset += line.length
   end
