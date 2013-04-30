@@ -77,15 +77,15 @@ class Enju
         toks = response.split(/\r?\n/)  #tokens
         toks.each do |t|
           dat = t.split(/\t/, 7)
-          anal = Hash.new
-          anal[:idx] = dat[0].to_i
-          anal[:word] = dat[1]
-          anal[:base] = dat[2]
-          anal[:pos] = dat[3]
-          anal[:cat] = dat[4]
-          anal[:type] = dat[5]
-          anal[:arg] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i]} if dat[6]
-          pas << anal
+          analysis = Hash.new
+          analysis[:idx] = dat[0].to_i
+          analysis[:word] = dat[1]
+          analysis[:base] = dat[2]
+          analysis[:pos] = dat[3]
+          analysis[:cat] = dat[4]
+          analysis[:type] = dat[5]
+          analysis[:arg] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i]} if dat[6]
+          pas << analysis
         end
 
         # get span offsets
@@ -165,9 +165,8 @@ class Enju
 
 
   def get_bnc
-    bnc = []                 # bnc word index (word offset)
-    beg, lidx, lcat = -1, -1, ''
-
+    bnc = {}                      # bnc word index (word offset)
+    beg, lidx, lcat = -1, -1, ''  # begining index, last index, last category
     @pas.each do |p|
       next if p[:idx] < 0
 
@@ -175,8 +174,8 @@ class Enju
         beg = p[:idx] if beg < 0
       else
         if beg >= 0
-          if NC_HEAD_CAT.include?(lcat)
-            bnc << [beg, p[:idx]-1]
+          if NC_HEAD_CAT.include?(lcat) and @head.include?(lidx)
+            bnc[lidx] = [beg, lidx]
           end
           beg = -1
         end
@@ -185,8 +184,8 @@ class Enju
       lidx, lcat = p[:idx], p[:cat]
     end
 
-    if (beg >= 0) && NC_HEAD_CAT.include?(lcat)
-        bnc << [beg, lidx]
+    if (beg >= 0) and NC_HEAD_CAT.include?(lcat) and @head.include?(lidx)
+        bnc[lidx] = [beg, lidx]
     end
 
     @bnc = bnc
@@ -197,8 +196,8 @@ class Enju
     get_bnc if @bnc.empty?
 
     bnc_so = []                # bnc stand-off (character offset)
-    @bnc.each do |b, e|
-      bnc_so << [@pas[b][:beg], @pas[e][:end]]
+    @bnc.each_pair do |hidx, span|
+      bnc_so << [@pas[span[0]][:beg], @pas[span[1]][:end]]
     end
     bnc_so.sort! {|a, b| a[0] <=> b[0] || b[1] <=> a[1]}
     bnc_so
@@ -268,7 +267,15 @@ class Enju
         break
       end
     end
-    focus = @g.adjacent_node(wh).first if wh > -1
+
+    if wh > -1
+      whmod = @edge.assoc(wh)
+      if whmod
+        focus = whmod[1]
+      else
+        focus = wh
+      end
+    end
 
     @focus = focus
   end
@@ -281,6 +288,16 @@ class Enju
 
   def idxv_get_word(v)
     v.collect {|x| @pas[x][:word]}
+  end
+
+  def idxs_get_words(s)
+    words = []
+    unless s == nil
+      (s[0]..s[1]).each do |i|
+        words.push @pas[i][:word]
+      end
+    end
+    words
   end
 
 end

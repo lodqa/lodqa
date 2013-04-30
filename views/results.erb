@@ -20,7 +20,9 @@
 
   function onFailure(xhr, status) {
     $('#loading').toggle();
-    document.getElementById("result").innerHTML = status + " (See console.)";
+    var html = "<pre>" + status + "</pre>";
+    html += "(See console)";
+    document.getElementById("result").innerHTML = html;
     console.log("error");
     console.log(xhr);
   }
@@ -82,12 +84,14 @@
 <td>
 <ul>
 <% @turis.each do |term, uris| %>
+<% unless @texps[term].empty? %>
 <li><%= @texps[term] %></li>
   <ul>
     <% uris.each do |uri| %>
       <li><a href="<%= uri %>"><%= uri %></a></uri>
     <% end %>
   </ul>
+<% end %>
 <% end %>
 </ul>
 </td>

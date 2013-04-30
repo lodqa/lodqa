@@ -17,11 +17,12 @@ class QueryParser
     @enju.gen_pasgraph("_pas_graph.png")
 
     @head  = @enju.get_head
-    bnp   = @enju.get_bnp
+    # bnp    = @enju.get_bnp
+    bnc    = @enju.get_bnc
     @rel   = @enju.get_rel
     @focus = @enju.get_focus
 
-    ###### psparql = Sparql.pseudo(head, bnp, rel, focus)
+    ###### psparql = Sparql.pseudo(head, bnc, rel, focus)
     ## delete 'me', in, e.g. "find me" or "show me"
     @head.delete_if {|h| @enju.idx_get_word(h) == 'me'}
     @rel.delete_if {|s, p, o| (@enju.idx_get_word(s) == 'me') or (@enju.idx_get_word(o) == 'me')}
@@ -35,11 +36,10 @@ class QueryParser
       @tvars[h] = v
       v = v.next
 
-      words = @enju.idxv_get_word(bnp[h])
-      words.delete_if {|w| w == 'a' || w == 'the' || w == 'some'} # stopword deletion
+      words = @enju.idxs_get_words(bnc[h])
+      # words.delete_if {|w| w == 'a' || w == 'the' || w == 'some'} # stopword deletion
       @texps[h] = (words.empty?)? '' : words.join(' ')
     end
-
 
     ## preds
     @pvars = Hash.new           # predicate variables
@@ -159,19 +159,23 @@ if __FILE__ == $0
   query          = config['testQuery']
 
   ## query from the command line
-  query = ARGV[0] unless ARGV.empty?
+  unless ARGV.empty?
+    query   = ARGV[0]
+    vid     = ARGV[1]
+    acronym = ARGV[2]
+  end
 
   qp = QueryParser.new(enju_url, ontofinder_url)
   qp.parse(query)
   psparql = qp.get_psparql
   puts psparql
 
-  sparql  = qp.get_sparql
+  sparql  = qp.get_sparql(vid, acronym)
   puts sparql
 
   ## result
-  require 'sparql/client'
-  endpoint = SPARQL::Client.new(endpoint_url)
-  result = endpoint.query(sparql)
-  result.each {|s| puts s[:t1] + "\t" + s[:l1]}
+  # require 'sparql/client'
+  # endpoint = SPARQL::Client.new(endpoint_url)
+  # result = endpoint.query(sparql)
+  # result.each {|s| puts s[:t1] + "\t" + s[:l1]}
 end
