@@ -117,18 +117,57 @@ SPARQL
     @head.each do |h|
       next if @turis[h].empty?
       
-      sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
+      v.next!
+      if @turis[h].length > 1
+        pieces = @turis[h].map {|url| "    {?#{@tvars[h]} ?#{v.next!} <#{url}>}"}
+        sparql += "\n" + pieces.join("\n    UNION\n") + "\n\n"
+      else
+        sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
+      end
     end
 
     @rel.each {|s, p, o| sparql += "    ?#{@tvars[s]} ?#{@pvars[p]} ?#{@tvars[o]} .\n"} # relation
 
     sparql += <<-SPARQL
-    ?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1 .
+
+    {?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1}
+    UNION
+    {?#{@tvars[@focus]} <http://www.w3.org/2000/01/rdf-schema#label> ?l1}
   }
 }
 SPARQL
 
   end
+
+
+  # sparql
+#   def get_sparql(vid, acronym)
+#     find_term_uris(vid) unless defined? @turis
+
+#     sparql = <<SPARQL
+# SELECT ?#{@tvars[@focus]} ?l1
+# WHERE {
+#   GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {
+# SPARQL
+
+#     v = 'd0'
+
+#     # instantiation
+#     @head.each do |h|
+#       next if @turis[h].empty?
+      
+#       sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
+#     end
+
+#     @rel.each {|s, p, o| sparql += "    ?#{@tvars[s]} ?#{@pvars[p]} ?#{@tvars[o]} .\n"} # relation
+
+#     sparql += <<-SPARQL
+#     ?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1 .
+#   }
+# }
+# SPARQL
+
+#   end
 
   def find_term_uris(vid)
     terms = Array.new
