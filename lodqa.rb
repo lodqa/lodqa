@@ -106,7 +106,7 @@ class QueryParser
     find_term_uris(vid) unless defined? @turis
 
     sparql = <<SPARQL
-SELECT ?#{@tvars[@focus]} ?l1
+SELECT DISTINCT ?#{@tvars[@focus]} ?l1
 WHERE {
   GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {
 SPARQL
