@@ -13,7 +13,7 @@ query          = config['testQuery']
 
 ## initialize query parser
 require './lodqa'
-qp = QueryParser.new(enju_url, ontofinder_url)
+qp = QueryParser.new(enju_url, ontofinder_url, "semanticTypes.xml")
 
 
 ## web service

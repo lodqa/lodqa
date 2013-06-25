@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
 #encoding: UTF-8
 require './enju'
+require './semantic_type_table'
 require 'net/http'
 require 'json'
 
 class QueryParser
-  def initialize (enju_url, ontofinder_url)
+  def initialize (enju_url, ontofinder_url, tui_xml_filename)
     @enju = Enju.new(enju_url)
     @ontofinder = ontofinder_url
+    @tui_table = SemanticTypeTable.new(tui_xml_filename)
   end
 
   # gsparql: generalized sparql
@@ -105,7 +107,17 @@ class QueryParser
   def get_sparql(vid, acronym)
     find_term_uris(vid) unless defined? @turis
 
+    p @texps[@focus]
+    @turis[@focus] = @tui_table.search(@texps[@focus])
+    puts "-=-=-=-=-"
+    p @focus
+    puts "-=-=-=-=-"
+    p @turis
+    puts "-=-=-=-=-"
+    p @head    
+
     sparql = <<SPARQL
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?#{@tvars[@focus]} ?l1
 WHERE {
   GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {
@@ -116,13 +128,21 @@ SPARQL
     # instantiation
     @head.each do |h|
       next if @turis[h].empty?
-      
       v.next!
+
       if @turis[h].length > 1
-        pieces = @turis[h].map {|url| "    {?#{@tvars[h]} ?#{v.next!} <#{url}>}"}
+        if (h == @focus)
+          pieces = @turis[h].map {|url| %Q(    <http://bioportal.bioontology.org/ontologies/umls/tui>  "url"^^xsd:string})}
+        else
+          pieces = @turis[h].map {|url| "    {?#{@tvars[h]} ?#{v.next!} <#{url}>}"}
+        end
         sparql += "\n" + pieces.join("\n    UNION\n") + "\n\n"
       else
-        sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
+        if (h == @focus)
+          sparql += %Q(    ?#{@tvars[h]} <http://bioportal.bioontology.org/ontologies/umls/tui> "#{@turis[h].first}"^^xsd:string .\n)
+        else
+          sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
+        end
       end
     end
 
@@ -204,7 +224,7 @@ if __FILE__ == $0
     acronym = ARGV[2]
   end
 
-  qp = QueryParser.new(enju_url, ontofinder_url)
+  qp = QueryParser.new(enju_url, ontofinder_url, "semanticTypes.xml")
   qp.parse(query)
   psparql = qp.get_psparql
   puts psparql
