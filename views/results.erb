@@ -84,7 +84,7 @@
 <td>
 <ul>
 <% @turis.each do |term, uris| %>
-<% unless @texps[term].empty? %>
+<% unless @texps[term].nil? or @texps[term].empty? %>
 <li><%= @texps[term] %></li>
   <ul>
     <% uris.each do |uri| %>

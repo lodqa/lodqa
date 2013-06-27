@@ -132,7 +132,7 @@ SPARQL
 
       if @turis[h].length > 1
         if (h == @focus)
-          pieces = @turis[h].map {|url| %Q(    <http://bioportal.bioontology.org/ontologies/umls/tui>  "url"^^xsd:string})}
+          pieces = @turis[h].map {|url| %Q(    <http://bioportal.bioontology.org/ontologies/umls/tui>  "#{url}"^^xsd:string})}
         else
           pieces = @turis[h].map {|url| "    {?#{@tvars[h]} ?#{v.next!} <#{url}>}"}
         end

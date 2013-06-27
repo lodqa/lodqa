@@ -19,6 +19,7 @@ module Strsim
   end
 
   def Strsim.get_trigrams (str)
+    return nil if str.nil? or str.empty?
     fstr = '__' + str + '__'
 
     trigrams = []

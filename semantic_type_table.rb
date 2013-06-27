@@ -25,6 +25,8 @@ class SemanticTypeTable
     dictionary.push(["symptom","T184"])
     dictionary.push(["injury","T037"])
     dictionary.push(["poisoning","T037"])
+    dictionary.push(["body location","T029"])
+    dictionary.push(["body region","T029"])
     dictionary.push(["body part","T023"])
     dictionary.push(["organ","T023"])
     dictionary.push(["organ component","T023"])
@@ -38,6 +40,21 @@ class SemanticTypeTable
     dictionary.push(["amino acid","T116"])
     dictionary.push(["peptide","T116"])
     dictionary.push(["protein","T116"])
+    dictionary.push(["indicator","T130"])
+    dictionary.push(["reagent","T130"])
+    dictionary.push(["disgnostic aid","T130"])
+    dictionary.push(["hazardous substance","T131"])
+    dictionary.push(["poisonous substance","T131"])
+    dictionary.push(["nucleic acid","T114"])
+    dictionary.push(["nucleoside","T114"])
+    dictionary.push(["nucleotide","T114"])
+    dictionary.push(["neuroreactive substance","T124"])
+    dictionary.push(["biogenic anime","T124"])
+    dictionary.push(["organ function","T042"])
+    dictionary.push(["tissue function","T042"])
+    dictionary.push(["body space","T030"])
+    dictionary.push(["junction","T030"])
+
 
     @dictionary = dictionary
   end
@@ -47,6 +64,7 @@ class SemanticTypeTable
   end
 
   def search(keyword)
+    return nil unless keyword
     results = []
     @dictionary.each do |key, tui|
       if (Strsim.jaccard(keyword, key) > 0.4)
