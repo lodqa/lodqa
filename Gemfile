@@ -8,6 +8,7 @@ gem 'rest-client'
 gem 'htmlentities'
 gem 'ruby-graphviz'
 gem 'diff-lcs'
+gem 'libxml-ruby'
 
 gem 'parseconfig'
 
