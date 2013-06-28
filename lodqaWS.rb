@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 #encoding: UTF-8
+## web service
+require 'bundler'
+Bundler.require
 
 ## configuration file processing
 require 'parseconfig'
@@ -10,15 +13,9 @@ enju_url       = config['enjuURL']
 ontofinder_url = config['ontofinderURL']
 query          = config['testQuery']
 
-
 ## initialize query parser
 require './lodqa'
 qp = QueryParser.new(enju_url, ontofinder_url, "semanticTypes.xml")
-
-
-## web service
-require 'sinatra'
-require 'erb'
 
 
 get '/' do
