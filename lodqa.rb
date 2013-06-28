@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #encoding: UTF-8
 require './enju'
-require './semantic_type_table'
+require './tuilookup'
 require 'net/http'
 require 'json'
 
@@ -9,7 +9,7 @@ class QueryParser
   def initialize (enju_url, ontofinder_url, tui_xml_filename)
     @enju = Enju.new(enju_url)
     @ontofinder = ontofinder_url
-    @tui_table = SemanticTypeTable.new(tui_xml_filename)
+    @tuis = TUILookup.new(tui_xml_filename)
   end
 
   # gsparql: generalized sparql
@@ -106,15 +106,7 @@ class QueryParser
   # sparql
   def get_sparql(vid, acronym)
     find_term_uris(vid) unless defined? @turis
-
-    p @texps[@focus]
-    @turis[@focus] = @tui_table.search(@texps[@focus])
-    puts "-=-=-=-=-"
-    p @focus
-    puts "-=-=-=-=-"
-    p @turis
-    puts "-=-=-=-=-"
-    p @head    
+    @turis[@focus] = @tuis.lookup(@texps[@focus])
 
     sparql = <<SPARQL
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>

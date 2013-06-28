@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 #encoding: UTF-8
-## web service
 require 'bundler'
 Bundler.require
+require './lodqa'
 
 ## configuration file processing
-require 'parseconfig'
 config         = ParseConfig.new('./lodqa.cfg')
 endpoint       = config['endpointURL']
 apikey         = config['apikey']
@@ -14,14 +13,11 @@ ontofinder_url = config['ontofinderURL']
 query          = config['testQuery']
 
 ## initialize query parser
-require './lodqa'
 qp = QueryParser.new(enju_url, ontofinder_url, "semanticTypes.xml")
-
 
 get '/' do
 	erb :index
 end
-
 
 post '/query' do
 	query = params['query']
