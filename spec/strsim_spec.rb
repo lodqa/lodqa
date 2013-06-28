@@ -1,3 +1,4 @@
+require 'spec_helper'
 require_relative '../strsim'
 
 describe 'get_trigrams' do
