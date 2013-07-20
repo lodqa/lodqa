@@ -67,7 +67,7 @@ class TUILookup
     return nil unless keyword
     results = []
     @dictionary.each do |key, tui|
-      if (Strsim.jaccard(keyword, key) > 0.4)
+      if (Strsim.jaccard(keyword, key) > 0.35)
         results.push(tui)
       end
     end
