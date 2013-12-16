@@ -142,9 +142,7 @@ SPARQL
 
     sparql += <<-SPARQL
 
-    {?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1}
-    UNION
-    {?#{@tvars[@focus]} <http://www.w3.org/2000/01/rdf-schema#label> ?l1}
+    ?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1
   }
 }
 SPARQL

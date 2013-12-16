@@ -1,10 +1,7 @@
+require 'spec_helper'
 require_relative '../lodqaWS'
-require 'rspec'
-require 'rack/test'
 
 describe 'lodqaWS' do
-	include Rack::Test::Methods
-
 	def app
 		Sinatra::Application
 	end
