@@ -4,6 +4,11 @@ require './strsim'
 
 class TUILookup
   def initialize (semanticTypesFILE)
+    # if semanticTypesFILE.nil?
+      # puts "Null semantic types file name!"
+    # else 
+      # puts "Semantic types file name: " + semanticTypesFILE
+    end
     parser = XML::Parser.file(semanticTypesFILE)
     doc = parser.parse
 
