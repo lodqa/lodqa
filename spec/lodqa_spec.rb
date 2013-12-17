@@ -21,10 +21,10 @@ require 'spec_helper'
 describe "LODQA", "error-handling in initialization method" do
   it "should handle bad enju url" do
     #qp = QueryParser.new
-    expect { QueryParser.new(@bad_enju_url, @good_ontofind_url, @good_tui_xml_filename) }.to raise_error
+    expect { QueryParser.new(@bad_enju_url, @good_ontofind_url, "semanticTypes.xml") }.to raise_error
   end
   it "should handle bad ontofind url" do
-    expect { QueryParser.new(@good_enju_url, @bad_ontofind_url, @good_tui_xml_filename) }.to raise_error
+    expect { QueryParser.new(@good_enju_url, @bad_ontofind_url, "semanticTypes.xml") }.to raise_error
   end  
   it "should handle bad tuilookup xml file name" do
     expect { QueryParser.new(@good_enju_url, @good_ontofind_url, @bad_tui_xml_filename) }.to raise_error
@@ -37,11 +37,11 @@ end
 
 describe "LODQA", "error-handling in parse method" do
   it "should handle empty query" do
-    qp = QueryParser.new(@good_enju_url, @good_ontofind_url, @good_tui_xml_filename)
+    qp = QueryParser.new(@good_enju_url, @good_ontofind_url, "semanticTypes.xml")
     expect { qp.parse(@empty_query) }.to raise_error
   end  
   it "should handle null query" do
-    qp = QueryParser.new(@good_enju_url, @good_ontofind_url, @good_tui_xml_filename)
+    qp = QueryParser.new(@good_enju_url, @good_ontofind_url, "semanticTypes.xml")
     expect { qp.parse(@null_query) }.to raise_error
   end
 end
