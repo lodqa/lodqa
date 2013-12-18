@@ -1,81 +1,129 @@
-body {margin:0px; padding:5px; width:850px}
-
-#title {
-    font-family: Verdana, Geneva, sans-serif;
-    font-weight: bolder;
-    font-size: xx-large;
-    color: #000000;
-}
-
-h1 {
-    font-family: Pristina, fantasy, sans-serif;
-    font-size: xx-large;
-    margin: 0px;
-    margin-bottom: 15px;
-}
-
-h2 {
-    font-size: x-large;
-    text-decoration: underline;
+body {
+    font-family: "Times New Roman", Times, serif;
+    background-color: #bbbbbb;
+    color: #222288;
 }
 
 a {text-decoration:none}
+a {color:#6666ff}
+a:hover {color:#222288}
 
-a {color:black}
-a:hover {color:purple}
+
+#frame {
+    position: relative;
+    margin: auto;
+    padding: 5px;
+    width: 800px;
+}
+
+#title {
+    display: block;
+    margin-bottom: 5px;
+    padding: 5px;
+    box-shadow: 4px 4px 4px #888888;
+    background-color: #ffffff;
+}
+
+#logo {
+    width:250px;
+}
+
+#slogan {
+    font-size: large;
+    font-style: italic;
+    color: #5555ff;
+}
+
+h1 {
+    width:30em;
+
+    margin-top:20px;
+    margin-bottom:10px;
+
+    white-space:nowrap;
+
+    font-size:large;
+    font-weight:bold;
+    /* fallback (Opera) */
+    background: #333399;
+    /* Mozilla: */
+    background: -moz-linear-gradient(left, #aaaaff, #FFFFFF);
+    /* Chrome, Safari:*/
+    background: -webkit-gradient(linear, left top, right top, from(#aaaaff), to(#FFFFFF));
+    /* MSIE */
+    filter: progid:DXImageTransform.Microsoft.Gradient(  StartColorStr='#aaaaff', EndColorStr='#FFFFFF', GradientType=1);
+}
+
+h2 {
+    width:30em;
+    border-style:solid;
+    border-color:#5555FF;
+    border-width: 0px 0px 2px 10px;
+    padding-left:2px;
+    margin-top: 30px;
+    font-size: medium;
+    color: #222288;
+}
+
+h3 {
+    width:32em;
+
+    margin-top:20px;
+    margin-bottom:10px;
+    padding:0px 2px;
+
+    border-style:solid;
+    border-color:#5555ff;
+    border-width:0px 0px 1px 10px;
+    border-top-left-radius:10px;
+    border-bottom-left-radius:10px;
+
+    font-size: medium;
+}
+
+
 
 .note {
-    color:#777777;
-    font-size:small;
-    font-style:italic;
+    display: block;
+    width: 40em;
+    margin: 10px 0px;
+    padding: 5px;
+
+    font-family: "Times New Roman", Times, sans-serif;
+    font-size: medium;
+    color:#444477;
+    /*font-style:italic;*/
+}
+
+#menu {
+    display: block;
+    position: absolute;
+    width: 80px;
+    padding: 5px;
+    box-shadow: 4px 4px 4px #888888;
+    background-color: #ffffff
+}
+
+.item {
+    display: block;
+    font-size: medium;
+}
+
+#content {
+    display: block;
+    position: absolute;
+    left: 100px;
+    width: 695px;
+    padding: 5px;
+    box-shadow: 4px 4px 4px #888888;
+    background-color: #ffffff
 }
 
 
 #buttons {text-align:right; margin:5px; padding:5px}
-#content {margin:5px; padding:5px}
 #pages   {text-align:center; margin:5px; padding:5px}
 
 
-.frame {
-	width:100%;
-    border-style:none;
-	border-width:0px;
-	text-align:left
-}
-
-.frame th {
-	border-width:0px;
-}
-
-.frame td {
-	border-width:0px;
-}
-
-.frame thead {
-	text-align:right;
-	font-style:italic;
-}
-.frame tbody {}
-
-.frame tfoot {
-	padding-top:2cm;
-	text-align:center;
-	font-style:italic;
-}
-
-.frame th {text-align:left; background-color: #EECCCC}
-.frame th {
-    /* fallback (Opera) */
-    background: #EECCCC;
-    /* Mozilla: */
-    background: -moz-linear-gradient(left, #00FF00, #FFFFFF);
-    /* Chrome, Safari:*/
-    background: -webkit-gradient(linear,
-                left top, right top, from(#00FF00), to(#FFFFFF));
-    /* MSIE */
-    filter: progid:DXImageTransform.Microsoft.Gradient(
-                StartColorStr='#00FF00', EndColorStr='#FFFFFF', GradientType=1);
-}
 
 table.list {
     border-style: none;
@@ -114,7 +162,6 @@ div.atext {
     margin-bottom:1px;
     background-color:#EEEECC;
 }
-
 
 
 #config {background-color: #EEEEEE}
