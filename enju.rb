@@ -58,7 +58,11 @@ class Enju
     end
   end
 
-
+  # Takes a plain-English sentence as input.
+  # Populates a bunch of instance variables that represent various aspects
+  # of the PAS and syntactic structure of the sentence.
+  # Return value is actually the value of the root, but that is a side
+  # effect, so don't depend on it.
   def parse (sentence)
     @sentence = sentence
     @pas   = []
@@ -68,9 +72,16 @@ class Enju
     @bnp   = []
     @focus = -1
 
+    # Response is the result of the parse in CONLL format.
+    # response will look like this:
+    # ...
+    # request will look like this:
+    # ...
+    # result will look like this:
+    # ...
     @enju_cgi.get :params => {:sentence=>sentence, :format=>'conll'} do |response, request, result|
       case response.code
-      when 200
+      when 200                  # 200 means success
         pas = []                # predicate-argument structures
 
         toks = response.split(/\r?\n/)  #tokens
@@ -84,7 +95,7 @@ class Enju
           analysis[:cat] = dat[4]
           analysis[:type] = dat[5]
           analysis[:arg] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i]} if dat[6]
-          pas << analysis
+          pas << analysis  # << is push operation
         end
 
         # get span offsets
@@ -132,12 +143,14 @@ class Enju
     end
   end
 
-
+  # The @pas data structure gets populated by the parse() method.
+  # Is it guaranteed to be non-null?
   def get_pas
     @pas
   end
 
-
+  # generates a graphics file that shows the predicate-argument 
+  # structure of the sentence
   def gen_pasgraph(filename)
     get_focus if @focus == -1
 
@@ -163,6 +176,9 @@ class Enju
   end
 
 
+  # returns a hash of word indices to arrays of begining and ending indices.
+  # It maps from a word's index to the slice of the array that contains that
+  # word within a base noun chunk. 
   def get_bnc
     bnc = {}                      # bnc word index (word offset)
     beg, lidx, lcat = -1, -1, ''  # begining index, last index, last category
@@ -190,7 +206,8 @@ class Enju
     @bnc = bnc
   end
 
-
+  # Returns a sorted array of base noun chunks represented by pairs
+  # of offsets of beginning character and ending character.
   def get_bnc_so
     get_bnc if @bnc.empty?
 
@@ -202,19 +219,21 @@ class Enju
     bnc_so
   end
 
-
+  # Returns an array of head words of base noun chunks, represented as
+  # word index of each head word
   def get_bnc_head
     get_bnc if @bnc.empty?
 
     bnc_head = []                 # bnc head word index (word offset)
     beg, lidx, lcat = -1, -1, ''
     @bnc.each do |f, l|
-      bnc_head << l
+      bnc_head << l # push operator <<
     end
     bnc_head
   end
 
-
+  # if there is something with no argument, e.g. the head of a noun
+  # phrase...
   def get_head
     head = []                 # head word index (word offset)
     @pas.each do |p|
@@ -223,7 +242,7 @@ class Enju
     @head = head
   end
 
-
+  # returns a hash of heads to the noun phrases that they are the heads of.
   def get_bnp
     get_head if @head.empty?
 
@@ -240,6 +259,7 @@ class Enju
   end
 
 
+  # returns an array of...subject, predicate, and object indices.
   def get_rel
     get_focus if @focus == -1
 
@@ -249,12 +269,17 @@ class Enju
       s = path.shift
       o = path.pop
       p = path
-      rel << [s, p, o]
+      rel << [s, p, o] 
     end
     rel
   end
 
 
+  # returns the index of the "focus word."  For example, for the input
+  # 
+  # What devices are used to treat heart failure?
+  #
+  # ...it will return 2.
   def get_focus
     get_head if @head.empty?
     focus = @head[0]
@@ -279,16 +304,24 @@ class Enju
     @focus = focus
   end
 
-
+  # Returns a word based on the index into the PAS.
+  # For single words, as opposed to arrays--see below for arrays.
   def idx_get_word(i)
     @pas[i][:word]
   end
 
-
+  # From an array of word indices, return an array of words.
+  # For arrays, as opposed to single words--see above for single words.
+  # The parameter v is a path.  Random walk.
+  #
+  # Called by lodqa.rb.
   def idxv_get_word(v)
     v.collect {|x| @pas[x][:word]}
   end
 
+  # Input: a pair of beginning and ending indices.
+  # This basically does a sequential walk through the words that appear
+  # sequentially in the input sentence.
   def idxs_get_words(s)
     words = []
     unless s == nil
@@ -301,6 +334,12 @@ class Enju
 
 end
 
+# From the Ruby documentation:
+# __FILE__ is the magic variable that contains the name of the current file. 
+# $0 is the name of the file used to start the program. This check says “If 
+# this is the main file being used…” This allows a file to be used as a 
+# library, and not to execute code in that context, but if the file is 
+# being used as an executable, then execute that code.
 
 if __FILE__ == $0
   enju = Enju.new("http://bionlp.dbcls.jp/enju");
