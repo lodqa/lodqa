@@ -20,7 +20,7 @@ describe "Enju", "Tests of normal functionality" do
     e = Enju.new("http://bionlp.dbcls.jp/enju")
     e.parse("Show me devices used to treat heart failure.")
     # verify the results of the four method calls used in lodqa.rb
-    e.get_head.should eql ([2, 3, 7]) 
+    e.get_head.should eql ([3, 4, 8]) # note that get_head returns a 1-based index, not 0-based
     e.get_bnc[2].should eql ([2, 2]) # single-word chunk
     e.get_bnc[7].should eql ([6, 7]) # multi-word chunk
     e.get_rel.should eql ([2, [], 7]) # not sure about this one
@@ -108,33 +108,33 @@ describe "Enju", "Tests of normal functionality" do
   it "should handle a variety of types of focuses" do
     e = Enju.new("http://bionlp.dbcls.jp/enju")
     e.parse("What genes are not regulated by Tolle?")
-    e.get_head.should eql ([1, 6]) 
+    e.get_head.should eql ([2, 7]) 
     e.get_bnc[1].should eql ([1, 1]) 
     e.get_bnc[6].should eql ([6, 6])
     e.get_focus.should eql ([1]) 
     #e.get_rel.should eql ([2, [], 7]) # not sure about this one
     e = Enju.new("http://bionlp.dbcls.jp/enju")
     e.parse("Which genes are not regulated by Tolle?")
-    e.get_head.should eql ([1, 6]) 
+    e.get_head.should eql ([2, 7]) 
     e.get_bnc[1].should eql ([1, 1]) 
     e.get_bnc[6].should eql ([6, 6])
     e.get_focus.should eql ([1]) 
     e = Enju.new("http://bionlp.dbcls.jp/enju")
     e.parse("show me all genes which are not regulated by Tolle")
-    e.get_head.should eql ([3, 9]) 
+    e.get_head.should eql ([4, 10]) 
     e.get_bnc[3].should eql ([3, 3]) 
     e.get_bnc[6].should eql ([6, 6])
     e.get_focus.should eql ([3]) 
     e = Enju.new("http://bionlp.dbcls.jp/enju")
     e.parse("get all genes that are not regulated by Tolle")
-    e.get_head.should eql ([2, 8])
+    e.get_head.should eql ([3, 9])
     e.get_bnc[2].should eql ([2, 2])
     e.get_bnc[8].should eql ([8, 8])
     e.get_focus.should eql ([2])
     e = Enju.new("http://bionlp.dbcls.jp/enju")
     e.parse("devices used to treat heart failure") # no Q-word--major boundary
                                                    # condition for focus
-    e.get_head.should eql ([0, 5])
+    e.get_head.should eql ([1, 6])
     e.get_bnc[0].should eql ([0, 0])
     e.get_bnc[5].should eql ([4, 5])
   end
