@@ -1,5 +1,5 @@
-require_relative '../tuilookup'
 require 'spec_helper'
+require_relative '../tuilookup'
 
 # @valid_semantic_types_file = "semanticTypes.xml"
 # @valid_semantic_types_file = "../semanticTypes.xml"
