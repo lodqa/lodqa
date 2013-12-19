@@ -1,33 +1,19 @@
 require 'spec_helper'
 require_relative '../lodqa'
 
-# define various variables that you will pass to the methods that you're
-# testing up here so that you don't have to define them over and over 
-# again later.
-@good_enju_url = "http://bionlp.dbcls.jp/enju"
-@bad_enju_url = "http://bionlp.dbcls.jp/enjuuuuu"
-@good_ontofind_url = "http://ontofinder.dbcls.jp"
-@bad_ontofind_url = "http://ontofinderrrrrrr.dbcls.jp"
-@good_tui_xml_filename = 'semanticTypes.xml'
-@bad_tui_xml_filename = 'semanticTypesssss.xml'
-@empty_query = ''
-@null_query = nil
-@valid_query = ''
-@null_vid = nil
-@empty_vid = ''
-@good_vid = ''
-@invalid_vid = 'ABCD'
-   
+enjuURL = "http://bionlp.dbcls.jp/enju"
+ontofinderURL = "http://ontofinder.dbcls.jp"
+
 describe "LODQA", "error-handling in initialization method" do
   it "should handle bad enju url" do
     #qp = QueryParser.new
-    expect { QueryParser.new(@bad_enju_url, @good_ontofind_url, "semanticTypes.xml") }.to raise_error
+    expect { QueryParser.new("http://bionlp.dbcls.jp/enjuuuu", ontofinderURL, "semanticTypes.xml") }.to raise_error
   end
   it "should handle bad ontofind url" do
-    expect { QueryParser.new(@good_enju_url, @bad_ontofind_url, "semanticTypes.xml") }.to raise_error
+    expect { QueryParser.new(enjuURL, "http://ontofinder.dbcls.jpppp", "semanticTypes.xml") }.to raise_error
   end  
   it "should handle bad tuilookup xml file name" do
-    expect { QueryParser.new(@good_enju_url, @good_ontofind_url, @bad_tui_xml_filename) }.to raise_error
+    expect { QueryParser.new(enjuURL, ontofinderURL, "semanticTypes.xmllll") }.to raise_error
   end
 end
 
@@ -37,21 +23,38 @@ end
 
 describe "LODQA", "error-handling in parse method" do
   it "should handle empty query" do
-    qp = QueryParser.new(@good_enju_url, @good_ontofind_url, "semanticTypes.xml")
-    expect { qp.parse(@empty_query) }.to raise_error
+    qp = QueryParser.new(enjuURL, ontofinderURL, "semanticTypes.xml")
+    expect { qp.parse("") }.to raise_error
   end  
   it "should handle null query" do
-    qp = QueryParser.new(@good_enju_url, @good_ontofind_url, "semanticTypes.xml")
-    expect { qp.parse(@null_query) }.to raise_error
+    qp = QueryParser.new(enjuURL, ontofinderURL, "semanticTypes.xml")
+    nullQuery = nil
+    expect { qp.parse(nullQuery) }.to raise_error
   end
 end
 
 describe "LODQA", "error-handling in get_query_with_bncs method" do
-  it "should handle case where there are no base noun chunks"
+  it "should handle case where there are no base noun chunks" do
+  # no need to check any return values here--we're just checking to see
+  # that it doesn't crash in this case.
+  # note that we picked the methods to call by taking a subset of the
+  # ones that get called in lodqaWS.rb.
+    qp = QueryParser.new(enjuURL, ontofinderURL, "semanticTypes.xml")
+    qp.parse("big")
+    qp.get_psparql
+    qp.get_texps
+  end
 end
 
 describe "LODQA", "error-handling in get_bncs method" do
   it "should handle case where there are no base noun chunks"
+  # no need to check any return values here--we're just checking to see
+  # that it doesn't crash in this case.
+  # note that we picked the methods to call by taking a subset of the
+  # ones that get called in lodqaWS.rb.
+    qp = QueryParser.new(enjuURL, ontofinderURL, "semanticTypes.xml")
+    qp.parse("big")
+    qp.get_bncs
 end
 
 describe "LODQA", "error-handling in get_texps method" do
@@ -59,7 +62,11 @@ describe "LODQA", "error-handling in get_texps method" do
 end
 
 describe "LODQA", "error-handling in get_psparql method" do
-  it "should handle case where some of this has no content, but I'm not sure what yet"
+  it "should handle case where some of this has no content, but I'm not sure what yet" do
+    qp = QueryParser.new(enjuURL, ontofinderURL, "semanticTypes.xml")
+    qp.parse("What devices are used to treat heart failure?")
+    qp.get_psparql.should eql ("SELECT ?t1\nWHERE {\n   ?t1 [:isa] [devices] . \n   ?t2 [:isa] [heart failure] . \n   ?t1 [used to treat] ?t2 . \n}") 
+  end
 end
 
 describe "LODQA", "error-handling in get_sparql method" do
