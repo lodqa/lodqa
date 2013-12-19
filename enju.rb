@@ -180,6 +180,7 @@ class Enju
   # returns a hash of word indices to arrays of begining and ending indices.
   # It maps from a word's index to the slice of the array that contains that
   # word within a base noun chunk. 
+  # Assumption: last word of the BNC is the head.
   def get_bnc
     bnc = {}                      # bnc word index (word offset)
     beg, lidx, lcat = -1, -1, ''  # begining index, last index, last category
@@ -233,8 +234,16 @@ class Enju
     bnc_head
   end
 
-  # if there is something with no argument, e.g. the head of a noun
-  # phrase...
+  # This returns indices of heads of base noun phrases 
+  # AND the head of the verb phrase.
+  # So, for the input 
+  #
+  # Show me devices used to treat heart failure
+  #
+  # ...it will return
+  #
+  # 2, 3, 7
+
   def get_head
     head = []                 # head word index (word offset)
     @pas.each do |p|
@@ -260,7 +269,7 @@ class Enju
   end
 
 
-  # returns an array of...subject, predicate, and object indices.
+  # returns an array of...subject, shortest path, and object indices.
   def get_rel
     get_focus if @focus == -1
 

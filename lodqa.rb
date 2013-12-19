@@ -47,7 +47,7 @@ class QueryParser
     @pexps = Hash.new           # predicate expressions
 
     v = 'r1'
-    @rel.each do |s, p, o|
+    @rel.each do |s, p, o| # p is shortest path between the subj and the obj
       @pvars[p] = v
       v = v.next
 
