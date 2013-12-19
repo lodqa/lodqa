@@ -1,5 +1,5 @@
-require_relative '../enju'
 require 'spec_helper'
+require_relative '../enju'
 
 describe "Enju", "Tests of error-handling" do
   it "should handle a bad Enju url" do
