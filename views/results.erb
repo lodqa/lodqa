@@ -1,15 +1,3 @@
-<!DOCTYPE html>
-<html language="english">
-<head>
-<title>LODQA for BioPortal</title>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css" />
-<script type="text/javascript">
-  function addvid(vid) {
-    document.getElementById("vids").value += " " + vid;
-  }
-</script>
-
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script type="text/javascript" src="js/sparql.js"></script>
 <script type="text/javascript">
@@ -53,35 +41,19 @@
   }
 </script>
 
-</head>
-<body>
-<h1>LODQA for <%= @oname %>@BioPortal</h1>
+<h1>Prototype Demo (targeting <%= @oname %>)</h1>
 
-<table class="frame">
-<thead>
-<tr><td>powered by <a href="http://www-tsujii.is.s.u-tokyo.ac.jp/enju/">Enju</a>, a HPSG parser.</tr>
-</thead>
-<tr><th>Query</th></tr>
-</table>
+<h2>Query</h2>
 <div class="atext"><%= @atext %></div>
-<br/>
 
-<table class="frame">
-<tr><th>Semantic analysis (predicate-argument relation graph)</th></tr>
-</table>
-<img src="temporary/_pas_graph.png">
+<h2>Semantic analysis (predicate-argument relation graph)</h2>
+<!-- <img src="temporary/_pas_graph.png"> -->
+<%= @pasgraph %>
 
-
-<table class="frame">
-<tr><th>Pesudo SPARQL</th></tr>
-</table>
+<h2>Pesudo SPARQL</h2>
 <div class="frame"><pre><%= @psparql %></pre></div>
-<br/>
 
-<table class="frame">
-<tr><th>Term mapping</th></tr>
-<tr>
-<td>
+<h2>Term mapping</h2>
 <ul>
 <% @turis.each do |term, uris| %>
 <% unless @texps[term].nil? or @texps[term].empty? %>
@@ -94,21 +66,13 @@
 <% end %>
 <% end %>
 </ul>
-</td>
-</tr>
-</table>
 
-<table class="frame">
-<tr><th>SPARQL</th></tr>
-<tr>
-<td><textarea id="sparql" name="sparql" maxlength="1200" required="required" style="height:100px; width:100%"><%= @sparql %></textarea></td>
+<h2>SPARQL</h2>
+<textarea id="sparql" name="sparql" maxlength="1200" required="required" style="height:100px; width:100%"><%= @sparql %></textarea>
 </tr>
-</table>
 
-<table class="frame">
-<tr><th>Results</th></tr>
-<tr><td><button type="button" onclick="enquire()">get results</button><image id="loading" src="images/loader-vflff1Mjj.gif"></td></tr>
-</table>
+<h2>Results</h2>
+<button type="button" onclick="enquire()">get results</button><image id="loading" src="images/loader-vflff1Mjj.gif">
 <div class="frame" id="result"></div>
 
 <script type="text/javascript">

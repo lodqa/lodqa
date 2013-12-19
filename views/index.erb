@@ -1,101 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>LODQA - querying SPARQL endpoints using natural language</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-  <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css" />
-  <script type="text/javascript">
-    function setquery(query) {
-      document.getElementById("query").value = query;
-    }
-  </script>
-</head>
-<body>
-<div id="title">LODQA for BioPortal</div>
-<ul class="note">
-  <li>It is a prototype service for proof-of-concept.</li>
-  <ul>
-    <li>The service may not be stable.</li>
-  </ul>
-  <li>LODQA project will be conducted as a open source project.</li>
-  <ul>
-    <li>If you are interested in, your contribution in anyway is very welcome.</li>
-  </ul>
-</ul>
-<table class="frame">
-<thead>
-<tr><td>powered by <a href="http://www-tsujii.is.s.u-tokyo.ac.jp/enju/">Enju</a>, a HPSG parser.</tr>
-</thead>
+<div class="note">
+<p>LODQA (Linked Open Data Question Answering) is an open source project aiming at developing a system to generate SPARQL queries from natural language queries.</p>
 
+
+</div>
+
+<h1>Prototype Demo (targeting OMIM)</h1>
 <form name="query" method="post"
       action="/query"
       entype="multipart/form-data">
-<tr><th>Query</th></tr>
-<tr>
-<td><input id="query" name="query" type="text" size="80" required="required" placeholder="Enter a query." style="width:100%" /></td>
-</tr>
-
-<tr><td style="font-style:italic">Examples Queries:</td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">what genes are associated with kabuki syndrome?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">what sign is associated with kabuki syndrome?</a></td></tr>
-<!-- <tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What devices are used to treat heart failure?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What diseases are associated with nail clubbing?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">Which organs are located on the left abdominal cavity?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What disorders can a pacemaker be used to treat?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What surgical approaches are used to treat cholecystitis?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What are some causes of epilepsy?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">What diseases are associated with acquired clubbing of nails?</a></td></tr>
-<tr><td style="font-style:italic"><a onclick="setquery(this.innerHTML)">Which organs are located on the left side of the abdominal cavity?</a></td></tr>
- -->
-<script type="text/javascript">
-  function setontology(vid, oname) {
-    document.getElementById("vid").value = vid;
-    document.getElementById("oname").value = oname;
-  }
-</script>
-<tr><th>Target ontology</th></tr>
-<tr>
-<td><input id="vid" name="vid" type="text" size="80" required="required" placeholder="Enter an ontology ID (vid)." style="width:100%" /></td>
-<td><input id="oname" name="oname" type="text" size="80" required="required" hidden="hidden" style="width:100%" /></td>
-</tr>
-
-<tr><td>
-Example ontologies:
-<table class="list">
-<tr><th>vid</th>  <th>acronym</th>   <th>name</th><th></th></tr>
-<tr><td>1353</td> <td>SNOMEDCT</td>  <td>SNOMED Clinical Terms</td><td><a onclick="setontology('1353', 'SNOMEDCT')" title="click to set">Use it</a></td></tr>
-<tr><td>1348</td> <td>OMIM</td>      <td>Online Mendelian Inheritance in Man</td><td><a onclick="setontology('1348', 'OMIM')" title="click to set">Use it</a></td><td style="border-style:none">&larr;The current system is configured for it!</td></tr>
-<tr><td>1109</td> <td>SO</td>        <td>Sequence types and features</td><td><a onclick="setontology('1109', 'SO')" title="click to set">Use it</a></td></tr>
-<tr><td>1062</td> <td>PR</td>        <td>PRotein Ontology (PRO)</td><td><a onclick="setontology('1062', 'PR')" title="click to set">Use it</a></td></tr>
-<tr><td>1029</td> <td>IMR</td>       <td>Molecule role (INOH Protein name/family name ontology)</td><td><a onclick="setontology('1029', 'IMR')" title="click to set">Use it</a></td></tr>
-<tr><td>1006</td> <td>CL</td>        <td>Cell type</td><td><a onclick="setontology('1006', 'CL')" title="click to set">Use it</a></td></tr>
-<tr><td>1053</td> <td>FMA</td>       <td>Foundational Model of Anatomy</td><td><a onclick="setontology('1053', 'FMA')" title="click to set">Use it</a></td></tr>
-<tr><td>1070</td> <td>GO</td>        <td>Gene Ontology</td><td><a onclick="setontology('1070', 'GO')" title="click to set">Use it</a></td></tr>
-<tr><td>1009</td> <td>DOID</td>      <td>Human disease</td><td><a onclick="setontology('1009', 'DOID')" title="click to set">Use it</a></td></tr>
-<tr><td>1132</td> <td>NCBITaxon</td> <td>NCBI organismal classification</td><td><a onclick="setontology('1132', 'NCBITaxon')" title="click to set">Use it</a></td></tr>
-<tr><td>1040</td> <td>MI</td>        <td>Protein-protein interaction</td><td><a onclick="setontology('1040', 'MI')" title="click to set">Use it</a></td></tr>
-<tr><td>1012</td> <td>ECO</td>       <td>Evidence codes</td><td><a onclick="setontology('1012', 'ECO')" title="click to set">Use it</a></td></tr>
-<tr><td>1123</td> <td>OBI</td>       <td>Ontology for Biomedical Investigations</td><td><a onclick="setontology('1123', 'OBI')" title="click to set">Use it</a></td></tr>
-<tr><td>1032</td> <td>NCIt</td>      <td>NCI Thesaurus</td><td><a onclick="setontology('1032', 'NCIt')" title="click to set">Use it</a></td></tr>
-
-</table>
-</td></tr>
-
-
-<tr>
-<td><input type="submit" value="submit" style="height:50px; width:100%" /></td>
-</tr>
+<input id="vid" name="vid" type="text" size="80" required="required" placeholder="Enter an ontology ID (vid)." value="1348" style="display:none" />
+<input id="oname" name="oname" type="text" size="80" required="required" value="OMIM" style="display:none" />
+<input id="query" name="query" type="text" size="80" required="required" placeholder="Enter a natural language query." style="height:30px; width:80%" />
+<input type="submit" value="submit" style="height:30px; width:100px" />
 </form>
 
-<tfoot>
-<tr><td>&nbsp;</td></tr>
-<tr><td>Under development by <a href="http://dbcls.rois.ac.jp">DBCLS</a></td></tr>
-<tr><td><font color='red'>It is a prototype system for proof-of-concept, and should be treated as such.<br/>
-Your any suggestion is very welcome.<br/>
-Contact: jdkim (at) dbcls (dot) rois (dot) ac (dot) jp</font></td></tr>
-</tfoot>
+<script type="text/javascript">
+  function setquery(query) {
+    document.getElementById("query").value = query;
+  }
+</script>
 
-</table>
-
-</body>
-</html>
+<table>
+<tr><td rowspan="2">Example</td></tr>
+<tr><td>
+<ul>
+<li><a onclick="setquery(this.innerHTML)">what genes are associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what sign is associated with kabuki syndrome?</a>
+</ul>
+</td></tr>

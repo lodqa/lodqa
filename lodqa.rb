@@ -16,7 +16,6 @@ class QueryParser
   def parse (query)
     @query = query
     @enju.parse(query)
-    @enju.gen_pasgraph("_pas_graph.png")
 
     @head  = @enju.get_head
     # bnp    = @enju.get_bnp
@@ -55,6 +54,13 @@ class QueryParser
       words = @enju.idxv_get_word(p)
       @pexps[p] = (words.empty?)? '' : words.join(' ')
     end
+  end
+
+
+  # To generate the PAS graph.
+  # It needs to be run after the parsing is finished.
+  def get_pasgraph
+    @enju.gen_pasgraph
   end
 
 

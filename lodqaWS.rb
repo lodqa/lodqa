@@ -19,9 +19,22 @@ get '/' do
 	erb :index
 end
 
+get '/participants' do
+	erb :participants
+end
+
+get '/references' do
+	erb :references
+end
+
+get '/motivation' do
+	erb :motivation
+end
+
 post '/query' do
 	query = params['query']
 	qp.parse(query)
+	@pasgraph = qp.get_pasgraph		# @pasgraph will be embedded in :results
 
 	vid   = params['vid']
 	@oname = params['oname']	# ontology name (acronym)

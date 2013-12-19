@@ -151,7 +151,7 @@ class Enju
 
   # generates a graphics file that shows the predicate-argument 
   # structure of the sentence
-  def gen_pasgraph(filename)
+  def gen_pasgraph
     get_focus if @focus == -1
 
     g = GraphViz.new(:G, :type => :digraph)
@@ -172,7 +172,8 @@ class Enju
     ## add edges
     @edge.each {|pred, arg, type| g.add_edges(n[pred], n[arg], :label => type)}
 
-    g.output(:png => "public/temporary/#{filename}")
+    g.output(:svg => String)
+    # g.output(:png => "public/temporary/#{filename}")
   end
 
 
