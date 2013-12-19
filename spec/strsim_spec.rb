@@ -28,3 +28,35 @@ describe 'get_trigrams' do
 	end
 
 end
+
+describe "strsim", "Simple error-handling in overlap method" do
+end
+
+describe "strsim", "Simple error-handling in Jaccard similarity coefficient calculation method" do
+  it 'should handle null input'
+  it 'should handle empty input'
+end
+
+describe "strsim", "Basic functionality test of overlap method" do
+  it 'should do the right thing with 100% overlap'
+  it 'should do the right thing with 0% overlap'
+  it 'should do the right thing with 50% overlap'
+end
+
+describe "strsim", "Basic functionality test of Jaccard similarity coefficient calculation method" do
+  it 'should do the right thing with 100% similarity' do 
+    string1 = "AAAAAA"
+    string2 = "AAAAAA"
+    Strsim.jaccard(string1, string2).should eql (1.0)
+  end  
+  it 'should do the right thing with 0% similarity' do
+    string1 = "A"
+    string2 = "B"
+    Strsim.jaccard(string1, string2).should eql (0.0)
+  end 
+  it 'should do the right thing with similarity between 0 and 1.0' do
+    string1 = "ABCD"
+    string2 = "ABXY"
+    Strsim.jaccard(string1, string2).should be_within(0.01).of(0.333)
+  end
+end
