@@ -236,13 +236,17 @@ class Enju
 
   # This returns indices of heads of base noun phrases 
   # AND the head of the verb phrase.
+  #
+  # NOTE: This is a 1-based index, not a zero-based index, effectively--
+  # Enju adds an additional line for the root.
+  #
   # So, for the input 
   #
   # Show me devices used to treat heart failure
   #
   # ...it will return
   #
-  # 2, 3, 7
+  # 3, 4, 8
 
   def get_head
     head = []                 # head word index (word offset)
