@@ -1,5 +1,5 @@
-require_relative '../lodqa'
 require 'spec_helper'
+require_relative '../lodqa'
 
 # define various variables that you will pass to the methods that you're
 # testing up here so that you don't have to define them over and over 
