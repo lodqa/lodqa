@@ -253,6 +253,7 @@ class Enju
   end
 
   # returns a hash of heads to the noun phrases that they are the heads of.
+  # Note that these are word (token) offsets, not character offsets.
   def get_bnp
     get_head if @head.empty?
 
