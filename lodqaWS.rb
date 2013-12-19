@@ -34,6 +34,7 @@ end
 post '/query' do
 	query = params['query']
 	qp.parse(query)
+	@pasgraph = qp.get_pasgraph		# @pasgraph will be embedded in :results
 
 	vid   = params['vid']
 	@oname = params['oname']	# ontology name (acronym)
