@@ -12,8 +12,8 @@ enju_url       = config['enjuURL']
 ontofinder_url = config['ontofinderURL']
 query          = config['testQuery']
 
-## initialize query parser
-qp = QueryParser.new(enju_url, ontofinder_url, "semanticTypes.xml")
+## initialize sparql generator
+g = SparqlGenerator.new(enju_url, ontofinder_url, "semanticTypes.xml")
 
 get '/' do
 	erb :index
@@ -32,20 +32,20 @@ get '/motivation' do
 end
 
 post '/query' do
-	query = params['query']
-	qp.parse(query)
-	@pasgraph = qp.get_pasgraph		# @pasgraph will be embedded in :results
+	query     = params['query']
+	oid       = params['oid']
+	@oacronym = params['oacronym']	# ontology name (acronym)
 
-	vid   = params['vid']
-	@oname = params['oname']	# ontology name (acronym)
-	@endpoint = endpoint
-	@apikey   = apikey
-	@psparql  = qp.get_psparql
-	@texps    = qp.get_texps
-	@turis    = qp.find_term_uris(vid)
-	@sparql   = qp.get_sparql(vid, @oname)
-	@atext    = qp.get_query_with_bncs
-	@terms    = qp.get_bncs
+	@endpoint  = endpoint
+	@apikey    = apikey
+	
+	p          = g.nlq2sparql(query, oid, @oacronym)
+	@pasgraph  = p.pasgraph		# @pasgraph will be embedded in :results
+	@psparql   = p.psparql
+	@term_exps = p.term_exps
+	@term_uris = p.term_uris
+	@sparql    = p.sparql
+	@atext     = p.query_annotation
 	#sparql.gsub!('<', '&lt;')
 	erb :results
 end

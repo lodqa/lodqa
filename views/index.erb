@@ -8,8 +8,8 @@
 <form name="query" method="post"
       action="/query"
       entype="multipart/form-data">
-<input id="vid" name="vid" type="text" size="80" required="required" placeholder="Enter an ontology ID (vid)." value="1348" style="display:none" />
-<input id="oname" name="oname" type="text" size="80" required="required" value="OMIM" style="display:none" />
+<input id="oid" name="oid" type="text" size="80" required="required" placeholder="Enter an ontology ID (vid)." value="1348" style="display:none" />
+<input id="oacronym" name="oacronym" type="text" size="80" required="required" value="OMIM" style="display:none" />
 <input id="query" name="query" type="text" size="80" required="required" placeholder="Enter a natural language query." style="height:30px; width:80%" />
 <input type="submit" value="submit" style="height:30px; width:100px" />
 </form>
@@ -26,5 +26,6 @@
 <ul>
 <li><a onclick="setquery(this.innerHTML)">what genes are associated with kabuki syndrome?</a>
 <li><a onclick="setquery(this.innerHTML)">what sign is associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what genes are associated with alzheimer disease?</a>
 </ul>
 </td></tr>

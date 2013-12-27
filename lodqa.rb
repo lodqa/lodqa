@@ -1,203 +1,183 @@
 #!/usr/bin/env ruby
 #encoding: UTF-8
-require './enju'
-require './tuilookup'
+require_relative './enjuparse'
+require_relative './tuilookup'
 require 'net/http'
 require 'json'
+require 'uri'
 
-class QueryParser
+
+class SparqlGenerator
   def initialize (enju_url, ontofinder_url, tui_xml_filename)
-    @enju = Enju.new(enju_url)
-    @ontofinder = ontofinder_url
-    @tuis = TUILookup.new(tui_xml_filename)
-  end
-
-  # gsparql: generalized sparql
-  def parse (query)
-    @query = query
-    @enju.parse(query)
-
-    @head  = @enju.get_head
-    # bnp    = @enju.get_bnp
-    bnc    = @enju.get_bnc
-    @rel   = @enju.get_rel
-    @focus = @enju.get_focus
-
-    ###### psparql = Sparql.pseudo(head, bnc, rel, focus)
-    ## delete 'me', in, e.g. "find me" or "show me"
-    @head.delete_if {|h| @enju.idx_get_word(h) == 'me'}
-    @rel.delete_if {|s, p, o| (@enju.idx_get_word(s) == 'me') or (@enju.idx_get_word(o) == 'me')}
-
-    ## terms
-    @tvars = Hash.new            # term variables
-    @texps = Hash.new            # term expressions
-
-    v = 't1'
-    @head.each do |h|
-      @tvars[h] = v
-      v = v.next
-
-      words = @enju.idxs_get_words(bnc[h])
-      # words.delete_if {|w| w == 'a' || w == 'the' || w == 'some'} # stopword deletion
-      @texps[h] = (words.empty?)? '' : words.join(' ')
-    end
-
-    ## preds
-    @pvars = Hash.new           # predicate variables
-    @pexps = Hash.new           # predicate expressions
-
-    v = 'r1'
-    @rel.each do |s, p, o| # p is shortest path between the subj and the obj
-      @pvars[p] = v
-      v = v.next
-
-      words = @enju.idxv_get_word(p)
-      @pexps[p] = (words.empty?)? '' : words.join(' ')
+    @enju_accessor       = RestClient::Resource.new enju_url
+    @ontofinder_accessor = RestClient::Resource.new ontofinder_url
+    begin
+      @tuis = TUILookup.new(tui_xml_filename)
+    rescue
+      raise
     end
   end
 
+  def nlq2sparql (query, oid, oacronym)
+    sparql = QueryParse.new(@enju_accessor, @ontofinder_accessor, @tuis, query, oid, oacronym)
+  end
+end
 
-  # To generate the PAS graph.
-  # It needs to be run after the parsing is finished.
-  def get_pasgraph
-    @enju.gen_pasgraph
+
+class QueryParse
+  attr_reader :query_annotation, :pasgraph, :psparql, :term_exps, :pred_exps, :term_uris, :sparql
+
+  def initialize (enju_accessor, ontofinder_accessor, tuis, query, oid, oacronym)
+    parse = EnjuParse.new(enju_accessor, query)
+
+    @query_annotation = get_query_annotation(query, parse.bnc_span_caret_index.values)
+    @pasgraph = parse.graph_rendering
+
+    term_vars, @term_exps = get_term_instantiation(parse)
+    pred_vars, @pred_exps = get_pred_instantiation(parse)
+
+    @psparql   = get_psparql(term_vars, term_exps, pred_vars, pred_exps, parse)
+    @term_uris = get_term_uris(ontofinder_accessor, parse.heads, term_exps, oid)
+    @sparql    = get_sparql(term_vars, term_exps, term_uris, pred_vars, pred_exps, parse, tuis, oid, oacronym)
   end
 
 
-  def get_query_with_bncs
-    bnc_so = @enju.get_bnc_so
+  def get_query_annotation (query, bnc_spans)
+    so = bnc_spans.collect{|c| c.push("BNC")}
 
-    so = []
-    bnc_so.each {|c| so << c.push("BNC")}
-
-    atext, last = '', 0
+    aquery, last = '', 0
     so.each do |cbeg, cend, label|
-      atext += @query[last...cbeg]
-      atext += "<span class='#{label}'>"
-      atext += @query[cbeg...cend]
-      atext += '</span>'
+      aquery += query[last...cbeg]
+      aquery += "<span class='#{label}'>"
+      aquery += query[cbeg...cend]
+      aquery += '</span>'
       last = cend
     end
-    atext += @query[last..-1]
+    aquery += query[last..-1]
   end
 
 
-  def get_bncs
-    bnc_so = @enju.get_bnc_so
+  def get_term_instantiation (parse)
+    if parse.heads
+      term_vars = Hash.new            # term variables
+      term_exps = Hash.new            # term expressions
 
-    terms = Array.new
-    bnc_so.each do |cbeg, cend|
-      terms.push @query[cbeg...cend]
+      v = 't0'
+      parse.heads.each do |h|
+        v = v.next
+        term_vars[h] = v
+        term_span    = parse.bnc_span_word_index[h]
+        term_exps[h] = (term_span[0] .. term_span[1]).collect{|i| parse.tparses[i][:word]}.join(' ')
+      end
+
+      return term_vars, term_exps
+    else
+      return nil, nil
     end
-
-    terms
   end
 
 
-  def get_texps
-    @texps
+  def get_pred_instantiation (parse)
+    if parse.heads
+      pred_vars = Hash.new            # pred variables
+      pred_exps = Hash.new            # pred expressions
+
+      v = 'p0'
+      parse.rels.each do |s, p, o|
+        v = v.next
+        pred_vars[p] = v
+        pred_exps[p] = p.collect{|i| parse.tparses[i][:word]}.join(' ')
+      end
+
+      return pred_vars, pred_exps
+    else
+      return nil, nil
+    end
   end
 
 
   ## pseudo sparql
-  def get_psparql
-    psparql = "SELECT ?#{@tvars[@focus]}\nWHERE {\n"
-    @head.each {|h| psparql += "   ?#{@tvars[h]} [:isa] [#{@texps[h]}] . \n"} # instantiation
-    @rel.each {|s, p, o| psparql += "   ?#{@tvars[s]} [#{@pexps[p]}] ?#{@tvars[o]} . \n"} # relation
-    psparql += "}"
-    @psparql = psparql
-  end
-
-
-  # sparql
-  def get_sparql(vid, acronym)
-    find_term_uris(vid) unless defined? @turis
-    @turis[@focus] = @tuis.lookup(@texps[@focus])
-
-    sparql = <<SPARQL
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT DISTINCT ?#{@tvars[@focus]} ?l1
-WHERE {
-  GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {
-SPARQL
-
-    v = 'd0'
-
-    # instantiation
-    @head.each do |h|
-      next if @turis[h].empty?
-      v.next!
-
-      if @turis[h].length > 1
-        if (h == @focus)
-          pieces = @turis[h].map {|url| %Q(    <http://bioportal.bioontology.org/ontologies/umls/tui>  "#{url}"^^xsd:string})}
-        else
-          pieces = @turis[h].map {|url| "    {?#{@tvars[h]} ?#{v.next!} <#{url}>}"}
-        end
-        sparql += "\n" + pieces.join("\n    UNION\n") + "\n\n"
-      else
-        if (h == @focus)
-          sparql += %Q(    ?#{@tvars[h]} <http://bioportal.bioontology.org/ontologies/umls/tui> "#{@turis[h].first}"^^xsd:string .\n)
-        else
-          sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
-        end
-      end
+  def get_psparql (term_vars, term_exps, pred_vars, pred_exps, parse)
+    psparql    = "SELECT ?#{term_vars[parse.focus]}\nWHERE {\n"
+    parse.heads.each do |h|
+      psparql += "   ?#{term_vars[h]} [:isa] [#{term_exps[h]}] . \n"
     end
-
-    @rel.each {|s, p, o| sparql += "    ?#{@tvars[s]} ?#{@pvars[p]} ?#{@tvars[o]} .\n"} # relation
-
-    sparql += <<-SPARQL
-
-    ?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1
-  }
-}
-SPARQL
-
+    parse.rels.each do |s, p, o|
+      psparql += "   ?#{term_vars[s]} [#{pred_exps[p]}] ?#{term_vars[o]} . \n"
+    end
+    psparql   += "}"
   end
 
 
-  # sparql
-#   def get_sparql(vid, acronym)
-#     find_term_uris(vid) unless defined? @turis
-
-#     sparql = <<SPARQL
-# SELECT ?#{@tvars[@focus]} ?l1
-# WHERE {
-#   GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {
-# SPARQL
-
-#     v = 'd0'
-
-#     # instantiation
-#     @head.each do |h|
-#       next if @turis[h].empty?
-      
-#       sparql += "    ?#{@tvars[h]} ?#{v.next!} <#{@turis[h].first}> .\n"
-#     end
-
-#     @rel.each {|s, p, o| sparql += "    ?#{@tvars[s]} ?#{@pvars[p]} ?#{@tvars[o]} .\n"} # relation
-
-#     sparql += <<-SPARQL
-#     ?#{@tvars[@focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1 .
-#   }
-# }
-# SPARQL
-
-#   end
-
-  def find_term_uris(vid)
-    terms = Array.new
-    @head.each {|h| terms.push @texps[h]}
-    rsc = "#{@ontofinder}/mappings.json"
-    RestClient.post rsc, {:data => terms.join("\n"), :vids => vid.to_s}, :content_type => 'multipart/form-data', :accept => :json do |response, request, result|
+  def get_term_uris(ontofinder_accessor, heads, term_exps, vid)
+    terms = heads.collect{|i| term_exps[i]}
+    response = ontofinder_accessor.post :data => terms.join("\n"), :vids => vid.to_s, :content_type => 'multipart/form-data', :accept => :json
+    term_uris =
       case response.code
       when 200
         uris = JSON.parse(response)
-        @turis = Hash[@head.zip(uris)]       # term URIs
+        Hash[heads.zip(uris)]
       else
-        @turis = nil
+        nil
       end
+  end
+
+
+  # to generate sparql (using UNION; when VALIUES constructs are not allowed)
+  def get_sparql(term_vars, term_exps, term_uris, pred_vars, pred_exps, parse, tuis, vid, acronym)
+    term_uris[parse.focus] = tuis.lookup(term_exps[parse.focus])
+
+    sparql  = "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n"
+    sparql += "SELECT DISTINCT ?#{term_vars[parse.focus]} ?l1\n"
+    sparql += "WHERE {\n"
+    sparql += "  GRAPH <http://bioportal.bioontology.org/ontologies/#{acronym}> {\n"
+
+    combinations = []
+    parse.heads.each do |h|
+
+      if combinations.empty?
+        combinations = term_uris[h].collect{|u| [u]}
+      else
+        combinations_new = []
+        if term_uris[h].empty?
+          combinations_new << (c << nil)
+        else
+          combinations.each do |c|
+            term_uris[h].each do |u|
+              combinations_new << (c + [u])
+            end
+          end
+        end
+        combinations = combinations_new
+      end
+
     end
+
+    v = 'd0'
+    groups = [];
+    combinations.each do |c|
+      group = ''
+      parse.heads.each_with_index do |h, i|
+        if (h == parse.focus)
+          group += %Q(    ?#{term_vars[h]} <http://bioportal.bioontology.org/ontologies/umls/tui> "#{c[i]}"^^xsd:string .\n)
+        else
+          v = v.next
+          group += %Q(    ?#{term_vars[h]} ?#{v} <#{c[i]}> .\n)
+        end
+      end
+      parse.rels.each {|s, p, o| group += %Q(    ?#{term_vars[s]} ?#{pred_vars[p]} ?#{term_vars[o]} .\n)}
+      group += %Q(    ?#{term_vars[parse.focus]} <http://www.w3.org/2004/02/skos/core#prefLabel> ?l1.\n)
+
+      groups << group
+    end
+    if groups.length == 1
+      sparql += groups.first
+    else
+      sparql += "    {\n" + groups.join("    }\n    UNION\n    {\n") + "    }\n"
+    end
+
+    sparql += %Q(  }\n)
+    sparql += %Q(})
   end
 
 end
@@ -211,7 +191,9 @@ if __FILE__ == $0
   endpoint_url   = config['endpointURL']
   enju_url       = config['enjuURL']
   ontofinder_url = config['ontofinderURL']
-  query          = config['testQuery']
+  query          = config['Query']
+  oid            = config['ontologyId']
+  oacronym       = config['ontologyAcronym']
 
   ## query from the command line
   unless ARGV.empty?
@@ -220,13 +202,23 @@ if __FILE__ == $0
     acronym = ARGV[2]
   end
 
-  qp = QueryParser.new(enju_url, ontofinder_url, "semanticTypes.xml")
-  qp.parse(query)
-  psparql = qp.get_psparql
-  puts psparql
+  g = SparqlGenerator.new(enju_url, ontofinder_url, "semanticTypes.xml")
+  p = g.nlq2sparql(query, oid, oacronym)
+  p p.query_annotation
+  puts "-----"
+  puts p.psparql
+  puts "-----"
+  p p.term_uris
+  puts "-----"
+  puts p.sparql
+  puts "-----"
 
-  sparql  = qp.get_sparql(vid, acronym)
-  puts sparql
+  # p.parse(query)
+  # psparql = qp.get_psparql
+  # puts psparql
+
+  # sparql  = qp.get_sparql(vid, acronym)
+  # puts sparql
 
   ## result
   # require 'sparql/client'

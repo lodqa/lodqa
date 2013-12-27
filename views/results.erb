@@ -55,9 +55,9 @@
 
 <h2>Term mapping</h2>
 <ul>
-<% @turis.each do |term, uris| %>
-<% unless @texps[term].nil? or @texps[term].empty? %>
-<li><%= @texps[term] %></li>
+<% @term_uris.each do |i, uris| %>
+<% unless @term_exps[i].nil? or @term_exps[i].empty? %>
+<li><%= @term_exps[i] %></li>
   <ul>
     <% uris.each do |uri| %>
       <li><a href="<%= uri %>"><%= uri %></a></uri>
@@ -72,8 +72,8 @@
 </tr>
 
 <h2>Results</h2>
-<button type="button" onclick="enquire()">get results</button><image id="loading" src="images/loader-vflff1Mjj.gif">
-<div class="frame" id="result"></div>
+<button type="button" onclick="enquire()">Send query to SPARQL endpoint</button><image id="loading" src="images/loader-vflff1Mjj.gif"> 
+<div class="frame" id="result">Availability is subject to change according to the state of the SPARQL endpoint.</div>
 
 <script type="text/javascript">
 $(function(){
