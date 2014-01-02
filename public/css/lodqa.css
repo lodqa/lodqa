@@ -81,8 +81,6 @@ h3 {
     font-size: medium;
 }
 
-
-
 .note {
     display: block;
     width: 40em;
@@ -93,6 +91,11 @@ h3 {
     font-size: medium;
     color:#444477;
     /*font-style:italic;*/
+}
+
+.attention {
+    font-style:italic;
+    color:red;
 }
 
 #menu {

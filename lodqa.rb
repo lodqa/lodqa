@@ -139,10 +139,10 @@ class QueryParse
         combinations = term_uris[h].collect{|u| [u]}
       else
         combinations_new = []
-        if term_uris[h].empty?
-          combinations_new << (c << nil)
-        else
-          combinations.each do |c|
+        combinations.each do |c|
+          if term_uris[h].empty?
+            combinations_new << (c + [nil])
+          else
             term_uris[h].each do |u|
               combinations_new << (c + [u])
             end
@@ -158,11 +158,13 @@ class QueryParse
     combinations.each do |c|
       group = ''
       parse.heads.each_with_index do |h, i|
-        if (h == parse.focus)
-          group += %Q(    ?#{term_vars[h]} <http://bioportal.bioontology.org/ontologies/umls/tui> "#{c[i]}"^^xsd:string .\n)
-        else
-          v = v.next
-          group += %Q(    ?#{term_vars[h]} ?#{v} <#{c[i]}> .\n)
+        unless c[i] == nil
+          if (h == parse.focus)
+            group += %Q(    ?#{term_vars[h]} <http://bioportal.bioontology.org/ontologies/umls/tui> "#{c[i]}"^^xsd:string .\n)
+          else
+            v = v.next
+            group += %Q(    ?#{term_vars[h]} ?#{v} <#{c[i]}> .\n)
+          end
         end
       end
       parse.rels.each {|s, p, o| group += %Q(    ?#{term_vars[s]} ?#{pred_vars[p]} ?#{term_vars[o]} .\n)}

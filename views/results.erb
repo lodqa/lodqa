@@ -59,8 +59,12 @@
 <% unless @term_exps[i].nil? or @term_exps[i].empty? %>
 <li><%= @term_exps[i] %></li>
   <ul>
-    <% uris.each do |uri| %>
-      <li><a href="<%= uri %>"><%= uri %></a></uri>
+    <% if uris.empty? %>
+      <li class = "attention">Could not find the URI. Try with a different spelling.</li>
+    <% else %>
+      <% uris.each do |uri| %>
+        <li><a href="<%= uri %>"><%= uri %></a></uri></li>
+      <% end %>
     <% end %>
   </ul>
 <% end %>
