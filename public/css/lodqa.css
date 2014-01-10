@@ -17,11 +17,27 @@ a:hover {color:#222288}
 }
 
 #title {
-    display: block;
     margin-bottom: 5px;
     padding: 5px;
     box-shadow: 4px 4px 4px #888888;
     background-color: #ffffff;
+}
+
+#menu {
+    position: absolute;
+    width: 80px;
+    padding: 5px;
+    box-shadow: 4px 4px 4px #888888;
+    background-color: #ffffff
+}
+
+#main {
+    position: absolute;
+    left: 100px;
+    width: 695px;
+    padding: 5px;
+    box-shadow: 4px 4px 4px #888888;
+    background-color: #ffffff
 }
 
 #logo {
@@ -29,10 +45,61 @@ a:hover {color:#222288}
 }
 
 #slogan {
-    font-size: large;
+    font-size: medium;
     font-style: italic;
-    color: #5555ff;
+    color: #8888ff;
 }
+
+.item {
+    display: block;
+    font-size: medium;
+}
+
+.note {
+    width: 40em;
+    padding: 5px;
+    margin-bottom: 20px;
+
+    font-family: "Times New Roman", Times, sans-serif;
+    font-size: medium;
+    color:#444477;
+    font-style:italic;
+    line-height: 140%;
+}
+
+.news {
+    border-style:solid;
+    border-color:#ddddbb;
+    border-width: 1px;
+    padding-bottom: 5px;
+    margin-bottom: 30px;
+    width: 40em;
+    font-family: "Times New Roman", Times, sans-serif;
+    background-color: #FFFFee;
+}
+
+
+.news:before {
+    position:relative;
+    top: -10px;
+    left: 5px;
+    padding: 2px;
+    content: "News";
+    color: #7777aa;
+    background-color: #ffffff;
+}
+
+.news ul {
+    margin: 0px;
+}
+
+
+.attention {
+    font-style:italic;
+    color:red;
+}
+
+
 
 h1 {
     width:30em;
@@ -81,46 +148,7 @@ h3 {
     font-size: medium;
 }
 
-.note {
-    display: block;
-    width: 40em;
-    margin: 10px 0px;
-    padding: 5px;
 
-    font-family: "Times New Roman", Times, sans-serif;
-    font-size: medium;
-    color:#444477;
-    /*font-style:italic;*/
-}
-
-.attention {
-    font-style:italic;
-    color:red;
-}
-
-#menu {
-    display: block;
-    position: absolute;
-    width: 80px;
-    padding: 5px;
-    box-shadow: 4px 4px 4px #888888;
-    background-color: #ffffff
-}
-
-.item {
-    display: block;
-    font-size: medium;
-}
-
-#content {
-    display: block;
-    position: absolute;
-    left: 100px;
-    width: 695px;
-    padding: 5px;
-    box-shadow: 4px 4px 4px #888888;
-    background-color: #ffffff
-}
 
 
 #buttons {text-align:right; margin:5px; padding:5px}
