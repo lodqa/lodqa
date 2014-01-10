@@ -177,12 +177,14 @@ class EnjuParse
   # returns an array of...subject, shortest path, and object indices.
   def get_rels
     @rels = []
-    for i in 0..(@heads.length - 2)
-      path = @graph.shortest_path(@heads[i], @heads[i+1])
-      s = path.shift
-      o = path.pop
-      p = path
-      @rels << [s, p, o] 
+    @heads.each_with_index do |h1, i|
+      @heads[i+1..-1].each do |h2|
+        puts "#{h1}, #{h2}"
+        path = @graph.shortest_path(h1, h2)
+        s = path.shift
+        o = path.pop
+        @rels << [s, path, o] if (path & @heads).empty?
+      end
     end
   end
 
