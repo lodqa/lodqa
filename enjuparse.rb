@@ -6,10 +6,7 @@
 Encoding.default_external="UTF-8"
 Encoding.default_internal="UTF-8"
 require 'rest-client'
-require 'htmlentities'
 require 'graphviz'
-require 'diff/lcs'
-require 'diff/lcs/string'
 require_relative './graph'
 
 # An instance of this class holds the parsing result
@@ -179,7 +176,6 @@ class EnjuParse
     @rels = []
     @heads.each_with_index do |h1, i|
       @heads[i+1..-1].each do |h2|
-        puts "#{h1}, #{h2}"
         path = @graph.shortest_path(h1, h2)
         s = path.shift
         o = path.pop
