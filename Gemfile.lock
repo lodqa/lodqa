@@ -58,6 +58,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  daemons
   diff-lcs
   erubis
   factory_girl (~> 4.0)
