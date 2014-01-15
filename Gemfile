@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'sinatra'
 gem 'thin'
 gem 'erubis'
+gem 'daemons'
 
 gem 'rest-client'
 gem 'htmlentities'
