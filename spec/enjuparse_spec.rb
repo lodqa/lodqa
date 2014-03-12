@@ -1,6 +1,5 @@
 require 'spec_helper'
 require_relative '../enjuparse'
-require_relative '../enju'
 
 describe "EnjuParse" do
   context "for passing of invaid enju accessor" do

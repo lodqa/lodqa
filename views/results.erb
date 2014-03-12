@@ -50,24 +50,22 @@
 <!-- <img src="temporary/_pas_graph.png"> -->
 <%= @pasgraph %>
 
-<h2>Pseudo SPARQL</h2>
+<h2>Psuedo SPARQL</h2>
 <div class="frame"><pre><%= @psparql %></pre></div>
 
 <h2>Term mapping</h2>
 <ul>
-<% @term_uris.each do |i, uris| %>
-<% unless @term_exps[i].nil? or @term_exps[i].empty? %>
-<li><%= @term_exps[i] %></li>
+<% @term_uris.each_key do |t| %>
+<li><%= t %></li>
   <ul>
-    <% if uris.empty? %>
+    <% if @term_uris[t].empty? %>
       <li class = "attention">Could not find the URI. Try with a different spelling.</li>
     <% else %>
-      <% uris.each do |uri| %>
+      <% @term_uris[t].each do |uri| %>
         <li><a href="<%= uri %>"><%= uri %></a></uri></li>
       <% end %>
     <% end %>
   </ul>
-<% end %>
 <% end %>
 </ul>
 

@@ -1,7 +1,7 @@
 require 'spec_helper'
-require_relative '../lodqaWS'
+require_relative '../lodqa-ws'
 
-describe 'lodqaWS' do
+describe 'lodqa-ws' do
 	def app
 		Sinatra::Application
 	end
