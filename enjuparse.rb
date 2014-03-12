@@ -9,34 +9,46 @@ require 'rest-client'
 require 'graphviz'
 require_relative './graph'
 
-# An instance of this class holds the parsing result
-# of a natural language query by Enju
-# tparses : array of token parses
-# root    : the index of the root word
-# focus   : the index of the focus word
-# heads   : the index of the noun chunk heads
-# bnc_span_word_index  : word span : (offset of the beginning word, off set of the ending word)
-# bnc_span_caret_index : caret span : (offset of the caret before the first character, offset of the caret after the last character)
+# An instance of this class holds the parsing result of a natural language query as anlyzed by Enju.
 class EnjuParse
-  attr_reader :tparses, :root, :focus, :heads, :bnc_span_word_index, :bnc_span_caret_index, :rels, :graph, :graph_rendering
+  # The array of token parses
+  attr_reader :tparses
+  # The index of the root word
+  attr_reader :root
+  # The index of the focus word, i.e., the one modified by a _wh_-modifier
+  attr_reader :focus
+  # The index of the noun chunk heads
+  attr_reader :heads
+  # Token-index of base noun chunks: head -> pair, (offset of the beginning token, offset of the ending token)
+  attr_reader :token_index_bncs
+  # Caret-index of base noun chunks: head -> pair, (offset of the caret before the first character, offset of the caret after the last character)
+  attr_reader :caret_index_bncs
+  # Shortest paths between two heads
+  attr_reader :rels
+  # A graphical rendering of the graph of predicate-argument relations
+  attr_reader :graph_rendering
 
-  # noun-chunk elements
-  # Note that PRP is removed here. For dialog analysis however PRP would need to be included.
+  # Noun-chunk elements
+  #
+  # (Note that PRP is not included. For dialog analysis however PRP (personal pronoun) would need to be included.)
   NC_CAT      = ["NN", "NNP", "CD", "FW", "JJ"]
+
+  # Noun-chunk elements that may appear at the head position
   NC_HEAD_CAT = ["NN", "NNP", "CD", "FW"]
 
-  # wh-
-  WH_CAT = ["WP", "WDT"]
+  # wh-pronoun and wh-determiner
+  WH_CAT      = ["WP", "WDT"]
 
   # This initializer takes an instance of 
   # RestClient::Resource to connect to an Enju cgi server
-  # and a plain-English sentence as input.
-  # Populates a bunch of instance variables that represent various aspects
+  # and a plain-English sentence as input,
+  # creates an instance of EnjuParse, and
+  # populates various attributes that represent various aspects
   # of the PAS and syntactic structure of the sentence.
-  def initialize (enju_accessor, sentence)
+  def initialize (sentence, enju_accessor)
     @sentence = sentence
 
-    get_tparses(enju_accessor, sentence)
+    get_tparses(sentence, enju_accessor)
     get_heads
     get_bnc_span_index
     get_focus
@@ -44,8 +56,10 @@ class EnjuParse
     get_rels
   end
 
+  private
+
   # It populates the instance variables, tparses and root
-  def get_tparses (enju_accessor, sentence)
+  def get_tparses (sentence, enju_accessor)
     raise "An instance of RestClient::Resource has to be passed for the first argument." unless enju_accessor.instance_of? RestClient::Resource
 
     response = enju_accessor.get :params => {:sentence=>@sentence, :format=>'conll'}
@@ -108,8 +122,8 @@ class EnjuParse
   # word within a base noun chunk. 
   # Assumption: last word of the BNC is the head.
   def get_bnc_span_index
-    @bnc_span_word_index = {}       
-    @bnc_span_caret_index = {}      
+    @token_index_bncs = {}       
+    @caret_index_bncs = {}      
     beg, lidx, lcat = -1, -1, ''    ## begining word index, last word index, last category
     @tparses.each do |p|
       if NC_CAT.include?(p[:cat])
@@ -117,8 +131,8 @@ class EnjuParse
       else
         if beg >= 0
           if NC_HEAD_CAT.include?(lcat) and @heads.include?(lidx)
-            @bnc_span_word_index[lidx]  = [beg, lidx]
-            @bnc_span_caret_index[lidx] = [@tparses[beg][:beg], @tparses[lidx][:end]]
+            @token_index_bncs[lidx]  = [beg, lidx]
+            @caret_index_bncs[lidx] = [@tparses[beg][:beg], @tparses[lidx][:end]]
           end
           beg = -1
         end
@@ -128,8 +142,8 @@ class EnjuParse
     end
 
     if (beg >= 0) and NC_HEAD_CAT.include?(lcat) and @heads.include?(lidx)
-        @bnc_span_word_index[lidx]  = [beg, lidx]
-        @bnc_span_caret_index[lidx] = [@tparses[beg][:beg], @tparses[lidx][:end]]
+        @token_index_bncs[lidx]  = [beg, lidx]
+        @caret_index_bncs[lidx] = [@tparses[beg][:beg], @tparses[lidx][:end]]
     end
   end
 
@@ -137,15 +151,6 @@ class EnjuParse
   # generates a graphics file that shows the predicate-argument 
   # structure of the sentence
   def get_graph
-    @graph = Graph.new
-    @tparses.each do |p|
-      if p[:args]
-        p[:args].each do |type, arg|
-          @graph.add_edge(p[:idx], arg, 1) if arg >= 0
-        end
-      end
-    end
-
     g = GraphViz.new(:G, :type => :digraph)
     g.node[:shape] = "box"
     g.node[:fontsize] = 11
@@ -173,10 +178,19 @@ class EnjuParse
 
   # returns an array of...subject, shortest path, and object indices.
   def get_rels
+    graph = Graph.new
+    @tparses.each do |p|
+      if p[:args]
+        p[:args].each do |type, arg|
+          graph.add_edge(p[:idx], arg, 1) if arg >= 0
+        end
+      end
+    end
+
     @rels = []
     @heads.each_with_index do |h1, i|
       @heads[i+1..-1].each do |h2|
-        path = @graph.shortest_path(h1, h2)
+        path = graph.shortest_path(h1, h2)
         s = path.shift
         o = path.pop
         @rels << [s, path, o] if (path & @heads).empty?
@@ -257,37 +271,19 @@ if __FILE__ == $0
 
   offset = 0
   ARGF.each do |line|
-#    bnc_so = enju.get_pasgraph(line.chomp)
-#    enju.parse_utf8(line.chomp)
     parse = EnjuParse.new(enju_accessor, line.chomp)
     parse.tparses.each do |p|
       p p
     end
-    puts "-----"
+    puts "Root-----------------------------"
     p parse.root
-    puts "-----"
+    puts "Heads----------------------------"
     p parse.heads
-    puts "-----"
-    p parse.bnc_span_word_index
-    puts "-----"
-    p parse.bnc_span_caret_index
-    puts "-----"
-    p parse.graph
-    puts "-----"
+    puts "BNCs (token_begin, token_end)----"
+    p parse.token_index_bncs
+    puts "BNCs (caret_begin, caret_end)----"
+    p parse.caret_index_bncs
+    puts "Relations------------------------"
     p parse.rels
-    puts "-----"
-
-    # enju.get_bnp
-    # enju.get_rel
-    # bnc_so = enju.get_bnc_so
-    # bnc_so.each do |sbeg, send|
-    #   puts("#{sbeg+offset}\t#{send+offset}\tBNC\t#{line[sbeg+offset...send+offset]}")
-    # end
-    # puts
-    # pas = enju.get_pas
-    # pas.each do |p|
-    #   p p
-    # end
-#    offset += line.length
   end
 end
