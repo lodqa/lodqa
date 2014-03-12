@@ -1,19 +1,20 @@
 #!/usr/bin/env ruby
-#encoding: UTF-8
 require 'bundler'
 Bundler.require
-require './lodqa'
+require_relative 'lodqa'
+require_relative 'annotation'
 
 ## configuration file processing
-config         = ParseConfig.new('./lodqa.cfg')
-endpoint       = config['endpointURL']
+config         = ParseConfig.new('lodqa.cfg')
 apikey         = config['apikey']
+endpoint_url   = config['endpointURL']
+graph_uri      = config['graphURI']
 enju_url       = config['enjuURL']
-ontofinder_url = config['ontofinderURL']
+dictionary_url = config['dictionaryURL']
 query          = config['testQuery']
 
 ## initialize sparql generator
-g = SparqlGenerator.new(enju_url, ontofinder_url, "semanticTypes.xml")
+g = Lodqa.new(enju_url, dictionary_url, endpoint_url, graph_uri)
 
 get '/' do
 	erb :index
@@ -33,19 +34,16 @@ end
 
 post '/query' do
 	query     = params['query']
-	oid       = params['oid']
-	@oacronym = params['oacronym']	# ontology name (acronym)
 
-	@endpoint  = endpoint
+	@endpoint  = endpoint_url
 	@apikey    = apikey
 	
-	p          = g.nlq2sparql(query, oid, @oacronym)
-	@pasgraph  = p.pasgraph		# @pasgraph will be embedded in :results
+	p          = g.nlq2sparql(query)
+	@pasgraph  = p.parse.graph_rendering		# @pasgraph will be embedded in :results
 	@psparql   = p.psparql
 	@term_exps = p.term_exps
 	@term_uris = p.term_uris
 	@sparql    = p.sparql
-	@atext     = p.query_annotation
-	#sparql.gsub!('<', '&lt;')
+	@atext     = Annotation.render_text_annotation(query, p.parse.caret_index_bncs.values)
 	erb :results
 end
