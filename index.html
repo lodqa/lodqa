@@ -1,13 +1,46 @@
 ---
-layout: default
-title: Your New Jekyll Site
+layout: main
+title: LODQA
 ---
 
-<div id="home">
-  <h1>Blog Posts</h1>
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
-    {% endfor %}
-  </ul>
+<div class="note">
+LODQA (Linked Open Data Question Answering) is an open source project aiming at developing a system to generate SPARQL queries from natural language queries.
 </div>
+
+<div class="news">
+<ul>
+<li>(Oct. 19/20, 2014) <a href="http://www.nliwod.org">NLIWoD 2014</a> Workshop will be collocated with <a href="http://iswc2014.semanticweb.org/">ISWC2014</a> in Trentino.</li>
+<li>(Feb. 17-21, 2014) <a href="http://2014.okbqa.org">OKBQA 2014</a> Hackathon is held in Jeju.</li>
+<li>(Oct. 01, 2013) Relation detection is improved to find the right pairs of terms in relation.</li>
+<li>(Dec. 20, 2013) LODQA is launched as an open source project.</li>
+</ul>
+</div>
+
+
+<!-- <h1>Prototype Demo (targeting OMIM)</h1>
+<form name="query" method="post"
+      action="/query"
+      entype="multipart/form-data">
+<input id="oid" name="oid" type="text" size="80" required="required" placeholder="Enter an ontology ID (vid)." value="1348" style="display:none" />
+<input id="oacronym" name="oacronym" type="text" size="80" required="required" value="OMIM" style="display:none" />
+<input id="query" name="query" type="text" size="80" required="required" placeholder="Enter a natural language query." style="height:30px; width:80%" />
+<input type="submit" value="submit" style="height:30px; width:100px" />
+</form>
+
+<script type="text/javascript">
+  function setquery(query) {
+    document.getElementById("query").value = query;
+  }
+</script>
+
+<h2>Sample Queries</h2>
+<ul>
+<li><a onclick="setquery(this.innerHTML)">what genes are associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what sign is associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what cellular dysfunction is associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what pathologic function is associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what neoplastic process is associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what anatomical abnormality is associated with kabuki syndrome?</a>
+<li><a onclick="setquery(this.innerHTML)">what genes are associated with alzheimer disease?</a>
+</ul>
+ -->
