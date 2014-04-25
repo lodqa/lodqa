@@ -1,3 +1,5 @@
-name: Your New Jekyll Site
+name: LODQA
 markdown: redcarpet
 pygments: true
+baseurl: ''
+relative_permalinks: false
