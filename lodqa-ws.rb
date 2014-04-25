@@ -16,6 +16,11 @@ query          = config['testQuery']
 ## initialize sparql generator
 g = Lodqa.new(enju_url, dictionary_url, endpoint_url, graph_uri)
 
+
+configure do
+	set :protection, :except => :frame_options
+end
+
 get '/' do
 	erb :index
 end
