@@ -6,7 +6,7 @@ LODQA (Linked Open Data Question-Answering) is a system to generate SPARQL queri
 Dependency
 ----------
 The Current LODQA system is dependent on two external services:
-- enju CGI server (http://bionlp.dbcls.jp/enju)
+- [enju](http://kmcs.nii.ac.jp/enju/) CGI server (http://bionlp.dbcls.jp/enju)
 - OntoFinder REST WS (http://ontofinder.dbcls.jp)
 
 
