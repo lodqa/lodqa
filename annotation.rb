@@ -2,12 +2,12 @@
 
 module Annotation
   def Annotation.render_text_annotation (text, annotation)
-    annotation2 = annotation.collect {|a| a.push('span') unless a[2]}
-    rendering, last = '', 0
-    annotation2.each do |b, e|
-      label = 'span'
+    rendering = ''
+    last = 0
+    annotation.each do |b, e, l|
+      l ||= 'span'
       rendering += text[last...b]
-      rendering += "<span class='#{label}'>"
+      rendering += "<span class='#{l}'>"
       rendering += text[b...e]
       rendering += '</span>'
       last = e
@@ -17,6 +17,6 @@ module Annotation
 end
 
 if __FILE__ == $0
-  a = Annotation.render_text_annotation("01234ABC89", [[5, 8]])
+  a = Annotation.render_text_annotation("01234ABC89", [[1, 3], [5, 8, 'label']])
   p a
 end
