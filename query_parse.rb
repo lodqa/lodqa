@@ -18,7 +18,7 @@ class QueryParse
   attr_reader :sparql
 
   def initialize (query, enju_accessor, dictionary_accessor, endpoint_accessor, graph_uri)
-    @parse = EnjuParse.new(query, enju_accessor)
+    @parse = EnjuParse.new(enju_accessor, query)
 
     term_vars, @term_exps = get_term_instantiation(parse)
     pred_vars, @pred_exps = get_pred_instantiation(parse)

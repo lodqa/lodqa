@@ -45,7 +45,7 @@ class EnjuParse
   # creates an instance of EnjuParse, and
   # populates various attributes that represent various aspects
   # of the PAS and syntactic structure of the sentence.
-  def initialize (sentence, enju_accessor)
+  def initialize (enju_accessor, sentence)
     @sentence = sentence
 
     get_tparses(sentence, enju_accessor)
@@ -60,7 +60,7 @@ class EnjuParse
 
   # It populates the instance variables, tparses and root
   def get_tparses (sentence, enju_accessor)
-    raise "An instance of RestClient::Resource has to be passed for the first argument." unless enju_accessor.instance_of? RestClient::Resource
+    raise "An instance of RestClient::Resource has to be passed as the first argument." unless enju_accessor.instance_of? RestClient::Resource
 
     response = enju_accessor.get :params => {:sentence=>@sentence, :format=>'conll'}
     case response.code

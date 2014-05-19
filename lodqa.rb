@@ -46,8 +46,6 @@ if __FILE__ == $0
   oid            = config['ontologyId']
   oacronym       = config['ontologyAcronym']
 
-  p ARGV
-
   ## query from the command line
   unless ARGV.empty?
     query   = ARGV[0]
