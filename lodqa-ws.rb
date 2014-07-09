@@ -36,7 +36,7 @@ get '/motivation' do
 	erb :motivation
 end
 
-post '/query' do
+get '/query' do
 	query     = params['query']
 
 	@endpoint  = endpoint_url
