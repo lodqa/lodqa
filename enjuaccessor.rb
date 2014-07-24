@@ -1,18 +1,15 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 #
 # It takes a plain-English sentence as input and returns parsing results by accessing an Enju cgi server.
 #
-Encoding.default_external="UTF-8"
-Encoding.default_internal="UTF-8"
 require 'rest-client'
 require 'graphviz'
 require_relative './graph'
 
 # An instance of this class holds the parsing result of a natural language query as anlyzed by Enju.
-class EnjuParse
+class EnjuAccessor
   # The array of token parses
-  attr_reader :tparses
+  attr_reader :tokens
   # The index of the root word
   attr_reader :root
   # The index of the focus word, i.e., the one modified by a _wh_-modifier
@@ -39,18 +36,19 @@ class EnjuParse
   # wh-pronoun and wh-determiner
   WH_CAT      = ["WP", "WDT"]
 
-  # This initializer takes an instance of 
-  # RestClient::Resource to connect to an Enju cgi server
-  # and a plain-English sentence as input,
+  # It initializes an instance of RestClient::Resource to connect to an Enju cgi server
+  def initialize (enju_url)
+    @enju = RestClient::Resource.new enju_url
+    raise "An instance of RestClient::Resource has to be passed as the first argument." unless enju.instance_of? RestClient::Resource
+  end
+
+  # It takes a plain-English sentence as input,
   # creates an instance of EnjuParse, and
   # populates various attributes that represent various aspects
   # of the PAS and syntactic structure of the sentence.
-  def initialize (enju_accessor, sentence)
-    @sentence = sentence
-
-    get_tparses(sentence, enju_accessor)
-    get_heads
-    get_bnc_span_index
+  def parse (sentence)
+    tokens = get_parse(sentence)
+    base_noun_chunks = get_base_noun_chunks(tokens)
     get_focus
     get_graph
     get_rels
@@ -58,41 +56,43 @@ class EnjuParse
 
   private
 
-  # It populates the instance variables, tparses and root
-  def get_tparses (sentence, enju_accessor)
-    raise "An instance of RestClient::Resource has to be passed as the first argument." unless enju_accessor.instance_of? RestClient::Resource
+  # It populates the instance variables, tokens and root
+  def get_parse (sentence)
+    return [] if sentence.nil? || sentence.empty?
 
-    response = enju_accessor.get :params => {:sentence=>@sentence, :format=>'conll'}
+    response = @enju.get :params => {:sentence=>sentence, :format=>'conll'}
     case response.code
     when 200             # 200 means success
       raise "Empty input." if response =~/^Empty line/
 
-      @tparses = []
+      @tokens = []
 
       # response is a parsing result in CONLL format.
       response.split(/\r?\n/).each_with_index do |t, i|  # for each token analysis
         dat = t.split(/\t/, 7)
-        tparse = Hash.new
-        tparse[:idx]  = i - 1   # use 0-oriented index
-        tparse[:word] = dat[1]
-        tparse[:base] = dat[2]
-        tparse[:pos]  = dat[3]
-        tparse[:cat]  = dat[4]
-        tparse[:type] = dat[5]
-        tparse[:args] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i - 1]} if dat[6]
-        @tparses << tparse  # '<<' is push operation
+        token = Hash.new
+        token[:idx]  = i - 1   # use 0-oriented index
+        token[:lex]  = dat[1]
+        token[:base] = dat[2]
+        token[:pos]  = dat[3]
+        token[:cat]  = dat[4]
+        token[:type] = dat[5]
+        token[:args] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i - 1]} if dat[6]
+        @tokens << token  # '<<' is push operation
       end
 
-      @root = @tparses.shift[:args][0][1]
+      @root = @tokens.shift[:args][0][1]
 
       # get span offsets
       i = 0
-      @tparses.each do |p|
+      @tokens.each do |p|
         i += 1 until sentence[i] !~ /[ \t\n]/
         p[:beg] = i
-        p[:end] = i + p[:word].length
+        p[:end] = i + p[:lex].length
         i = p[:end]
       end
+
+      @tokens
     else
       raise "Enju CGI server dose not respond."
     end
@@ -107,44 +107,24 @@ class EnjuParse
   # ...it will return
   #
   # 2, 7
-  def get_heads
-    @heads = []
-    @tparses.each do |p|
-      @heads << p[:idx] if p[:args] == nil and NC_HEAD_CAT.include?(p[:cat])
-    end
-
-    @heads.delete_if {|h| @tparses[h][:word] == 'me'}
-  end
-
 
   # returns a hash of word indices to arrays of begining and ending indices.
   # It maps from a word's index to the slice of the array that contains that
   # word within a base noun chunk. 
   # Assumption: last word of the BNC is the head.
-  def get_bnc_span_index
-    @token_index_bncs = {}       
-    @caret_index_bncs = {}      
-    beg, lidx, lcat = -1, -1, ''    ## begining word index, last word index, last category
-    @tparses.each do |p|
-      if NC_CAT.include?(p[:cat])
-        beg = p[:idx] if beg < 0
-      else
-        if beg >= 0
-          if NC_HEAD_CAT.include?(lcat) and @heads.include?(lidx)
-            @token_index_bncs[lidx]  = [beg, lidx]
-            @caret_index_bncs[lidx] = [@tparses[beg][:beg], @tparses[lidx][:end]]
-          end
-          beg = -1
+  def get_base_noun_chunks (tokens)
+    base_noun_chunks = []
+    beg = -1    ## the index of the begining token of the base noun chunk
+    tokens.each do |t|
+      beg = t[:idx] if beg < 0 if NC_CAT.include?(t[:cat])
+      if beg >= 0
+        if t[:args] == nil && NC_HEAD_CAT.include?(t[:cat])
+          base_noun_chunks << {:head => t[:idx], :beg => beg, :end => t[:idx]}
         end
+        beg = -1
       end
-
-      lidx, lcat = p[:idx], p[:cat]
     end
-
-    if (beg >= 0) and NC_HEAD_CAT.include?(lcat) and @heads.include?(lidx)
-        @token_index_bncs[lidx]  = [beg, lidx]
-        @caret_index_bncs[lidx] = [@tparses[beg][:beg], @tparses[lidx][:end]]
-    end
+    base_noun_chunks
   end
 
 
@@ -157,11 +137,11 @@ class EnjuParse
     g.edge[:fontsize] = 9
 
     n = []
-    @tparses.each do |p|
-      n[p[:idx]] = g.add_nodes(p[:idx].to_s, :label => "#{p[:word]}/#{p[:pos]}/#{p[:cat]}")
+    @tokens.each do |p|
+      n[p[:idx]] = g.add_nodes(p[:idx].to_s, :label => "#{p[:lex]}/#{p[:pos]}/#{p[:cat]}")
     end
 
-    @tparses.each do |p|
+    @tokens.each do |p|
       if p[:args]
         p[:args].each do |type, arg|
           if arg >= 0 then g.add_edges(n[p[:idx]], n[arg], :label => type) end
@@ -179,7 +159,7 @@ class EnjuParse
   # returns an array of...subject, shortest path, and object indices.
   def get_rels
     graph = Graph.new
-    @tparses.each do |p|
+    @tokens.each do |p|
       if p[:args]
         p[:args].each do |type, arg|
           graph.add_edge(p[:idx], arg, 1) if arg >= 0
@@ -208,7 +188,7 @@ class EnjuParse
     # find the wh-word
     # assumption: one query has one wh-word
     wh = -1
-    @tparses.each do |p|
+    @tokens.each do |p|
       if WH_CAT.include?(p[:cat])
         wh = p[:idx]
         break
@@ -217,8 +197,8 @@ class EnjuParse
 
     @focus =
       if wh > -1
-        if @tparses[wh][:args]
-          @tparses[wh][:args][0][1]
+        if @tokens[wh][:args]
+          @tokens[wh][:args][0][1]
         else
           wh
         end
@@ -232,7 +212,7 @@ class EnjuParse
   # Returns a word based on the index into the PAS.
   # For single words, as opposed to arrays--see below for arrays.
   def idx_get_word(i)
-    @tparses[i][:word]
+    @tokens[i][:lex]
   end
 
   # From an array of word indices, return an array of words.
@@ -241,7 +221,7 @@ class EnjuParse
   #
   # Called by lodqa.rb.
   def idxv_get_word(v)
-    v.collect {|x| @tparses[x][:word]}
+    v.collect {|x| @tokens[x][:lex]}
   end
 
   # Input: a pair of beginning and ending indices.
@@ -251,7 +231,7 @@ class EnjuParse
     words = []
     unless s == nil
       (s[0]..s[1]).each do |i|
-        words.push @tparses[i][:word]
+        words.push @tokens[i][:lex]
       end
     end
     words
@@ -272,7 +252,7 @@ if __FILE__ == $0
   offset = 0
   ARGF.each do |line|
     parse = EnjuParse.new(enju_accessor, line.chomp)
-    parse.tparses.each do |p|
+    parse.tokens.each do |p|
       p p
     end
     puts "Root-----------------------------"
