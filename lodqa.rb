@@ -3,15 +3,13 @@ require 'net/http'
 require_relative 'query_parse'
 
 class Lodqa
-  def initialize (enju_url, dictionary_url, endpoint_url, graph_uri = nil)
+  def initialize (enju_url, dictionary_url)
     @enju_accessor       = RestClient::Resource.new enju_url
     @dictionary_accessor = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}
-    @endpoint_accessor   = RestClient::Resource.new endpoint_url
-    @graph_uri           = graph_uri
   end
 
-  def nlq2sparql (query)
-    sparql = QueryParse.new(query, @enju_accessor, @dictionary_accessor, @endpoint_accessor, @graph_uri)
+  def nlq2sparql (query, graph_uri = nil)
+    sparql = QueryParse.new(query, @enju_accessor, @dictionary_accessor, graph_uri)
   end
 end
 
@@ -43,15 +41,13 @@ if __FILE__ == $0
   enju_url       = config['enjuURL']
   dictionary_url = config['dictionaryURL']
   query          = config['Query']
-  oid            = config['ontologyId']
-  oacronym       = config['ontologyAcronym']
-
+  
   ## query from the command line
   unless ARGV.empty?
     query   = ARGV[0]
   end
 
-  l = Lodqa.new(enju_url, dictionary_url, endpoint_url)
+  l = Lodqa.new(enju_url, dictionary_url)
   p = l.nlq2sparql(query)
   # p p.query_annotation
   # puts "-----"

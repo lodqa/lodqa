@@ -1,8 +1,12 @@
 #!/usr/bin/env ruby
+#
+# It produces a SPARQL query from a query in Enlgish.
+#
 require_relative 'enjuparse'
 require 'net/http'
 require 'json'
 
+# An instance of this class holds the result of SPARQL generation together with by-products.
 class QueryParse
   # Parsing result. See Enjuparse.
   attr_reader :parse
@@ -17,7 +21,7 @@ class QueryParse
   # SPARQL query
   attr_reader :sparql
 
-  def initialize (query, enju_accessor, dictionary_accessor, endpoint_accessor, graph_uri)
+  def initialize (query, enju_accessor, dictionary_accessor, graph_uri)
     @parse = EnjuParse.new(enju_accessor, query)
 
     term_vars, @term_exps = get_term_instantiation(parse)
