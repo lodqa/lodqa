@@ -47,10 +47,10 @@ class EnjuAccessor
   # populates various attributes that represent various aspects
   # of the PAS and syntactic structure of the sentence.
   def parse (sentence)
-    tokens = get_parse(sentence)
+    tokens, root = get_parse(sentence)
     base_noun_chunks = get_base_noun_chunks(tokens)
-    get_focus
-    get_graph
+    focus = get_focus(tokens, base_noun_chunks)
+    graph_rendering = get_graph(tokens, root)
     get_rels
   end
 
@@ -65,7 +65,7 @@ class EnjuAccessor
     when 200             # 200 means success
       raise "Empty input." if response =~/^Empty line/
 
-      @tokens = []
+      tokens = []
 
       # response is a parsing result in CONLL format.
       response.split(/\r?\n/).each_with_index do |t, i|  # for each token analysis
@@ -78,21 +78,21 @@ class EnjuAccessor
         token[:cat]  = dat[4]
         token[:type] = dat[5]
         token[:args] = dat[6].split.collect{|a| type, ref = a.split(':'); [type, ref.to_i - 1]} if dat[6]
-        @tokens << token  # '<<' is push operation
+        tokens << token  # '<<' is push operation
       end
 
-      @root = @tokens.shift[:args][0][1]
+      root = @tokens.shift[:args][0][1]
 
       # get span offsets
       i = 0
-      @tokens.each do |p|
+      tokens.each do |p|
         i += 1 until sentence[i] !~ /[ \t\n]/
         p[:beg] = i
         p[:end] = i + p[:lex].length
         i = p[:end]
       end
 
-      @tokens
+      tokens, root
     else
       raise "Enju CGI server dose not respond."
     end
@@ -130,18 +130,18 @@ class EnjuAccessor
 
   # generates a graphics file that shows the predicate-argument 
   # structure of the sentence
-  def get_graph
+  def get_graph (tokens, root, focus)
     g = GraphViz.new(:G, :type => :digraph)
     g.node[:shape] = "box"
     g.node[:fontsize] = 11
     g.edge[:fontsize] = 9
 
     n = []
-    @tokens.each do |p|
+    tokens.each do |p|
       n[p[:idx]] = g.add_nodes(p[:idx].to_s, :label => "#{p[:lex]}/#{p[:pos]}/#{p[:cat]}")
     end
 
-    @tokens.each do |p|
+    tokens.each do |p|
       if p[:args]
         p[:args].each do |type, arg|
           if arg >= 0 then g.add_edges(n[p[:idx]], n[arg], :label => type) end
@@ -149,10 +149,10 @@ class EnjuAccessor
       end
     end
 
-    g.get_node(@root.to_s).set {|_n| _n.color = "blue"} if @root >= 0
-    g.get_node(@focus.to_s).set {|_n| _n.color = "red"} if @focus >= 0
+    g.get_node(root.to_s).set {|_n| _n.color = "blue"} if root >= 0
+    g.get_node(focus.to_s).set {|_n| _n.color = "red"} if focus >= 0
 
-    @graph_rendering = g.output(:svg => String)
+    graph_rendering = g.output(:svg => String)
   end
 
 
@@ -184,26 +184,26 @@ class EnjuAccessor
   # What devices are used to treat heart failure?
   #
   # ...it will return 1 (devides).
-  def get_focus
+  def get_focus (tokens, base_noun_chunks)
     # find the wh-word
     # assumption: one query has one wh-word
     wh = -1
-    @tokens.each do |p|
-      if WH_CAT.include?(p[:cat])
-        wh = p[:idx]
+    tokens.each do |t|
+      if WH_CAT.include?(t[:cat])
+        wh = t[:idx]
         break
       end
     end
 
-    @focus =
+    focus =
       if wh > -1
-        if @tokens[wh][:args]
-          @tokens[wh][:args][0][1]
+        if tokens[wh][:args]
+          tokens[wh][:args][0][1]
         else
           wh
         end
-      elsif @heads
-        @heads[0]
+      elsif !base_noun_chunks.nil? && !base_noun_chunks.empty?
+        base_noun_chunks[0][:head]
       else
         nil
       end
