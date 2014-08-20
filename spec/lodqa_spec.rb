@@ -19,7 +19,7 @@ describe "QueryParse", "error-handling in initialization method" do
   end
   it "should handle bad ontofind url" do
     expect { SparqlGenerator.new(enjuURL, "http://dictionary.dbcls.jpppp") }.to raise_error
-  end  
+  end
 end
 
 describe "LODQA", "error-handling on configuration" do

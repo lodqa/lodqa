@@ -1,0 +1,165 @@
+[SPARQL Endpoint] http://s2.semanticscience.org:13000/sparql
+[Maximum number of hops] 2
+[Input Query] what drugs are associated with diabetes?
+[Pseudo Graph Pattern]
+{
+  "nodes": [
+    {
+      "id": "t1",
+      "head": 1,
+      "text": "drugs"
+    },
+    {
+      "id": "t2",
+      "head": 5,
+      "text": "diabetes"
+    }
+  ],
+  "edges": [
+    {
+      "subject": "t1",
+      "object": "t2",
+      "text": "associated with"
+    }
+  ],
+  "focus": 1
+}
+=====
+[URI lookup]
+{"drugs"=>["http://bio2rdf.org/drugbank_vocabulary:drug", "http://bio2rdf.org/pharmgkb_vocabulary:drug", "http://bio2rdf.org/drugbank_vocabulary:Drug"], "diabetes"=>["http://bio2rdf.org/pharmgkb:PA446359"]}
+-----
+{:nodes=>[{:id=>"t1", :head=>1, :text=>"drugs", :term=>"<http://bio2rdf.org/drugbank_vocabulary:drug>"}, {:id=>"t2", :head=>5, :text=>"diabetes", :term=>"<http://bio2rdf.org/pharmgkb:PA446359>"}], :edges=>[{:subject=>"t1", :object=>"t2", :text=>"associated with"}], :focus=>1}
+-----
+[["t1", "p01", "t2"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+"-=-=-=-"
+[["t1", "p01", "t2"]]
+[["t2", "p01", "t1"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["t1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["x01", "p01", "t1"], ["x01", "p02", "t2"]]
+[["x01", "p01", "t1"], ["t2", "p02", "x01"]]
+"-=-=-=-"
+[["t1", "p01", "t2"]]
+[["t2", "p01", "t1"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["t1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["x01", "p01", "t1"], ["x01", "p02", "t2"]]
+[["x01", "p01", "t1"], ["t2", "p02", "x01"]]
+"-=-=-=-"
+SELECT ?p01 WHERE {<http://bio2rdf.org/drugbank_vocabulary:drug> ?p01 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 WHERE {<http://bio2rdf.org/pharmgkb:PA446359> ?p01 <http://bio2rdf.org/drugbank_vocabulary:drug> . FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 ?x01 ?p02 WHERE {<http://bio2rdf.org/drugbank_vocabulary:drug> ?p01 ?x01 . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 ?x01 ?p02 WHERE {<http://bio2rdf.org/drugbank_vocabulary:drug> ?p01 ?x01 . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?x01 ?p01 ?p02 WHERE {?x01 ?p01 <http://bio2rdf.org/drugbank_vocabulary:drug> . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?x01 ?p01 ?p02 WHERE {?x01 ?p01 <http://bio2rdf.org/drugbank_vocabulary:drug> . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+{:nodes=>[{:id=>"t1", :head=>1, :text=>"drugs", :term=>"<http://bio2rdf.org/pharmgkb_vocabulary:drug>"}, {:id=>"t2", :head=>5, :text=>"diabetes", :term=>"<http://bio2rdf.org/pharmgkb:PA446359>"}], :edges=>[{:subject=>"t1", :object=>"t2", :text=>"associated with"}], :focus=>1}
+-----
+[["t1", "p01", "t2"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+"-=-=-=-"
+[["t1", "p01", "t2"]]
+[["t2", "p01", "t1"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["t1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["x01", "p01", "t1"], ["x01", "p02", "t2"]]
+[["x01", "p01", "t1"], ["t2", "p02", "x01"]]
+"-=-=-=-"
+[["t1", "p01", "t2"]]
+[["t2", "p01", "t1"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["t1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["x01", "p01", "t1"], ["x01", "p02", "t2"]]
+[["x01", "p01", "t1"], ["t2", "p02", "x01"]]
+"-=-=-=-"
+SELECT ?p01 WHERE {<http://bio2rdf.org/pharmgkb_vocabulary:drug> ?p01 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 WHERE {<http://bio2rdf.org/pharmgkb:PA446359> ?p01 <http://bio2rdf.org/pharmgkb_vocabulary:drug> . FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 ?x01 ?p02 WHERE {<http://bio2rdf.org/pharmgkb_vocabulary:drug> ?p01 ?x01 . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 ?x01 ?p02 WHERE {<http://bio2rdf.org/pharmgkb_vocabulary:drug> ?p01 ?x01 . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?x01 ?p01 ?p02 WHERE {?x01 ?p01 <http://bio2rdf.org/pharmgkb_vocabulary:drug> . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?x01 ?p01 ?p02 WHERE {?x01 ?p01 <http://bio2rdf.org/pharmgkb_vocabulary:drug> . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+{:nodes=>[{:id=>"t1", :head=>1, :text=>"drugs", :term=>"<http://bio2rdf.org/drugbank_vocabulary:Drug>"}, {:id=>"t2", :head=>5, :text=>"diabetes", :term=>"<http://bio2rdf.org/pharmgkb:PA446359>"}], :edges=>[{:subject=>"t1", :object=>"t2", :text=>"associated with"}], :focus=>1}
+-----
+[["t1", "p01", "t2"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+"-=-=-=-"
+[["t1", "p01", "t2"]]
+[["t2", "p01", "t1"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["t1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["x01", "p01", "t1"], ["x01", "p02", "t2"]]
+[["x01", "p01", "t1"], ["t2", "p02", "x01"]]
+"-=-=-=-"
+[["t1", "p01", "t2"]]
+[["it1", "st1", "t1"], ["it1", "p01", "t2"]]
+[["t2", "p01", "t1"]]
+[["it1", "st1", "t1"], ["t2", "p01", "it1"]]
+[["t1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["it1", "st1", "t1"], ["it1", "p01", "x01"], ["x01", "p02", "t2"]]
+[["t1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["it1", "st1", "t1"], ["it1", "p01", "x01"], ["t2", "p02", "x01"]]
+[["x01", "p01", "t1"], ["x01", "p02", "t2"]]
+[["it1", "st1", "t1"], ["x01", "p01", "it1"], ["x01", "p02", "t2"]]
+[["x01", "p01", "t1"], ["t2", "p02", "x01"]]
+[["it1", "st1", "t1"], ["x01", "p01", "it1"], ["t2", "p02", "x01"]]
+"-=-=-=-"
+SELECT ?p01 WHERE {<http://bio2rdf.org/drugbank_vocabulary:Drug> ?p01 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?it1 ?st1 ?p01 WHERE {?it1 ?st1 <http://bio2rdf.org/drugbank_vocabulary:Drug> . ?it1 ?p01 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?it1)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?st1) IN ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 WHERE {<http://bio2rdf.org/pharmgkb:PA446359> ?p01 <http://bio2rdf.org/drugbank_vocabulary:Drug> . FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?it1 ?st1 ?p01 WHERE {?it1 ?st1 <http://bio2rdf.org/drugbank_vocabulary:Drug> . <http://bio2rdf.org/pharmgkb:PA446359> ?p01 ?it1 . FILTER (isIRI(?it1)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?st1) IN ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 ?x01 ?p02 WHERE {<http://bio2rdf.org/drugbank_vocabulary:Drug> ?p01 ?x01 . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?it1 ?st1 ?p01 ?x01 ?p02 WHERE {?it1 ?st1 <http://bio2rdf.org/drugbank_vocabulary:Drug> . ?it1 ?p01 ?x01 . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?it1) && isIRI(?x01)) FILTER (?it1 != ?x01) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?st1) IN ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?p01 ?x01 ?p02 WHERE {<http://bio2rdf.org/drugbank_vocabulary:Drug> ?p01 ?x01 . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?it1 ?st1 ?p01 ?x01 ?p02 WHERE {?it1 ?st1 <http://bio2rdf.org/drugbank_vocabulary:Drug> . ?it1 ?p01 ?x01 . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?it1) && isIRI(?x01)) FILTER (?it1 != ?x01) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?st1) IN ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?x01 ?p01 ?p02 WHERE {?x01 ?p01 <http://bio2rdf.org/drugbank_vocabulary:Drug> . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?it1 ?st1 ?x01 ?p01 ?p02 WHERE {?it1 ?st1 <http://bio2rdf.org/drugbank_vocabulary:Drug> . ?x01 ?p01 ?it1 . ?x01 ?p02 <http://bio2rdf.org/pharmgkb:PA446359> . FILTER (isIRI(?it1) && isIRI(?x01)) FILTER (?it1 != ?x01) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?st1) IN ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?x01 ?p01 ?p02 WHERE {?x01 ?p01 <http://bio2rdf.org/drugbank_vocabulary:Drug> . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?x01)) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
+SELECT ?it1 ?st1 ?x01 ?p01 ?p02 WHERE {?it1 ?st1 <http://bio2rdf.org/drugbank_vocabulary:Drug> . ?x01 ?p01 ?it1 . <http://bio2rdf.org/pharmgkb:PA446359> ?p02 ?x01 . FILTER (isIRI(?it1) && isIRI(?x01)) FILTER (?it1 != ?x01) FILTER (str(?p01) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?p02) NOT IN ("http://rdfs.org/ns/void#inDataset", "http://bio2rdf.org/omim_vocabulary:refers-to", "http://bio2rdf.org/omim_vocabulary:article", "http://bio2rdf.org/omim_vocabulary:mapping-method", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY")) FILTER (str(?st1) IN ("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.w3.org/2000/01/rdf-schema#subClassOf", "http://bioportal.bioontology.org/ontologies/umls/hasSTY"))} LIMIT 10
+++++++++++
+==========
