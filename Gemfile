@@ -5,8 +5,8 @@ gem 'thin'
 gem 'erubis'
 
 gem 'rest-client'
+gem 'sparql-client'
 gem 'ruby-graphviz'
-gem 'libxml-ruby'
 
 gem 'parseconfig'
 

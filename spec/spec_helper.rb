@@ -1,1 +1,1 @@
-require 'enju_accessor'
+require 'lodqa'
