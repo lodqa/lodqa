@@ -22,17 +22,17 @@ class Lodqa::Lodqa
     @graphfinder = GraphFinder.new(endpoint_url, options[:endpoint_options] ||= {})
   end
 
-  def find_answer
+  def find_answer(maxhop = 2)
     @terms.first.product(*terms.drop(1)) do |ts|
       @pgp[:nodes].each_with_index {|n, i| n[:term] = ts[i]}
-      @graphfinder.search_graph(@pgp, options[:maxhop])
+      @graphfinder.search_graph(@pgp, maxhop)
     end
   end
 
-  def each_solution(&block)
+  def each_solution(maxhop = 2, &block)
     @terms.first.product(*terms.drop(1)) do |ts|
       @pgp[:nodes].each_with_index {|n, i| n[:term] = ts[i]}
-      @graphfinder.search_graph(@pgp, options[:maxhop]) {|s| block.call(s)}
+      @graphfinder.search_graph(@pgp, maxhop) {|s| block.call(s)}
     end
   end
 
