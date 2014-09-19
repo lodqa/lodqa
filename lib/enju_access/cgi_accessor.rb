@@ -108,7 +108,7 @@ class EnjuAccess::CGIAccessor
   end
 
 
-  # It finds the shorted path between the head word of any two base noun chunks that are not interfered by other base noun chunks.
+  # It finds the shortest path between the head word of any two base noun chunks that are not interfered by other base noun chunks.
   def get_relations (tokens, base_noun_chunks)
     graph = Graph.new
     tokens.each do |t|
