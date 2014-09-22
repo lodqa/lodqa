@@ -7,36 +7,41 @@ module Lodqa; end unless defined? Lodqa
 # An instance of this class is initialized with a dictionary.
 class Lodqa::Dictionary
   def initialize (dictionary_url)
-    p dictionary_url
     @dictionary = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}
   end
 
-  def lookup (term)
-    uris = @dictionary.post :terms => [term].to_json do |response, request, result|
-      case response.code
-      when 200
-        JSON.parse response
-      else
-        nil
+  def lookup (terms)
+    terms = [terms] if terms.class == String
+    return nil  unless terms.class == Array
+    mappings = _lookup(terms)
+
+    # interpolation
+    mappings.each_key do |k|
+      if mappings[k].empty?
+        ngram = k.split
+        length = ngram.length
+        (1 ... length).reverse_each do |m|
+          subkeys = (0 .. length - m).collect{|b| ngram[b, m].join(' ')}
+          submappings = _lookup(subkeys).values.flatten.uniq
+          unless submappings.empty?
+            mappings[k] = [submappings.last]
+            break
+          end
+        end
       end
     end
-    uris
   end
 
-  def find_uris (nodes)
-    p nodes
-    terms = nodes.collect{|n| n[:text]}
-    uris  = @dictionary.post :terms => terms.to_json do |response, request, result|
+  private
+
+  def _lookup (terms)
+    @dictionary.post :terms => terms.to_json do |response, request, result|
       case response.code
       when 200
-        puts "got <====="
         JSON.parse response
       else
-        nil
+        terms.map{|t| [t, []]}.to_h
       end
     end
-
-    # nodes.each{|n| n[:term] = uris[n[:text]].map{|u| "<#{u}>"}[0]}
-    uris.nil? ? nil : nodes.collect{|n| uris[n[:text]].map{|u| "<#{u}>"}}
   end
 end

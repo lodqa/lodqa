@@ -1,0 +1,13 @@
+parser_url: "http://bionlp.dbcls.jp/enju"
+endpoint_url: "http://omim.bio2rdf.org/sparql"
+ignore_predicates:
+ - "http://rdfs.org/ns/void#inDataset"
+ - "http://bio2rdf.org/omim_vocabulary:refers-to"
+ - "http://bio2rdf.org/omim_vocabulary:article"
+ - "http://bio2rdf.org/omim_vocabulary:mapping-method"
+sortal_predicates:
+ - "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+ - "http://www.w3.org/2000/01/rdf-schema#subClassOf"
+graph_uri: "http://bio2rdf.org/bio2rdf.dataset:bio2rdf-omim-20131212"
+dictionary_url: "http://pubdictionaries.org:80/dictionaries/id_mapping?dictionaries=%5B%22Bio2RDF+R3+OMIM+%28Classes%29%22%2C%22Bio2RDF+R3+OMIM%22%5D&output_format=simple&threshold=0.5&top_n=0"
+query: "what clinical synopsis are related to neurologic central nervous system?"

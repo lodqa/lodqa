@@ -1,61 +1,79 @@
 #!/usr/bin/env ruby
 #
-# It takes two entities as inut and find the predicate sequences connecting them.
+# An instance of the class searches the SPARQL endpoint for a pseudo graph pattern.
 #
 require 'json'
 require 'sparql/client'
 
 class GraphFinder
-  IGNORE_PREDICATES = [
-    "http://rdfs.org/ns/void#inDataset",
-    "http://bio2rdf.org/omim_vocabulary:refers-to",
-    "http://bio2rdf.org/omim_vocabulary:article",
-    "http://bio2rdf.org/omim_vocabulary:mapping-method"
-    # "http://purl.bioontology.org/ontology/MEDLINEPLUS/SIB"
-  ]
-
-  SORTAL_PREDICATES = [
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "http://www.w3.org/2000/01/rdf-schema#subClassOf",
-    "http://bioportal.bioontology.org/ontologies/umls/hasSTY"
-  ]
-
   # This constructor takes the URL of an end point to be searched
   # optionally options can be passed to the server of the end point.
-  def initialize (ep_url, ep_options = {})
-    @endpoint = SPARQL::Client.new(ep_url, ep_options)
+  def initialize (pgp, ep_url, options = {})
+    options ||= {}
+    @debug = options[:debug] || false
+
+    @pgp = pgp
+    @endpoint = SPARQL::Client.new(ep_url, options[:endpoint_options] || {})
+
+    @ignore_predicates = options[:ignore_predicates] || []
+    @sortal_predicates = options[:sortal_predicates] || []
+
+    max_hop = options[:max_hop] || 2
+    @bgps = gen_bgps(pgp, max_hop)
   end
 
-  # It searchs for graphs that match the pgp, pseudo graph pattern.
+  # It generates bgps by applying variation operations to the pgp.
   # The option _max_hop_ specifies the maximum number of hops to be searched.
-  def search_graph (pgp, max_hop = 1)
+  def gen_bgps (pgp, max_hop = 1)
+    if @debug
+      puts "=== [Pseudo Graph Pattern] ====="
+      p pgp
+      puts "=== [Maximum number of hops]: #{max_hop} ====="
+    end
+
     bgps = generate_split_variations(pgp[:edges], max_hop)
-    bgps.each {|bgp| p bgp}
-    p "-=-=-=-"
-    bgps = generate_inversed_variations(bgps)
-    bgps.each {|bgp| p bgp}
-    p "-=-=-=-"
-    bgps = generate_instantiated_variations(bgps, pgp)
-    bgps.each {|bgp| p bgp}
-    p "-=-=-=-"
+    if @debug
+      puts "=== [split variations] ====="
+      bgps.each {|bgp| p bgp}
+    end
 
+    bgps = generate_inverse_variations(bgps)
+    if @debug
+      puts "=== [inverse variations] ====="
+      bgps.each {|bgp| p bgp}
+    end
 
-    bgps.each do |bgp|
-      sparql = compose_sparql(bgp, pgp)
-      puts "#{sparql}\n++++++++++"
+    bgps = generate_instantiation_variations(bgps, pgp)
+    if @debug
+      puts "=== [instantiation variations] ====="
+      bgps.each {|bgp| p bgp}
+    end
+    bgps
+  end
+
+  def each_solution
+    @bgps.each do |bgp|
+      sparql = compose_sparql(bgp, @pgp)
+      if @debug
+        puts "#{sparql}\n++++++++++"
+      end
       begin
         result = @endpoint.query(sparql)
       rescue => detail
-        p detail
-        puts "==========\n"
+        if @debug
+          p detail
+          puts "==========\n"
+        end
         sleep(2)
         next
         # print detail.backtrace.join("\n")
       end 
       result.each_solution do |solution|
-        puts solution.inspect
+        yield(solution)
       end
-      puts "==========\n"
+      if @debug
+        puts "==========\n"
+      end
       sleep(2)
     end
   end
@@ -91,7 +109,7 @@ class GraphFinder
   end
 
   # make variations by inversing each triple pattern
-  def generate_inversed_variations (bgps)
+  def generate_inverse_variations (bgps)
     rbgps = []
 
     bgps.each do |bgp|
@@ -104,24 +122,24 @@ class GraphFinder
   end
 
   # make variations by instantiating terms
-  def generate_instantiated_variations(bgps, pgp)
-    iid = {}
-    pgp[:nodes].each do |n|
-      r = generate_instance_id_if_applicable(n)
-      iid[n[:id]] = r unless r == nil
+  def generate_instantiation_variations(bgps, pgp)
+    iids = {}
+    pgp[:nodes].each do |id, node|
+      iid = class?(node[:term]) ? 'i' + id : nil
+      iids[id] = iid unless iid.nil?
     end
 
     ibgps = []
     bgps.each do |bgp|
-      [false, true].repeated_permutation(iid.keys.length) do |instantiate_scheme|
+      [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
         # id of the terms to be instantiated
-        itids = iid.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
+        itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
 
         # initialize the instantiated bgp with the triple patterns for term instantiation
-        ibgp = itids.collect{|t| [iid[t], 's' + t, t]}
+        ibgp = itids.collect{|t| [iids[t], 's' + t, t]}
 
         # add update triples
-        bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iid[e] : e}}
+        bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e] : e}}
 
         ibgps << ibgp
       end
@@ -130,13 +148,9 @@ class GraphFinder
     ibgps
   end
 
-  def generate_instance_id_if_applicable (node)
-    class_p(node[:term])? 'i' + node[:id] : nil
-  end
-
-  def class_p (term)
+  def class?(term)
     if /^<.+>$/.match(term)
-      sparql = "SELECT ?p WHERE {?s ?p #{term} FILTER (str(?p) IN (#{SORTAL_PREDICATES.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
+      sparql = "SELECT ?p WHERE {?s ?p #{term} FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
       result = @endpoint.query(sparql)
       return true if result.length > 0
     end
@@ -144,18 +158,16 @@ class GraphFinder
   end
 
   def compose_sparql(bgp, pgp)
-    # index the terms
-    tidx = {}
-    pgp[:nodes].each{|n| tidx[n[:id]] = n[:term]}
+    nodes = pgp[:nodes]
 
     # get the variables
-    variables = bgp.flatten.uniq - tidx.keys
+    variables = bgp.flatten.uniq - nodes.keys
 
     # initialize the query
     query = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')} WHERE {"
 
     # stringify the bgp
-    query += bgp.map{|tp| tp.map{|e| tidx.has_key?(e)? tidx[e] : '?' + e}.join(' ')}.join(' . ') + ' .'
+    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e)? nodes[e][:term] : '?' + e}.join(' ')}.join(' . ') + ' .'
 
     ## constraints on x-variables (including i-variables)
     x_variables = variables.dup.keep_if {|v| v[0] == 'x' or v[0] == 'i'}
@@ -173,10 +185,10 @@ class GraphFinder
     ex_predicates = []
 
     # filter out ignore predicates
-    ex_predicates += IGNORE_PREDICATES
+    ex_predicates += @ignore_predicates
 
     # filter out sotral predicates
-    ex_predicates += SORTAL_PREDICATES
+    ex_predicates += @sortal_predicates
 
     unless ex_predicates.empty?
       p_variables.each {|v| query += %| FILTER (str(?#{v}) NOT IN (#{ex_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
@@ -186,7 +198,7 @@ class GraphFinder
     s_variables = variables.dup.keep_if{|v| v[0] == 's'}
 
     # s-variables to be bound to sortal predicates
-    s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{SORTAL_PREDICATES.map{|s| '"'+s+'"'}.join(', ')}))|}
+    s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
 
     # query += "}"
     query += "} LIMIT 10"
@@ -231,23 +243,57 @@ end
 if __FILE__ == $0
   APIKEY = "4d9b44c5-5aad-4c3e-9692-e7490b860896"
   EP_URL = "http://sparql.bioontology.org/sparql/?apikey=#{APIKEY}&outputformat=json"
-  gf = GraphFinder.new(EP_URL, {:method => :get, :read_timeout => 600})
 
-  # EP_URL = "http://dbpedia.org/sparql/"
-  # gf = GraphFinder.new(EP_URL)
-  # what genes are related to alzheimer?
-  # ((w, "genes"), (w, "alzheimer"))
-  # what genes are related to the deseases that are connected to memory problem?
-  # ((w, :a, "genes"), (w, "related", "diseases"), ("diseases", "connected", "memory problem"))
+  IGNORE_PREDICATES = [
+    "http://rdfs.org/ns/void#inDataset",
+    "http://bio2rdf.org/omim_vocabulary:refers-to",
+    "http://bio2rdf.org/omim_vocabulary:article",
+    "http://bio2rdf.org/omim_vocabulary:mapping-method"
+    # "http://purl.bioontology.org/ontology/MEDLINEPLUS/SIB"
+  ]
+
+  SORTAL_PREDICATES = [
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+    "http://bioportal.bioontology.org/ontologies/umls/hasSTY"
+  ]
 
 
-  # EP_URL = "http://omim.bio2rdf.org/sparql/"
-  # gf = GraphFinder.new(EP_URL)
+  query_graph = {
+    :nodes => {
+      "t1" => {
+        :head => 1,
+        :text => "genes"
+      },
+      "t2" => {
+        :head => 5,
+        :text => "diabetes"
+      }
+    },
+    :edges => [
+      {
+        :subject => "t1",
+        :object => "t2",
+        :text => "related to"
+      }
+    ],
+    :focus => "t1"
+  }
 
-  query_json = File.read (ARGV[0])
-  query_graph = JSON.parse query_json, :symbolize_names => true
+  max_hop = 2
 
-  gf.search_graph(query_graph, ARGV[1].to_i)
-  # gf.shortestPaths(ARGV[0], ARGV[1])
-  # gf.shortestPaths("http://dbpedia.org/resource/SAHSA", "http://dbpedia.org/resource/Honolulu_International_Airport")
+  query_graph = JSON.parse File.read (ARGV[0]) unless ARGV[0].nil?
+  max_hop = ARGV[1] unless ARGV[1].nil?
+
+  gf = GraphFinder.new(query_graph, EP_URL, {
+                                  :endpoint_options => {:method => :get, :read_timeout => 600},
+                                  :debug => true,
+                                  :ignore_precates => IGNORE_PREDICATES,
+                                  :sortal_predicates => SORTAL_PREDICATES,
+                                  :max_hop => max_hop
+                                })
+
+  gf.each_solution do |s|
+    p s
+  end
 end

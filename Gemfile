@@ -8,7 +8,7 @@ gem 'rest-client'
 gem 'sparql-client'
 gem 'ruby-graphviz'
 
-gem 'parseconfig'
+gem 'app_config'
 
 group :test do
 	gem 'rack-test'

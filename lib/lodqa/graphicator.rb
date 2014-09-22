@@ -22,15 +22,18 @@ class Graphicator
   end
 
   def get_nodes (parse)
+    nodes = {}
+
     variable = 't0'
-    nodes = parse[:base_noun_chunks].collect do |c|
+    parse[:base_noun_chunks].each do |c|
       variable = variable.next;
-      {
-        :id => variable,
+      nodes[variable] = {
         :head => c[:head],
         :text => parse[:tokens][c[:beg] .. c[:end]].collect{|t| t[:lex]}.join(' ')
       }
     end
+
+    nodes
   end
 
   def get_edges (nodes, parse)

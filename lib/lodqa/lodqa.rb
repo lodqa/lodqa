@@ -2,7 +2,7 @@
 require 'net/http'
 require 'json'
 require 'enju_access/enju_access'
-require 'graphfinder/graphfinder'
+require 'graph_finder/graph_finder'
 require 'lodqa/dictionary'
 
 module Lodqa; end unless defined? Lodqa
@@ -12,35 +12,62 @@ class Lodqa::Lodqa
   attr_reader :pgp
   attr_reader :terms
 
-  def initialize(query, parser_url, dictionary_url, endpoint_url, options = {})
-    parser     = EnjuAccess::CGIAccessor.new(parser_url)
+  def initialize(query, parser_url, dictionary_url, ep_url, options = {})
+    options ||= {}
+    @debug = options[:debug] || false
+
+    @ep_url = ep_url
+    @options = options
+
+    parser = EnjuAccess::CGIAccessor.new(parser_url)
+    parse  = parser.parse(query)
+    @pgp   = graphicate(parse)
+
     dictionary = Lodqa::Dictionary.new(dictionary_url)
-    @parse     = parser.parse(query)
-    @pgp       = graphicate(@parse)
-    @terms     = dictionary.find_uris(@pgp[:nodes])
+    mappings   = dictionary.lookup(@pgp[:nodes].values.collect{|n| n[:text]})
 
-    @graphfinder = GraphFinder.new(endpoint_url, options[:endpoint_options] ||= {})
-  end
+    terms      = mappings.nil? ? nil : @pgp[:nodes].values.map{|n| mappings[n[:text]].collect{|u| "<#{u}>"}}
 
-  def find_answer(maxhop = 2)
-    @terms.first.product(*terms.drop(1)) do |ts|
-      @pgp[:nodes].each_with_index {|n, i| n[:term] = ts[i]}
-      @graphfinder.search_graph(@pgp, maxhop)
+    @anchored_pgps = terms.first.product(*terms.drop(1)).collect do |ts|
+      anchored_pgp = pgp.dup
+      anchored_pgp[:nodes] = pgp[:nodes].dup
+      anchored_pgp[:nodes].each_key{|k| anchored_pgp[:nodes][k] = pgp[:nodes][k].dup}
+      anchored_pgp[:nodes].each_value.with_index{|n, i| n[:term] = ts[i]}
+      anchored_pgp
+    end
+
+    if @debug
+      puts "[query] #{query}"
+      p @pgp
+      puts "-----"
+      p mappings
+      puts "====="
     end
   end
 
-  def each_solution(maxhop = 2, &block)
-    @terms.first.product(*terms.drop(1)) do |ts|
-      @pgp[:nodes].each_with_index {|n, i| n[:term] = ts[i]}
-      @graphfinder.search_graph(@pgp, maxhop) {|s| block.call(s)}
+  def get_anchored_pgps
+    @anchored_pgps
+  end
+
+  def get_focus
+    @pgp[:focus]
+  end
+
+  def find_answer
+    @anchored_pgps.each do |anchored_pgp|
+      graphfinder = GraphFinder.new(anchored_pgp, @ep_url, @options)
+      graphfinder.each_solution do |s|
+        p s
+      end
     end
   end
 
-
-  def each_solution(&block)
-    @terms.first.product(*terms.drop(1)) do |ts|
-      @pgp[:nodes].each_with_index {|n, i| n[:term] = ts[i]}
-      @graphfinder.search_graph(@pgp, options[:maxhop]) {|s| block.call(s)}
+  def each_anchored_pgp_and_solution(proc_anchored_pgp = nil, proc_solution = nil)
+    @anchored_pgps.each do |anchored_pgp|
+      proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
+      GraphFinder.new(anchored_pgp, @ep_url, @options).each_solution do |s|
+        proc_solution.call(s)
+      end
     end
   end
 
@@ -48,28 +75,37 @@ class Lodqa::Lodqa
 
   def graphicate (parse)
     nodes = get_nodes(parse)
-    edges = get_edges(nodes, parse)
+
+    node_index = {}
+    nodes.each_key{|k| node_index[nodes[k][:head]] = k}
+
+    focus = node_index[parse[:focus]]
+    focus = node_index.values.first if focus.nil?
+
+    edges = get_edges(parse, node_index)
     graph = {
       :nodes => nodes,
       :edges => edges,
-      :focus => parse[:focus]
+      :focus => focus
     }
   end
 
   def get_nodes (parse)
+    nodes = {}
+
     variable = 't0'
-    nodes = parse[:base_noun_chunks].collect do |c|
+    parse[:base_noun_chunks].each do |c|
       variable = variable.next;
-      {
-        :id => variable,
+      nodes[variable] = {
         :head => c[:head],
         :text => parse[:tokens][c[:beg] .. c[:end]].collect{|t| t[:lex]}.join(' ')
       }
     end
+
+    nodes
   end
 
-  def get_edges (nodes, parse)
-    node_index = nodes.collect{|n| [n[:head], n[:id]]}.to_h
+  def get_edges (parse, node_index)
     edges = parse[:relations].collect do |s, p, o|
       {
         :subject => node_index[s],
@@ -83,9 +119,10 @@ end
 
 if __FILE__ == $0
   # default values
-  config_file = 'config/bio2rdf-mashup.cfg'
-  config_file = 'config/bio2rdf-omim.cfg'
+  config_file = 'config/bio2rdf-omim.yml'
   maxhop = 2
+  query = nil
+  debug = false
 
   ## command line option processing
   require 'optparse'
@@ -100,6 +137,14 @@ if __FILE__ == $0
       maxhop = n.to_i
     end
 
+    opts.on('-q', '--query query', "gives the query to process.") do |q|
+      query = q.chomp
+    end
+
+    opts.on('-d', '--debug', "tells it to be verbose.") do |q|
+      debug = true
+    end
+
     opts.on('-h', '--help', 'displays this screen') do
       puts opts
       exit
@@ -109,43 +154,44 @@ if __FILE__ == $0
   optparse.parse!
 
   ## configuration
-  require 'parseconfig'
-  config = ParseConfig.new(config_file)
-  endpoint_url   = config['endpointURL']
-  enju_url       = config['enjuURL']
-  dictionary_url = config['dictionaryURL']
-  query          = config['Query']
+  require 'app_config'
+  AppConfig.setup!(yaml: config_file)
+  endpoint_url      = AppConfig.endpoint_url
+  ignore_predicates = AppConfig.ignore_predicates
+  sortal_predicates = AppConfig.sortal_predicates
+  parser_url        = AppConfig.parser_url
+  dictionary_url    = AppConfig.dictionary_url
+  query             = AppConfig.query if query.nil?
   
   ## query from the command line
-  unless ARGV.empty?
-    query   = ARGV[0]
+  query = ARGV[0] unless ARGV[0].nil?
+
+  # puts "[SPARQL Endpoint] #{endpoint_url}"
+  # puts "[dictionary URL] #{dictionary_url}"
+  # puts "[Maximum number of hops] #{maxhop}"
+
+  # lodqa = Lodqa::Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {:debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+  lodqa = Lodqa::Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {:debug => debug, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+  # lodqa.find_answer
+
+  proc_anchored_pgp = Proc.new do |anchored_pgp|
+    puts "================="
+    p anchored_pgp
   end
 
-  puts "[SPARQL Endpoint] #{endpoint_url}"
-  puts "[Maximum number of hops] #{maxhop}"
+  focus = lodqa.get_focus
 
-  lodqa = Lodqa::Lodqa.new(query, enju_url, dictionary_url, endpoint_url)
-  lodqa.find_answer
+  proc_solution = Proc.new do |solution|
+    target = if solution[('i' + focus).to_sym].nil?
+      focus.to_sym
+    else
+      ('i' + focus).to_sym
+    end
+    puts solution[target]
 
-  # p p.query_annotation
-  # puts "-----"
-  # puts p.psparql
-  # puts "-----"
-  # p p.term_uris
-  # puts "-----"
-  # puts p.sparql
-  # puts "-----"
+    # p solution
+  end
 
-  # p.parse(query)
-  # psparql = qp.get_psparql
-  # puts psparql
-
-  # sparql  = qp.get_sparql(vid, acronym)
-  # puts sparql
-
-  ## result
-  # require 'sparql/client'
-  # endpoint = SPARQL::Client.new(endpoint_url)
-  # result = endpoint.query(sparql)
-  # result.each {|s| puts s[:t1] + "\t" + s[:l1]}
+  # lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
+  lodqa.each_anchored_pgp_and_solution(nil, proc_solution)
 end

@@ -1,16 +1,14 @@
 {
-  "nodes": [
-    {
-      "id": "t1",
+  "nodes": {
+    "t1":{
       "head": 1,
       "text": "genes"
     },
-    {
-      "id": "t2",
+    "t2":{
       "head": 5,
       "text": "diabetes"
     }
-  ],
+  },
   "edges": [
     {
       "subject": "t1",
@@ -18,5 +16,5 @@
       "text": "related to"
     }
   ],
-  "focus": 1
+  "focus": "t1"
 }

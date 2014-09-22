@@ -1,0 +1,11 @@
+endpoint_url: "http://sparql.bioontology.org/sparql/?apikey=4d9b44c5-5aad-4c3e-9692-e7490b860896"
+ignore_predicates:
+sortal_predicates:
+ - "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+ - "http://www.w3.org/2000/01/rdf-schema#subClassOf"
+ - "http://bioportal.bioontology.org/ontologies/umls/hasSTY"
+apikey: "4d9b44c5-5aad-4c3e-9692-e7490b860896"
+graph_uri: "http://bioportal.bioontology.org/ontologies/OMIM"
+dictionary_url: "http://pubdictionaries.org:80/dictionaries/id_mapping?dictionaries=%5B%22OMIM-BioPortal%22%2C%22UMLS-TUI-URI%22%5D&output_format=simple&threshold=0.6&top_n=0"
+query: "what genes are related to alzheimer disease?"
+parser_url: "http://bionlp.dbcls.jp/enju"

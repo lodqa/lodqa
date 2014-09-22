@@ -147,18 +147,18 @@ class EnjuAccess::CGIAccessor
       end
     end
 
-    focus =
-      if wh > -1
-        if tokens[wh][:args]
-          tokens[wh][:args][0][1]
-        else
-          wh
-        end
-      elsif base_noun_chunks.nil? || base_noun_chunks.empty?
-        nil
-      else
-        base_noun_chunks[0][:head]
-      end
+    focus = if wh > -1
+              if tokens[wh][:args]
+                tokens[wh][:args][0][1]
+              else
+                wh
+              end
+            elsif base_noun_chunks.nil? || base_noun_chunks.empty?
+              nil
+            else
+              puts "here?"
+              base_noun_chunks[0][:head]
+            end
   end
 
 end
