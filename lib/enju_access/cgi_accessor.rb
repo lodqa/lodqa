@@ -156,7 +156,6 @@ class EnjuAccess::CGIAccessor
             elsif base_noun_chunks.nil? || base_noun_chunks.empty?
               nil
             else
-              puts "here?"
               base_noun_chunks[0][:head]
             end
   end
