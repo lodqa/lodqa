@@ -1,13 +1,16 @@
 #!/usr/bin/env ruby
 require 'rest-client'
+require 'sparql/client'
+
 require 'json'
 
 module Lodqa; end unless defined? Lodqa
 
 # An instance of this class is initialized with a dictionary.
 class Lodqa::Dictionary
-  def initialize (dictionary_url)
+  def initialize (dictionary_url, endpoint)
     @dictionary = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}
+    @endpoint = endpoint
   end
 
   def lookup (terms)

@@ -1,86 +1,45 @@
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script type="text/javascript" src="js/sparql.js"></script>
-<script type="text/javascript">
-  var bioportal = new SPARQL({ 
-    apikey: "<%= @apikey %>", 
-    endpoint: "<%= @endpoint %>"
-  });
-
-  function onFailure(xhr, status) {
-    $('#loading').toggle();
-    var html = "<pre>" + status + "</pre>";
-    html += "(See console)";
-    document.getElementById("result").innerHTML = html;
-    console.log("error");
-    console.log(xhr);
-  }
-
-  function onSuccess(json) {
-    $('#loading').toggle();
-    var html = "<table border='1'>";
-    for (var b in json.results.bindings) {
-      html += "<tr>";
-      for (var x in json.head.vars) { 
-        var value = json.results.bindings[b][json.head.vars[x]];
-        if (value.type == "uri")
-          html += "<td><a href='"+value.value+"'>" + value.value + "</a></td>";
-        else
-          html += "<td>" + value.value + "</td>";
-      }
-      html += "</tr>";
-    }
-    html += "</table>";
-    document.getElementById("result").innerHTML = html;
-  }
-
-  function enquire()
-  {
-    $('#loading').toggle();
-    var query = document.getElementById("sparql").value;
-    bioportal.query(query).done(onSuccess).error(onFailure);
-  }
-</script>
-
 <h1>Prototype Demo (targeting <%= @oname %>)</h1>
 
 <h2>Query</h2>
-<div class="atext"><%= @atext %></div>
+<div class="atext"><%= @query %></div>
 
 <h2>Semantic analysis (predicate-argument relation graph)</h2>
-<!-- <img src="temporary/_pas_graph.png"> -->
-<%= @pasgraph %>
-
-<h2>Psuedo SPARQL</h2>
-<div class="frame"><pre><%= @psparql %></pre></div>
-
-<h2>Term mapping</h2>
-<ul>
-<% @term_uris.each_key do |t| %>
-<li><%= t %></li>
-  <ul>
-    <% if @term_uris[t].empty? %>
-      <li class = "attention">Could not find the URI. Try with a different spelling.</li>
-    <% else %>
-      <% @term_uris[t].each do |uri| %>
-        <li><a href="<%= uri %>"><%= uri %></a></uri></li>
-      <% end %>
-    <% end %>
-  </ul>
-<% end %>
-</ul>
 
 <h2>SPARQL</h2>
 <textarea id="sparql" name="sparql" maxlength="1200" required="required" style="height:100px; width:100%"><%= @sparql %></textarea>
 </tr>
 
 <h2>Results</h2>
-<button type="button" onclick="enquire()">Send query to SPARQL endpoint</button><image id="loading" src="images/loader-vflff1Mjj.gif"> 
-<div class="frame" id="result">Availability is subject to change according to the state of the SPARQL endpoint.</div>
+<!-- <button type="button" onclick="enquire()">Send query to SPARQL endpoint</button><image id="loading" src="images/loader-vflff1Mjj.gif">  -->
+
+<h1>Simple Echo / Chat Server</h1>
+<form id="form">
+ <input type="text" id="input" value="send a message"></input>
+</form>
+<div id="msgs"></div>
+
 
 <script type="text/javascript">
-$(function(){
-    $('#loading').hide();
-});
+  window.onload = function(){
+    (function(){
+      var show = function(el){
+        return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
+      }(document.getElementById('msgs'));
+
+      var ws       = new WebSocket('ws://localhost:9292/update');
+      ws.onopen    = function()  { show('websocket opened'); };
+      ws.onclose   = function()  { show('websocket closed'); }
+      ws.onmessage = function(m) { show('websocket message: ' +  m.data); };
+
+      var sender = function(f){
+        var input     = document.getElementById('input');
+        input.onclick = function(){ input.value = "" };
+        f.onsubmit    = function(){
+          ws.send(input.value);
+          input.value = "send a message";
+          return false;
+        }
+      }(document.getElementById('form'));
+    })();
+  }
 </script>
-</body>
-</html>

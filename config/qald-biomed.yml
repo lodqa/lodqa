@@ -1,5 +1,5 @@
 parser_url: "http://bionlp.dbcls.jp/enju"
-endpoint_url: "http://sparql.pubannotation.org/sparql"
+endpoint_url: "http://rdf.pubannotation.org/sparql"
 ignore_predicates:
 sortal_predicates:
  - "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"

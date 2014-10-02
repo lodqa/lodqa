@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'net/http'
+require 'sparql/client'
 require 'json'
 require 'enju_access/enju_access'
 require 'graph_finder/graph_finder'
@@ -13,20 +14,18 @@ class Lodqa::Lodqa
   attr_reader :terms
 
   def initialize(query, parser_url, dictionary_url, ep_url, options = {})
-    options ||= {}
-    @debug = options[:debug] || false
-
-    @ep_url = ep_url
-    @options = options
+    @options = options || {}
+    @debug = @options[:debug] || false
 
     parser = EnjuAccess::CGIAccessor.new(parser_url)
     parse  = parser.parse(query)
     @pgp   = graphicate(parse)
 
-    dictionary = Lodqa::Dictionary.new(dictionary_url)
-    mappings   = dictionary.lookup(@pgp[:nodes].values.collect{|n| n[:text]})
+    @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
 
-    terms      = mappings.nil? ? nil : @pgp[:nodes].values.map{|n| mappings[n[:text]].collect{|u| "<#{u}>"}}
+    dictionary = Lodqa::Dictionary.new(dictionary_url, @endpoint)
+    mappings   = dictionary.lookup(@pgp[:nodes].values.collect{|n| n[:text]})
+    terms      = @pgp[:nodes].values.map{|n| mappings[n[:text]]}
 
     @anchored_pgps = terms.first.product(*terms.drop(1)).collect do |ts|
       anchored_pgp = pgp.dup
@@ -55,7 +54,7 @@ class Lodqa::Lodqa
 
   def find_answer
     @anchored_pgps.each do |anchored_pgp|
-      graphfinder = GraphFinder.new(anchored_pgp, @ep_url, @options)
+      graphfinder = GraphFinder.new(anchored_pgp, @endpoint, @options)
       graphfinder.each_solution do |s|
         p s
       end
@@ -65,7 +64,7 @@ class Lodqa::Lodqa
   def each_anchored_pgp_and_solution(proc_anchored_pgp = nil, proc_solution = nil)
     @anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-      GraphFinder.new(anchored_pgp, @ep_url, @options).each_solution do |s|
+      GraphFinder.new(anchored_pgp, @endpoint, @options).each_solution do |s|
         proc_solution.call(s)
       end
     end
@@ -182,16 +181,17 @@ if __FILE__ == $0
   focus = lodqa.get_focus
 
   proc_solution = Proc.new do |solution|
-    target = if solution[('i' + focus).to_sym].nil?
-      focus.to_sym
-    else
-      ('i' + focus).to_sym
-    end
-    puts solution[target]
-
-    # p solution
+    # target = if solution[('i' + focus).to_sym].nil?
+    #   focus.to_sym
+    # else
+    #   ('i' + focus).to_sym
+    # end
+    # puts solution[target]
+    # puts '-----'
+    # p solution.keys
+    p solution
   end
 
-  # lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
-  lodqa.each_anchored_pgp_and_solution(nil, proc_solution)
+  lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
+  # lodqa.each_anchored_pgp_and_solution(nil, proc_solution)
 end

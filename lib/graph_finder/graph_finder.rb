@@ -8,13 +8,12 @@ require 'sparql/client'
 class GraphFinder
   # This constructor takes the URL of an end point to be searched
   # optionally options can be passed to the server of the end point.
-  def initialize (pgp, ep_url, options = {})
+  def initialize (pgp, endpoint, options = {})
     options ||= {}
     @debug = options[:debug] || false
 
     @pgp = pgp
-    @endpoint = SPARQL::Client.new(ep_url, options[:endpoint_options] || {})
-
+    @endpoint = endpoint
     @ignore_predicates = options[:ignore_predicates] || []
     @sortal_predicates = options[:sortal_predicates] || []
 
@@ -149,8 +148,8 @@ class GraphFinder
   end
 
   def class?(term)
-    if /^<.+>$/.match(term)
-      sparql = "SELECT ?p WHERE {?s ?p #{term} FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
+    if /^http:/.match(term)
+      sparql = "SELECT ?p WHERE {?s ?p <#{term}> FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
       result = @endpoint.query(sparql)
       return true if result.length > 0
     end
@@ -167,7 +166,7 @@ class GraphFinder
     query = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')} WHERE {"
 
     # stringify the bgp
-    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e)? nodes[e][:term] : '?' + e}.join(' ')}.join(' . ') + ' .'
+    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e)? "<#{nodes[e][:term]}>" : '?' + e}.join(' ')}.join(' . ') + ' .'
 
     ## constraints on x-variables (including i-variables)
     x_variables = variables.dup.keep_if {|v| v[0] == 'x' or v[0] == 'i'}
