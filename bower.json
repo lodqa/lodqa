@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "springy": "~2.6.1",
-    "jQuery": "~2.1.1"
+    "jQuery": "~2.1.1",
+    "node-events": "https://github.com/Jxck/events.git"
   }
 }
