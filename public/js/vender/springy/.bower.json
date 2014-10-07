@@ -1,0 +1,27 @@
+{
+  "name": "Springy",
+  "main": "springy.js",
+  "version": "2.6.1",
+  "homepage": "https://github.com/dhotson/springy",
+  "authors": [
+    "Dennis Hotson <dennis@99designs.com>"
+  ],
+  "description": "A force directed graph layout algorithm",
+  "keywords": [
+    "graph",
+    "layout",
+    "visualization",
+    "physics"
+  ],
+  "license": "MIT",
+  "_release": "2.6.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.6.1",
+    "commit": "4480a8e3ff7f51623fa70dcd9aa5afaaba5a35ee"
+  },
+  "_source": "git://github.com/dhotson/springy.git",
+  "_target": "~2.6.1",
+  "_originalSource": "springy",
+  "_direct": true
+}
