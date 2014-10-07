@@ -1,5 +1,5 @@
 window.onload = function(){
-  (function(){
+  var loadSolution = function(){
     var show = function(el){
       return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
     }(document.getElementById('lodqa-messages'));
@@ -11,6 +11,8 @@ window.onload = function(){
     ws.onopen    = function()  { show('websocket opened!'); };
     ws.onclose   = function()  { show('websocket closed!'); };
     ws.onmessage = function(m) {
+
+      if(m.data === 'start') return;
 
       var jsondata = JSON.parse(m.data);
 
@@ -37,5 +39,17 @@ window.onload = function(){
         show('websocket message: ' +  m.data);
       }
     };
-  })();
+  },
+  initGraph = function(){
+    var graph = new Springy.Graph();
+    graph.newNode({
+      label: 'test'
+    });
+    $('#lodqa-graph').springy({
+      graph: graph
+    });
+  };
+
+  initGraph();
+  loadSolution();
 }
