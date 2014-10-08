@@ -80,19 +80,50 @@ window.onload = function() {
         label: solution[id]
       };
     },
-    addItxs = function(graph, solution){
-        return Object.keys(solution)
-          .filter(function(id) {
-            return id[0] === 'i';
-          })
-          .map(_.partial(toTerm, solution))
-          .map(toLabel)
-          .map(function(term) {
-            return {
-              id: term.id,
-              node: graph.newNode(term)
-            };
+    addTxs = function(graph, nodes) {
+      Object.keys(nodes)
+        .map(function(key) {
+          return {
+            id: key,
+            label: nodes[key].term
+          };
+        })
+        .map(toLabel)
+        .map(toNode)
+        .forEach(_.partial(addNode, graph));
+    },
+    addItxs = function(graph, solution) {
+      return Object.keys(solution)
+        .filter(function(id) {
+          return id[0] === 'i';
+        })
+        .map(_.partial(toTerm, solution))
+        .map(toLabel)
+        .map(function(term) {
+          return {
+            id: term.id,
+            node: graph.newNode(term)
+          };
         });
+    },
+    addStxs = function(graph, solution, itxs) {
+      Object.keys(solution)
+        .filter(function(id) {
+          return id[0] === 's';
+        })
+        .map(_.partial(toTerm, solution))
+        .map(toLabel)
+        .forEach(_.partial(addStxEdge, graph, itxs));
+    },
+    addStxEdge = function(graph, itxs, term) {
+      var tid = term.id.substr(1),
+        itx = itxs.filter(function(itx) {
+          return itx.id === 'i' + tid
+        }).map(function(itx) {
+          return itx.node;
+        })[0];
+
+      graph.newEdge(graph.nodeSet[tid], itx, term)
     },
     bindGpaph = function(solution) {
       var addNodeGraph, graph;
@@ -100,40 +131,14 @@ window.onload = function() {
       solution
         .on('anchored_pgp', function(anchored_pgp) {
           graph = initGraph();
-          addNodeGraph = _.partial(addNode, graph);
-
-          Object.keys(anchored_pgp.nodes)
-            .map(function(key) {
-              return {
-                id: key,
-                label: anchored_pgp.nodes[key].term
-              };
-            })
-            .map(toLabel)
-            .map(toNode)
-            .forEach(addNodeGraph);
+          addTxs(graph, anchored_pgp.nodes);
 
           console.log(graph);
         })
         .on('solution', function(solution) {
-          var toTermFromSolution = _.partial(toTerm, solution),
-              itxs = addItxs(graph, solution);
+          var itxs = addItxs(graph, solution);
 
-          Object.keys(solution)
-            .filter(function(id) {
-              return id[0] === 's';
-            })
-            .map(toTermFromSolution)
-            .map(toLabel)
-            .forEach(function(term) {
-              var tid = term.id.substr(1);
-
-              graph.newEdge(graph.nodeSet[tid], itxs.filter(function(itx) {
-                return itx.id === 'i' + tid
-              }).map(function(itx) {
-                return itx.node;
-              })[0], term)
-            });
+          addStxs(graph, solution, itxs);
 
           console.log(solution, itxs);
         });
