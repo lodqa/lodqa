@@ -168,6 +168,6 @@ window.onload = function() {
 
   var solution = loadSolution();
 
-  bindDebug(solution);
   bindGpaph(solution);
+  bindDebug(solution);
 }
