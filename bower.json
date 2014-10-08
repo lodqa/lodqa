@@ -4,6 +4,7 @@
   "dependencies": {
     "springy": "~2.6.1",
     "jQuery": "~2.1.1",
-    "node-events": "https://github.com/Jxck/events.git"
+    "node-events": "https://github.com/Jxck/events.git",
+    "decompose-url": "~0.1.3"
   }
 }

@@ -59,14 +59,20 @@ window.onload = function() {
   var solution = loadSolution();
 
   solution.on('anchored_pgp', function(data) {
-    console.log(data.anchored_pgp.nodes);
-
     var graph = initGraph();
-    Object.keys(data.anchored_pgp.nodes).forEach(function(key) {
-      graph.newNode({
-        label: data.anchored_pgp.nodes[key].term
+    Object.keys(data.anchored_pgp.nodes)
+      .map(function(key) {
+        return data.anchored_pgp.nodes[key].term;
+      })
+      .map(function(term) {
+        var path = decomposeUrl(term).path;
+        return path[path.length - 1];
+      })
+      .forEach(function(term) {
+        graph.newNode({
+          label: term
+        });
       });
-    });
   })
 
   bindDebug(solution);
