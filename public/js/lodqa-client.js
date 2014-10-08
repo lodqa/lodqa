@@ -47,7 +47,11 @@ window.onload = function() {
     },
     initGraph = function() {
       var graph = new Springy.Graph();
-      var canvas = $('<canvas>');
+      var canvas = $('<canvas>')
+        .attr({
+          width: 690,
+          height: 1000
+        });
       $('#lodqa-results').append(canvas);
       canvas.springy({
         graph: graph
@@ -56,26 +60,47 @@ window.onload = function() {
       return graph;
     },
     toLabel = function(term) {
-      var path = decomposeUrl(term.label).path;
+      var url = decomposeUrl(term.label),
+        path = url.path;
+
       return {
         id: term.id,
-        label: path[path.length - 1]
+        label: url.hash ? url.hash : path[path.length - 1]
       };
     },
     toNode = function(term) {
       return new Springy.Node(term.id, term);
     },
-    addGraph = function(graph, node) {
+    addNode = function(graph, node) {
       graph.addNode(node);
     },
+    toTerm = function(solution, id) {
+      return {
+        id: id,
+        label: solution[id]
+      };
+    },
+    addItxs = function(graph, solution){
+        return Object.keys(solution)
+          .filter(function(id) {
+            return id[0] === 'i';
+          })
+          .map(_.partial(toTerm, solution))
+          .map(toLabel)
+          .map(function(term) {
+            return {
+              id: term.id,
+              node: graph.newNode(term)
+            };
+        });
+    },
     bindGpaph = function(solution) {
-      var addCurrnetGraph;
+      var addNodeGraph, graph;
 
       solution
         .on('anchored_pgp', function(anchored_pgp) {
-          var graph = initGraph();
-
-          addCurrnetGraph = _.partial(addGraph, graph);
+          graph = initGraph();
+          addNodeGraph = _.partial(addNode, graph);
 
           Object.keys(anchored_pgp.nodes)
             .map(function(key) {
@@ -86,26 +111,31 @@ window.onload = function() {
             })
             .map(toLabel)
             .map(toNode)
-            .forEach(addCurrnetGraph);
+            .forEach(addNodeGraph);
 
           console.log(graph);
         })
         .on('solution', function(solution) {
+          var toTermFromSolution = _.partial(toTerm, solution),
+              itxs = addItxs(graph, solution);
+
           Object.keys(solution)
             .filter(function(id) {
-              return id[0] === 'i';
+              return id[0] === 's';
             })
-            .map(function(id) {
-              return {
-                id: id,
-                label: solution[id]
-              };
-            })
+            .map(toTermFromSolution)
             .map(toLabel)
-            .map(toNode)
-            .forEach(addCurrnetGraph);
+            .forEach(function(term) {
+              var tid = term.id.substr(1);
 
-          console.log(solution);
+              graph.newEdge(graph.nodeSet[tid], itxs.filter(function(itx) {
+                return itx.id === 'i' + tid
+              }).map(function(itx) {
+                return itx.node;
+              })[0], term)
+            });
+
+          console.log(solution, itxs);
         });
     };
 
