@@ -92,38 +92,34 @@ window.onload = function() {
         .map(toNode)
         .forEach(_.partial(addNode, graph));
     },
+    addStx = function(graph, solution, tx_id, itx) {
+      var stx_id = 's' + tx_id;
+
+      Object.keys(solution)
+        .filter(function(id) {
+          return id === stx_id;
+        })
+        .map(_.partial(toTerm, solution))
+        .map(toLabel)
+        .forEach(function(term) {
+          graph.newEdge(graph.nodeSet[tx_id], itx, term)
+        });
+    },
     addItxs = function(graph, solution) {
+      var addStxSoluntion = _.partial(addStx, graph, solution);
+
       return Object.keys(solution)
         .filter(function(id) {
           return id[0] === 'i';
         })
         .map(_.partial(toTerm, solution))
         .map(toLabel)
-        .map(function(term) {
-          return {
-            id: term.id,
-            node: graph.newNode(term)
-          };
-        });
-    },
-    addStxs = function(graph, solution, itxs) {
-      Object.keys(solution)
-        .filter(function(id) {
-          return id[0] === 's';
-        })
-        .map(_.partial(toTerm, solution))
-        .map(toLabel)
-        .forEach(_.partial(addStxEdge, graph, itxs));
-    },
-    addStxEdge = function(graph, itxs, term) {
-      var tid = term.id.substr(1),
-        itx = itxs.filter(function(itx) {
-          return itx.id === 'i' + tid
-        }).map(function(itx) {
-          return itx.node;
-        })[0];
+        .forEach(function(term) {
+          var tx_id = term.id.substr(1),
+            itx = graph.newNode(term);
 
-      graph.newEdge(graph.nodeSet[tid], itx, term)
+          addStxSoluntion(tx_id, itx);
+        });
     },
     bindGpaph = function(solution) {
       var addNodeGraph, graph;
@@ -136,11 +132,9 @@ window.onload = function() {
           console.log(graph);
         })
         .on('solution', function(solution) {
-          var itxs = addItxs(graph, solution);
+          addItxs(graph, solution);
 
-          addStxs(graph, solution, itxs);
-
-          console.log(solution, itxs);
+          console.log(solution);
         });
     };
 
