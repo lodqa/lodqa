@@ -92,18 +92,24 @@ window.onload = function() {
         .map(toNode)
         .forEach(_.partial(addNode, graph));
     },
-    addStx = function(graph, solution, tx_id, itx) {
-      var stx_id = 's' + tx_id;
-
+    addEdge = function(graph, solution, edge_id, node1, node2, color) {
       Object.keys(solution)
         .filter(function(id) {
-          return id === stx_id;
+          return id === edge_id;
         })
         .map(_.partial(toTerm, solution))
         .map(toLabel)
         .forEach(function(term) {
-          graph.newEdge(graph.nodeSet[tx_id], itx, term)
+          _.extend(term, {
+            color: color
+          });
+          graph.newEdge(node1, node2, term)
         });
+    },
+    addStx = function(graph, solution, tx_id, itx) {
+      var stx_id = 's' + tx_id;
+
+      addEdge(graph, solution, stx_id, graph.nodeSet[tx_id], itx);
     },
     addItxs = function(graph, solution) {
       var addStxSoluntion = _.partial(addStx, graph, solution);
@@ -133,6 +139,28 @@ window.onload = function() {
         })
         .on('solution', function(solution) {
           addItxs(graph, solution);
+
+          Object.keys(solution)
+            .filter(function(id) {
+              return id[0] === 'x';
+            })
+            .map(_.partial(toTerm, solution))
+            .map(toLabel)
+            .forEach(function(term) {
+              var xxx = graph.newNode(term),
+                p_no = parseInt(term.id[1]),
+                ids = {
+                  tx_id1: 't' + (p_no + 1),
+                  tx_id2: 't' + (p_no + 2),
+                  p_id1: 'p' + p_no + '1',
+                  p_id2: 'p' + p_no + '2'
+                };
+
+              addEdge(graph, solution, ids.p_id1, graph.nodeSet[ids.tx_id1], xxx, '#FF0000');
+              addEdge(graph, solution, ids.p_id2, xxx, graph.nodeSet[ids.tx_id2], '#0000FF');
+
+              console.log(ids);
+            });
 
           console.log(solution);
         });
