@@ -55,10 +55,28 @@ window.onload = function() {
 
       return graph;
     },
+    toLabel = function(term) {
+      var path = decomposeUrl(term.label).path;
+      return {
+        id: term.id,
+        label: path[path.length - 1]
+      };
+    },
+    toNode = function(term) {
+      return new Springy.Node(term.id, term);
+    },
+    addGraph = function(graph, node) {
+      graph.addNode(node);
+    },
     bindGpaph = function(solution) {
+      var addCurrnetGraph;
+
       solution
         .on('anchored_pgp', function(anchored_pgp) {
           var graph = initGraph();
+
+          addCurrnetGraph = _.partial(addGraph, graph);
+
           Object.keys(anchored_pgp.nodes)
             .map(function(key) {
               return {
@@ -66,21 +84,28 @@ window.onload = function() {
                 label: anchored_pgp.nodes[key].term
               };
             })
-            .map(function(term) {
-              var path = decomposeUrl(term.label).path;
-              return {
-                id: term.id,
-                label: path[path.length - 1]
-              };
-            })
-            .forEach(function(term) {
-              graph.addNode(new Springy.Node(term.id, term));
-            });
+            .map(toLabel)
+            .map(toNode)
+            .forEach(addCurrnetGraph);
 
           console.log(graph);
         })
         .on('solution', function(solution) {
-          //   console.log(solution);
+          Object.keys(solution)
+            .filter(function(id) {
+              return id[0] === 'i';
+            })
+            .map(function(id) {
+              return {
+                id: id,
+                label: solution[id]
+              };
+            })
+            .map(toLabel)
+            .map(toNode)
+            .forEach(addCurrnetGraph);
+
+          console.log(solution);
         });
     };
 
