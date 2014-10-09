@@ -68,6 +68,12 @@ window.onload = function() {
         label: url.hash ? url.hash : path[path.length - 1]
       };
     },
+    extendFont = function(term) {
+      return _.extend(term, {
+        font: '8px Verdana, sans-serif'
+      })
+    },
+    toLabelAndExtendFont = _.compose(extendFont, toLabel),
     toNode = function(term) {
       return new Springy.Node(term.id, term);
     },
@@ -88,7 +94,7 @@ window.onload = function() {
             label: nodes[key].term
           };
         })
-        .map(toLabel)
+        .map(toLabelAndExtendFont)
         .map(toNode)
         .forEach(_.partial(addNode, graph));
     },
@@ -119,7 +125,7 @@ window.onload = function() {
           return id === 'x' + p_no + '1';
         })
         .map(_.partial(toTerm, solution))
-        .map(toLabel)
+        .map(toLabelAndExtendFont)
         .forEach(function(term) {
           var xxx = graph.newNode(term),
             ids = {
@@ -136,14 +142,14 @@ window.onload = function() {
     },
     addItxs = function(graph, solution) {
       var addStxSolution = _.partial(addStx, graph, solution),
-          addXxxSolution = _.partial(addXxx, graph, solution);
+        addXxxSolution = _.partial(addXxx, graph, solution);
 
       Object.keys(solution)
         .filter(function(id) {
           return id[0] === 'i';
         })
         .map(_.partial(toTerm, solution))
-        .map(toLabel)
+        .map(toLabelAndExtendFont)
         .forEach(function(term) {
           var tx_id = term.id.substr(1),
             itx = graph.newNode(term);
