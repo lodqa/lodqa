@@ -111,10 +111,34 @@ window.onload = function() {
 
       addEdge(graph, solution, stx_id, graph.nodeSet[tx_id], itx);
     },
-    addItxs = function(graph, solution) {
-      var addStxSoluntion = _.partial(addStx, graph, solution);
+    addXxx = function(graph, solution, t_subject_id, itx) {
+      var p_no = parseInt(t_subject_id[1]) - 1;
 
-      return Object.keys(solution)
+      Object.keys(solution)
+        .filter(function(id) {
+          return id === 'x' + p_no + '1';
+        })
+        .map(_.partial(toTerm, solution))
+        .map(toLabel)
+        .forEach(function(term) {
+          var xxx = graph.newNode(term),
+            ids = {
+              t_objec_id: 't' + (p_no + 2),
+              p_id1: 'p' + p_no + '1',
+              p_id2: 'p' + p_no + '2'
+            };
+
+          addEdge(graph, solution, ids.p_id1, itx, xxx, '#FF0000');
+          addEdge(graph, solution, ids.p_id2, xxx, graph.nodeSet[ids.t_objec_id], '#0000FF');
+
+          console.log(ids);
+        });
+    },
+    addItxs = function(graph, solution) {
+      var addStxSolution = _.partial(addStx, graph, solution),
+          addXxxSolution = _.partial(addXxx, graph, solution);
+
+      Object.keys(solution)
         .filter(function(id) {
           return id[0] === 'i';
         })
@@ -124,7 +148,8 @@ window.onload = function() {
           var tx_id = term.id.substr(1),
             itx = graph.newNode(term);
 
-          addStxSoluntion(tx_id, itx);
+          addStxSolution(tx_id, itx);
+          addXxxSolution(tx_id, itx);
         });
     },
     bindGpaph = function(solution) {
@@ -139,28 +164,6 @@ window.onload = function() {
         })
         .on('solution', function(solution) {
           addItxs(graph, solution);
-
-          Object.keys(solution)
-            .filter(function(id) {
-              return id[0] === 'x';
-            })
-            .map(_.partial(toTerm, solution))
-            .map(toLabel)
-            .forEach(function(term) {
-              var xxx = graph.newNode(term),
-                p_no = parseInt(term.id[1]),
-                ids = {
-                  tx_id1: 't' + (p_no + 1),
-                  tx_id2: 't' + (p_no + 2),
-                  p_id1: 'p' + p_no + '1',
-                  p_id2: 'p' + p_no + '2'
-                };
-
-              addEdge(graph, solution, ids.p_id1, graph.nodeSet[ids.tx_id1], xxx, '#FF0000');
-              addEdge(graph, solution, ids.p_id2, xxx, graph.nodeSet[ids.tx_id2], '#0000FF');
-
-              console.log(ids);
-            });
 
           console.log(solution);
         });
