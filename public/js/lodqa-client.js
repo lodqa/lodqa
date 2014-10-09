@@ -50,7 +50,7 @@ window.onload = function() {
       var canvas = $('<canvas>')
         .attr({
           width: 690,
-          height: 1000
+          height: 400
         });
       $('#lodqa-results').append(canvas);
       canvas.springy({
