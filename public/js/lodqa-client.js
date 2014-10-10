@@ -68,12 +68,13 @@ window.onload = function() {
         label: url.hash ? url.hash : path[path.length - 1]
       };
     },
-    extendFont = function(term) {
-      return _.extend(term, {
-        font: '8px Verdana, sans-serif'
+    setFont = function(value, target) {
+      return _.extend(target, {
+        font: value
       })
     },
-    toLabelAndExtendFont = _.compose(extendFont, toLabel),
+    setFontNormal = _.partial(setFont, '8px Verdana, sans-serif'),
+    toLabelAndSetFontNormal = _.compose(setFontNormal, toLabel),
     toNode = function(term) {
       return new Springy.Node(term.id, term);
     },
@@ -86,7 +87,7 @@ window.onload = function() {
         label: solution[id]
       };
     },
-    addSubjects = function(graph, nodes) {
+    addSubjects = function(graph, nodes, focus) {
       Object.keys(nodes)
         .map(function(key) {
           return {
@@ -94,7 +95,13 @@ window.onload = function() {
             label: nodes[key].term
           };
         })
-        .map(toLabelAndExtendFont)
+        .map(toLabelAndSetFontNormal)
+        .map(function(term) {
+          if (term.id == focus) {
+            return setFont('32px Verdana, sans-serif', term);
+          }
+          return term;
+        })
         .map(toNode)
         .forEach(_.partial(addNode, graph));
     },
@@ -131,7 +138,7 @@ window.onload = function() {
         hasIdInSolutin = _.partial(hasId, solution),
         //左手があれば前回の右手に、無ければsubject instanceから繋ぐ
         left = hasIdInSolutin(left_node_id) ? previousRight : itx,
-        toNodeData = _.compose(toLabelAndExtendFont, _.partial(toTerm, solution)),
+        toNodeData = _.compose(toLabelAndSetFontNormal, _.partial(toTerm, solution)),
         //右手があれば右手に、無ければobjectに繋ぐ
         right = hasIdInSolutin(right_node_id) ? graph.newNode(toNodeData(right_node_id)) : graph.nodeSet[t_objec_id];
 
@@ -165,7 +172,7 @@ window.onload = function() {
           return id[0] === 'i';
         })
         .map(_.partial(toTerm, solution))
-        .map(toLabelAndExtendFont)
+        .map(toLabelAndSetFontNormal)
         .forEach(function(term) {
           addSubjectInstanceFromSolution(term, 't2');
         });
@@ -176,7 +183,7 @@ window.onload = function() {
       solution
         .on('anchored_pgp', function(anchored_pgp) {
           graph = initGraph();
-          addSubjects(graph, anchored_pgp.nodes);
+          addSubjects(graph, anchored_pgp.nodes, anchored_pgp.focus);
         })
         .on('solution', function(solution) {
           addSubjectInstances(graph, solution);
