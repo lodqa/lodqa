@@ -86,7 +86,7 @@ window.onload = function() {
         label: solution[id]
       };
     },
-    addTxs = function(graph, nodes) {
+    addSubjects = function(graph, nodes) {
       Object.keys(nodes)
         .map(function(key) {
           return {
@@ -105,44 +105,60 @@ window.onload = function() {
         })
         .map(_.partial(toTerm, solution))
         .map(toLabel)
-        .forEach(function(term) {
-          _.extend(term, {
+        .map(function(term) {
+          return _.extend(term, {
             color: color
           });
+        })
+        .forEach(function(term) {
           graph.newEdge(node1, node2, term)
         });
     },
-    addStx = function(graph, solution, tx_id, itx) {
+    addEdgeFromSubjectToInstance = function(graph, solution, tx_id, itx) {
       var stx_id = 's' + tx_id;
-
-      addEdge(graph, solution, stx_id, graph.nodeSet[tx_id], itx);
+      addEdge(graph, solution, stx_id, graph.nodeSet[tx_id], itx, '#999999');
     },
-    addXxx = function(graph, solution, t_subject_id, itx) {
-      var p_no = parseInt(t_subject_id[1]) - 1;
+    hasId = function(solution, left_node_id) {
+      return Object.keys(solution)
+        .filter(function(id) {
+          return id === left_node_id;
+        }).length === 1;
+    },
+    addEdgeOfPath = function(graph, solution, itx, p_no, t_objec_id, previousRight, path_id) {
+      var p_child_no = path_id[2],
+        left_node_id = 'x' + p_no + (parseInt(p_child_no) - 1),
+        right_node_id = 'x' + p_no + p_child_no,
+        hasIdInSolutin = _.partial(hasId, solution),
+        //左手があれば前回の右手に、無ければsubject instanceから繋ぐ
+        left = hasIdInSolutin(left_node_id) ? previousRight : itx,
+        toNodeData = _.compose(toLabelAndExtendFont, _.partial(toTerm, solution)),
+        //右手があれば右手に、無ければobjectに繋ぐ
+        right = hasIdInSolutin(right_node_id) ? graph.newNode(toNodeData(right_node_id)) : graph.nodeSet[t_objec_id];
+
+      addEdge(graph, solution, 'p' + p_no + p_child_no, left, right, '#0000FF');
+      return right;
+    },
+    addPath = function(graph, solution, t_subject_id, itx, t_objec_id) {
+      var p_no = parseInt(t_subject_id[1]) - 1,
+        addPathFromSubjectInstanceToObject = _.partial(addEdgeOfPath, graph, solution, itx, p_no, t_objec_id);
 
       Object.keys(solution)
         .filter(function(id) {
-          return id === 'x' + p_no + '1';
+          return id[0] === 'p' && id[1] === String(p_no);
         })
-        .map(_.partial(toTerm, solution))
-        .map(toLabelAndExtendFont)
-        .forEach(function(term) {
-          var xxx = graph.newNode(term),
-            ids = {
-              t_objec_id: 't' + (p_no + 2),
-              p_id1: 'p' + p_no + '1',
-              p_id2: 'p' + p_no + '2'
-            };
-
-          addEdge(graph, solution, ids.p_id1, itx, xxx, '#FF0000');
-          addEdge(graph, solution, ids.p_id2, xxx, graph.nodeSet[ids.t_objec_id], '#0000FF');
-
-          console.log(ids);
-        });
+        .reduce(function(previousRight, path_id) {
+          return addPathFromSubjectInstanceToObject(previousRight, path_id);
+        }, null);
     },
-    addItxs = function(graph, solution) {
-      var addStxSolution = _.partial(addStx, graph, solution),
-        addXxxSolution = _.partial(addXxx, graph, solution);
+    addSubjectInstance = function(graph, solution, term, endNodeId) {
+      var tx_id = term.id.substr(1),
+        itx = graph.newNode(term);
+
+      addEdgeFromSubjectToInstance(graph, solution, tx_id, itx);
+      addPath(graph, solution, tx_id, itx, endNodeId);
+    },
+    addSubjectInstances = function(graph, solution) {
+      var addSubjectInstanceFromSolution = _.partial(addSubjectInstance, graph, solution);
 
       Object.keys(solution)
         .filter(function(id) {
@@ -151,11 +167,7 @@ window.onload = function() {
         .map(_.partial(toTerm, solution))
         .map(toLabelAndExtendFont)
         .forEach(function(term) {
-          var tx_id = term.id.substr(1),
-            itx = graph.newNode(term);
-
-          addStxSolution(tx_id, itx);
-          addXxxSolution(tx_id, itx);
+          addSubjectInstanceFromSolution(term, 't2');
         });
     },
     bindGpaph = function(solution) {
@@ -164,14 +176,10 @@ window.onload = function() {
       solution
         .on('anchored_pgp', function(anchored_pgp) {
           graph = initGraph();
-          addTxs(graph, anchored_pgp.nodes);
-
-          console.log(graph);
+          addSubjects(graph, anchored_pgp.nodes);
         })
         .on('solution', function(solution) {
-          addItxs(graph, solution);
-
-          console.log(solution);
+          addSubjectInstances(graph, solution);
         });
     };
 
