@@ -87,6 +87,13 @@ window.onload = function() {
         label: solution[id]
       };
     },
+    toBigFont = _.partial( setFont, '18px Verdana, sans-serif'),
+    toRed = function(term) {
+      return _.extend(term, {
+        color: '#FF512C'
+      });
+    },
+    toFocus = _.compose(toRed, toBigFont),
     addSubjects = function(graph, nodes, focus) {
       Object.keys(nodes)
         .map(function(key) {
@@ -97,10 +104,7 @@ window.onload = function() {
         })
         .map(toLabelAndSetFontNormal)
         .map(function(term) {
-          if (term.id == focus) {
-            return setFont('32px Verdana, sans-serif', term);
-          }
-          return term;
+          return term.id === focus ? toFocus(term) : term;
         })
         .map(toNode)
         .forEach(_.partial(addNode, graph));
@@ -142,7 +146,7 @@ window.onload = function() {
         //右手があれば右手に、無ければobjectに繋ぐ
         right = hasIdInSolutin(right_node_id) ? graph.newNode(toNodeData(right_node_id)) : graph.nodeSet[t_objec_id];
 
-      addEdge(graph, solution, 'p' + p_no + p_child_no, left, right, '#0000FF');
+      addEdge(graph, solution, 'p' + p_no + p_child_no, left, right, '#2B5CFF');
       return right;
     },
     addPath = function(graph, solution, t_subject_id, itx, t_objec_id) {
@@ -164,7 +168,7 @@ window.onload = function() {
       addEdgeFromSubjectToInstance(graph, solution, tx_id, itx);
       addPath(graph, solution, tx_id, itx, endNodeId);
     },
-    addSubjectInstances = function(graph, solution) {
+    addSubjectInstances = function(graph, solution, focus) {
       var addSubjectInstanceFromSolution = _.partial(addSubjectInstance, graph, solution);
 
       Object.keys(solution)
@@ -173,20 +177,25 @@ window.onload = function() {
         })
         .map(_.partial(toTerm, solution))
         .map(toLabelAndSetFontNormal)
+        .map(function(term) {
+          var tx_id = term.id.substr(1);
+          return tx_id === focus ? toRed(term) : term;
+        })
         .forEach(function(term) {
           addSubjectInstanceFromSolution(term, 't2');
         });
     },
     bindGpaph = function(solution) {
-      var addNodeGraph, graph;
+      var addNodeGraph, graph, focus;
 
       solution
         .on('anchored_pgp', function(anchored_pgp) {
           graph = initGraph();
-          addSubjects(graph, anchored_pgp.nodes, anchored_pgp.focus);
+          focus = anchored_pgp.focus;
+          addSubjects(graph, anchored_pgp.nodes, focus);
         })
         .on('solution', function(solution) {
-          addSubjectInstances(graph, solution);
+          addSubjectInstances(graph, solution, focus);
         });
     };
 
