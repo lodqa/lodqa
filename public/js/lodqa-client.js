@@ -45,6 +45,41 @@ window.onload = function() {
           currentRegion.innerHTML += '<br />' + JSON.stringify(solution);
         });
     },
+    bindTable = function(solution) {
+      solution
+        .on('anchored_pgp', function(anchored_pgp) {
+          var $region = $('<div>'),
+            $table = $('<table>');
+
+          $region
+            .addClass('anchored_pgp-table')
+            .append($table);
+
+          $table
+            .append(
+              $('<tr>')
+              .append($('<th>'))
+              .append($('<th>').text('head'))
+              .append($('<th>').text('text'))
+              .append($('<th>').text('term'))
+            );
+
+          Object.keys(anchored_pgp.nodes)
+            .map(function(node_id) {
+              var node = anchored_pgp.nodes[node_id];
+              return $('<tr>')
+                .append($('<td>').text(node_id))
+                .append($('<td>').text(node.head))
+                .append($('<td>').text(node.text))
+                .append($('<td>').text(node.term));
+            })
+            .forEach(function($tr) {
+              $table.append($tr);
+            });
+
+          $('#lodqa-results').append($region);
+        })
+    },
     initGraph = function() {
       var graph = new Springy.Graph();
       var canvas = $('<canvas>')
@@ -225,6 +260,7 @@ window.onload = function() {
 
   var solution = loadSolution();
 
+  bindTable(solution);
   bindGpaph(solution);
   bindDebug(solution);
 }

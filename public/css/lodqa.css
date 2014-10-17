@@ -197,3 +197,24 @@ div.atext {
 
 #config {background-color: #EEEEEE}
 
+.anchored_pgp-table {
+    border: 1px solid black;
+}
+
+.anchored_pgp-table table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.anchored_pgp-table th {
+    background-color: #eee;
+    border: 1px solid #b9b9b9;
+    color: #333;
+    padding: 6px;
+}
+
+.anchored_pgp-table td {
+    background-color: #fff;
+    border: 1px solid #b9b9b9;
+    padding: 6px;
+}
