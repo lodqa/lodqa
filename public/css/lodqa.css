@@ -197,6 +197,7 @@ div.atext {
 
 #config {background-color: #EEEEEE}
 
+/* anchored_pgp-table */
 .anchored_pgp-table {
     border: 1px solid black;
 }
@@ -217,4 +218,9 @@ div.atext {
     background-color: #fff;
     border: 1px solid #b9b9b9;
     padding: 6px;
+}
+
+/* anchored_pgp-table focus*/
+.anchored_pgp-table .focus td {
+    color: #FF512C;
 }
