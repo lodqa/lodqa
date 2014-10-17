@@ -268,5 +268,5 @@ window.onload = function() {
 
   bindTable(solution);
   bindGpaph(solution);
-  bindDebug(solution);
+  // bindDebug(solution);
 }
