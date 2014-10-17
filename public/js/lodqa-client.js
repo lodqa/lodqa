@@ -59,6 +59,12 @@ window.onload = function() {
 
       return graph;
     },
+    toSubjectTerm = function(nodes, key) {
+      return {
+        id: key,
+        label: nodes[key].term
+      };
+    },
     toLabel = function(term) {
       var url = decomposeUrl(term.label),
         path = url.path;
@@ -81,33 +87,51 @@ window.onload = function() {
     addNode = function(graph, node) {
       graph.addNode(node);
     },
-    toTerm = function(solution, id) {
-      return {
-        id: id,
-        label: solution[id]
-      };
-    },
-    toBigFont = _.partial( setFont, '18px Verdana, sans-serif'),
+    toBigFont = _.partial(setFont, '18px Verdana, sans-serif'),
     toRed = function(term) {
       return _.extend(term, {
         color: '#FF512C'
       });
     },
     toFocus = _.compose(toRed, toBigFont),
+    setFocus = function(focus, term) {
+      return term.id === focus ? toFocus(term) : term;
+    },
+    subjectPositions = [
+      [],
+      [{
+        x: 0,
+        y: 0
+      }],
+      [{
+        x: 0,
+        y: 10
+      }, {
+        x: 10,
+        y: 0
+      }]
+    ],
+    setPosition = function(number_of_nodes, term, index) {
+      return _.extend(term, {
+        position: subjectPositions[number_of_nodes][index]
+      });
+    },
     addSubjects = function(graph, nodes, focus) {
-      Object.keys(nodes)
-        .map(function(key) {
-          return {
-            id: key,
-            label: nodes[key].term
-          };
-        })
+      var node_ids = Object.keys(nodes);
+
+      node_ids
+        .map(_.partial(toSubjectTerm, nodes))
         .map(toLabelAndSetFontNormal)
-        .map(function(term) {
-          return term.id === focus ? toFocus(term) : term;
-        })
+        .map(_.partial(setFocus, focus))
+        .map(_.partial(setPosition, node_ids.length))
         .map(toNode)
         .forEach(_.partial(addNode, graph));
+    },
+    toTerm = function(solution, id) {
+      return {
+        id: id,
+        label: solution[id]
+      };
     },
     addEdge = function(graph, solution, edge_id, node1, node2, color) {
       Object.keys(solution)

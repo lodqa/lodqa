@@ -13,13 +13,12 @@
     "physics"
   ],
   "license": "MIT",
-  "_release": "322a7bae8b",
+  "_release": "be4e74dcfa",
   "_resolution": {
     "type": "commit",
-    "commit": "322a7bae8bc33f5c3f787657df3b9a6d5544fe12"
+    "commit": "be4e74dcfa6a6dfd1646b64a8c2da39efbd5a909"
   },
   "_source": "git@github.com:shigeruNakajima/springy.git",
-  "_target": "322a7bae8bc33f5c3f787657df3b9a6d5544fe12",
-  "_originalSource": "git@github.com:shigeruNakajima/springy.git",
-  "_direct": true
+  "_target": "be4e74dcfa6a6dfd1646b64a8c2da39efbd5a909",
+  "_originalSource": "git@github.com:shigeruNakajima/springy.git"
 }

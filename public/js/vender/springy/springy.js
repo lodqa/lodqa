@@ -338,8 +338,14 @@
 
 	Layout.ForceDirected.prototype.point = function(node) {
 		if (!(node.id in this.nodePoints)) {
-			var mass = (node.data.mass !== undefined) ? node.data.mass : 1.0;
-			this.nodePoints[node.id] = new Layout.ForceDirected.Point(Vector.random(), mass);
+			var mass = (node.data.mass !== undefined) ? node.data.mass : 1.0,
+				position = (node.data.position !== undefined) ? node.data.position : null;
+
+			if(position){
+				this.nodePoints[node.id] = new Layout.ForceDirected.Point(new Vector(position.x, position.y), mass);
+			}else{
+				this.nodePoints[node.id] = new Layout.ForceDirected.Point(Vector.random(), mass);
+			}
 		}
 
 		return this.nodePoints[node.id];
@@ -457,7 +463,9 @@
 		this.eachNode(function(node, point) {
 			// Same question as above; along with updateVelocity, is this all of
 			// your integration code?
-			point.p = point.p.add(point.v.multiply(timestep));
+			if(node.data.position === undefined){
+				point.p = point.p.add(point.v.multiply(timestep));
+			}
 		});
 	};
 
