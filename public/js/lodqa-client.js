@@ -8,8 +8,8 @@ window.onload = function() {
       .on('solution', _.partial(presetation.onSolution, data));
   };
 
-  // var solution = lodqaClient.loadSolution();
-  var solution = lodqaClient.loadSolutionStub();
+  var solution = lodqaClient.loadSolution();
+  // var solution = lodqaClient.loadSolutionStub();
 
   bindSolution(solution, lodqaClient.tablePresentation);
   bindSolution(solution, lodqaClient.graphPresentation);
