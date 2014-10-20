@@ -15,7 +15,7 @@
 
         return graph;
       },
-      toSubjectTerm = function(nodes, key) {
+      toAnchoredPgpNodeTerm = function(nodes, key) {
         return {
           id: key,
           label: nodes[key].term
@@ -53,7 +53,7 @@
       setFocus = function(focus, term) {
         return term.id === focus ? toFocus(term) : term;
       },
-      subjectPositions = [
+      anchoredPgpNodePositions = [
         [],
         [{
           x: 0,
@@ -79,14 +79,14 @@
       ],
       setPosition = function(number_of_nodes, term, index) {
         return _.extend(term, {
-          position: subjectPositions[number_of_nodes][index]
+          position: anchoredPgpNodePositions[number_of_nodes][index]
         });
       },
-      addSubjects = function(graph, nodes, focus) {
+      addAnchoredPgpNodes = function(graph, nodes, focus) {
         var node_ids = Object.keys(nodes);
 
         node_ids
-          .map(_.partial(toSubjectTerm, nodes))
+          .map(_.partial(toAnchoredPgpNodeTerm, nodes))
           .map(toLabelAndSetFontNormal)
           .map(_.partial(setFocus, focus))
           .map(_.partial(setPosition, node_ids.length))
@@ -99,10 +99,10 @@
           label: solution[id]
         };
       },
-      addEdge = function(graph, solution, edge_id, node1, node2, color) {
-        Object.keys(solution)
+      addEdge = function(graph, solution, edgeId, node1, node2, color) {
+        return _.first(Object.keys(solution)
           .filter(function(id) {
-            return id === edge_id;
+            return id === edgeId;
           })
           .map(_.partial(toTerm, solution))
           .map(toLabel)
@@ -111,57 +111,18 @@
               color: color
             });
           })
-          .forEach(function(term) {
-            graph.newEdge(node1, node2, term)
-          });
+          .map(function(term) {
+            return graph.newEdge(node1, node2, term)
+          }));
       },
-      addEdgeFromSubjectToInstance = function(graph, solution, tx_id, itx) {
-        var stx_id = 's' + tx_id;
-        addEdge(graph, solution, stx_id, graph.nodeSet[tx_id], itx, '#999999');
+      addEdgeToInstance = function(graph, solution, instanceNode) {
+        var anchoredPgpNodeId = instanceNode.data.id.substr(1),
+          edge_id = 's' + anchoredPgpNodeId,
+          anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId];
+        addEdge(graph, solution, edge_id, anchoredPgpNode, instanceNode, '#999999');
       },
-      hasId = function(solution, left_node_id) {
+      addInstanceNode = function(graph, solution, focus) {
         return Object.keys(solution)
-          .filter(function(id) {
-            return id === left_node_id;
-          }).length === 1;
-      },
-      addEdgeOfPath = function(graph, solution, itx, p_no, t_objec_id, previousRight, path_id) {
-        var p_child_no = path_id[2],
-          left_node_id = 'x' + p_no + (parseInt(p_child_no) - 1),
-          right_node_id = 'x' + p_no + p_child_no,
-          hasIdInSolutin = _.partial(hasId, solution),
-          //左手があれば前回の右手に、無ければsubject instanceから繋ぐ
-          left = hasIdInSolutin(left_node_id) ? previousRight : itx,
-          toNodeData = _.compose(toLabelAndSetFontNormal, _.partial(toTerm, solution)),
-          //右手があれば右手に、無ければobjectに繋ぐ
-          right = hasIdInSolutin(right_node_id) ? graph.newNode(toNodeData(right_node_id)) : graph.nodeSet[t_objec_id];
-
-        addEdge(graph, solution, 'p' + p_no + p_child_no, left, right, '#2B5CFF');
-        return right;
-      },
-      addPath = function(graph, solution, t_subject_id, itx, t_objec_id) {
-        var p_no = parseInt(t_subject_id[1]) - 1,
-          addPathFromSubjectInstanceToObject = _.partial(addEdgeOfPath, graph, solution, itx, p_no, t_objec_id);
-
-        Object.keys(solution)
-          .filter(function(id) {
-            return id[0] === 'p' && id[1] === String(p_no);
-          })
-          .reduce(function(previousRight, path_id) {
-            return addPathFromSubjectInstanceToObject(previousRight, path_id);
-          }, null);
-      },
-      addSubjectInstance = function(graph, solution, term, endNodeId) {
-        var tx_id = term.id.substr(1),
-          itx = graph.newNode(term);
-
-        addEdgeFromSubjectToInstance(graph, solution, tx_id, itx);
-        addPath(graph, solution, tx_id, itx, endNodeId);
-      },
-      addSubjectInstances = function(graph, solution, focus) {
-        var addSubjectInstanceFromSolution = _.partial(addSubjectInstance, graph, solution);
-
-        Object.keys(solution)
           .filter(function(id) {
             return id[0] === 'i';
           })
@@ -171,19 +132,99 @@
             var tx_id = term.id.substr(1);
             return tx_id === focus ? toRed(term) : term;
           })
-          .forEach(function(term) {
-            addSubjectInstanceFromSolution(term, 't2');
-          });
+          .reduce(function(result, term) {
+            var instanceNode = graph.newNode(term);
+            addEdgeToInstance(graph, solution, instanceNode);
+            result[term.id] = instanceNode;
+            return result;
+          }, {});
+      },
+      addTransitNode = function(graph, solution) {
+        return Object.keys(solution)
+          .filter(function(id) {
+            return id[0] === 'x';
+          })
+          .map(_.partial(toTerm, solution))
+          .map(toLabelAndSetFontNormal)
+          .reduce(function(result, term) {
+            result[term.id] = graph.newNode(term);
+            return result;
+          }, {});
+      },
+      toPathInfo = function(pathId) {
+        return {
+          id: pathId,
+          no: pathId[1],
+          childNo: parseInt(pathId[2])
+        }
+      },
+      toLeftId = function(edge, pathInfo) {
+        var anchoredPgpNodeId = edge.subject,
+          instanceNodeId = 'i' + anchoredPgpNodeId;
+
+        return {
+          transitNodeId: 'x' + pathInfo.no + (pathInfo.childNo - 1),
+          instanceNodeId: 'i' + anchoredPgpNodeId,
+          anchoredPgpNodeId: anchoredPgpNodeId
+        };
+      },
+      toRightId = function(edge, pathInfo) {
+        var anchoredPgpNodeId = edge.object,
+          instanceNodeId = 'i' + anchoredPgpNodeId;
+
+        return {
+          transitNodeId: 'x' + pathInfo.no + pathInfo.childNo,
+          instanceNodeId: 'i' + anchoredPgpNodeId,
+          anchoredPgpNodeId: anchoredPgpNodeId
+        };
+      },
+      toGraphId = function(transitNodes, instanceNodes, canididateIds) {
+        if (transitNodes[canididateIds.transitNodeId]) {
+          return transitNodes[canididateIds.transitNodeId].id;
+        } else if (instanceNodes[canididateIds.instanceNodeId]) {
+          return instanceNodes[canididateIds.instanceNodeId].id
+        } else {
+          return canididateIds.anchoredPgpNodeId;
+        }
+      },
+      toPath = function(graph, edges, transitNodes, instanceNodes, pathInfo) {
+        var edge = edges[pathInfo.no],
+          toGraphIdFromNodes = _.partial(toGraphId, transitNodes, instanceNodes),
+          toGraphNode = _.compose(function(id) {
+            return graph.nodeSet[id];
+          }, toGraphIdFromNodes);
+
+        return {
+          id: pathInfo.id,
+          left: toGraphNode(toLeftId(edge, pathInfo)),
+          right: toGraphNode(toRightId(edge, pathInfo))
+        };
+      },
+      addPath = function(graph, solution, edges, transitNodes, instanceNodes) {
+        return Object.keys(solution)
+          .filter(function(id) {
+            return id[0] === 'p';
+          })
+          .map(toPathInfo)
+          .map(_.partial(toPath, graph, edges, transitNodes, instanceNodes))
+          .reduce(function(result, path) {
+            result[path.id] = addEdge(graph, solution, path.id, path.left, path.right, '#2B5CFF');
+            return result;
+          }, {});
       };
 
     return {
       onAnchoredPgp: function(domId, data, anchored_pgp) {
         data.graph = initGraph();
         data.focus = anchored_pgp.focus;
-        addSubjects(data.graph, anchored_pgp.nodes, data.focus);
+        data.edges = anchored_pgp.edges;
+        addAnchoredPgpNodes(data.graph, anchored_pgp.nodes, data.focus);
       },
       onSolution: function(data, solution) {
-        addSubjectInstances(data.graph, solution, data.focus);
+        var instanceNodes = addInstanceNode(data.graph, solution, data.focus),
+          transitNodes = addTransitNode(data.graph, solution);
+
+        addPath(data.graph, solution, data.edges, transitNodes, instanceNodes);
       }
     };
   }();
