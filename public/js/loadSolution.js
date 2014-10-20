@@ -7,7 +7,7 @@
       }
     }(document.getElementById('lodqa-messages'));
 
-    var ws = new WebSocket('ws://localhost:9292/solutions'),
+    var ws = new WebSocket(location.href.replace('http://', 'ws://')),
       emitter = new events.EventEmitter();
 
     ws.onopen = function() {
