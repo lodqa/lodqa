@@ -40,31 +40,31 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/solutions' do
-	  if !request.websocket?
-	  	@query = params['query']
-	    erb :solutions
-	  else
-	    request.websocket do |ws|
-		    ws.onopen do
-		    	ws.send("start")
-		    	EM.defer do
-		        @query = "what side effects are associated with streptomycin?"
+		if !request.websocket?
+			@query = params['query']
+			erb :solutions
+		else
+			request.websocket do |ws|
+				ws.onopen do
+					ws.send("start")
+					EM.defer do
+						@query = "what side effects are associated with streptomycin?"
 						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
 
 						proc_anchored_pgp = Proc.new do |anchored_pgp|
-			      	EM.add_timer(1){ws.send({:anchored_pgp => anchored_pgp}.to_json)}
-					  end
+							EM.add_timer(1){ws.send({:anchored_pgp => anchored_pgp}.to_json)}
+						end
 
-					  proc_solution = Proc.new do |solution|
+						proc_solution = Proc.new do |solution|
 							EM.add_timer(1){ws.send({:solution => solution.to_h}.to_json)}
-					  end
+						end
 
-			  		lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
+						lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
 
-			  		ws.close_connection
-		    	end
-		    end
-		  end
-	  end
+						ws.close_connection
+					end
+				end
+			end
+		end
 	end
 end
