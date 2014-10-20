@@ -65,6 +65,16 @@
         }, {
           x: 10,
           y: 0
+        }],
+        [{
+          x: 0,
+          y: 10
+        }, {
+          x: 5,
+          y: 0
+        }, {
+          x: 10,
+          y: 10
         }]
       ],
       setPosition = function(number_of_nodes, term, index) {
