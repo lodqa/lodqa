@@ -53,6 +53,54 @@
       setFocus = function(focus, term) {
         return term.id === focus ? toFocus(term) : term;
       },
+      extendIndex = function(a, index) {
+        a.index = index;
+        return a;
+      },
+      threeNodeOrders = {
+        t1: [1, 0, 2],
+        t2: [0, 1, 2],
+        t3: [0, 2, 1]
+      },
+      getNodeOrder = function(id) {
+        return threeNodeOrders[id];
+      },
+      getTwoEdgeNode = function(edgeCount) {
+        return _.first(Object.keys(edgeCount)
+          .map(function(id) {
+            return {
+              id: id,
+              count: edgeCount[id]
+            };
+          })
+          .filter(function(node) {
+            return node.count === 2;
+          })
+          .map(function(node) {
+            return node.id;
+          }));
+      },
+      countEdge = function(edges) {
+        return edges.reduce(function(edgeCount, edge) {
+          edgeCount[edge.subject] ++;
+          edgeCount[edge.object] ++;
+          return edgeCount;
+        }, {
+          t1: 0,
+          t2: 0,
+          t3: 0
+        });
+      },
+      getOrderWhenThreeNode = _.compose(getNodeOrder, getTwoEdgeNode, countEdge),
+      sortNode = function(nodeIds, edges, a, b) {
+        if (nodeIds.length === 3) {
+          var nodeOrder = getOrderWhenThreeNode(edges);
+
+          return nodeOrder[a.index] - nodeOrder[b.index];
+        } else {
+          return b.index - a.index;
+        }
+      },
       anchoredPgpNodePositions = [
         [],
         [{
@@ -71,10 +119,10 @@
           y: 10
         }, {
           x: 5,
-          y: 0
+          y: 5
         }, {
           x: 10,
-          y: 10
+          y: 0
         }]
       ],
       setPosition = function(number_of_nodes, term, index) {
@@ -82,14 +130,16 @@
           position: anchoredPgpNodePositions[number_of_nodes][index]
         });
       },
-      addAnchoredPgpNodes = function(graph, nodes, focus) {
-        var node_ids = Object.keys(nodes);
+      addAnchoredPgpNodes = function(graph, nodes, focus, edges) {
+        var nodeIds = Object.keys(nodes);
 
-        node_ids
+        nodeIds
           .map(_.partial(toAnchoredPgpNodeTerm, nodes))
           .map(toLabelAndSetFontNormal)
           .map(_.partial(setFocus, focus))
-          .map(_.partial(setPosition, node_ids.length))
+          .map(extendIndex)
+          .sort(_.partial(sortNode, nodeIds, edges))
+          .map(_.partial(setPosition, nodeIds.length))
           .map(toNode)
           .forEach(_.partial(addNode, graph));
       },
@@ -218,7 +268,7 @@
         data.graph = initGraph();
         data.focus = anchored_pgp.focus;
         data.edges = anchored_pgp.edges;
-        addAnchoredPgpNodes(data.graph, anchored_pgp.nodes, data.focus);
+        addAnchoredPgpNodes(data.graph, anchored_pgp.nodes, data.focus, data.edges);
       },
       onSolution: function(data, solution) {
         var instanceNodes = addInstanceNode(data.graph, solution, data.focus),
