@@ -13,5 +13,5 @@ window.onload = function() {
 
   bindSolution(solution, lodqaClient.tablePresentation);
   bindSolution(solution, lodqaClient.graphPresentation);
-  bindSolution(solution, lodqaClient.debugPresentation);
+  // bindSolution(solution, lodqaClient.debugPresentation);
 }
