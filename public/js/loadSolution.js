@@ -3,7 +3,7 @@
   this.lodqaClient.loadSolution = function() {
     var show = function(el) {
       return function(msg) {
-        el.innerHTML = msg + '<br />' + el.innerHTML;
+        el.innerHTML = msg;
       }
     }(document.getElementById('lodqa-messages'));
 
@@ -11,10 +11,10 @@
       emitter = new events.EventEmitter();
 
     ws.onopen = function() {
-      show('websocket opened!');
+      show('lodqa running ...');
     };
     ws.onclose = function() {
-      show('websocket closed!');
+      show('lodqa finished.');
     };
     ws.onmessage = function(m) {
       if (m.data === 'start') return;
