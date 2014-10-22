@@ -18,8 +18,8 @@ class Lodqa::Lodqa
     @debug = @options[:debug] || false
 
     parser = EnjuAccess::CGIAccessor.new(parser_url)
-    parse  = parser.parse(query)
-    @pgp   = graphicate(parse)
+    @parse  = parser.parse(query)
+    @pgp   = graphicate(@parse)
 
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
 
@@ -50,6 +50,10 @@ class Lodqa::Lodqa
 
   def get_focus
     @pgp[:focus]
+  end
+
+  def get_parse_rendering
+    EnjuAccess::get_graph_rendering(@parse)
   end
 
   def find_answer
@@ -118,7 +122,7 @@ end
 
 if __FILE__ == $0
   # default values
-  config_file = 'config/bio2rdf-omim.yml'
+  config_file = 'config/qald-biomed.yml'
   maxhop = 2
   query = nil
   debug = false
