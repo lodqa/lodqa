@@ -50,6 +50,7 @@ class LodqaWS < Sinatra::Base
 					EM.defer do
 						@query = params['query']
 						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+						parse_rendering = lodqa.get_parse_rendering
 
 						proc_anchored_pgp = Proc.new do |anchored_pgp|
 							EM.add_timer(1){ws.send({:anchored_pgp => anchored_pgp}.to_json)}
