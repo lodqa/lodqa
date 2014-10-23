@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>PromiseExt</id>
+    <version>0.1.0</version>
+    <authors>SPA Tools</authors>
+    <owners>SPA Tools</owners>
+    <licenseUrl>https://github.com/spatools/promise/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/spatools/promise</projectUrl>
+    <iconUrl>http://www.gravatar.com/avatar/6ef2fbcb91a9299ffb3c918b50d038d4.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      An AMD Ecmascript 6 Polyfill which is strictly following specification + Extensions.
+      Built version available using package 'PromiseExt.Built'.
+    </description>
+    <releaseNotes>
+      You can see release notes at :
+      https://github.com/spatools/promise
+    </releaseNotes>
+    <copyright>Copyright 2014 - SPA Tools</copyright>
+    <tags>
+      Promise,
+      es6,
+      ecmascript6,
+      Extension,
+      Polyfill,
+      Require,
+      AMD
+    </tags>
+    <dependencies>
+      <dependency id="RequireJS" version="2.1.10" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\dist\promise.js" target="Content\Scripts\" />
+    <file src="..\dist\promise-almond.js" target="Content\Scripts\" />
+    <file src="..\dist\promise\abstract.js" target="Content\Scripts\promise" />
+    <file src="..\dist\promise\class.js" target="Content\Scripts\promise" />
+    <file src="..\dist\promise\extensions.js" target="Content\Scripts\promise" />
+    <file src="..\dist\promise\status.js" target="Content\Scripts\promise" />
+    <file src="..\dist\promise\tasks.js" target="Content\Scripts\promise" />
+    <file src="..\dist\promise\timeout.js" target="Content\Scripts\promise" />
+    <file src="..\dist\promise\utils.js" target="Content\Scripts\promise" />
+  </files>
+</package>

@@ -1,0 +1,43 @@
+{
+  "name": "promise-ext",
+  "version": "0.3.4",
+  "description": "An Ecmascript 6 Polyfill which is strictly following specification + Extensions",
+  "main": "lib/promise.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spatools/promise.git"
+  },
+  "keywords": [
+    "promise",
+    "es6",
+    "extension",
+    "queue",
+    "javascript",
+    "typescript"
+  ],
+  "devDependencies": {
+	"grunt": ">=0.4.2",
+	"grunt-contrib-clean": ">=0.5.0",
+	"grunt-contrib-connect": ">=0.6.0",
+	"grunt-contrib-jshint": ">=0.8.0",
+	"grunt-contrib-requirejs": ">=0.4.1",
+	"grunt-contrib-watch": ">=0.5.3",
+	"grunt-mocha": ">=0.4.10",
+	"grunt-nuget": ">=0.1.1",
+	"grunt-typescript": ">=0.3.6",
+	"grunt-tslint": ">=0.4.0",
+	"load-grunt-tasks": ">=0.3.0",
+	"time-grunt": ">=0.2.9"
+  },
+  "author": "SPA Tools",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spatools/promise/issues"
+  }
+}
