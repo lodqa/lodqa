@@ -15,11 +15,12 @@
 
       var jsondata = JSON.parse(m.data);
 
-      if ("anchored_pgp" in jsondata) {
-        emitter.emit('anchored_pgp', jsondata.anchored_pgp);
-      } else if ("solution" in jsondata) {
-        emitter.emit('solution', jsondata.solution);
-      }
+      ["anchored_pgp", "solution", "parse_rendering"]
+      .forEach(function(event) {
+        if (jsondata.hasOwnProperty(event)) {
+          emitter.emit(event, jsondata[event]);
+        }
+      });
     };
 
     return emitter;

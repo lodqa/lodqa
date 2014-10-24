@@ -12,6 +12,11 @@ window.onload = function() {
       loader
         .on('ws_open', presetation.onOpen)
         .on('ws_close', presetation.onClose);
+    },
+    bindParseRenderingState = function(loader) {
+      loader.on("parse_rendering", function(data) {
+        document.getElementById('lodqa-parse_rendering').innerHTML = data;
+      });
     };
 
   var loader = lodqaClient.loadSolution();
@@ -22,4 +27,5 @@ window.onload = function() {
   // bindSolutionState(loader, lodqaClient.debugPresentation);
 
   bindWebsocketState(loader);
+  bindParseRenderingState(loader);
 }
