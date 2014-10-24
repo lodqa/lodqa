@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-#!/usr/bin/env ruby
 require 'sinatra/base'
 require 'sparql/client'
 require 'sinatra-websocket'
@@ -48,16 +47,17 @@ class LodqaWS < Sinatra::Base
 				ws.onopen do
 					ws.send("start")
 					EM.defer do
-						@query = params['query']
-						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
-						parse_rendering = lodqa.get_parse_rendering
+						@query = "what side effects are associated with streptomycin?"
+						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+
+						ws_send(EM, ws, :parse_rendering, lodqa.get_parse_rendering)
 
 						proc_anchored_pgp = Proc.new do |anchored_pgp|
-							EM.add_timer(1){ws.send({:anchored_pgp => anchored_pgp}.to_json)}
+							ws_send(EM, ws, :anchored_pgp, anchored_pgp)
 						end
 
 						proc_solution = Proc.new do |solution|
-							EM.add_timer(1){ws.send({:solution => solution.to_h}.to_json)}
+							ws_send(EM, ws, :solution, solution.to_h)
 						end
 
 						lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
@@ -67,5 +67,11 @@ class LodqaWS < Sinatra::Base
 				end
 			end
 		end
+	end
+
+	private
+
+	def ws_send(eventMachine, websocket, key, value)
+		eventMachine.add_timer(1){websocket.send({key => value}.to_json)}
 	end
 end
