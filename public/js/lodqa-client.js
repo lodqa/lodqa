@@ -1,17 +1,25 @@
 window.onload = function() {
-  var bindSolution = function(solution, presetation) {
-    var data = {},
-      domId = 'lodqa-results';
+  var bindSolutionState = function(loader, presetation) {
+      var data = {},
+        domId = 'lodqa-results';
 
-    solution
-      .on('anchored_pgp', _.partial(presetation.onAnchoredPgp, domId, data))
-      .on('solution', _.partial(presetation.onSolution, data));
-  };
+      loader
+        .on('anchored_pgp', _.partial(presetation.onAnchoredPgp, domId, data))
+        .on('solution', _.partial(presetation.onSolution, data));
+    },
+    bindWebsocketState = function(loader) {
+      var presetation = lodqaClient.websocketPresentation;
+      loader
+        .on('ws_open', presetation.onOpen)
+        .on('ws_close', presetation.onClose);
+    };
 
-  var solution = lodqaClient.loadSolution();
-  // var solution = lodqaClient.loadSolutionStub();
+  var loader = lodqaClient.loadSolution();
+  // var loader = lodqaClient.loadSolutionStub();
 
-  bindSolution(solution, lodqaClient.tablePresentation);
-  bindSolution(solution, lodqaClient.graphPresentation);
-  // bindSolution(solution, lodqaClient.debugPresentation);
+  bindSolutionState(loader, lodqaClient.tablePresentation);
+  bindSolutionState(loader, lodqaClient.graphPresentation);
+  // bindSolutionState(loader, lodqaClient.debugPresentation);
+
+  bindWebsocketState(loader);
 }
