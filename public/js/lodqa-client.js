@@ -8515,7 +8515,7 @@ window.onload = function() {
   var loader = require('./loader/loadSolution')();
   // var loader = require('./loader/loadSolutionStub')();
 
-  bindSolutionState(loader, require('./presentation/tablePresentation'));
+  bindSolutionState(loader, require('./presentation/anchoredPgpTablePresentation'));
   bindSolutionState(loader, require('./presentation/graphPresentation'));
   bindSolutionState(loader, require('./presentation/debugPresentation'));
 
@@ -8523,7 +8523,7 @@ window.onload = function() {
   bindParseRenderingState(loader);
 }
 
-},{"./loader/loadSolution":9,"./presentation/debugPresentation":10,"./presentation/graphPresentation":11,"./presentation/tablePresentation":12,"./presentation/websocketPresentation":13,"lodash":7}],9:[function(require,module,exports){
+},{"./loader/loadSolution":9,"./presentation/anchoredPgpTablePresentation":10,"./presentation/debugPresentation":11,"./presentation/graphPresentation":12,"./presentation/websocketPresentation":13,"lodash":7}],9:[function(require,module,exports){
 module.exports = function() {
   var ws = new WebSocket(location.href.replace('http://', 'ws://')),
     event = require('events'),
@@ -8552,6 +8552,51 @@ module.exports = function() {
 };
 
 },{"events":1}],10:[function(require,module,exports){
+var _ = require('lodash');
+
+module.exports = {
+  onAnchoredPgp: function(domId, data, anchored_pgp) {
+    var $region = $('<div>'),
+      $table = $('<table>');
+
+    $region
+      .addClass('anchored_pgp-table')
+      .append($table);
+
+    $table
+      .append(
+        $('<tr>')
+        .append($('<th>'))
+        .append($('<th>').text('head'))
+        .append($('<th>').text('text'))
+        .append($('<th>').text('term'))
+      );
+
+    Object.keys(anchored_pgp.nodes)
+      .map(function(node_id) {
+        var node = anchored_pgp.nodes[node_id],
+          $tr = $('<tr>')
+          .append($('<td>').text(node_id))
+          .append($('<td>').text(node.head))
+          .append($('<td>').text(node.text))
+          .append($('<td>').text(node.term));
+
+        if (node_id === anchored_pgp.focus) {
+          $tr.addClass('focus');
+        }
+
+        return $tr;
+      })
+      .forEach(function($tr) {
+        $table.append($tr);
+      });
+
+    $('#' + domId).append($region);
+  },
+  onSolution: _.noop
+};
+
+},{"lodash":7}],11:[function(require,module,exports){
 module.exports = {
   onAnchoredPgp: function(domId, data, anchored_pgp) {
     data.currentRegion = document.createElement('div');
@@ -8565,7 +8610,7 @@ module.exports = {
   }
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var _ =require('lodash');
 
 module.exports = function() {
@@ -8848,52 +8893,7 @@ module.exports = function() {
   };
 }();
 
-},{"lodash":7,"url":6}],12:[function(require,module,exports){
-var _ = require('lodash');
-
-module.exports = {
-  onAnchoredPgp: function(domId, data, anchored_pgp) {
-    var $region = $('<div>'),
-      $table = $('<table>');
-
-    $region
-      .addClass('anchored_pgp-table')
-      .append($table);
-
-    $table
-      .append(
-        $('<tr>')
-        .append($('<th>'))
-        .append($('<th>').text('head'))
-        .append($('<th>').text('text'))
-        .append($('<th>').text('term'))
-      );
-
-    Object.keys(anchored_pgp.nodes)
-      .map(function(node_id) {
-        var node = anchored_pgp.nodes[node_id],
-          $tr = $('<tr>')
-          .append($('<td>').text(node_id))
-          .append($('<td>').text(node.head))
-          .append($('<td>').text(node.text))
-          .append($('<td>').text(node.term));
-
-        if (node_id === anchored_pgp.focus) {
-          $tr.addClass('focus');
-        }
-
-        return $tr;
-      })
-      .forEach(function($tr) {
-        $table.append($tr);
-      });
-
-    $('#' + domId).append($region);
-  },
-  onSolution: _.noop
-};
-
-},{"lodash":7}],13:[function(require,module,exports){
+},{"lodash":7,"url":6}],13:[function(require,module,exports){
 var show = function(el) {
     return function(msg) {
       el.innerHTML = msg;
