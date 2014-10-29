@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "dependencies": {
     "jQuery": "~2.1.1",
-    "node-events": "https://github.com/Jxck/events.git",
     "decompose-url": "~0.1.3",
     "lodash": "~2.4.1",
     "Springy": "git@github.com:shigeruNakajima/springy.git#be4e74dcfa6a6dfd1646b64a8c2da39efbd5a909"

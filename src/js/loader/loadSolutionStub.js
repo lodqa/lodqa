@@ -1567,7 +1567,8 @@ var data = [
 ];
 
 module.exports = function() {
-  var emitter = new events.EventEmitter(),
+  var event = require('events'),
+    emitter = new event.EventEmitter,
     DelayPromise = function(delay, aciton, startTime) {
       return new Promise(function(resolve, reject) {
         _.delay(function() {

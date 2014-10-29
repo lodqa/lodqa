@@ -1,6 +1,7 @@
 module.exports = function() {
   var ws = new WebSocket(location.href.replace('http://', 'ws://')),
-    emitter = new events.EventEmitter();
+    event = require('events'),
+    emitter = new event.EventEmitter;
 
   ws.onopen = function() {
     emitter.emit('ws_open');
