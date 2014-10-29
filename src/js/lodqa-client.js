@@ -1,5 +1,6 @@
 window.onload = function() {
-  var bindSolutionState = function(loader, presentation) {
+  var _ = require('lodash'),
+    bindSolutionState = function(loader, presentation) {
       var data = {},
         domId = 'lodqa-results';
 

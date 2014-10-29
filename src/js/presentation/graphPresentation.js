@@ -1,3 +1,5 @@
+var _ =require('lodash');
+
 module.exports = function() {
   var initGraph = function() {
       var graph = new Springy.Graph();

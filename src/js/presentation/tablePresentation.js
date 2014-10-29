@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = {
   onAnchoredPgp: function(domId, data, anchored_pgp) {
     var $region = $('<div>'),
