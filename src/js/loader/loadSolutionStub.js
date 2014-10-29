@@ -1565,7 +1565,8 @@ var data = [
       }]
     }
   ],
-  _ = require('lodash');
+  _ = require('lodash'),
+  Promise = require('Promise');
 
 module.exports = function() {
   var event = require('events'),
