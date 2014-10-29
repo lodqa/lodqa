@@ -20,12 +20,13 @@ module.exports = function() {
       };
     },
     toLabel = function(term) {
-      var url = decomposeUrl(term.label),
-        path = url.path;
+      var url = require('url'),
+        parsedUrl = url.parse(term.label),
+        paths = parsedUrl.pathname.split('/');
 
       return {
         id: term.id,
-        label: url.hash ? url.hash : path[path.length - 1]
+        label: parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1]
       };
     },
     setFont = function(value, target) {
