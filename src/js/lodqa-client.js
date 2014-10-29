@@ -8,7 +8,7 @@ window.onload = function() {
         .on('solution', _.partial(presentation.onSolution, data));
     },
     bindWebsocketState = function(loader) {
-      var presentation = lodqaClient.websocketPresentation;
+      var presentation = require('./presentation/websocketPresentation');
       loader
         .on('ws_open', presentation.onOpen)
         .on('ws_close', presentation.onClose);
@@ -22,9 +22,9 @@ window.onload = function() {
   var loader = require('./loader/loadSolution')();
   // var loader = require('./loader/loadSolutionStub')();
 
-  bindSolutionState(loader, lodqaClient.tablePresentation);
-  bindSolutionState(loader, lodqaClient.graphPresentation);
-  // bindSolutionState(loader, lodqaClient.debugPresentation);
+  bindSolutionState(loader, require('./presentation/tablePresentation'));
+  bindSolutionState(loader, require('./presentation/graphPresentation'));
+  bindSolutionState(loader, require('./presentation/debugPresentation'));
 
   bindWebsocketState(loader);
   bindParseRenderingState(loader);
