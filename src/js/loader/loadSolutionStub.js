@@ -1,26 +1,26 @@
-var data = [
-    // Paths split to 3.
-    {
-      anchored_pgp: {
-        "nodes": {
-          "t1": {
-            "head": 2,
-            "text": "side effects",
-            "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-          },
-          "t2": {
-            "head": 6,
-            "text": "streptomycin",
-            "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297"
-          }
+var data_split_to_3 = {
+    anchored_pgp: {
+      "nodes": {
+        "t1": {
+          "head": 2,
+          "text": "side effects",
+          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
         },
-        "edges": [{
-          "subject": "t1",
-          "object": "t2",
-          "text": "associated with"
-        }],
-        "focus": "t1"
+        "t2": {
+          "head": 6,
+          "text": "streptomycin",
+          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297"
+        }
       },
+      "edges": [{
+        "subject": "t1",
+        "object": "t2",
+        "text": "associated with"
+      }],
+      "focus": "t1"
+    },
+    sparqls: [{
+      sparql: "sparql1",
       solutions: [{
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
@@ -61,7 +61,10 @@ var data = [
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
+      }]
+    }, {
+      sparql: "sparql2",
+      solutions: [{
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
@@ -221,7 +224,10 @@ var data = [
         "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
         "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
         "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
+      }]
+    }, {
+      sparql: "sparql3",
+      solutions: [{
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
@@ -382,38 +388,40 @@ var data = [
         "p02": "http://www.w3.org/2002/07/owl#sameAs",
         "p03": "http://www.w3.org/2002/07/owl#sameAs"
       }]
-    },
-    // 3 nodes.
-    {
-      anchored_pgp: {
-        "nodes": {
-          "t1": {
-            "head": 3,
-            "text": "side effects",
-            "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-          },
-          "t2": {
-            "head": 5,
-            "text": "drugs",
-            "term": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs"
-          },
-          "t3": {
-            "head": 8,
-            "text": "asthma",
-            "term": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116"
-          }
+    }]
+  },
+  data_3_node = {
+    anchored_pgp: {
+      "nodes": {
+        "t1": {
+          "head": 3,
+          "text": "side effects",
+          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
         },
-        "edges": [{
-          "subject": "t1",
-          "object": "t2",
-          "text": "of"
-        }, {
-          "subject": "t1",
-          "object": "t3",
-          "text": "used for"
-        }],
-        "focus": "t1"
+        "t2": {
+          "head": 5,
+          "text": "drugs",
+          "term": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs"
+        },
+        "t3": {
+          "head": 8,
+          "text": "asthma",
+          "term": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116"
+        }
       },
+      "edges": [{
+        "subject": "t1",
+        "object": "t2",
+        "text": "of"
+      }, {
+        "subject": "t1",
+        "object": "t3",
+        "text": "used for"
+      }],
+      "focus": "t1"
+    },
+    sparqls: [{
+      sparql: "sparql1",
       solutions: [{
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
@@ -1355,29 +1363,31 @@ var data = [
         "x11": "http://www.dbpedia.org/resource/Asthma",
         "p12": "http://www.w3.org/2002/07/owl#sameAs"
       }]
-    },
-    // 2 nodes and paths split 2.
-    {
-      anchored_pgp: {
-        "nodes": {
-          "t1": {
-            "head": 2,
-            "text": "side effects",
-            "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-          },
-          "t2": {
-            "head": 6,
-            "text": "streptomycin",
-            "term": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082"
-          }
+    }]
+  },
+  data_2_nodes_and_paths_split_2 = {
+    anchored_pgp: {
+      "nodes": {
+        "t1": {
+          "head": 2,
+          "text": "side effects",
+          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
         },
-        "edges": [{
-          "subject": "t1",
-          "object": "t2",
-          "text": "associated with"
-        }],
-        "focus": "t1"
+        "t2": {
+          "head": 6,
+          "text": "streptomycin",
+          "term": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082"
+        }
       },
+      "edges": [{
+        "subject": "t1",
+        "object": "t2",
+        "text": "associated with"
+      }],
+      "focus": "t1"
+    },
+    sparqls: [{
+      sparql: "sparql",
       solutions: [{
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
@@ -1499,29 +1509,31 @@ var data = [
         "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
         "p02": "http://www.w3.org/2002/07/owl#sameAs"
       }]
-    },
-    // Paths not split.
-    {
-      anchored_pgp: {
-        "nodes": {
-          "t1": {
-            "head": 2,
-            "text": "side effects",
-            "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-          },
-          "t2": {
-            "head": 6,
-            "text": "streptomycin",
-            "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297"
-          }
+    }]
+  },
+  data_paths_no_split = {
+    anchored_pgp: {
+      "nodes": {
+        "t1": {
+          "head": 2,
+          "text": "side effects",
+          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
         },
-        "edges": [{
-          "subject": "t1",
-          "object": "t2",
-          "text": "associated with"
-        }],
-        "focus": "t1"
+        "t2": {
+          "head": 6,
+          "text": "streptomycin",
+          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297"
+        }
       },
+      "edges": [{
+        "subject": "t1",
+        "object": "t2",
+        "text": "associated with"
+      }],
+      "focus": "t1"
+    },
+    sparqls: [{
+      sparql: "sparql",
       solutions: [{
         "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
@@ -1563,7 +1575,13 @@ var data = [
         "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
         "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
       }]
-    }
+    }]
+  },
+  data = [
+    data_split_to_3,
+    data_3_node,
+    data_2_nodes_and_paths_split_2,
+    data_paths_no_split
   ],
   _ = require('lodash'),
   Promise = require('Promise');
@@ -1571,51 +1589,70 @@ var data = [
 module.exports = function() {
   var event = require('events'),
     emitter = new event.EventEmitter,
-    DelayPromise = function(delay, aciton, startTime) {
+    DelayPromise = function(delay, aciton) {
       return new Promise(function(resolve, reject) {
         _.delay(function() {
-          startTime += delay;
           try {
             aciton();
-            resolve(startTime);
+            resolve();
           } catch (err) {
             reject(err);
           }
-        }, startTime);
+        }, delay);
       });
     },
     DelayTenPromise = _.partial(DelayPromise, 10),
     toEmitAction = function(event, data) {
       return function() {
         emitter.emit(event, data);
+        // console.log(event);
       };
     },
-    toEmitSolutionAction = _.partial(toEmitAction, 'solution'),
-    EmitSalutionsPromise = function(solutions, startTime) {
+    EmitSalutionsPromise = function(solutions) {
+      var toEmitSolutionAction = _.partial(toEmitAction, 'solution');
+
       return solutions
         .map(toEmitSolutionAction)
         .reduce(function(promise, emitSolution) {
-          var EmitSolutionActionPramise = _.partial(DelayTenPromise, emitSolution);
-          return promise.then(EmitSolutionActionPramise);
-        }, Promise.resolve(startTime));
+          return promise.then(function() {
+            return DelayTenPromise(emitSolution)
+          });
+        }, Promise.resolve());
     },
-    EmitAnchoredPgpPromise = function(anchored_pgp, solutions, startTime) {
-      // console.debug('EmitAnchoredPgpPromise', anchored_pgp, startTime);
+    EmitSparqlsPromise = function(sparqls) {
+      var toEmitSparqlAction = _.partial(toEmitAction, 'sparql');
 
+      return sparqls
+        .map(function(sparql) {
+          return {
+            aciton: toEmitSparqlAction(sparql.sparql),
+            solutions: sparql.solutions
+          }
+        })
+        .reduce(function(promise, sparql) {
+          return promise.then(function() {
+            return new DelayTenPromise(sparql.aciton)
+              .then(function() {
+                return new EmitSalutionsPromise(sparql.solutions);
+              });
+          });
+        }, Promise.resolve());
+    },
+    EmitAnchoredPgpPromise = function(anchored_pgp, sparqls) {
       var emittAnchorePgp = toEmitAction('anchored_pgp', anchored_pgp),
-        anchoredPgpPromise = new DelayTenPromise(emittAnchorePgp, startTime);
+        anchoredPgpPromise = new DelayTenPromise(emittAnchorePgp);
 
-      return anchoredPgpPromise.then(function(startTime) {
-        return new EmitSalutionsPromise(solutions, startTime);
+      return anchoredPgpPromise.then(function() {
+        return new EmitSparqlsPromise(sparqls);
       });
     };
 
   data
     .reduce(function(promise, record) {
-      return promise.then(function(startTime) {
-        return new EmitAnchoredPgpPromise(record.anchored_pgp, record.solutions, startTime);
+      return promise.then(function() {
+        return new EmitAnchoredPgpPromise(record.anchored_pgp, record.sparqls);
       });
-    }, Promise.resolve(10))
+    }, Promise.resolve())
     .catch(function(err) {
       console.error(err, err.stack);
     });
