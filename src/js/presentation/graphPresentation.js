@@ -1,4 +1,8 @@
-var _ =require('lodash');
+var _ = require('lodash'),
+  instance = require('./instance'),
+  transformIf = function(predicate, transform, object) {
+    return predicate(object) ? transform(object) : object;
+  };
 
 module.exports = function() {
   var initGraph = function() {
@@ -172,17 +176,16 @@ module.exports = function() {
         anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId];
       addEdge(graph, solution, edge_id, anchoredPgpNode, instanceNode, '#999999');
     },
-    addInstanceNode = function(graph, solution, focus) {
+    addInstanceNode = function(graph, isFocus, solution) {
+      var markIfFocus = _.partial(transformIf, _.compose(isFocus, function(term) {
+        return term.id;
+      }), toRed);
+
       return Object.keys(solution)
-        .filter(function(id) {
-          return id[0] === 'i';
-        })
+        .filter(instance.is)
         .map(_.partial(toTerm, solution))
         .map(toLabelAndSetFontNormal)
-        .map(function(term) {
-          var tx_id = term.id.substr(1);
-          return tx_id === focus ? toRed(term) : term;
-        })
+        .map(markIfFocus)
         .reduce(function(result, term) {
           var instanceNode = graph.newNode(term);
           addEdgeToInstance(graph, solution, instanceNode);
@@ -273,7 +276,8 @@ module.exports = function() {
       addAnchoredPgpNodes(privateData.graph, anchored_pgp.nodes, privateData.focus, privateData.edges);
     },
     onSolution: function(solution) {
-      var instanceNodes = addInstanceNode(privateData.graph, solution, privateData.focus),
+      var isFocus = _.partial(instance.isNodeId, privateData.focus),
+        instanceNodes = addInstanceNode(privateData.graph, isFocus, solution),
         transitNodes = addTransitNode(privateData.graph, solution);
 
       addPath(privateData.graph, solution, privateData.edges, transitNodes, instanceNodes);
