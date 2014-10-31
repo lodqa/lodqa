@@ -27,12 +27,13 @@ window.onload = function() {
       });
     };
 
-  var loader = require('./loader/loadSolution')();
-  // var loader = require('./loader/loadSolutionStub')();
+  // var loader = require('./loader/loadSolution')();
+  var loader = require('./loader/loadSolutionStub')();
 
   bindSolutionState(loader, require('./presentation/anchoredPgpTablePresentation'));
   bindSolutionState(loader, require('./presentation/graphPresentation'));
-  bindSolutionState(loader, require('./presentation/debugPresentation'));
+  // bindSolutionState(loader, require('./presentation/debugPresentation'));
+  bindSolutionState(loader, require('./presentation/sparqlTablePresentation'));
 
   bindWebsocketState(loader);
   bindParseRenderingState(loader);
