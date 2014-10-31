@@ -38,6 +38,5 @@ module.exports = {
       });
 
     $('#' + domId).append($region);
-  },
-  onSolution: _.noop
+  }
 };
