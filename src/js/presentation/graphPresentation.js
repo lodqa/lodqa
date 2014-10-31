@@ -262,20 +262,21 @@ module.exports = function() {
           result[path.id] = addEdge(graph, solution, path.id, path.left, path.right, '#2B5CFF');
           return result;
         }, {});
-    };
+    },
+    privateData = {};
 
   return {
-    onAnchoredPgp: function(domId, data, anchored_pgp) {
-      data.graph = initGraph();
-      data.focus = anchored_pgp.focus;
-      data.edges = anchored_pgp.edges;
-      addAnchoredPgpNodes(data.graph, anchored_pgp.nodes, data.focus, data.edges);
+    onAnchoredPgp: function(domId, anchored_pgp) {
+      privateData.graph = initGraph();
+      privateData.focus = anchored_pgp.focus;
+      privateData.edges = anchored_pgp.edges;
+      addAnchoredPgpNodes(privateData.graph, anchored_pgp.nodes, privateData.focus, privateData.edges);
     },
-    onSolution: function(data, solution) {
-      var instanceNodes = addInstanceNode(data.graph, solution, data.focus),
-        transitNodes = addTransitNode(data.graph, solution);
+    onSolution: function(solution) {
+      var instanceNodes = addInstanceNode(privateData.graph, solution, privateData.focus),
+        transitNodes = addTransitNode(privateData.graph, solution);
 
-      addPath(data.graph, solution, data.edges, transitNodes, instanceNodes);
+      addPath(privateData.graph, solution, privateData.edges, transitNodes, instanceNodes);
     }
   };
 }();

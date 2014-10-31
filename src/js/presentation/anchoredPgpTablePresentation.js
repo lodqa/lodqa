@@ -1,7 +1,7 @@
 var _ = require('lodash');
 
 module.exports = {
-  onAnchoredPgp: function(domId, data, anchored_pgp) {
+  onAnchoredPgp: function(domId, anchored_pgp) {
     var $region = $('<div>'),
       $table = $('<table>');
 
