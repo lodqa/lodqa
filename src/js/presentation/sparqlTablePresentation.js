@@ -35,11 +35,13 @@ module.exports = {
   },
   onSolution: function(solution) {
     var focusInstanceId = _.first(
-      Object.keys(solution)
-      .filter(instance.is)
-      .filter(_.partial(instance.isNodeId, privateData.focus))
-    );
+        Object.keys(solution)
+        .filter(instance.is)
+        .filter(_.partial(instance.isNodeId, privateData.focus))
+      ),
+      toLastOfUrl = require('./toLastOfUrl'),
+      label = toLastOfUrl(solution[focusInstanceId]);
 
-    privateData.currentInstances.append($('<li>').text(solution[focusInstanceId]))
+    privateData.currentInstances.append($('<li>').text(label));
   }
 };

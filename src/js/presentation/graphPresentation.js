@@ -26,13 +26,9 @@ module.exports = function() {
       };
     },
     toLabel = function(term) {
-      var url = require('url'),
-        parsedUrl = url.parse(term.label),
-        paths = parsedUrl.pathname.split('/');
-
       return {
         id: term.id,
-        label: parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1]
+        label: require('./toLastOfUrl')(term.label)
       };
     },
     setFont = function(value, target) {

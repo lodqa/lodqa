@@ -9014,7 +9014,7 @@ window.onload = function() {
   bindParseRenderingState(loader);
 }
 
-},{"./loader/loadSolutionStub":16,"./presentation/anchoredPgpTablePresentation":17,"./presentation/graphPresentation":18,"./presentation/sparqlTablePresentation":20,"./presentation/websocketPresentation":21,"lodash":14}],16:[function(require,module,exports){
+},{"./loader/loadSolutionStub":16,"./presentation/anchoredPgpTablePresentation":17,"./presentation/graphPresentation":18,"./presentation/sparqlTablePresentation":20,"./presentation/websocketPresentation":22,"lodash":14}],16:[function(require,module,exports){
 var data_split_to_3 = {
     anchored_pgp: {
       "nodes": {
@@ -10750,13 +10750,9 @@ module.exports = function() {
       };
     },
     toLabel = function(term) {
-      var url = require('url'),
-        parsedUrl = url.parse(term.label),
-        paths = parsedUrl.pathname.split('/');
-
       return {
         id: term.id,
-        label: parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1]
+        label: require('./toLastOfUrl')(term.label)
       };
     },
     setFont = function(value, target) {
@@ -11009,7 +11005,7 @@ module.exports = function() {
   };
 }();
 
-},{"./instance":19,"lodash":14,"url":13}],19:[function(require,module,exports){
+},{"./instance":19,"./toLastOfUrl":21,"lodash":14}],19:[function(require,module,exports){
 module.exports = {
   is: function(id) {
     return id[0] === 'i';
@@ -11057,16 +11053,26 @@ module.exports = {
   },
   onSolution: function(solution) {
     var focusInstanceId = _.first(
-      Object.keys(solution)
-      .filter(instance.is)
-      .filter(_.partial(instance.isNodeId, privateData.focus))
-    );
+        Object.keys(solution)
+        .filter(instance.is)
+        .filter(_.partial(instance.isNodeId, privateData.focus))
+      ),
+      toLastOfUrl = require('./toLastOfUrl'),
+      label = toLastOfUrl(solution[focusInstanceId]);
 
-    privateData.currentInstances.append($('<li>').text(solution[focusInstanceId]))
+    privateData.currentInstances.append($('<li>').text(label));
   }
 };
 
-},{"./instance":19,"lodash":14}],21:[function(require,module,exports){
+},{"./instance":19,"./toLastOfUrl":21,"lodash":14}],21:[function(require,module,exports){
+module.exports = function(srcUrl) {
+  var parsedUrl = require('url').parse(srcUrl),
+    paths = parsedUrl.pathname.split('/');
+
+  return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
+};
+
+},{"url":13}],22:[function(require,module,exports){
 var show = function(el) {
     return function(msg) {
       el.innerHTML = msg;
