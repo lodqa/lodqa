@@ -197,30 +197,34 @@ div.atext {
 
 #config {background-color: #EEEEEE}
 
-/* anchored_pgp-table */
-.anchored_pgp-table {
+/* anchored_pgp-table, sparql-table */
+.anchored_pgp-table, .sparql-table {
     border: 1px solid black;
 }
 
-.anchored_pgp-table table {
+.anchored_pgp-table table, .sparql-table table {
     border-collapse: collapse;
     width: 100%;
 }
 
-.anchored_pgp-table th {
+.anchored_pgp-table th, .sparql-table th {
     background-color: #eee;
     border: 1px solid #b9b9b9;
     color: #333;
     padding: 6px;
 }
 
-.anchored_pgp-table td {
+.anchored_pgp-table td, .sparql-table td {
     background-color: #fff;
     border: 1px solid #b9b9b9;
     padding: 6px;
 }
 
-/* anchored_pgp-table focus*/
+/* anchored_pgp-table */
+.anchored_pgp-table {
+    margin-bottom: 8px;
+}
+
 .anchored_pgp-table .focus td {
     color: #FF512C;
 }
