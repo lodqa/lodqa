@@ -27,8 +27,8 @@ window.onload = function() {
       });
     };
 
-  // var loader = require('./loader/loadSolution')();
-  var loader = require('./loader/loadSolutionStub')();
+  var loader = require('./loader/loadSolution')();
+  // var loader = require('./loader/loadSolutionStub')();
 
   bindSolutionState(loader, require('./presentation/anchoredPgpTablePresentation'));
   // bindSolutionState(loader, require('./presentation/debugPresentation'));
