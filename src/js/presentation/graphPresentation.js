@@ -5,14 +5,14 @@ var _ = require('lodash'),
   };
 
 module.exports = function() {
-  var initGraph = function() {
+  var initGraph = function(domId) {
       var graph = new Springy.Graph();
       var canvas = $('<canvas>')
         .attr({
           width: 690,
           height: 400
         });
-      $('#lodqa-results').append(canvas);
+      $('#' + domId).append(canvas);
       canvas.springy({
         graph: graph
       });
@@ -266,10 +266,14 @@ module.exports = function() {
 
   return {
     onAnchoredPgp: function(domId, anchored_pgp) {
-      privateData.graph = initGraph();
+      privateData.domId = domId;
+      privateData.nodes = anchored_pgp.nodes;
       privateData.focus = anchored_pgp.focus;
       privateData.edges = anchored_pgp.edges;
-      addAnchoredPgpNodes(privateData.graph, anchored_pgp.nodes, privateData.focus, privateData.edges);
+    },
+    onSparql: function(sparql) {
+      privateData.graph = initGraph(privateData.domId);
+      addAnchoredPgpNodes(privateData.graph, privateData.nodes, privateData.focus, privateData.edges);
     },
     onSolution: function(solution) {
       var isFocus = _.partial(instance.isNodeId, privateData.focus),
