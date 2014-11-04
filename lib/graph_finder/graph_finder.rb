@@ -77,6 +77,36 @@ class GraphFinder
     end
   end
 
+  def each_sparql_and_solution(proc_sparql = nil, proc_solution = nil)
+    @bgps.each do |bgp|
+      sparql = compose_sparql(bgp, @pgp)
+      proc_sparql.call(sparql) unless proc_sparql.nil?
+
+      if @debug
+        puts "#{sparql}\n++++++++++"
+      end
+      begin
+        result = @endpoint.query(sparql)
+      rescue => detail
+        if @debug
+          p detail
+          puts "==========\n"
+        end
+        sleep(2)
+        next
+        # print detail.backtrace.join("\n")
+      end 
+      result.each_solution do |solution|
+        proc_solution.call(solution) unless proc_solution.nil?
+      end
+      if @debug
+        puts "==========\n"
+      end
+      sleep(2)
+    end
+  end
+
+
   private
 
   def generate_split_variations(connections, max_hop)

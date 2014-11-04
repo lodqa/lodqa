@@ -74,6 +74,13 @@ class Lodqa::Lodqa
     end
   end
 
+  def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil)
+    @anchored_pgps.each do |anchored_pgp|
+      proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
+      GraphFinder.new(anchored_pgp, @endpoint, @options).each_sparql_and_solution(proc_sparql, proc_solution)
+    end
+  end
+
   private
 
   def graphicate (parse)
