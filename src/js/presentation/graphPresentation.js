@@ -281,13 +281,17 @@ module.exports = function() {
       privateData.edges = anchored_pgp.edges;
     },
     onSparql: function(sparql) {
-      privateData.graph = new Graph(privateData.domId, {
-        width: 690,
-        height: 400
-      });
-      privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
+      privateData.graph = null;
     },
     onSolution: function(solution) {
+      if (!privateData.graph) {
+        privateData.graph = new Graph(privateData.domId, {
+          width: 690,
+          height: 400
+        });
+        privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
+      }
+
       var isFocus = _.partial(instance.isNodeId, privateData.focus),
         instanceNodes = privateData.graph.addInstanceNode(isFocus, solution),
         transitNodes = privateData.graph.addTransitNode(solution);

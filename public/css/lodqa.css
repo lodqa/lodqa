@@ -222,9 +222,16 @@ div.atext {
 
 /* anchored_pgp-table */
 .anchored_pgp-table {
-    margin-bottom: 8px;
+    margin: 16px 0 8px 0;
 }
 
 .anchored_pgp-table .focus td {
     color: #FF512C;
+}
+
+/* sparql-table */
+.sparql-table ul
+{
+    list-style-type: none;
+    padding-left: 0;
 }
