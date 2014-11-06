@@ -47,7 +47,7 @@ class LodqaWS < Sinatra::Base
 				ws.onopen do
 					ws.send("start")
 					EM.defer do
-						@query = "what side effects are associated with streptomycin?"
+						@query = params['query']
 						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
 
 						ws_send(EM, ws, :parse_rendering, lodqa.get_parse_rendering)
