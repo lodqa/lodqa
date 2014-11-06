@@ -9360,13 +9360,14 @@ window.onload = function() {
   bindSolutionState(loader, require('./presentation/anchoredPgpTablePresentation'));
   // bindSolutionState(loader, require('./presentation/debugPresentation'));
   bindSolutionState(loader, require('./presentation/sparqlTablePresentation'));
+  bindSolutionState(loader, require('./presentation/solutionTablePresentation'));
   bindSolutionState(loader, require('./presentation/graphPresentation'));
 
   bindWebsocketState(loader);
   bindParseRenderingState(loader);
 }
 
-},{"./loader/loadSolution":14,"./presentation/anchoredPgpTablePresentation":16,"./presentation/graphPresentation":17,"./presentation/sparqlTablePresentation":19,"./presentation/websocketPresentation":21,"lodash":10}],14:[function(require,module,exports){
+},{"./loader/loadSolution":14,"./presentation/anchoredPgpTablePresentation":16,"./presentation/graphPresentation":17,"./presentation/solutionTablePresentation":20,"./presentation/sparqlTablePresentation":21,"./presentation/websocketPresentation":23,"lodash":10}],14:[function(require,module,exports){
 module.exports = function() {
   var ws = new WebSocket(location.href.replace('http://', 'ws://')),
     event = require('events'),
@@ -9668,7 +9669,7 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"./instance":18,"./toLastOfUrl":20,"lodash":10}],16:[function(require,module,exports){
+},{"./instance":18,"./toLastOfUrl":22,"lodash":10}],16:[function(require,module,exports){
 var _ = require('lodash');
 
 module.exports = {
@@ -9715,38 +9716,35 @@ module.exports = {
 },{"lodash":10}],17:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
-  SolutionGraph = require('./SolutionGraph');
+  SolutionGraph = require('./SolutionGraph'),
+  privateData = {};
 
-module.exports = function() {
-  var privateData = {};
-
-  return {
-    onAnchoredPgp: function(domId, anchored_pgp) {
-      privateData.domId = domId;
-      privateData.anchoredPgp = anchored_pgp;
-      privateData.focus = anchored_pgp.focus;
-      privateData.edges = anchored_pgp.edges;
-    },
-    onSparql: function(sparql) {
-      privateData.graph = null;
-    },
-    onSolution: function(solution) {
-      if (!privateData.graph) {
-        privateData.graph = new SolutionGraph(privateData.domId, {
-          width: 690,
-          height: 400
-        });
-        privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
-      }
-
-      var isFocus = _.partial(instance.isNodeId, privateData.focus),
-        instanceNodes = privateData.graph.addInstanceNode(isFocus, solution),
-        transitNodes = privateData.graph.addTransitNode(solution);
-
-      privateData.graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
+module.exports = {
+  onAnchoredPgp: function(domId, anchored_pgp) {
+    privateData.domId = domId;
+    privateData.anchoredPgp = anchored_pgp;
+    privateData.focus = anchored_pgp.focus;
+    privateData.edges = anchored_pgp.edges;
+  },
+  onSparql: function(sparql) {
+    privateData.graph = null;
+  },
+  onSolution: function(solution) {
+    if (!privateData.graph) {
+      privateData.graph = new SolutionGraph(privateData.domId, {
+        width: 690,
+        height: 400
+      });
+      privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
     }
-  };
-}();
+
+    var isFocus = _.partial(instance.isNodeId, privateData.focus),
+      instanceNodes = privateData.graph.addInstanceNode(isFocus, solution),
+      transitNodes = privateData.graph.addTransitNode(solution);
+
+    privateData.graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
+  }
+};
 
 },{"./SolutionGraph":15,"./instance":18,"lodash":10}],18:[function(require,module,exports){
 module.exports = {
@@ -9760,10 +9758,85 @@ module.exports = {
 
 },{}],19:[function(require,module,exports){
 var _ = require('lodash'),
-  instance = require('./instance'),
   multiline = require('multiline'),
-  Hogan = require('hogan.js'),
-  makeTemplate = _.compose(_.bind(Hogan.compile, Hogan), multiline),
+  Hogan = require('hogan.js');
+
+module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
+
+},{"hogan.js":8,"lodash":10,"multiline":11}],20:[function(require,module,exports){
+var _ = require('lodash'),
+  instance = require('./instance'),
+  makeTemplate = require('./makeTemplate'),
+  reigonTemplate = makeTemplate(function() {
+    /*
+    <div class="sparql-table">
+        <table class="solutions-table">
+            <tr>
+                <th>solutions</th>
+            </tr>
+        </table>
+    </div>
+    */
+  }),
+  solutionRowTemplate = makeTemplate(function() {
+    /*
+    <tr>
+        <td class="solution">{{{solution}}}</td>
+    </tr>
+    */
+  }),
+  solutionTemplate = makeTemplate(function() {
+    /*
+    {{id}} : <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
+    */
+  }),
+  toLastOfUrl = require('./toLastOfUrl'),
+  privateData = {};
+
+module.exports = {
+  onAnchoredPgp: function(domId, anchored_pgp) {
+    privateData.domId = domId;
+  },
+  onSparql: function(sparql) {　　
+    privateData.currentRegion = null;
+  },
+  onSolution: function(solution) {
+    if (!privateData.currentRegion) {
+      var $region = $(reigonTemplate.render());
+
+      privateData.currentRegion = $region.find('.solutions-table');
+
+      $('#' + privateData.domId)
+        .append($region);
+    }
+
+    var solutionLinks = Object.keys(solution)
+      .map(function(key) {
+        return {
+          id: key,
+          url: solution[key]
+        };
+      })
+      .map(function(url) {
+        return _.extend(url, {
+          label: toLastOfUrl(url.url)
+        })
+      })
+      .map(function(a) {
+        return solutionTemplate.render(a);
+      }).join(''),
+      solutionRow = solutionRowTemplate.render({
+        solution: solutionLinks
+      });
+
+    privateData.currentRegion.append(solutionRow);
+  }
+};
+
+},{"./instance":18,"./makeTemplate":19,"./toLastOfUrl":22,"lodash":10}],21:[function(require,module,exports){
+var _ = require('lodash'),
+  instance = require('./instance'),
+  makeTemplate = require('./makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="sparql-table">
@@ -9821,7 +9894,7 @@ module.exports = {
   }
 };
 
-},{"./instance":18,"./toLastOfUrl":20,"hogan.js":8,"lodash":10,"multiline":11}],20:[function(require,module,exports){
+},{"./instance":18,"./makeTemplate":19,"./toLastOfUrl":22,"lodash":10}],22:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -9829,7 +9902,7 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":6}],21:[function(require,module,exports){
+},{"url":6}],23:[function(require,module,exports){
 var show = function(el) {
     return function(msg) {
       el.innerHTML = msg;

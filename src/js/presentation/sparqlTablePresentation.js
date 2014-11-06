@@ -1,8 +1,6 @@
 var _ = require('lodash'),
   instance = require('./instance'),
-  multiline = require('multiline'),
-  Hogan = require('hogan.js'),
-  makeTemplate = _.compose(_.bind(Hogan.compile, Hogan), multiline),
+  makeTemplate = require('./makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="sparql-table">

@@ -33,6 +33,7 @@ window.onload = function() {
   bindSolutionState(loader, require('./presentation/anchoredPgpTablePresentation'));
   // bindSolutionState(loader, require('./presentation/debugPresentation'));
   bindSolutionState(loader, require('./presentation/sparqlTablePresentation'));
+  bindSolutionState(loader, require('./presentation/solutionTablePresentation'));
   bindSolutionState(loader, require('./presentation/graphPresentation'));
 
   bindWebsocketState(loader);
