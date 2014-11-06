@@ -8947,14 +8947,12 @@ module.exports = {
       .append(
         $('<tr>')
         .append($('<th>').text('sparql'))
-        .append($('<th>').text('instances'))
-        .append($('<th>').text('graph'))
+        .append($('<th>').text('answer'))
       )
       .append(
         $('<tr>')
         .append($('<td>').text(sparql))
         .append($('<td>').append(privateData.currentInstances))
-        .append($('<td>'))
       );
 
     $('#' + privateData.domId).append($region);
