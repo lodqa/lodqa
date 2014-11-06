@@ -1,5 +1,30 @@
 var _ = require('lodash'),
   instance = require('./instance'),
+  multiline = require('multiline'),
+  Hogan = require('hogan.js'),
+  makeTemplate = _.compose(_.bind(Hogan.compile, Hogan), multiline),
+  reigonTemplate = makeTemplate(function() {
+    /*
+    <div class="sparql-table">
+        <table>
+            <tr>
+                <th>sparql</th>
+                <th>answer</th>
+            </tr>
+            <tr>
+                <td class="sparql">{{sparql}}</td>
+                <td><ul class="answer-list"></ul></td>
+            </tr>
+        </table>
+    </div>
+    */
+  }),
+  instanceTemplate = makeTemplate(function() {
+    /*
+    <li>{{instance}}</li>
+    */
+  }),
+  toLastOfUrl = require('./toLastOfUrl'),
   privateData = {};
 
 module.exports = {
@@ -8,28 +33,15 @@ module.exports = {
     privateData.focus = anchored_pgp.focus;
   },
   onSparql: function(sparql) {
-    var $region = $('<div>'),
-      $table = $('<table>');
+    var html = reigonTemplate.render({
+        sparql: sparql
+      }),
+      $region = $(html);
 
-    $region
-      .addClass('sparql-table')
-      .append($table);
+    privateData.currentAnswerList = $region.find('.answer-list');
 
-    privateData.currentInstances = $('<ul>');
-
-    $table
-      .append(
-        $('<tr>')
-        .append($('<th>').text('sparql'))
-        .append($('<th>').text('answer'))
-      )
-      .append(
-        $('<tr>')
-        .append($('<td>').text(sparql))
-        .append($('<td>').append(privateData.currentInstances))
-      );
-
-    $('#' + privateData.domId).append($region);
+    $('#' + privateData.domId)
+      .append($region);
   },
   onSolution: function(solution) {
     var focusInstanceId = _.first(
@@ -37,9 +49,13 @@ module.exports = {
         .filter(instance.is)
         .filter(_.partial(instance.isNodeId, privateData.focus))
       ),
-      toLastOfUrl = require('./toLastOfUrl'),
       label = toLastOfUrl(solution[focusInstanceId]);
 
-    privateData.currentInstances.append($('<li>').text(label));
+    privateData.currentAnswerList
+      .append(
+        instanceTemplate.render({
+          instance: label
+        })
+      );
   }
 };

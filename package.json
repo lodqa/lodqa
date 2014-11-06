@@ -5,7 +5,9 @@
     "gulp-browserify": "^0.5.0"
   },
   "dependencies": {
+    "hogan.js": "^3.0.2",
     "lodash": "^2.4.1",
+    "multiline": "^1.0.1",
     "promise": "^6.0.1"
   }
 }
