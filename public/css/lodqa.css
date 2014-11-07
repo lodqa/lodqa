@@ -197,31 +197,31 @@ div.atext {
 
 #config {background-color: #EEEEEE}
 
-/* anchored_pgp-table, sparql-table */
-.anchored_pgp-table, .sparql-table {
+/* result-region */
+.result-region {
     border: 1px solid black;
 }
 
-.anchored_pgp-table table, .sparql-table table {
+.result-region table {
     border-collapse: collapse;
     width: 100%;
 }
 
-.anchored_pgp-table th, .sparql-table th {
+.result-region th {
     background-color: #eee;
     border: 1px solid #b9b9b9;
     color: #333;
     padding: 6px;
 }
 
-.anchored_pgp-table td, .sparql-table td {
+.result-region td {
     background-color: #fff;
     border: 1px solid #b9b9b9;
     padding: 6px;
 }
 
 /* anchored_pgp-table */
-.anchored_pgp-table {
+.anchored_pgp-region {
     margin: 16px 0 8px 0;
 }
 

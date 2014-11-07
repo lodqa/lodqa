@@ -3,7 +3,7 @@ var _ = require('lodash'),
   makeTemplate = require('./makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
-    <div class="sparql-table">
+    <div class="result-region">
         <table class="solutions-table">
             <tr>
                 <th>solutions</th>
@@ -21,7 +21,7 @@ var _ = require('lodash'),
   }),
   solutionTemplate = makeTemplate(function() {
     /*
-    {{id}} : <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
+    {{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
     */
   }),
   toLastOfUrl = require('./toLastOfUrl'),

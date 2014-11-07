@@ -3,8 +3,8 @@ var _ = require('lodash'),
   makeTemplate = require('./makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
-    <div class="sparql-table">
-        <table>
+    <div class="result-region">
+        <table class="sparql-table">
             <tr>
                 <th>sparql</th>
                 <th>answer</th>
