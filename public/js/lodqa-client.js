@@ -9774,12 +9774,15 @@ var _ = require('lodash'),
   makeTemplate = require('./makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
-    <div class="result-region">
-        <table class="solutions-table">
+    <div class="result-region solution-region hide">
+        <table>
             <tr>
                 <th>solutions</th>
             </tr>
         </table>
+    </div>
+    <div>
+       <input type="button" value="Show solutions in table"></input>
     </div>
     */
   }),
@@ -9796,6 +9799,35 @@ var _ = require('lodash'),
     */
   }),
   toLastOfUrl = require('./toLastOfUrl'),
+  SolutionLsit = function(domId) {
+    var $region = $(reigonTemplate.render())
+      .on('click', 'input', function(event) {
+        $region.removeClass('hide');
+        $(event.target).hide();
+      });
+
+    $('#' + domId)
+      .append($region);
+
+    return $region.find('table');
+  },
+  toSolutionRow = function(solution) {
+    var solutionLinks = Object.keys(solution)
+      .map(function(key) {
+        return {
+          id: key,
+          url: solution[key],
+          label: toLastOfUrl(solution[key])
+        };
+      })
+      .map(function(url) {
+        return solutionTemplate.render(url);
+      });
+
+    return solutionRowTemplate.render({
+      solution: solutionLinks.join('')
+    });
+  },
   privateData = {};
 
 module.exports = {
@@ -9803,38 +9835,14 @@ module.exports = {
     privateData.domId = domId;
   },
   onSparql: function(sparql) {　　
-    privateData.currentRegion = null;
+    privateData.currentSolutionList = null;
   },
   onSolution: function(solution) {
-    if (!privateData.currentRegion) {
-      var $region = $(reigonTemplate.render());
-
-      privateData.currentRegion = $region.find('.solutions-table');
-
-      $('#' + privateData.domId)
-        .append($region);
+    if (!privateData.currentSolutionList) {
+      privateData.currentSolutionList = new SolutionLsit(privateData.domId);
     }
 
-    var solutionLinks = Object.keys(solution)
-      .map(function(key) {
-        return {
-          id: key,
-          url: solution[key]
-        };
-      })
-      .map(function(url) {
-        return _.extend(url, {
-          label: toLastOfUrl(url.url)
-        })
-      })
-      .map(function(a) {
-        return solutionTemplate.render(a);
-      }).join(''),
-      solutionRow = solutionRowTemplate.render({
-        solution: solutionLinks
-      });
-
-    privateData.currentRegion.append(solutionRow);
+    privateData.currentSolutionList.append(toSolutionRow(solution));
   }
 };
 

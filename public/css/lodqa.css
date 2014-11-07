@@ -230,8 +230,17 @@ div.atext {
 }
 
 /* sparql-table */
-.sparql-table ul
-{
+.sparql-table ul {
     list-style-type: none;
     padding-left: 0;
+}
+
+/* solution-table */
+.hide {
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+.solution-region {
+    transition: all 0.5s ease 0.1s;
 }
