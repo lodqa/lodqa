@@ -80,10 +80,16 @@ jQuery.fn.springy = function(params) {
 	var nearest = null;
 	var dragged = null;
 
+	// Add EventEmitter.
+	var event = new EventEmitter2;
+	this.event = event;
+
 	jQuery(canvas).mousedown(function(e) {
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = nearest = dragged = layout.nearest(p);
+
+		event.emit('selected', selected);
 
 		if (selected.node !== null) {
 			dragged.point.m = 10000.0;
@@ -101,6 +107,9 @@ jQuery.fn.springy = function(params) {
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		selected = layout.nearest(p);
+
+		event.emit('selected', selected);
+
 		node = selected.node;
 		if (node && node.data && node.data.ondoubleclick) {
 			node.data.ondoubleclick();
@@ -111,6 +120,8 @@ jQuery.fn.springy = function(params) {
 		var pos = jQuery(this).offset();
 		var p = fromScreen({x: e.pageX - pos.left, y: e.pageY - pos.top});
 		nearest = layout.nearest(p);
+
+		event.emit('nearest', nearest);
 
 		if (dragged !== null && dragged.node !== null) {
 			dragged.point.p.x = p.x;
