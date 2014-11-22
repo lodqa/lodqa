@@ -12,6 +12,7 @@ class Lodqa::Lodqa
   attr_reader :parse
   attr_reader :pgp
   attr_reader :terms
+  attr_reader :anchored_pgps
 
   def initialize(query, parser_url, dictionary_url, ep_url, options = {})
     @options = options || {}
