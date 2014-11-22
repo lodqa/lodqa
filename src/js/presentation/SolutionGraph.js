@@ -3,15 +3,29 @@ var _ = require('lodash'),
   transformIf = function(predicate, transform, object) {
     return predicate(object) ? transform(object) : object;
   },
+  updateLinkOnSelect = function(link, springy) {
+    springy.event
+      .on('selected', function(selected) {
+        link
+          .text(selected.node.data.url)
+          .attr('href', selected.node.data.url);
+      });
+  },
   Graph = function(domId, options) {
-    var graph = new Springy.Graph();
-    var canvas = $('<canvas>')
+    var graph = new Springy.Graph(),
+      link = $('<a target="_blank">'),
+      canvas = $('<canvas>')
       .attr(options);
 
-    $('#' + domId).append(canvas);
-    canvas.springy({
+    $('#' + domId)
+      .append(link)
+      .append(canvas);
+
+    var springy = canvas.springy({
       graph: graph
     });
+
+    updateLinkOnSelect(link, springy);
 
     return graph;
   },
@@ -24,7 +38,8 @@ var _ = require('lodash'),
   toLabel = function(term) {
     return {
       id: term.id,
-      label: require('./toLastOfUrl')(term.label)
+      label: require('./toLastOfUrl')(term.label),
+      url: term.label
     };
   },
   setFont = function(value, target) {

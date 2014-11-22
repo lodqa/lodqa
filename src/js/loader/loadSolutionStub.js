@@ -1589,11 +1589,11 @@ var data_split_to_3 = {
 module.exports = function() {
   var event = require('events'),
     emitter = new event.EventEmitter,
-    DelayPromise = function(delay, aciton) {
+    DelayPromise = function(delay, action) {
       return new Promise(function(resolve, reject) {
         _.delay(function() {
           try {
-            aciton();
+            action();
             resolve();
           } catch (err) {
             reject(err);
@@ -1601,58 +1601,40 @@ module.exports = function() {
         }, delay);
       });
     },
-    DelayTenPromise = _.partial(DelayPromise, 10),
     toEmitAction = function(event, data) {
       return function() {
         emitter.emit(event, data);
         // console.log(event);
       };
     },
-    EmitSalutionsPromise = function(solutions) {
-      var toEmitSolutionAction = _.partial(toEmitAction, 'solution');
-
-      return solutions
-        .map(toEmitSolutionAction)
-        .reduce(function(promise, emitSolution) {
-          return promise.then(function() {
-            return DelayTenPromise(emitSolution)
-          });
-        }, Promise.resolve());
+    toPromiseGenerator = function(action) {
+      return _.partial(DelayPromise, 10, action);
     },
-    EmitSparqlsPromise = function(sparqls) {
-      var toEmitSparqlAction = _.partial(toEmitAction, 'sparql');
-
-      return sparqls
-        .map(function(sparql) {
-          return {
-            aciton: toEmitSparqlAction(sparql.sparql),
-            solutions: sparql.solutions
-          }
-        })
-        .reduce(function(promise, sparql) {
-          return promise.then(function() {
-            return new DelayTenPromise(sparql.aciton)
-              .then(function() {
-                return new EmitSalutionsPromise(sparql.solutions);
-              });
-          });
-        }, Promise.resolve());
+    toEmitPromiseGenerator = _.compose(toPromiseGenerator, toEmitAction),
+    toEmitSolution = _.partial(toEmitPromiseGenerator, 'solution'),
+    toEmitSparql = _.partial(toEmitPromiseGenerator, 'sparql'),
+    toEmitAnchoredPgp = _.partial(toEmitPromiseGenerator, 'anchored_pgp'),
+    toEmitSparqlAndSolutions = function(sparql) {
+      return [toEmitSparql(sparql.sparql)]
+        .concat(sparql.solutions.map(toEmitSolution));
     },
-    EmitAnchoredPgpPromise = function(anchored_pgp, sparqls) {
-      var emittAnchorePgp = toEmitAction('anchored_pgp', anchored_pgp),
-        anchoredPgpPromise = new DelayTenPromise(emittAnchorePgp);
-
-      return anchoredPgpPromise.then(function() {
-        return new EmitSparqlsPromise(sparqls);
-      });
+    flatten = function(prev, array) {
+      return prev.concat(array);
+    },
+    lineupPromise = function(prev, promiseGenerator) {
+      return prev.then(promiseGenerator);
+    },
+    toAllPromiseGenerator = function(record) {
+      return [toEmitAnchoredPgp(record.anchored_pgp)]
+        .concat(record.sparqls
+          .map(toEmitSparqlAndSolutions)
+          .reduce(flatten, []));
     };
 
   data
-    .reduce(function(promise, record) {
-      return promise.then(function() {
-        return new EmitAnchoredPgpPromise(record.anchored_pgp, record.sparqls);
-      });
-    }, Promise.resolve())
+    .map(toAllPromiseGenerator)
+    .reduce(flatten, [])
+    .reduce(lineupPromise, Promise.resolve())
     .catch(function(err) {
       console.error(err, err.stack);
     });
