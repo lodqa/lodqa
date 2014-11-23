@@ -9,9 +9,9 @@ require 'json'
 class LodqaWS < Sinatra::Base
 	## configuration
 	require 'app_config'
-	# AppConfig.setup!(yaml: 'config/qald-biomed.yml')
+	AppConfig.setup!(yaml: 'config/qald-biomed.yml')
 	# AppConfig.setup!(yaml: 'config/bio2rdf-mashup.yml')
-	AppConfig.setup!(yaml: 'config/biogateway.yml')
+	# AppConfig.setup!(yaml: 'config/biogateway.yml')
 	endpoint_url      = AppConfig.endpoint_url
 	endpoint_options  = AppConfig.endpoint_options
 	ignore_predicates = AppConfig.ignore_predicates
