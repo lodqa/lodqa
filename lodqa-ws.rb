@@ -42,16 +42,22 @@ class LodqaWS < Sinatra::Base
 
 	get '/analysis' do
 		@query = params['query']
-		lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+		lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+
+		lodqa.parse(@query, parser_url)
 		@parse_rendering = lodqa.parse_rendering
 		@pgp = lodqa.pgp
+
+		lodqa.lookup(dictionary_url)
 		@mappings = lodqa.mappings
+
 		erb :analysis
 	end
 
 	get '/solutions' do
+		query = params['query']
+
 		if !request.websocket?
-			@query = params['query']
 			erb :solutions
 		else
 			request.websocket do |ws|
@@ -68,11 +74,15 @@ class LodqaWS < Sinatra::Base
 						ws_send(EM, ws, :solution, solution.to_h)
 					end
 
+					lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+
+					# replace the next two lines to
+					# lodqa.pgp = ...
+					# lodqa.mappings = ...
+					lodqa.parse(query, parser_url)
+					lodqa.lookup(dictionary_url)
+
 					EM.defer do
-						@query = params['query']
-						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
-						parse_rendering = lodqa.get_parse_rendering
-						ws.send({:parse_rendering => parse_rendering}.to_json)
 						ws.send("start")
 						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
 						ws.close_connection

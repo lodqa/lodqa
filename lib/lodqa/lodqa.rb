@@ -9,58 +9,27 @@ require 'lodqa/dictionary'
 module Lodqa; end unless defined? Lodqa
 
 class Lodqa::Lodqa
-  attr_reader :parse_rendering
+  attr_reader   :parse_rendering
   attr_accessor :pgp
   attr_accessor :mappings
 
-  def initialize(query, parser_url, dictionary_url, ep_url, options = {})
+  def initialize(ep_url, options = {})
     @options = options || {}
     @debug = @options[:debug] || false
-
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
+  end
 
+  def parse(query, parser_url)
     parser = EnjuAccess::CGIAccessor.new(parser_url)
     parse = parser.parse(query)
-    parse_rendering = EnjuAccess::get_graph_rendering(parse)
+    @parse_rendering = EnjuAccess::get_graph_rendering(parse)
 
-    @pgp   = graphicate(parse)
+    @pgp = graphicate(parse)
+  end
 
+  def lookup(dictionary_url)
     dictionary = Lodqa::Dictionary.new(dictionary_url, @endpoint)
     @mappings   = dictionary.lookup(@pgp[:nodes].values.collect{|n| n[:text]})
-
-    if @debug
-      puts "[query] #{query}"
-      p @pgp
-      puts "-----"
-      p mappings
-      puts "====="
-    end
-  end
-
-  def get_anchored_pgps
-    @anchored_pgps
-  end
-
-  def get_focus
-    @pgp[:focus]
-  end
-
-  def find_answer
-    @anchored_pgps.each do |anchored_pgp|
-      graphfinder = GraphFinder.new(anchored_pgp, @endpoint, @options)
-      graphfinder.each_solution do |s|
-        p s
-      end
-    end
-  end
-
-  def each_anchored_pgp_and_solution(proc_anchored_pgp = nil, proc_solution = nil)
-    @anchored_pgps.each do |anchored_pgp|
-      proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-      GraphFinder.new(anchored_pgp, @endpoint, @options).each_solution do |s|
-        proc_solution.call(s)
-      end
-    end
   end
 
   def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil)
@@ -187,8 +156,6 @@ if __FILE__ == $0
     puts "================="
     p anchored_pgp
   end
-
-  focus = lodqa.get_focus
 
   proc_solution = Proc.new do |solution|
     # target = if solution[('i' + focus).to_sym].nil?
