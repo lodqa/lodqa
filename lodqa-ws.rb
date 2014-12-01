@@ -40,6 +40,15 @@ class LodqaWS < Sinatra::Base
 		erb :motivation
 	end
 
+	get '/analysis' do
+		@query = params['query']
+		lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+		@parse_rendering = lodqa.parse_rendering
+		@pgp = lodqa.pgp
+		@mappings = lodqa.mappings
+		erb :analysis
+	end
+
 	get '/solutions' do
 		if !request.websocket?
 			@query = params['query']
