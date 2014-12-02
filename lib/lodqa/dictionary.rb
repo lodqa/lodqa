@@ -38,7 +38,7 @@ class Lodqa::Dictionary
   private
 
   def _lookup (terms)
-    @dictionary.post :terms => terms.to_json do |response, request, result|
+    @dictionary.post terms.to_json do |response, request, result|
       case response.code
       when 200
         JSON.parse response
