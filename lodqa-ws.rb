@@ -61,31 +61,34 @@ class LodqaWS < Sinatra::Base
 			erb :solutions
 		else
 			request.websocket do |ws|
-				ws.onopen do
-					proc_anchored_pgp = Proc.new do |anchored_pgp|
-						ws_send(EM, ws, :anchored_pgp, anchored_pgp)
-					end
+				proc_anchored_pgp = Proc.new do |anchored_pgp|
+					ws_send(EM, ws, :anchored_pgp, anchored_pgp)
+				end
 
-					proc_sparql = Proc.new do |sparql|
-						ws_send(EM, ws, :sparql, sparql)
-					end
+				proc_sparql = Proc.new do |sparql|
+					ws_send(EM, ws, :sparql, sparql)
+				end
 
-					proc_solution = Proc.new do |solution|
-						ws_send(EM, ws, :solution, solution.to_h)
-					end
+				proc_solution = Proc.new do |solution|
+					ws_send(EM, ws, :solution, solution.to_h)
+				end
 
-					lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+				ws.onmessage do |data|
+					begin
+						json = JSON.parse(data)
+						lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
 
-					# replace the next two lines to
-					# lodqa.pgp = ...
-					# lodqa.mappings = ...
-					lodqa.parse(query, parser_url)
-					lodqa.lookup(dictionary_url)
+						lodqa.pgp = json['pgp']
+						lodqa.mappings = json['mappings']
+						lodqa.parse(query, parser_url)
 
-					EM.defer do
-						ws.send("start")
-						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
-						ws.close_connection
+						EM.defer do
+							ws.send("start")
+							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
+							ws.close_connection
+						end
+					rescue JSON::ParserError => e
+						p e.message
 					end
 				end
 			end

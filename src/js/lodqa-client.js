@@ -44,4 +44,8 @@ window.onload = function() {
 
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
+
+  loader.on('ws_open', function() {
+    loader.beginSearch();
+  });
 };
