@@ -10,6 +10,8 @@ class LodqaWS < Sinatra::Base
 	## configuration
 	require 'app_config'
 	AppConfig.setup!(yaml: 'config/qald-biomed.yml')
+	# AppConfig.setup!(yaml: 'config/bio2rdf-mashup.yml')
+	# AppConfig.setup!(yaml: 'config/biogateway.yml')
 	endpoint_url      = AppConfig.endpoint_url
 	endpoint_options  = AppConfig.endpoint_options
 	ignore_predicates = AppConfig.ignore_predicates
@@ -38,34 +40,51 @@ class LodqaWS < Sinatra::Base
 		erb :motivation
 	end
 
+	get '/analysis' do
+		@query = params['query']
+		lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+
+		lodqa.parse(@query, parser_url)
+		@parse_rendering = lodqa.parse_rendering
+		@pgp = lodqa.pgp
+
+		lodqa.lookup(dictionary_url)
+		@mappings = lodqa.mappings
+
+		erb :analysis
+	end
+
 	get '/solutions' do
+		query = params['query']
+
 		if !request.websocket?
-			@query = params['query']
 			erb :solutions
 		else
 			request.websocket do |ws|
 				ws.onopen do
-					ws.send("start")
+					proc_anchored_pgp = Proc.new do |anchored_pgp|
+						ws_send(EM, ws, :anchored_pgp, anchored_pgp)
+					end
+
+					proc_sparql = Proc.new do |sparql|
+						ws_send(EM, ws, :sparql, sparql)
+					end
+
+					proc_solution = Proc.new do |solution|
+						ws_send(EM, ws, :solution, solution.to_h)
+					end
+
+					lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+
+					# replace the next two lines to
+					# lodqa.pgp = ...
+					# lodqa.mappings = ...
+					lodqa.parse(query, parser_url)
+					lodqa.lookup(dictionary_url)
+
 					EM.defer do
-						@query = params['query']
-						lodqa = Lodqa::Lodqa.new(@query, parser_url, dictionary_url, endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
-
-						ws_send(EM, ws, :parse_rendering, lodqa.get_parse_rendering)
-
-						proc_anchored_pgp = Proc.new do |anchored_pgp|
-							ws_send(EM, ws, :anchored_pgp, anchored_pgp)
-						end
-
-						proc_sparql = Proc.new do |sparql|
-							ws_send(EM, ws, :sparql, sparql)
-						end
-
-						proc_solution = Proc.new do |solution|
-							ws_send(EM, ws, :solution, solution.to_h)
-						end
-
+						ws.send("start")
 						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
-
 						ws.close_connection
 					end
 				end
