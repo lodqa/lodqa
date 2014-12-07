@@ -122,7 +122,7 @@ nav a {
 /* Home
 /*
 /*****************************************************************************/
-.note {
+.intro {
     width: 40em;
     padding: 5px;
     margin-bottom: 20px;
@@ -135,25 +135,10 @@ nav a {
 }
 
 .news {
-    border-style:solid;
     border-color:#ddddbb;
-    border-width: 1px;
-    padding-bottom: 5px;
-    margin-bottom: 30px;
     width: 45em;
     font-family: "Times New Roman", Times, sans-serif;
     background-color: #FFFFee;
-}
-
-
-.news:before {
-    position:relative;
-    top: -10px;
-    left: 5px;
-    padding: 2px;
-    content: "News";
-    color: #7777aa;
-    background-color: #ffffff;
 }
 
 .news ul {

@@ -1,0 +1,3 @@
+- [NLIWoD 2014](http://www.nliwod.org) workshop was collocated with [ISWC2014](http://iswc2014.semanticweb.org/) in Trentino (Oct. 19, 2014) 
+- [OKBQA 2014](http://2014.okbqa.org) hackathon was held in Jeju (Feb. 17-21, 2014) 
+- LODQA launched as an open source project (Dec. 20, 2013)

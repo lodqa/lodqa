@@ -12,18 +12,17 @@ The output of the project is freely available and contribution is open to any in
 
 ## DBCLS
 
-* [Jin-Dong Kim][jdkim] (Project Leader)
-* Yasunori Yamamoto (Endpoint profiling)
-* Atsuko Yamaguchi (Federated search)
+* [Jin-Dong Kim][jdkim] : Project Leader
+* Shigeru Nakajima ([Luxiar](http://www.luxiar.com)) : Software Engineer
 
 ## University of Colorado
-* [Kevin Bretonnel Cohen][cohen] (Evaluation, Linguistic aspects)
+* [Kevin Bretonnel Cohen][cohen] : Evaluation, Linguistic aspects
 
 ## Stanford University
-* [Michel Dumontier][dumontier] (Evaluation, LOD provider)
+* [Michel Dumontier][dumontier] : Evaluation, LOD provider
 
 ## Bayer CropScience
-* [Erick Antezana][antezana] (Evaluation, LOD provider)
+* [Erick Antezana][antezana] : Evaluation, LOD provider
 
 [dbcls]: http://dbcls.rois.ac.jp
 [ucolorado]: http://compbio.ucdenver.edu/

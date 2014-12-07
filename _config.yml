@@ -1,5 +1,6 @@
+title: LODQA
 name: LODQA
-markdown: redcarpet
-pygments: true
+markdown: kramdown
+highlighter: pygments
 baseurl: ''
 relative_permalinks: false

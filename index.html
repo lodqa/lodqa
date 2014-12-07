@@ -1,20 +1,110 @@
 ---
 layout: main
 title: LODQA
+#lodqa_url: 'http://lodqa.org'
+lodqa_url: 'http://localhost:9292'
+ep_url: 'http://rdf.pubannotation.org/sparql'
+parser_url: 'http://bionlp.dbcls.jp/enju'
+dictionary_url: 'http://pubdictionaries.org:80/dictionaries/id_mapping?dictionaries=%5B%22qald-drugbank%22%2C%22qald-diseasome%22%2C%22qald-sider%22%5D&output_format=simple&threshold=0.5&top_n=0'
 ---
 
-<div class="note">
+<div class="intro">
 LODQA (Linked Open Data Question Answering) is an open source project aiming at developing a system to generate SPARQL queries from natural language queries.
 </div>
 
-<div class="news">
+<fieldset class="news">
+<legend>News</legend>
+{% markdown news.md %}
+</fieldset>
+
+<div class="lodqa">
+<h1 class="id">Demo</h1>
+
+
+<script type="text/javascript">
+	function setConfiguration() {
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function() {
+		  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+		    document.getElementById("endpoint_url").innerHTML=xmlhttp.responseText;
+		  }
+		}
+
+		var config_url = document.getElementById("config").value;
+		xmlhttp.open("GET", config_url, true);
+		xmlhttp.send();
+	}
+</script>
+<form action="{{page:lodqa_url}}/analysis"
+      method="get"
+      entype="multipart/form-data"
+      oninput="max_hop_value.value=max_hop.value">
+
+<fieldset style="display:inline-block">
+<legend>Predefined configurations</legend>
+<input id="config-name" type="radio" checked />Name:
+<select name="config" id="config" onchange="setConfiguration()">
+  <option value="http://localhost/~jdkim/lodqa/config/qald-biomed.json">QALD-Biomed</option>
+  <option value="http://localhost/~jdkim/lodqa/config/bio2rdf-mashup.json">Bio2RDF-Meshup</option>
+</select>
+<br/>
+<input id="config-else" type="radio" />Else: 
+<!-- <input type="url" name="config" /> -->
+</fieldset>
+
+<fieldset>
+<legend>Configure</legend>
+End point:
+<input name="endpoint_url" id="endpoint_url" type="url" placeholder="URL" />
+Graph:
+<input name="graph_uri" id="graph_uri" type="url" placeholder="IRI" /><br/>
+Dictionary:
+<input name="dictionary_url" id="dictionary_url" type="url" placeholder="URL" /><br/>
+Parser:
+<input name="parser_url" id="parser_url" type="url" placeholder="URL" /><br/>
+
+Ignore Predicates:
+<textarea name="ignore_predicates" type="text" maxlength="1000"
+	   placeholder="newline-, tab-, or space-separated predicates."
+	   style="height:50px; width:400px"></textarea><br/>
+
+Sortal Predicates:
+<textarea name="sortal_predicates" type="text" maxlength="1000"
+	   placeholder="newline-, tab-, or space-separated predicates."
+	   style="height:50px; width:400px"></textarea><br/>
+
+Max hop:
+<input name="max_hop" type="range" min="1" max="4" value="2" />
+<output name="max_hop_value" for="max_hop"></output>
+
+</fieldset>
+
+<p class="description">The demo system targets DrugBank, SIDER, and Diseasome as included in QALD.</p>
+
+<input name="query" type="text" size="80"
+	   required="required"
+	   placeholder="Enter a natural language query."
+	   style="height:30px; width:80%" />
+<input type="submit"
+	   value="submit"
+	   style="height:30px; width:100px" />
+</form>
+
+<script type="text/javascript">
+  function setquery(query) {
+    document.getElementById("query").value = query;
+  }
+</script>
+
+<table>
+<tr><td rowspan="2">Example</td></tr>
+<tr><td>
 <ul>
-<li>(Oct. 19/20, 2014) <a href="http://www.nliwod.org">NLIWoD 2014</a> Workshop will be collocated with <a href="http://iswc2014.semanticweb.org/">ISWC2014</a> in Trentino.</li>
-<li>(Feb. 17-21, 2014) <a href="http://2014.okbqa.org">OKBQA 2014</a> Hackathon is held in Jeju.</li>
-<li>(Oct. 01, 2013) Relation detection is improved to find the right pairs of terms in relation.</li>
-<li>(Dec. 20, 2013) LODQA is launched as an open source project.</li>
+<li><a onclick="setquery(this.innerHTML)">what genes are associated with alzheimer disease?</a>
+<li><a onclick="setquery(this.innerHTML)">what side effects are associated with streptomycin?</a>
+<li><a onclick="setquery(this.innerHTML)">what drugs are used for diseases associated with the gene ALD?</a>
 </ul>
-</div>
+</td></tr>
 
 
 <!-- <h1>Prototype Demo (targeting OMIM)</h1>
