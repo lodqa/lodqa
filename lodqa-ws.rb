@@ -1,24 +1,13 @@
 #!/usr/bin/env ruby
 require 'sinatra/base'
-require 'sparql/client'
+require 'rest_client'
 require 'sinatra-websocket'
 require 'erb'
 require 'lodqa'
 require 'json'
+require 'app_config'
 
 class LodqaWS < Sinatra::Base
-	## configuration
-	require 'app_config'
-	AppConfig.setup!(yaml: 'config/qald-biomed.yml')
-	# AppConfig.setup!(yaml: 'config/bio2rdf-mashup.yml')
-	# AppConfig.setup!(yaml: 'config/biogateway.yml')
-	endpoint_url      = AppConfig.endpoint_url
-	endpoint_options  = AppConfig.endpoint_options
-	ignore_predicates = AppConfig.ignore_predicates
-	sortal_predicates = AppConfig.sortal_predicates
-	parser_url        = AppConfig.parser_url
-	dictionary_url    = AppConfig.dictionary_url
-
 	configure do
 		set :protection, :except => :frame_options
 		set :server, 'thin'
@@ -41,20 +30,32 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/analysis' do
+		@config = get_config(params)
 		@query = params['query']
-		lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
 
-		lodqa.parse(@query, parser_url)
-		@parse_rendering = lodqa.parse_rendering
-		@pgp = lodqa.pgp
+		unless @config.nil? || @config['endpoint_url'].nil? || @config['endpoint_url'].empty?
+			lodqa = Lodqa::Lodqa.new(@config['endpoint_url'])
 
-		lodqa.lookup(dictionary_url)
-		@mappings = lodqa.mappings
+			lodqa.parse(@query, @config['parser_url']) unless @config['parser_url'].nil? || @config['parser_url'].empty?
+			@parse_rendering = lodqa.parse_rendering
+			@pgp = lodqa.pgp
 
-		erb :analysis
+			lodqa.lookup(@config['dictionary_url']) unless @config['dictionary_url'].nil? || @config['dictionary_url'].empty?
+			@mappings = lodqa.mappings
+		else
+			@message = 'Endpoint is not specified.'
+		end
+
+		if !@message.nil?
+			@config = 'EMPTY' if @config.nil? || @config.empty?
+			erb :error
+		else
+			erb :analysis
+		end
 	end
 
 	get '/solutions' do
+		config = get_config(params)
 		query = params['query']
 
 		if !request.websocket?
@@ -74,7 +75,7 @@ class LodqaWS < Sinatra::Base
 						ws_send(EM, ws, :solution, solution.to_h)
 					end
 
-					lodqa = Lodqa::Lodqa.new(endpoint_url, {:max_hop => 3, :debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+					lodqa = Lodqa::Lodqa.new(config["endpoint_url"], {:max_hop => config["max_hop"], :ignore_predicates => config["ignore_predicates"], :sortal_predicates => config["sortal_predicates"]})
 
 					# replace the next two lines to
 					# lodqa.pgp = ...
@@ -96,5 +97,37 @@ class LodqaWS < Sinatra::Base
 
 	def ws_send(eventMachine, websocket, key, value)
 		eventMachine.add_timer(1){websocket.send({key => value}.to_json)}
+	end
+
+	def get_config(params)
+		# default configuration
+		config_file = 'config/qald-biomed.json'
+		config = JSON.parse File.read(config_file) if File.file?(config_file)
+
+		# configuration file passed through params
+		unless params.nil?
+			unless params['config'].nil? || params['config'].empty?
+				begin
+					config_add = RestClient.get config_url do |response, request, result|
+			      case response.code
+			      when 200 then JSON.parse response end
+		    	end
+		    rescue
+		    	warn "invalid url"
+		    end
+
+		    config.merge! config_add unless config_add.nil?
+		  end
+
+		  config['endpoint_url']      = params['endpoint_url']      unless params['endpoint_url'].nil?   || params['endpoint_url'].strip.empty?
+		  config['graph_uri']         = params['graph_uri']         unless params['graph_uri'].nil?      || params['graph_uri'].strip.empty?
+		  config['dictionary_url']    = params['dictionary_url']    unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
+		  config['parser_url']        = params['parser_url']        unless params['parser_url'].nil?     || params['parser_url'].strip.empty?
+		  config['max_hop']           = params['max_hop']           unless params['max_hop'].nil?        || params['max_hop'].strip.empty?
+		  config['ignore_predicates'] = params['ignore_predicates'].split unless params['ignore_predicates'].nil? || params['ignore_predicates'].strip.empty?
+		  config['sortal_predicates'] = params['sortal_predicates'].split unless params['sortal_predicates'].nil? || params['sortal_predicates'].strip.empty?
+		end
+
+	  config
 	end
 end
