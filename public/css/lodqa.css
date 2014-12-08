@@ -197,6 +197,12 @@ div.atext {
 
 #config {background-color: #EEEEEE}
 
+/* comon style */
+.list-in-table {
+    list-style-type: none;
+    padding-left: 0;
+}
+
 /* result-region */
 .result-region {
     border: 1px solid black;
@@ -227,12 +233,6 @@ div.atext {
 
 .anchored_pgp-table .focus td {
     color: #FF512C;
-}
-
-/* sparql-table */
-.sparql-table ul {
-    list-style-type: none;
-    padding-left: 0;
 }
 
 /* solution-table */

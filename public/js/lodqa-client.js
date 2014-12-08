@@ -9334,8 +9334,8 @@ module.exports = function(mappings) {
   makeTemplate = require('../render/makeTemplate'),
     regionTemplate = makeTemplate(function() {
       /*
-      <div class="result-region mappings-region">
-          <table class="anchored_pgp-table">
+      <div class="result-region">
+          <table class="mapping-editor-table">
               <tr>
                   <th>node</th>
                   <th>mappings</th>
@@ -9344,7 +9344,7 @@ module.exports = function(mappings) {
                   <tr class="mappings-node">
                       <td>{{nade_name}}</td>
                       <td>
-                          <ul class="mapping-list">
+                          <ul class="mapping-list list-in-table">
                             {{#mappings}}
                                 <li>
                                     <input class="mapping-checkbox" type="checkbox" checked="checked" node="{{nade_name}}" mapping="{{name}}"></input>
@@ -9974,7 +9974,7 @@ var _ = require('lodash'),
             </tr>
             <tr>
                 <td class="sparql">{{sparql}}</td>
-                <td><ul class="answer-list"></ul></td>
+                <td><ul class="answer-list list-in-table"></ul></td>
             </tr>
         </table>
     </div>
