@@ -1,7 +1,7 @@
 module.exports = function(pgp) {
   var graph = require('./lodqaGraph')('lodqa-pgp', {
     width: 690,
-    height: 100
+    height: 50
   });
 
   graph.addNodes(graph.graph, Object.keys(pgp.nodes).map(function(key) {
