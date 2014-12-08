@@ -1,6 +1,5 @@
 window.onload = function() {
-  var _ = require('lodash'),
-    bindWebsocketPresentation = function(loader) {
+  var bindWebsocketPresentation = function(loader) {
       var presentation = require('./presentation/websocketPresentation')('lodqa-messages');
       loader
         .on('ws_open', presentation.onOpen)
@@ -11,54 +10,45 @@ window.onload = function() {
         document.getElementById('lodqa-parse_rendering').innerHTML = data;
       });
     },
-    bindAnchoredPgpPresentation = function(loader, presentation) {
-      var domId = 'lodqa-results';
-
-      loader
-        .on('anchored_pgp', _.partial(presentation.onAnchoredPgp, domId));
-    },
-    bindResultPresentation = function(loader, presentation) {
-      var domId = 'lodqa-results',
-        skeltonPresentation = {
-          onAnchoredPgp: _.noop,
-          onSolution: _.noop,
-          onSparql: _.noop
-        };
-
-      presentation = _.extend(skeltonPresentation, presentation);
-
-      bindAnchoredPgpPresentation(loader, presentation);
-      loader
-        .on('sparql', presentation.onSparql)
-        .on('solution', presentation.onSolution);
-    },
     bindMappingsEditor = function(mappings) {
       var domId = 'lodqa-mappings',
+        mappings = JSON.parse(document.getElementById(domId).innerHTML),
         $region = require('./editor/mappingEditor')(mappings);
 
       document.getElementById(domId).innerHTML = '';
       $("#" + domId)
         .append($region);
+
+      return mappings;
+    },
+    bindResult = require('./controller/bindResult'),
+    pgpGraph = require('./graph/pgpGraph'),
+    bindPgpPresentation = function() {
+      var domId = 'lodqa-pgp',
+        pgp = JSON.parse(document.getElementById(domId).innerHTML);
+      document.getElementById(domId).innerHTML = '';
+      pgpGraph(pgp);
+
+      return pgp;
     };
 
   var loader = require('./loader/loadSolution')();
   // var loader = require('./loader/loadSolutionStub')();
 
-  // bindResultPresentation(loader, require('./presentation/debugPresentation'));
-  bindAnchoredPgpPresentation(loader, require('./presentation/anchoredPgpTablePresentation'));
-  bindResultPresentation(loader, require('./presentation/sparqlTablePresentation'));
-  bindResultPresentation(loader, require('./presentation/solutionTablePresentation'));
-  bindResultPresentation(loader, require('./presentation/graphPresentation'));
+  // bindResult.all(loader, require('./presentation/debugPresentation'));
+  bindResult.anchoredPgp(loader, require('./presentation/anchoredPgpTablePresentation'));
+  bindResult.all(loader, require('./presentation/sparqlTablePresentation'));
+  bindResult.all(loader, require('./presentation/solutionTablePresentation'));
+  bindResult.all(loader, require('./presentation/graphPresentation'));
 
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  var mappings = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
-  bindMappingsEditor(mappings);
+  var pgp = bindPgpPresentation();
+  var mappings = bindMappingsEditor(mappings);
 
   $('#beginSerach').on('click', function(e) {
-    var $target = $(e.target),
-      pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML);
+    var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');
     loader.beginSearch(pgp, mappings);

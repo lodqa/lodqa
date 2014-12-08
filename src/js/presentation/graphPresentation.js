@@ -1,6 +1,6 @@
 var _ = require('lodash'),
   instance = require('./instance'),
-  SolutionGraph = require('./SolutionGraph'),
+  SolutionGraph = require('../graph/SolutionGraph'),
   privateData = {};
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
       privateData.graph = new SolutionGraph(privateData.domId, {
         width: 690,
         height: 400
-      });
+    });
       privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
     }
 
