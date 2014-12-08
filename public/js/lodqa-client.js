@@ -9819,9 +9819,9 @@ var _ = require('lodash'),
 
 module.exports = {
   onAnchoredPgp: function(domId, anchored_pgp) {
-    var aa = _.partial(toViewParameters, anchored_pgp),
+    var toParams = _.partial(toViewParameters, anchored_pgp),
       nodes = Object.keys(anchored_pgp.nodes)
-      .map(aa)
+      .map(toParams)
       .reduce(toArray, []),
       table = template.render({
         nodes: nodes
@@ -9895,13 +9895,8 @@ var _ = require('lodash'),
   solutionRowTemplate = makeTemplate(function() {
     /*
     <tr>
-        <td class="solution">{{{solution}}}</td>
+        <td class="solution">{{#solutions}}{{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>{{/solutions}}</td>
     </tr>
-    */
-  }),
-  solutionTemplate = makeTemplate(function() {
-    /*
-    {{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
     */
   }),
   toLastOfUrl = require('./toLastOfUrl'),
@@ -9917,21 +9912,22 @@ var _ = require('lodash'),
 
     return $region.find('table');
   },
+  toViewParameters = function(solution, key) {
+    return {
+      id: key,
+      url: solution[key],
+      label: toLastOfUrl(solution[key])
+    };
+  },
+  toArray = require('../collection/toArray'),
   toSolutionRow = function(solution) {
-    var solutionLinks = Object.keys(solution)
-      .map(function(key) {
-        return {
-          id: key,
-          url: solution[key],
-          label: toLastOfUrl(solution[key])
-        };
-      })
-      .map(function(url) {
-        return solutionTemplate.render(url);
-      });
+    var toParams = _.partial(toViewParameters, solution),
+      solutionLinks = Object.keys(solution)
+      .map(toParams)
+      .reduce(toArray, []);
 
     return solutionRowTemplate.render({
-      solution: solutionLinks.join('')
+      solutions: solutionLinks
     });
   },
   privateData = {};
@@ -9952,7 +9948,7 @@ module.exports = {
   }
 };
 
-},{"../render/makeTemplate":25,"./instance":20,"./toLastOfUrl":23,"lodash":10}],22:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":25,"./instance":20,"./toLastOfUrl":23,"lodash":10}],22:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),

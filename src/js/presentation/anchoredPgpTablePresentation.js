@@ -32,9 +32,9 @@ var _ = require('lodash'),
 
 module.exports = {
   onAnchoredPgp: function(domId, anchored_pgp) {
-    var aa = _.partial(toViewParameters, anchored_pgp),
+    var toParams = _.partial(toViewParameters, anchored_pgp),
       nodes = Object.keys(anchored_pgp.nodes)
-      .map(aa)
+      .map(toParams)
       .reduce(toArray, []),
       table = template.render({
         nodes: nodes
