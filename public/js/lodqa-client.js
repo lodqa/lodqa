@@ -9413,7 +9413,7 @@ module.exports = function(mappings) {
   return $region;
 }
 
-},{"../render/makeTemplate":26}],16:[function(require,module,exports){
+},{"../render/makeTemplate":30}],16:[function(require,module,exports){
 window.onload = function() {
   var bindWebsocketPresentation = function(loader) {
       var presentation = require('./presentation/websocketPresentation')('lodqa-messages');
@@ -9428,13 +9428,25 @@ window.onload = function() {
     },
     bindMappingsEditor = function(mappings) {
       var domId = 'lodqa-mappings',
+        mappings = JSON.parse(document.getElementById(domId).innerHTML),
         $region = require('./editor/mappingEditor')(mappings);
 
       document.getElementById(domId).innerHTML = '';
       $("#" + domId)
         .append($region);
+
+      return mappings;
     },
-    bindResult = require('./controller/bindResult');
+    bindResult = require('./controller/bindResult'),
+    pgpGraph = require('./graph/pgpGraph'),
+    bindPgpPresentation = function() {
+      var domId = 'lodqa-pgp',
+        pgp = JSON.parse(document.getElementById(domId).innerHTML);
+      document.getElementById(domId).innerHTML = '';
+      pgpGraph(pgp);
+
+      return pgp;
+    };
 
   var loader = require('./loader/loadSolution')();
   // var loader = require('./loader/loadSolutionStub')();
@@ -9448,12 +9460,11 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  var mappings = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
-  bindMappingsEditor(mappings);
+  var pgp = bindPgpPresentation();
+  var mappings = bindMappingsEditor(mappings);
 
   $('#beginSerach').on('click', function(e) {
-    var $target = $(e.target),
-      pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML);
+    var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');
     loader.beginSearch(pgp, mappings);
@@ -9463,237 +9474,37 @@ window.onload = function() {
   });
 };
 
-},{"./controller/bindResult":14,"./editor/mappingEditor":15,"./loader/loadSolution":17,"./presentation/anchoredPgpTablePresentation":19,"./presentation/graphPresentation":20,"./presentation/solutionTablePresentation":22,"./presentation/sparqlTablePresentation":23,"./presentation/websocketPresentation":25}],17:[function(require,module,exports){
-var EventEmitter = require('events').EventEmitter,
-  _ = require('lodash');
-
-module.exports = function() {
-  var emitter = new EventEmitter,
-    openConnection = function() {
-      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace('analysis', 'solutions'));
-
-      ws.onopen = function() {
-        emitter.emit('ws_open');
-      };
-      ws.onclose = function() {
-        emitter.emit('ws_close');
-      };
-      ws.onmessage = function(m) {
-        if (m.data === 'start') return;
-
-        var jsondata = JSON.parse(m.data);
-
-        ['anchored_pgp', 'sparql', 'solution', 'parse_rendering']
-        .forEach(function(event) {
-          if (jsondata.hasOwnProperty(event)) {
-            emitter.emit(event, jsondata[event]);
-          }
-        });
-      };
-
-      return ws;
-    };
-
-  return _.extend(emitter, {
-    beginSearch: function(pgp, mappings) {
-      var ws = openConnection();
-      emitter.once('ws_open', function() {
-        ws.send(JSON.stringify({
-          pgp: pgp,
-          mappings: mappings
-        }))
-      });
-    }
-  });
-};
-
-},{"events":1,"lodash":10}],18:[function(require,module,exports){
+},{"./controller/bindResult":14,"./editor/mappingEditor":15,"./graph/pgpGraph":19,"./loader/loadSolution":22,"./presentation/anchoredPgpTablePresentation":23,"./presentation/graphPresentation":24,"./presentation/solutionTablePresentation":26,"./presentation/sparqlTablePresentation":27,"./presentation/websocketPresentation":29}],17:[function(require,module,exports){
 var _ = require('lodash'),
-  instance = require('./instance'),
+  instance = require('../presentation/instance'),
+  setFont = require('./setFont'),
+  toRed = require('./toRed'),
   transformIf = function(predicate, transform, object) {
     return predicate(object) ? transform(object) : object;
-  },
-  updateLinkOnSelect = function(link, springy) {
-    springy.event
-      .on('selected', function(selected) {
-        link
-          .text(selected.node.data.url)
-          .attr('href', selected.node.data.url);
-      });
-  },
-  Graph = function(domId, options) {
-    var graph = new Springy.Graph(),
-      link = $('<a target="_blank">'),
-      canvas = $('<canvas>')
-      .attr(options);
-
-    $('#' + domId)
-      .append(link)
-      .append(canvas);
-
-    var springy = canvas.springy({
-      graph: graph
-    });
-
-    updateLinkOnSelect(link, springy);
-
-    return graph;
-  },
-  toAnchoredPgpNodeTerm = function(nodes, key) {
-    return {
-      id: key,
-      label: nodes[key].term
-    };
   },
   toLabel = function(term) {
     return {
       id: term.id,
-      label: require('./toLastOfUrl')(term.label),
+      label: require('../presentation/toLastOfUrl')(term.label),
       url: term.label
     };
   },
-  setFont = function(value, target) {
-    return _.extend(target, {
-      font: value
-    })
-  },
   setFontNormal = _.partial(setFont, '8px Verdana, sans-serif'),
   toLabelAndSetFontNormal = _.compose(setFontNormal, toLabel),
-  toNode = function(term) {
-    return new Springy.Node(term.id, term);
-  },
-  addNode = function(graph, node) {
-    graph.addNode(node);
-  },
-  toBigFont = _.partial(setFont, '18px Verdana, sans-serif'),
-  toRed = function(term) {
-    return _.extend(term, {
-      color: '#FF512C'
-    });
-  },
-  toFocus = _.compose(toRed, toBigFont),
-  setFocus = function(focus, term) {
-    return term.id === focus ? toFocus(term) : term;
-  },
-  extendIndex = function(a, index) {
-    a.index = index;
-    return a;
-  },
-  threeNodeOrders = {
-    t1: [1, 0, 2],
-    t2: [0, 1, 2],
-    t3: [0, 2, 1]
-  },
-  getNodeOrder = function(id) {
-    return threeNodeOrders[id];
-  },
-  getTwoEdgeNode = function(edgeCount) {
-    return _.first(Object.keys(edgeCount)
-      .map(function(id) {
-        return {
-          id: id,
-          count: edgeCount[id]
-        };
-      })
-      .filter(function(node) {
-        return node.count === 2;
-      })
-      .map(function(node) {
-        return node.id;
-      }));
-  },
-  countEdge = function(edges) {
-    return edges.reduce(function(edgeCount, edge) {
-      edgeCount[edge.subject] ++;
-      edgeCount[edge.object] ++;
-      return edgeCount;
-    }, {
-      t1: 0,
-      t2: 0,
-      t3: 0
-    });
-  },
-  getOrderWhenThreeNode = _.compose(getNodeOrder, getTwoEdgeNode, countEdge),
-  sortNode = function(nodeIds, edges, a, b) {
-    if (nodeIds.length === 3) {
-      var nodeOrder = getOrderWhenThreeNode(edges);
-
-      return nodeOrder[a.index] - nodeOrder[b.index];
-    } else {
-      return b.index - a.index;
-    }
-  },
-  anchoredPgpNodePositions = [
-    [],
-    [{
-      x: 0,
-      y: 0
-    }],
-    [{
-      x: -20,
-      y: 20
-    }, {
-      x: 20,
-      y: -20
-    }],
-    [{
-      x: -40,
-      y: 40
-    }, {
-      x: 0,
-      y: 0
-    }, {
-      x: 40,
-      y: -40
-    }]
-  ],
-  setPosition = function(number_of_nodes, term, index) {
-    return _.extend(term, {
-      position: anchoredPgpNodePositions[number_of_nodes][index]
-    });
-  },
-  addAnchoredPgpNodes = function(graph, anchoredPgp) {
-    var nodeIds = Object.keys(anchoredPgp.nodes);
-
-    nodeIds
-      .map(_.partial(toAnchoredPgpNodeTerm, anchoredPgp.nodes))
-      .map(toLabelAndSetFontNormal)
-      .map(_.partial(setFocus, anchoredPgp.focus))
-      .map(extendIndex)
-      .sort(_.partial(sortNode, nodeIds, anchoredPgp.edges))
-      .map(_.partial(setPosition, nodeIds.length))
-      .map(toNode)
-      .forEach(_.partial(addNode, graph));
-  },
   toTerm = function(solution, id) {
     return {
       id: id,
       label: solution[id]
     };
   },
-  addEdge = function(graph, solution, edgeId, node1, node2, color) {
-    return _.first(Object.keys(solution)
-      .filter(function(id) {
-        return id === edgeId;
-      })
-      .map(_.partial(toTerm, solution))
-      .map(toLabel)
-      .map(function(term) {
-        return _.extend(term, {
-          color: color
-        });
-      })
-      .map(function(term) {
-        return graph.newEdge(node1, node2, term)
-      }));
-  },
-  addEdgeToInstance = function(graph, solution, instanceNode) {
+  addEdgeToInstance = function(graph, addEdge, solution, instanceNode) {
     var anchoredPgpNodeId = instanceNode.data.id.substr(1),
-      edge_id = 's' + anchoredPgpNodeId,
-      anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId];
-    addEdge(graph, solution, edge_id, anchoredPgpNode, instanceNode, '#999999');
+      edgeId = 's' + anchoredPgpNodeId,
+      anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId],
+      edge = toEdge(solution, edgeId);
+    addEdge(graph, edge, anchoredPgpNode, instanceNode, '#999999');
   },
-  addInstanceNode = function(graph, isFocus, solution) {
+  addInstanceNode = function(graph, addEdge, isFocus, solution) {
     var markIfFocus = _.partial(transformIf, _.compose(isFocus, function(term) {
       return term.id;
     }), toRed);
@@ -9705,7 +9516,7 @@ var _ = require('lodash'),
       .map(markIfFocus)
       .reduce(function(result, term) {
         var instanceNode = graph.newNode(term);
-        addEdgeToInstance(graph, solution, instanceNode);
+        addEdgeToInstance(graph, addEdge, solution, instanceNode);
         result[term.id] = instanceNode;
         return result;
       }, {});
@@ -9771,7 +9582,7 @@ var _ = require('lodash'),
       right: toGraphNode(toRightId(edge, pathInfo))
     };
   },
-  addPath = function(graph, solution, edges, transitNodes, instanceNodes) {
+  addPath = function(graph, addEdge, solution, edges, transitNodes, instanceNodes) {
     return Object.keys(solution)
       .filter(function(id) {
         return id[0] === 'p';
@@ -9779,9 +9590,185 @@ var _ = require('lodash'),
       .map(toPathInfo)
       .map(_.partial(toPath, graph, edges, transitNodes, instanceNodes))
       .reduce(function(result, path) {
-        result[path.id] = addEdge(graph, solution, path.id, path.left, path.right, '#2B5CFF');
+          var edge = toEdge(solution, path.id);
+        result[path.id] = addEdge(graph, edge, path.left, path.right, '#2B5CFF');
         return result;
       }, {});
+  },
+  toAnchoredPgpNodeTerm = function(nodes, key) {
+    return {
+      id: key,
+      label: nodes[key].term
+    };
+  },
+  addAnchoredPgpNodes = function(graph, addNodes, anchoredPgp) {
+    var nodeIds = Object.keys(anchoredPgp.nodes);
+
+    addNodes(
+      graph,
+      nodeIds
+      .map(_.partial(toAnchoredPgpNodeTerm, anchoredPgp.nodes))
+      .map(toLabelAndSetFontNormal),
+      anchoredPgp.focus,
+      anchoredPgp.edges
+    );
+  },
+  toEdge = function(solution, edgeId) {
+    var edge = Object.keys(solution)
+      .filter(function(id) {
+        return id === edgeId;
+      })
+      .map(_.partial(toTerm, solution))
+      .map(toLabel)[0];
+
+    return edge;
+  };
+
+module.exports = function(domId, options) {
+  var graph = require('./lodqaGraph')(domId, options);
+
+  return {
+    addAnchoredPgpNodes: _.partial(addAnchoredPgpNodes, graph.graph, graph.addNodes),
+    addInstanceNode: _.partial(addInstanceNode, graph.graph, graph.addEdge),
+    addTransitNode: _.partial(addTransitNode, graph.graph),
+    addPath: _.partial(addPath, graph.graph, graph.addEdge)
+  };
+};
+
+},{"../presentation/instance":25,"../presentation/toLastOfUrl":28,"./lodqaGraph":18,"./setFont":20,"./toRed":21,"lodash":10}],18:[function(require,module,exports){
+var _ = require('lodash'),
+  setFont = require('./setFont'),
+  toRed = require('./toRed'),
+  updateLinkOnSelect = function(link, springy) {
+    springy.event
+      .on('selected', function(selected) {
+        link
+          .text(selected.node.data.url)
+          .attr('href', selected.node.data.url);
+      });
+  },
+  Graph = function(domId, options) {
+    var graph = new Springy.Graph(),
+      link = $('<a target="_blank">'),
+      canvas = $('<canvas>')
+      .attr(options);
+
+    $('#' + domId)
+      .append(link)
+      .append(canvas);
+
+    var springy = canvas.springy({
+      graph: graph
+    });
+
+    updateLinkOnSelect(link, springy);
+
+    return graph;
+  },
+  toNode = function(term) {
+    return new Springy.Node(term.id, term);
+  },
+  addNode = function(graph, node) {
+    graph.addNode(node);
+  },
+  toBigFont = _.partial(setFont, '18px Verdana, sans-serif'),
+  toFocus = _.compose(toRed, toBigFont),
+  setFocus = function(focus, term) {
+    return term.id === focus ? toFocus(term) : term;
+  },
+  extendIndex = function(a, index) {
+    a.index = index;
+    return a;
+  },
+  threeNodeOrders = {
+    t1: [1, 0, 2],
+    t2: [0, 1, 2],
+    t3: [0, 2, 1]
+  },
+  getNodeOrder = function(id) {
+    return threeNodeOrders[id];
+  },
+  getTwoEdgeNode = function(edgeCount) {
+    return _.first(Object.keys(edgeCount)
+      .map(function(id) {
+        return {
+          id: id,
+          count: edgeCount[id]
+        };
+      })
+      .filter(function(node) {
+        return node.count === 2;
+      })
+      .map(function(node) {
+        return node.id;
+      }));
+  },
+  countEdge = function(edges) {
+    return edges.reduce(function(edgeCount, edge) {
+      edgeCount[edge.subject] ++;
+      edgeCount[edge.object] ++;
+      return edgeCount;
+    }, {
+      t1: 0,
+      t2: 0,
+      t3: 0
+    });
+  },
+  getOrderWhenThreeNode = _.compose(getNodeOrder, getTwoEdgeNode, countEdge),
+  specialSort = function(nodeOrder, a, b) {
+    return nodeOrder[a.index] - nodeOrder[b.index];
+  },
+  simpleSort = function(a, b) {
+    return b.index - a.index;
+  },
+  anchoredPgpNodePositions = [
+    [],
+    [{
+      x: 0,
+      y: 0
+    }],
+    [{
+      x: -20,
+      y: 20
+    }, {
+      x: 20,
+      y: -20
+    }],
+    [{
+      x: -40,
+      y: 40
+    }, {
+      x: 0,
+      y: 0
+    }, {
+      x: 40,
+      y: -40
+    }]
+  ],
+  setPosition = function(number_of_nodes, term, index) {
+    return _.extend(term, {
+      position: anchoredPgpNodePositions[number_of_nodes][index]
+    });
+  },
+  addNodes = function(graph, nodes, focus, edges) {
+    var sortFuc = nodes.length === 3 ?
+      _.partial(specialSort, getOrderWhenThreeNode(edges)) :
+      simpleSort;
+
+    nodes
+      .map(_.partial(setFocus, focus))
+      .map(extendIndex)
+      .sort(sortFuc)
+      .map(_.partial(setPosition, nodes.length))
+      .map(toNode)
+      .forEach(_.partial(addNode, graph));
+  },
+  addEdge = function(graph, edge, node1, node2, color) {
+    edge = _.extend(edge, {
+      color: color
+    });
+
+    return graph.newEdge(node1, node2, edge);
   };
 
 module.exports = function(domId, options) {
@@ -9789,14 +9776,101 @@ module.exports = function(domId, options) {
 
   return {
     graph: graph,
-    addAnchoredPgpNodes: _.partial(addAnchoredPgpNodes, graph),
-    addInstanceNode: _.partial(addInstanceNode, graph),
-    addTransitNode: _.partial(addTransitNode, graph),
-    addPath: _.partial(addPath, graph)
+    addNodes: addNodes,
+    addEdge: addEdge
   };
 };
 
-},{"./instance":21,"./toLastOfUrl":24,"lodash":10}],19:[function(require,module,exports){
+},{"./setFont":20,"./toRed":21,"lodash":10}],19:[function(require,module,exports){
+module.exports = function (pgp) {
+    var graph = require('./lodqaGraph')('lodqa-pgp', {
+        width: 690,
+        height: 100
+    });
+
+    graph.addNodes(graph.graph, Object.keys(pgp.nodes).map(function(key) {
+        return {
+            id: key,
+            label: pgp.nodes[key].text
+        };
+    }), pgp.focus, pgp.edges);
+
+    pgp.edges.forEach(function(edge, index) {
+        graph.addEdge(
+            graph.graph, {
+                id: index,
+                label: edge.text
+            },
+            graph.graph.nodeSet[edge.subject],
+            graph.graph.nodeSet[edge.object],
+            '#000000'
+        );
+    });
+};
+
+},{"./lodqaGraph":18}],20:[function(require,module,exports){
+var _ = require('lodash');
+
+module.exports =  function(value, target) {
+    return _.extend(target, {
+        font: value
+    })
+};
+
+},{"lodash":10}],21:[function(require,module,exports){
+var _ = require('lodash');
+
+module.exports = function(term) {
+    return _.extend(term, {
+        color: '#FF512C'
+    });
+};
+
+},{"lodash":10}],22:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter,
+  _ = require('lodash');
+
+module.exports = function() {
+  var emitter = new EventEmitter,
+    openConnection = function() {
+      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace('analysis', 'solutions'));
+
+      ws.onopen = function() {
+        emitter.emit('ws_open');
+      };
+      ws.onclose = function() {
+        emitter.emit('ws_close');
+      };
+      ws.onmessage = function(m) {
+        if (m.data === 'start') return;
+
+        var jsondata = JSON.parse(m.data);
+
+        ['anchored_pgp', 'sparql', 'solution', 'parse_rendering']
+        .forEach(function(event) {
+          if (jsondata.hasOwnProperty(event)) {
+            emitter.emit(event, jsondata[event]);
+          }
+        });
+      };
+
+      return ws;
+    };
+
+  return _.extend(emitter, {
+    beginSearch: function(pgp, mappings) {
+      var ws = openConnection();
+      emitter.once('ws_open', function() {
+        ws.send(JSON.stringify({
+          pgp: pgp,
+          mappings: mappings
+        }))
+      });
+    }
+  });
+};
+
+},{"events":1,"lodash":10}],23:[function(require,module,exports){
 var _ = require('lodash'),
   makeTemplate = require('../render/makeTemplate'),
   template = makeTemplate(function() {
@@ -9843,10 +9917,10 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":13,"../render/makeTemplate":26,"lodash":10}],20:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":30,"lodash":10}],24:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
-  SolutionGraph = require('./SolutionGraph'),
+  SolutionGraph = require('../graph/SolutionGraph'),
   privateData = {};
 
 module.exports = {
@@ -9864,7 +9938,7 @@ module.exports = {
       privateData.graph = new SolutionGraph(privateData.domId, {
         width: 690,
         height: 400
-      });
+    });
       privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
     }
 
@@ -9876,7 +9950,7 @@ module.exports = {
   }
 };
 
-},{"./SolutionGraph":18,"./instance":21,"lodash":10}],21:[function(require,module,exports){
+},{"../graph/SolutionGraph":17,"./instance":25,"lodash":10}],25:[function(require,module,exports){
 module.exports = {
   is: function(id) {
     return id[0] === 'i';
@@ -9886,7 +9960,7 @@ module.exports = {
   }
 };
 
-},{}],22:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -9960,7 +10034,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":13,"../render/makeTemplate":26,"./instance":21,"./toLastOfUrl":24,"lodash":10}],23:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":30,"./instance":25,"./toLastOfUrl":28,"lodash":10}],27:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -10021,7 +10095,7 @@ module.exports = {
   }
 };
 
-},{"../render/makeTemplate":26,"./instance":21,"./toLastOfUrl":24,"lodash":10}],24:[function(require,module,exports){
+},{"../render/makeTemplate":30,"./instance":25,"./toLastOfUrl":28,"lodash":10}],28:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -10029,7 +10103,7 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":6}],25:[function(require,module,exports){
+},{"url":6}],29:[function(require,module,exports){
 var _ = require('lodash'),
   show = function(el, msg) {
     el.innerHTML = msg;
@@ -10045,7 +10119,7 @@ module.exports = function(domId) {
   };
 }
 
-},{"lodash":10}],26:[function(require,module,exports){
+},{"lodash":10}],30:[function(require,module,exports){
 var _ = require('lodash'),
   multiline = require('multiline'),
   Hogan = require('hogan.js');

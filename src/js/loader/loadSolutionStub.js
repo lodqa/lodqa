@@ -14,7 +14,7 @@ var data_split_to_3 = {
       },
       "edges": [{
         "subject": "t1",
-        "object": "t2",
+        "object": "t2", 
         "text": "associated with"
       }],
       "focus": "t1"
