@@ -56,9 +56,14 @@ window.onload = function() {
   var mappings = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
   bindMappingsEditor(mappings);
 
-  loader.on('ws_open', function() {
-    var pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML);
+  $('#beginSerach').on('click', function(e) {
+    var $target = $(e.target),
+      pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML);
 
+    $target.attr('disabled', 'disabled');
     loader.beginSearch(pgp, mappings);
+    loader.once('ws_close', function() {
+      $target.removeAttr('disabled');
+    })
   });
 };
