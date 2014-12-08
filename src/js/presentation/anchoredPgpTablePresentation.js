@@ -1,5 +1,5 @@
 var _ = require('lodash'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   tableTemplate = makeTemplate(function() {
     /*
     <div class="result-region anchored_pgp-region">

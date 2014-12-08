@@ -1,5 +1,5 @@
 module.exports = function(mappings) {
-  makeTemplate = require('../presentation/makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
     regionTemplate = makeTemplate(function() {
       /*
       <div class="result-region mappings-region">

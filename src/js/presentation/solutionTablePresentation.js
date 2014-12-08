@@ -1,6 +1,6 @@
 var _ = require('lodash'),
   instance = require('./instance'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="result-region solution-region hide">

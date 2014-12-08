@@ -9326,7 +9326,7 @@ module.exports = function (str) {
 
 },{}],13:[function(require,module,exports){
 module.exports = function(mappings) {
-  makeTemplate = require('../presentation/makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
     regionTemplate = makeTemplate(function() {
       /*
       <div class="result-region mappings-region">
@@ -9387,7 +9387,7 @@ module.exports = function(mappings) {
   return $region;
 }
 
-},{"../presentation/makeTemplate":20}],14:[function(require,module,exports){
+},{"../render/makeTemplate":24}],14:[function(require,module,exports){
 window.onload = function() {
   var _ = require('lodash'),
     bindWebsocketPresentation = function(loader) {
@@ -9453,7 +9453,7 @@ window.onload = function() {
   });
 };
 
-},{"./editor/mappingEditor":13,"./loader/loadSolution":15,"./presentation/anchoredPgpTablePresentation":17,"./presentation/graphPresentation":18,"./presentation/solutionTablePresentation":21,"./presentation/sparqlTablePresentation":22,"./presentation/websocketPresentation":24,"lodash":10}],15:[function(require,module,exports){
+},{"./editor/mappingEditor":13,"./loader/loadSolution":15,"./presentation/anchoredPgpTablePresentation":17,"./presentation/graphPresentation":18,"./presentation/solutionTablePresentation":20,"./presentation/sparqlTablePresentation":21,"./presentation/websocketPresentation":23,"lodash":10}],15:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter,
   _ = require('lodash');
 
@@ -9779,9 +9779,9 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"./instance":19,"./toLastOfUrl":23,"lodash":10}],17:[function(require,module,exports){
+},{"./instance":19,"./toLastOfUrl":22,"lodash":10}],17:[function(require,module,exports){
 var _ = require('lodash'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   tableTemplate = makeTemplate(function() {
     /*
     <div class="result-region anchored_pgp-region">
@@ -9828,7 +9828,7 @@ module.exports = {
   }
 };
 
-},{"./makeTemplate":20,"lodash":10}],18:[function(require,module,exports){
+},{"../render/makeTemplate":24,"lodash":10}],18:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   SolutionGraph = require('./SolutionGraph'),
@@ -9873,15 +9873,8 @@ module.exports = {
 
 },{}],20:[function(require,module,exports){
 var _ = require('lodash'),
-  multiline = require('multiline'),
-  Hogan = require('hogan.js');
-
-module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
-
-},{"hogan.js":8,"lodash":10,"multiline":11}],21:[function(require,module,exports){
-var _ = require('lodash'),
   instance = require('./instance'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="result-region solution-region hide">
@@ -9956,10 +9949,10 @@ module.exports = {
   }
 };
 
-},{"./instance":19,"./makeTemplate":20,"./toLastOfUrl":23,"lodash":10}],22:[function(require,module,exports){
+},{"../render/makeTemplate":24,"./instance":19,"./toLastOfUrl":22,"lodash":10}],21:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="result-region">
@@ -10017,7 +10010,7 @@ module.exports = {
   }
 };
 
-},{"./instance":19,"./makeTemplate":20,"./toLastOfUrl":23,"lodash":10}],23:[function(require,module,exports){
+},{"../render/makeTemplate":24,"./instance":19,"./toLastOfUrl":22,"lodash":10}],22:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -10025,7 +10018,7 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":6}],24:[function(require,module,exports){
+},{"url":6}],23:[function(require,module,exports){
 var _ = require('lodash'),
   show = function(el, msg) {
     el.innerHTML = msg;
@@ -10041,4 +10034,11 @@ module.exports = function(domId) {
   };
 }
 
-},{"lodash":10}]},{},[14])
+},{"lodash":10}],24:[function(require,module,exports){
+var _ = require('lodash'),
+  multiline = require('multiline'),
+  Hogan = require('hogan.js');
+
+module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
+
+},{"hogan.js":8,"lodash":10,"multiline":11}]},{},[14])
