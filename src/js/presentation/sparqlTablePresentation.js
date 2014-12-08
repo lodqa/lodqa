@@ -1,6 +1,6 @@
 var _ = require('lodash'),
   instance = require('./instance'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="result-region">
@@ -11,7 +11,7 @@ var _ = require('lodash'),
             </tr>
             <tr>
                 <td class="sparql">{{sparql}}</td>
-                <td><ul class="answer-list"></ul></td>
+                <td><ul class="answer-list list-in-table"></ul></td>
             </tr>
         </table>
     </div>

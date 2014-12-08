@@ -10,6 +10,8 @@ class << EnjuAccess
   # It generates a SVG expression that shows the predicate-argument
   # structure of the sentence
   def get_graph_rendering(parse)
+    return '' if parse.nil? || parse[:root].nil?
+
     tokens = parse[:tokens]
     root   = parse[:root]
     focus  = parse[:focus]

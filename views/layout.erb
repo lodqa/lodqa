@@ -6,25 +6,30 @@
   <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<div id="frame">
 
-<div id="title">
-<image id ="logo" src="images/lodqa-logo.svg" />
+<div id="header" class="frame">
+<div id="logo">
+<a href="http://www.lodqa.org"><img src="images/lodqa-logo.svg" alt="Logo" id='logo' /></a>
+</div>
+
 <div id="slogan">
-Querying linked open data (LOD) using natural language. Sounds great? Let's realize it!
-</div>
-</div>
-
-<div id="menu">
-<a class="item" href="/">Front</a>
-<a class="item" href="motivation">Motivation</a>
-<a class="item" href="participants">Participants</a>
-<a class="item" href="references">References</a>
-<a class="item" href="https://github.com/lodqa/lodqa">github</a>
+Querying linked open data using natural languages.<br/>
+Sounds great? Let's realize it, together!
 </div>
 
-<div id="main">
-<%= yield %>
+<nav id="main-nav">
+<ul>
+  <li><a href="http://www.lodqa.org/">Front</a></li>
+  <li><a href="http://www.lodqa.org/motivation/">Motivation</a></li>
+  <li><a href="http://www.lodqa.org/references/">References</a></li>
+  <li><a href="http://www.lodqa.org/people/">People</a></li>
+  <li><a href="https://github.com/lodqa/lodqa">github</a></li>
+</ul>
+</nav>
+</div>
+
+<div id="main" class="frame">
+	<%= yield %>
 </div>
 
 </div>

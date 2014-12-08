@@ -47,8 +47,8 @@ class EnjuAccess::CGIAccessor
 
   # It populates the instance variables, tokens and root
   def get_parse (sentence)
+    return [[], nil] if sentence.nil? || sentence.strip.empty?
     sentence = sentence.strip
-    return [] if sentence.nil? || sentence.empty?
 
     response = @enju.get :params => {:sentence=>sentence, :format=>'conll'}
     case response.code
