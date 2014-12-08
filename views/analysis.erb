@@ -8,7 +8,19 @@
 <div id="lodqa-parse_rendering"><%= @parse_rendering %></div>
 
 <h1>PGP</h1>
-<div id="lodqa-parse_rendering"><%= @pgp %></div>
+<div id="lodqa-pgp"><%= @pgp.to_json %></div>
 
 <h1>Mappings</h1>
-<div id="lodqa-mappings"><%= @mappings %></div>
+<div id="lodqa-mappings"><%= @mappings.to_json %></div>
+
+<input id="beginSerach" type="button" value="Begin Search"></input>
+
+<h1>Results</h1>
+<div id="lodqa-messages"></div>
+<div id="lodqa-results"></div>
+
+<script src="js/vender/springy/springy.js"></script>
+<script src="js/vender/jQuery/dist/jquery.min.js"></script>
+<script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
+<script src="js/vender/springy/springyui.js"></script>
+<script src="js/lodqa-client.js"></script>

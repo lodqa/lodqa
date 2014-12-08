@@ -1,16 +1,14 @@
-var show = function(el) {
-    return function(msg) {
-      el.innerHTML = msg;
-    }
-  }(document.getElementById('lodqa-messages')),
-  onOpen = function() {
-    show('lodqa running ...');
-  },
-  onClose = function() {
-    show('lodqa finished.');
+var _ = require('lodash'),
+  show = function(el, msg) {
+    el.innerHTML = msg;
   };
 
-module.exports = {
-  onOpen: onOpen,
-  onClose: onClose
-};
+module.exports = function(domId) {
+  var onOpen = _.partial(show, document.getElementById(domId), 'lodqa running ...'),
+    onClose = _.partial(show, document.getElementById(domId), 'lodqa finished.');
+
+  return {
+    onOpen: onOpen,
+    onClose: onClose
+  };
+}

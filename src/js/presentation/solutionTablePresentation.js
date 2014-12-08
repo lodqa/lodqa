@@ -1,6 +1,6 @@
 var _ = require('lodash'),
   instance = require('./instance'),
-  makeTemplate = require('./makeTemplate'),
+  makeTemplate = require('../render/makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
     <div class="result-region solution-region hide">
@@ -18,13 +18,8 @@ var _ = require('lodash'),
   solutionRowTemplate = makeTemplate(function() {
     /*
     <tr>
-        <td class="solution">{{{solution}}}</td>
+        <td class="solution">{{#solutions}}{{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>{{/solutions}}</td>
     </tr>
-    */
-  }),
-  solutionTemplate = makeTemplate(function() {
-    /*
-    {{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
     */
   }),
   toLastOfUrl = require('./toLastOfUrl'),
@@ -40,21 +35,22 @@ var _ = require('lodash'),
 
     return $region.find('table');
   },
+  toViewParameters = function(solution, key) {
+    return {
+      id: key,
+      url: solution[key],
+      label: toLastOfUrl(solution[key])
+    };
+  },
+  toArray = require('../collection/toArray'),
   toSolutionRow = function(solution) {
-    var solutionLinks = Object.keys(solution)
-      .map(function(key) {
-        return {
-          id: key,
-          url: solution[key],
-          label: toLastOfUrl(solution[key])
-        };
-      })
-      .map(function(url) {
-        return solutionTemplate.render(url);
-      });
+    var toParams = _.partial(toViewParameters, solution),
+      solutionLinks = Object.keys(solution)
+      .map(toParams)
+      .reduce(toArray, []);
 
     return solutionRowTemplate.render({
-      solution: solutionLinks.join('')
+      solutions: solutionLinks
     });
   },
   privateData = {};

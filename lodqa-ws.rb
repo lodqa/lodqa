@@ -5,7 +5,6 @@ require 'sinatra-websocket'
 require 'erb'
 require 'lodqa'
 require 'json'
-require 'app_config'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -62,31 +61,34 @@ class LodqaWS < Sinatra::Base
 			erb :solutions
 		else
 			request.websocket do |ws|
-				ws.onopen do
-					proc_anchored_pgp = Proc.new do |anchored_pgp|
-						ws_send(EM, ws, :anchored_pgp, anchored_pgp)
-					end
+				proc_anchored_pgp = Proc.new do |anchored_pgp|
+					ws_send(EM, ws, :anchored_pgp, anchored_pgp)
+				end
 
-					proc_sparql = Proc.new do |sparql|
-						ws_send(EM, ws, :sparql, sparql)
-					end
+				proc_sparql = Proc.new do |sparql|
+					ws_send(EM, ws, :sparql, sparql)
+				end
 
-					proc_solution = Proc.new do |solution|
-						ws_send(EM, ws, :solution, solution.to_h)
-					end
+				proc_solution = Proc.new do |solution|
+					ws_send(EM, ws, :solution, solution.to_h)
+				end
 
-					lodqa = Lodqa::Lodqa.new(config["endpoint_url"], {:max_hop => config["max_hop"], :ignore_predicates => config["ignore_predicates"], :sortal_predicates => config["sortal_predicates"]})
+				ws.onmessage do |data|
+					begin
+						json = JSON.parse(data)
+						lodqa = Lodqa::Lodqa.new(config['endpoint_url'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
 
-					# replace the next two lines to
-					# lodqa.pgp = ...
-					# lodqa.mappings = ...
-					lodqa.parse(query, parser_url)
-					lodqa.lookup(dictionary_url)
+						lodqa.pgp = json['pgp']
+						lodqa.mappings = json['mappings']
+						lodqa.parse(query, config['parser_url'])
 
-					EM.defer do
-						ws.send("start")
-						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
-						ws.close_connection
+						EM.defer do
+							ws.send("start")
+							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
+							ws.close_connection
+						end
+					rescue JSON::ParserError => e
+						p e.message
 					end
 				end
 			end
@@ -123,7 +125,7 @@ class LodqaWS < Sinatra::Base
 		  config['graph_uri']         = params['graph_uri']         unless params['graph_uri'].nil?      || params['graph_uri'].strip.empty?
 		  config['dictionary_url']    = params['dictionary_url']    unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 		  config['parser_url']        = params['parser_url']        unless params['parser_url'].nil?     || params['parser_url'].strip.empty?
-		  config['max_hop']           = params['max_hop']           unless params['max_hop'].nil?        || params['max_hop'].strip.empty?
+		  config['max_hop']           = params['max_hop'].to_i      unless params['max_hop'].nil?        || params['max_hop'].strip.empty?
 		  config['ignore_predicates'] = params['ignore_predicates'].split unless params['ignore_predicates'].nil? || params['ignore_predicates'].strip.empty?
 		  config['sortal_predicates'] = params['sortal_predicates'].split unless params['sortal_predicates'].nil? || params['sortal_predicates'].strip.empty?
 		end
