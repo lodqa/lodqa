@@ -32,8 +32,8 @@ window.onload = function() {
       return pgp;
     };
 
-  // var loader = require('./loader/loadSolution')();
-  var loader = require('./loader/loadSolutionStub')();
+  var loader = require('./loader/loadSolution')();
+  // var loader = require('./loader/loadSolutionStub')();
 
   // bindResult.all(loader, require('./presentation/debugPresentation'));
   bindResult.anchoredPgp(loader, require('./presentation/anchoredPgpTablePresentation'));

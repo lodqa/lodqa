@@ -1,422 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
-
-module.exports = require('./lib/core.js')
-require('./lib/done.js')
-require('./lib/es6-extensions.js')
-require('./lib/node-extensions.js')
-},{"./lib/core.js":2,"./lib/done.js":3,"./lib/es6-extensions.js":4,"./lib/node-extensions.js":5}],2:[function(require,module,exports){
-'use strict';
-
-var asap = require('asap')
-
-module.exports = Promise;
-function Promise(fn) {
-  if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new')
-  if (typeof fn !== 'function') throw new TypeError('not a function')
-  var state = null
-  var value = null
-  var deferreds = []
-  var self = this
-
-  this.then = function(onFulfilled, onRejected) {
-    return new self.constructor(function(resolve, reject) {
-      handle(new Handler(onFulfilled, onRejected, resolve, reject))
-    })
-  }
-
-  function handle(deferred) {
-    if (state === null) {
-      deferreds.push(deferred)
-      return
-    }
-    asap(function() {
-      var cb = state ? deferred.onFulfilled : deferred.onRejected
-      if (cb === null) {
-        (state ? deferred.resolve : deferred.reject)(value)
-        return
-      }
-      var ret
-      try {
-        ret = cb(value)
-      }
-      catch (e) {
-        deferred.reject(e)
-        return
-      }
-      deferred.resolve(ret)
-    })
-  }
-
-  function resolve(newValue) {
-    try { //Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-      if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.')
-      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
-        var then = newValue.then
-        if (typeof then === 'function') {
-          doResolve(then.bind(newValue), resolve, reject)
-          return
-        }
-      }
-      state = true
-      value = newValue
-      finale()
-    } catch (e) { reject(e) }
-  }
-
-  function reject(newValue) {
-    state = false
-    value = newValue
-    finale()
-  }
-
-  function finale() {
-    for (var i = 0, len = deferreds.length; i < len; i++)
-      handle(deferreds[i])
-    deferreds = null
-  }
-
-  doResolve(fn, resolve, reject)
-}
-
-
-function Handler(onFulfilled, onRejected, resolve, reject){
-  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null
-  this.onRejected = typeof onRejected === 'function' ? onRejected : null
-  this.resolve = resolve
-  this.reject = reject
-}
-
-/**
- * Take a potentially misbehaving resolver function and make sure
- * onFulfilled and onRejected are only called once.
- *
- * Makes no guarantees about asynchrony.
- */
-function doResolve(fn, onFulfilled, onRejected) {
-  var done = false;
-  try {
-    fn(function (value) {
-      if (done) return
-      done = true
-      onFulfilled(value)
-    }, function (reason) {
-      if (done) return
-      done = true
-      onRejected(reason)
-    })
-  } catch (ex) {
-    if (done) return
-    done = true
-    onRejected(ex)
-  }
-}
-
-},{"asap":6}],3:[function(require,module,exports){
-'use strict';
-
-var Promise = require('./core.js')
-var asap = require('asap')
-
-module.exports = Promise
-Promise.prototype.done = function (onFulfilled, onRejected) {
-  var self = arguments.length ? this.then.apply(this, arguments) : this
-  self.then(null, function (err) {
-    asap(function () {
-      throw err
-    })
-  })
-}
-},{"./core.js":2,"asap":6}],4:[function(require,module,exports){
-'use strict';
-
-//This file contains the ES6 extensions to the core Promises/A+ API
-
-var Promise = require('./core.js')
-var asap = require('asap')
-
-module.exports = Promise
-
-/* Static Functions */
-
-function ValuePromise(value) {
-  this.then = function (onFulfilled) {
-    if (typeof onFulfilled !== 'function') return this
-    return new Promise(function (resolve, reject) {
-      asap(function () {
-        try {
-          resolve(onFulfilled(value))
-        } catch (ex) {
-          reject(ex);
-        }
-      })
-    })
-  }
-}
-ValuePromise.prototype = Promise.prototype
-
-var TRUE = new ValuePromise(true)
-var FALSE = new ValuePromise(false)
-var NULL = new ValuePromise(null)
-var UNDEFINED = new ValuePromise(undefined)
-var ZERO = new ValuePromise(0)
-var EMPTYSTRING = new ValuePromise('')
-
-Promise.resolve = function (value) {
-  if (value instanceof Promise) return value
-
-  if (value === null) return NULL
-  if (value === undefined) return UNDEFINED
-  if (value === true) return TRUE
-  if (value === false) return FALSE
-  if (value === 0) return ZERO
-  if (value === '') return EMPTYSTRING
-
-  if (typeof value === 'object' || typeof value === 'function') {
-    try {
-      var then = value.then
-      if (typeof then === 'function') {
-        return new Promise(then.bind(value))
-      }
-    } catch (ex) {
-      return new Promise(function (resolve, reject) {
-        reject(ex)
-      })
-    }
-  }
-
-  return new ValuePromise(value)
-}
-
-Promise.all = function (arr) {
-  var args = Array.prototype.slice.call(arr)
-
-  return new Promise(function (resolve, reject) {
-    if (args.length === 0) return resolve([])
-    var remaining = args.length
-    function res(i, val) {
-      try {
-        if (val && (typeof val === 'object' || typeof val === 'function')) {
-          var then = val.then
-          if (typeof then === 'function') {
-            then.call(val, function (val) { res(i, val) }, reject)
-            return
-          }
-        }
-        args[i] = val
-        if (--remaining === 0) {
-          resolve(args);
-        }
-      } catch (ex) {
-        reject(ex)
-      }
-    }
-    for (var i = 0; i < args.length; i++) {
-      res(i, args[i])
-    }
-  })
-}
-
-Promise.reject = function (value) {
-  return new Promise(function (resolve, reject) { 
-    reject(value);
-  });
-}
-
-Promise.race = function (values) {
-  return new Promise(function (resolve, reject) { 
-    values.forEach(function(value){
-      Promise.resolve(value).then(resolve, reject);
-    })
-  });
-}
-
-/* Prototype Methods */
-
-Promise.prototype['catch'] = function (onRejected) {
-  return this.then(null, onRejected);
-}
-
-},{"./core.js":2,"asap":6}],5:[function(require,module,exports){
-'use strict';
-
-//This file contains then/promise specific extensions that are only useful for node.js interop
-
-var Promise = require('./core.js')
-var asap = require('asap')
-
-module.exports = Promise
-
-/* Static Functions */
-
-Promise.denodeify = function (fn, argumentCount) {
-  argumentCount = argumentCount || Infinity
-  return function () {
-    var self = this
-    var args = Array.prototype.slice.call(arguments)
-    return new Promise(function (resolve, reject) {
-      while (args.length && args.length > argumentCount) {
-        args.pop()
-      }
-      args.push(function (err, res) {
-        if (err) reject(err)
-        else resolve(res)
-      })
-      fn.apply(self, args)
-    })
-  }
-}
-Promise.nodeify = function (fn) {
-  return function () {
-    var args = Array.prototype.slice.call(arguments)
-    var callback = typeof args[args.length - 1] === 'function' ? args.pop() : null
-    var ctx = this
-    try {
-      return fn.apply(this, arguments).nodeify(callback, ctx)
-    } catch (ex) {
-      if (callback === null || typeof callback == 'undefined') {
-        return new Promise(function (resolve, reject) { reject(ex) })
-      } else {
-        asap(function () {
-          callback.call(ctx, ex)
-        })
-      }
-    }
-  }
-}
-
-Promise.prototype.nodeify = function (callback, ctx) {
-  if (typeof callback != 'function') return this
-
-  this.then(function (value) {
-    asap(function () {
-      callback.call(ctx, null, value)
-    })
-  }, function (err) {
-    asap(function () {
-      callback.call(ctx, err)
-    })
-  })
-}
-
-},{"./core.js":2,"asap":6}],6:[function(require,module,exports){
-(function (process){
-
-// Use the fastest possible means to execute a task in a future turn
-// of the event loop.
-
-// linked list of tasks (single, with head node)
-var head = {task: void 0, next: null};
-var tail = head;
-var flushing = false;
-var requestFlush = void 0;
-var isNodeJS = false;
-
-function flush() {
-    /* jshint loopfunc: true */
-
-    while (head.next) {
-        head = head.next;
-        var task = head.task;
-        head.task = void 0;
-        var domain = head.domain;
-
-        if (domain) {
-            head.domain = void 0;
-            domain.enter();
-        }
-
-        try {
-            task();
-
-        } catch (e) {
-            if (isNodeJS) {
-                // In node, uncaught exceptions are considered fatal errors.
-                // Re-throw them synchronously to interrupt flushing!
-
-                // Ensure continuation if the uncaught exception is suppressed
-                // listening "uncaughtException" events (as domains does).
-                // Continue in next event to avoid tick recursion.
-                if (domain) {
-                    domain.exit();
-                }
-                setTimeout(flush, 0);
-                if (domain) {
-                    domain.enter();
-                }
-
-                throw e;
-
-            } else {
-                // In browsers, uncaught exceptions are not fatal.
-                // Re-throw them asynchronously to avoid slow-downs.
-                setTimeout(function() {
-                   throw e;
-                }, 0);
-            }
-        }
-
-        if (domain) {
-            domain.exit();
-        }
-    }
-
-    flushing = false;
-}
-
-if (typeof process !== "undefined" && process.nextTick) {
-    // Node.js before 0.9. Note that some fake-Node environments, like the
-    // Mocha test runner, introduce a `process` global without a `nextTick`.
-    isNodeJS = true;
-
-    requestFlush = function () {
-        process.nextTick(flush);
-    };
-
-} else if (typeof setImmediate === "function") {
-    // In IE10, Node.js 0.9+, or https://github.com/NobleJS/setImmediate
-    if (typeof window !== "undefined") {
-        requestFlush = setImmediate.bind(window, flush);
-    } else {
-        requestFlush = function () {
-            setImmediate(flush);
-        };
-    }
-
-} else if (typeof MessageChannel !== "undefined") {
-    // modern browsers
-    // http://www.nonblocking.io/2011/06/windownexttick.html
-    var channel = new MessageChannel();
-    channel.port1.onmessage = flush;
-    requestFlush = function () {
-        channel.port2.postMessage(0);
-    };
-
-} else {
-    // old browsers
-    requestFlush = function () {
-        setTimeout(flush, 0);
-    };
-}
-
-function asap(task) {
-    tail = tail.next = {
-        task: task,
-        domain: isNodeJS && process.domain,
-        next: null
-    };
-
-    if (!flushing) {
-        flushing = true;
-        requestFlush();
-    }
-};
-
-module.exports = asap;
-
-
-}).call(this,require("oMfpAn"))
-},{"oMfpAn":8}],7:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -719,72 +301,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],8:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    if (canPost) {
-        var queue = [];
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-}
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-
-},{}],9:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 (function (global){
 /*! http://mths.be/punycode v1.2.4 by @mathias */
 ;(function(root) {
@@ -1295,7 +812,7 @@ process.chdir = function (dir) {
 }(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1381,7 +898,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],11:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1468,13 +985,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":10,"./encode":11}],13:[function(require,module,exports){
+},{"./decode":3,"./encode":4}],6:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2183,7 +1700,7 @@ function isNullOrUndefined(arg) {
   return  arg == null;
 }
 
-},{"punycode":9,"querystring":12}],14:[function(require,module,exports){
+},{"punycode":2,"querystring":5}],7:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -2608,7 +2125,7 @@ function isNullOrUndefined(arg) {
   }
 })(typeof exports !== 'undefined' ? exports : Hogan);
 
-},{}],15:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -2631,7 +2148,7 @@ Hogan.Template = require('./template').Template;
 Hogan.template = Hogan.Template;
 module.exports = Hogan;
 
-},{"./compiler":14,"./template":16}],16:[function(require,module,exports){
+},{"./compiler":7,"./template":9}],9:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -2974,7 +2491,7 @@ var Hogan = {};
 
 })(typeof exports !== 'undefined' ? exports : Hogan);
 
-},{}],17:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -9763,7 +9280,7 @@ var Hogan = {};
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],18:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 var stripIndent = require('strip-indent');
 
@@ -9789,7 +9306,7 @@ multiline.stripIndent = function (fn) {
 	return stripIndent(multiline(fn));
 };
 
-},{"strip-indent":19}],19:[function(require,module,exports){
+},{"strip-indent":12}],12:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	var match = str.match(/^[ \t]*(?=\S)/gm);
@@ -9807,12 +9324,12 @@ module.exports = function (str) {
 	return indent > 0 ? str.replace(re, '') : str;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 module.exports = function(a, element) {
   return a.concat([element]);
 };
 
-},{}],21:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var _ = require('lodash'),
     bindAnchoredPgpPresentation = function(loader, presentation) {
     var domId = 'lodqa-results';
@@ -9833,7 +9350,7 @@ var _ = require('lodash'),
 
 module.exports = bindResult;
 
-},{"lodash":17}],22:[function(require,module,exports){
+},{"lodash":10}],15:[function(require,module,exports){
 module.exports = function(mappings) {
   makeTemplate = require('../render/makeTemplate'),
     regionTemplate = makeTemplate(function() {
@@ -9896,7 +9413,7 @@ module.exports = function(mappings) {
   return $region;
 }
 
-},{"../render/makeTemplate":37}],23:[function(require,module,exports){
+},{"../render/makeTemplate":31}],16:[function(require,module,exports){
 window.onload = function() {
   var bindWebsocketPresentation = function(loader) {
       var presentation = require('./presentation/websocketPresentation')('lodqa-messages');
@@ -9931,8 +9448,8 @@ window.onload = function() {
       return pgp;
     };
 
-  // var loader = require('./loader/loadSolution')();
-  var loader = require('./loader/loadSolutionStub')();
+  var loader = require('./loader/loadSolution')();
+  // var loader = require('./loader/loadSolutionStub')();
 
   // bindResult.all(loader, require('./presentation/debugPresentation'));
   bindResult.anchoredPgp(loader, require('./presentation/anchoredPgpTablePresentation'));
@@ -9957,11 +9474,12 @@ window.onload = function() {
   });
 };
 
-},{"./controller/bindResult":21,"./editor/mappingEditor":22,"./graph/pgpGraph":26,"./loader/loadSolutionStub":29,"./presentation/anchoredPgpTablePresentation":30,"./presentation/graphPresentation":31,"./presentation/solutionTablePresentation":33,"./presentation/sparqlTablePresentation":34,"./presentation/websocketPresentation":36}],24:[function(require,module,exports){
+},{"./controller/bindResult":14,"./editor/mappingEditor":15,"./graph/pgpGraph":20,"./loader/loadSolution":23,"./presentation/anchoredPgpTablePresentation":24,"./presentation/graphPresentation":25,"./presentation/solutionTablePresentation":27,"./presentation/sparqlTablePresentation":28,"./presentation/websocketPresentation":30}],17:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('../presentation/instance'),
   setFont = require('./setFont'),
   toRed = require('./toRed'),
+  fixNodePosition = require('./fixNodePosition'),
   transformIf = function(predicate, transform, object) {
     return predicate(object) ? transform(object) : object;
   },
@@ -10086,89 +9604,11 @@ var _ = require('lodash'),
   },
   addAnchoredPgpNodes = function(graph, addNodes, anchoredPgp) {
     var nodeIds = Object.keys(anchoredPgp.nodes),
-      extendIndex = function(a, index) {
-        a.index = index;
-        return a;
-      },
-      threeNodeOrders = {
-        t1: [1, 0, 2],
-        t2: [0, 1, 2],
-        t3: [0, 2, 1]
-      },
-      getNodeOrder = function(id) {
-        return threeNodeOrders[id];
-      },
-      getTwoEdgeNode = function(edgeCount) {
-        return _.first(Object.keys(edgeCount)
-          .map(function(id) {
-            return {
-              id: id,
-              count: edgeCount[id]
-            };
-          })
-          .filter(function(node) {
-            return node.count === 2;
-          })
-          .map(function(node) {
-            return node.id;
-          }));
-      },
-      countEdge = function(edges) {
-        return edges.reduce(function(edgeCount, edge) {
-          edgeCount[edge.subject] ++;
-          edgeCount[edge.object] ++;
-          return edgeCount;
-        }, {
-          t1: 0,
-          t2: 0,
-          t3: 0
-        });
-      },
-      getOrderWhenThreeNode = _.compose(getNodeOrder, getTwoEdgeNode, countEdge),
-      specialSort = function(nodeOrder, a, b) {
-        return nodeOrder[a.index] - nodeOrder[b.index];
-      },
-      simpleSort = function(a, b) {
-        return b.index - a.index;
-      },
-      sortFuc = nodeIds.length === 3 ?
-      _.partial(specialSort, getOrderWhenThreeNode(anchoredPgp.edges)) :
-      simpleSort,
-      anchoredPgpNodePositions = [
-        [],
-        [{
-          x: 0,
-          y: 0
-        }],
-        [{
-          x: -20,
-          y: 20
-        }, {
-          x: 20,
-          y: -20
-        }],
-        [{
-          x: -40,
-          y: 40
-        }, {
-          x: 0,
-          y: 0
-        }, {
-          x: 40,
-          y: -40
-        }]
-      ],
-      setPosition = function(number_of_nodes, term, index) {
-        return _.extend(term, {
-          position: anchoredPgpNodePositions[number_of_nodes][index]
-        });
-      },
       nodes = nodeIds
       .map(_.partial(toAnchoredPgpNodeTerm, anchoredPgp.nodes))
-      .map(toLabelAndSetFontNormal)
-      .map(extendIndex)
-      .sort(sortFuc)
-      .map(_.partial(setPosition, nodeIds.length));
+      .map(toLabelAndSetFontNormal);
+
+    nodes = fixNodePosition(nodes, anchoredPgp.edges);
 
     addNodes(
       graph,
@@ -10198,7 +9638,95 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"../presentation/instance":32,"../presentation/toLastOfUrl":35,"./lodqaGraph":25,"./setFont":27,"./toRed":28,"lodash":17}],25:[function(require,module,exports){
+},{"../presentation/instance":26,"../presentation/toLastOfUrl":29,"./fixNodePosition":18,"./lodqaGraph":19,"./setFont":21,"./toRed":22,"lodash":10}],18:[function(require,module,exports){
+var _ = require('lodash'),
+  extendIndex = function(a, index) {
+    a.index = index;
+    return a;
+  },
+  threeNodeOrders = {
+    t1: [1, 0, 2],
+    t2: [0, 1, 2],
+    t3: [0, 2, 1]
+  },
+  getNodeOrder = function(id) {
+    return threeNodeOrders[id];
+  },
+  getTwoEdgeNode = function(edgeCount) {
+    return _.first(Object.keys(edgeCount)
+      .map(function(id) {
+        return {
+          id: id,
+          count: edgeCount[id]
+        };
+      })
+      .filter(function(node) {
+        return node.count === 2;
+      })
+      .map(function(node) {
+        return node.id;
+      }));
+  },
+  countEdge = function(edges) {
+    return edges.reduce(function(edgeCount, edge) {
+      edgeCount[edge.subject] ++;
+      edgeCount[edge.object] ++;
+      return edgeCount;
+    }, {
+      t1: 0,
+      t2: 0,
+      t3: 0
+    });
+  },
+  getOrderWhenThreeNode = _.compose(getNodeOrder, getTwoEdgeNode, countEdge),
+  specialSort = function(nodeOrder, a, b) {
+    return nodeOrder[a.index] - nodeOrder[b.index];
+  },
+  simpleSort = function(a, b) {
+    return b.index - a.index;
+  },
+  anchoredPgpNodePositions = [
+    [],
+    [{
+      x: 0,
+      y: 0
+    }],
+    [{
+      x: -20,
+      y: 20
+    }, {
+      x: 20,
+      y: -20
+    }],
+    [{
+      x: -40,
+      y: 40
+    }, {
+      x: 0,
+      y: 0
+    }, {
+      x: 40,
+      y: -40
+    }]
+  ],
+  setPosition = function(number_of_nodes, term, index) {
+    return _.extend(term, {
+      position: anchoredPgpNodePositions[number_of_nodes][index]
+    });
+  };
+
+module.exports = function(nodes, edges) {
+  var sortFuc = nodes.length === 3 ?
+    _.partial(specialSort, getOrderWhenThreeNode(edges)) :
+    simpleSort;
+
+  return nodes
+    .map(extendIndex)
+    .sort(sortFuc)
+    .map(_.partial(setPosition, nodes.length))
+};
+
+},{"lodash":10}],19:[function(require,module,exports){
 var _ = require('lodash'),
   setFont = require('./setFont'),
   toRed = require('./toRed'),
@@ -10263,7 +9791,7 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"./setFont":27,"./toRed":28,"lodash":17}],26:[function(require,module,exports){
+},{"./setFont":21,"./toRed":22,"lodash":10}],20:[function(require,module,exports){
 module.exports = function(pgp) {
   var graph = require('./lodqaGraph')('lodqa-pgp', {
     width: 690,
@@ -10290,7 +9818,7 @@ module.exports = function(pgp) {
   });
 };
 
-},{"./lodqaGraph":25}],27:[function(require,module,exports){
+},{"./lodqaGraph":19}],21:[function(require,module,exports){
 var _ = require('lodash');
 
 module.exports =  function(value, target) {
@@ -10299,7 +9827,7 @@ module.exports =  function(value, target) {
     })
 };
 
-},{"lodash":17}],28:[function(require,module,exports){
+},{"lodash":10}],22:[function(require,module,exports){
 var _ = require('lodash');
 
 module.exports = function(term) {
@@ -10308,1656 +9836,51 @@ module.exports = function(term) {
     });
 };
 
-},{"lodash":17}],29:[function(require,module,exports){
-var data_split_to_3 = {
-    anchored_pgp: {
-      "nodes": {
-        "t1": {
-          "head": 2,
-          "text": "side effects",
-          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-        },
-        "t2": {
-          "head": 6,
-          "text": "streptomycin",
-          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297"
-        }
-      },
-      "edges": [{
-        "subject": "t1",
-        "object": "t2", 
-        "text": "associated with"
-      }],
-      "focus": "t1"
-    },
-    sparqls: [{
-      sparql: "sparql1",
-      solutions: [{
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }]
-    }, {
-      sparql: "sparql2",
-      solutions: [{
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/10631",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104741",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002736",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104865",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/10631",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104865",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104758",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104865",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104865",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002736",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/104865",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002871",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/10631",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "p03": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }]
-    }, {
-      sparql: "sparql3",
-      solutions: [{
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "x02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p03": "http://www.w3.org/2002/07/owl#sameAs"
-      }]
-    }]
-  },
-  data_3_node = {
-    anchored_pgp: {
-      "nodes": {
-        "t1": {
-          "head": 3,
-          "text": "side effects",
-          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-        },
-        "t2": {
-          "head": 5,
-          "text": "drugs",
-          "term": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs"
-        },
-        "t3": {
-          "head": 8,
-          "text": "asthma",
-          "term": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116"
-        }
-      },
-      "edges": [{
-        "subject": "t1",
-        "object": "t2",
-        "text": "of"
-      }, {
-        "subject": "t1",
-        "object": "t3",
-        "text": "used for"
-      }],
-      "focus": "t1"
-    },
-    sparqls: [{
-      sparql: "sparql1",
-      solutions: [{
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00368",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00373",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00471",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00521",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00368",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00373",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00471",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00521",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00373",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00368",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00471",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00521",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00368",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00373",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00471",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00521",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00373",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00640",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00668",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00901",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00960",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01064",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00939",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00007",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/3911",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00640",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00668",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01097",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00180",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/3379",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00176",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/3404",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00215",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/2771",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00244",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/4075",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00176",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/3404",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00180",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/3379",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00215",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/2771",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00244",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/4075",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00179",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/possibleDrug",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00005",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00043",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00051",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00065",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://purl.org/net/tcm/tcm.lifescience.ntu.edu.tw/id/disease/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004096",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "it2": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00163",
-        "st2": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www.w3.org/2002/07/owl#sameAs",
-        "x01": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/116",
-        "p02": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/possibleDiseaseTarget",
-        "p11": "http://www.w3.org/2002/07/owl#sameAs",
-        "x11": "http://www.dbpedia.org/resource/Asthma",
-        "p12": "http://www.w3.org/2002/07/owl#sameAs"
-      }]
-    }]
-  },
-  data_2_nodes_and_paths_split_2 = {
-    anchored_pgp: {
-      "nodes": {
-        "t1": {
-          "head": 2,
-          "text": "side effects",
-          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-        },
-        "t2": {
-          "head": 6,
-          "text": "streptomycin",
-          "term": "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082"
-        }
-      },
-      "edges": [{
-        "subject": "t1",
-        "object": "t2",
-        "text": "associated with"
-      }],
-      "focus": "t1"
-    },
-    sparqls: [{
-      sparql: "sparql",
-      solutions: [{
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "x01": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect",
-        "p02": "http://www.w3.org/2002/07/owl#sameAs"
-      }]
-    }]
-  },
-  data_paths_no_split = {
-    anchored_pgp: {
-      "nodes": {
-        "t1": {
-          "head": 2,
-          "text": "side effects",
-          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects"
-        },
-        "t2": {
-          "head": 6,
-          "text": "streptomycin",
-          "term": "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297"
-        }
-      },
-      "edges": [{
-        "subject": "t1",
-        "object": "t2",
-        "text": "associated with"
-      }],
-      "focus": "t1"
-    },
-    sparqls: [{
-      sparql: "sparql",
-      solutions: [{
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002878",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002994",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011053",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0040034",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0041296",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002418",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0002792",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0004610",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0007947",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }, {
-        "it1": "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0011606",
-        "st1": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "p01": "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffect"
-      }]
-    }]
-  },
-  data = [
-    data_split_to_3,
-    data_3_node,
-    data_2_nodes_and_paths_split_2,
-    data_paths_no_split
-  ],
-  EventEmitter = require('events').EventEmitter,
-  _ = require('lodash'),
-  Promise = require('Promise'),
-  DelayPromise = function(delay, action) {
-    return new Promise(function(resolve, reject) {
-      _.delay(function() {
-        try {
-          action();
-          resolve();
-        } catch (err) {
-          reject(err);
-        }
-      }, delay);
-    });
-  },
-  toEmitAction = function(emitter, event, data) {
-    return function() {
-      emitter.emit(event, data);
-      // console.log(event);
-    };
-  },
-  toPromiseGenerator = function(action) {
-    return _.partial(DelayPromise, 10, action);
-  },
-  start = function(emitter) {
-    var toEmitPromiseGenerator = _.compose(toPromiseGenerator, _.partial(toEmitAction, emitter)),
-      toEmitSolution = _.partial(toEmitPromiseGenerator, 'solution'),
-      toEmitSparql = _.partial(toEmitPromiseGenerator, 'sparql'),
-      toEmitAnchoredPgp = _.partial(toEmitPromiseGenerator, 'anchored_pgp'),
-      toEmitSparqlAndSolutions = function(sparql) {
-        return [toEmitSparql(sparql.sparql)]
-          .concat(sparql.solutions.map(toEmitSolution));
-      },
-      flatten = function(prev, array) {
-        return prev.concat(array);
-      },
-      lineupPromise = function(prev, promiseGenerator) {
-        return prev.then(promiseGenerator);
-      },
-      toAllPromiseGenerator = function(record) {
-        return [toEmitAnchoredPgp(record.anchored_pgp)]
-          .concat(record.sparqls
-            .map(toEmitSparqlAndSolutions)
-            .reduce(flatten, []));
-      };
-
-    data
-      .map(toAllPromiseGenerator)
-      .reduce(flatten, [])
-      .reduce(lineupPromise, Promise.resolve())
-      .catch(function(err) {
-        console.error(err, err.stack);
-      });
-  };
+},{"lodash":10}],23:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter,
+  _ = require('lodash');
 
 module.exports = function() {
-  var emitter = new EventEmitter;
+  var emitter = new EventEmitter,
+    openConnection = function() {
+      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace('analysis', 'solutions'));
+
+      ws.onopen = function() {
+        emitter.emit('ws_open');
+      };
+      ws.onclose = function() {
+        emitter.emit('ws_close');
+      };
+      ws.onmessage = function(m) {
+        if (m.data === 'start') return;
+
+        var jsondata = JSON.parse(m.data);
+
+        ['anchored_pgp', 'sparql', 'solution', 'parse_rendering']
+        .forEach(function(event) {
+          if (jsondata.hasOwnProperty(event)) {
+            emitter.emit(event, jsondata[event]);
+          }
+        });
+      };
+
+      return ws;
+    };
 
   return _.extend(emitter, {
-    beginSearch: _.partial(start, emitter)
+    beginSearch: function(pgp, mappings) {
+      var ws = openConnection();
+      emitter.once('ws_open', function() {
+        ws.send(JSON.stringify({
+          pgp: pgp,
+          mappings: mappings
+        }))
+      });
+    }
   });
 };
 
-},{"Promise":1,"events":7,"lodash":17}],30:[function(require,module,exports){
+},{"events":1,"lodash":10}],24:[function(require,module,exports){
 var _ = require('lodash'),
   makeTemplate = require('../render/makeTemplate'),
   template = makeTemplate(function() {
@@ -12004,7 +9927,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":20,"../render/makeTemplate":37,"lodash":17}],31:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":31,"lodash":10}],25:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   SolutionGraph = require('../graph/SolutionGraph'),
@@ -12037,7 +9960,7 @@ module.exports = {
   }
 };
 
-},{"../graph/SolutionGraph":24,"./instance":32,"lodash":17}],32:[function(require,module,exports){
+},{"../graph/SolutionGraph":17,"./instance":26,"lodash":10}],26:[function(require,module,exports){
 module.exports = {
   is: function(id) {
     return id[0] === 'i';
@@ -12047,7 +9970,7 @@ module.exports = {
   }
 };
 
-},{}],33:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -12121,7 +10044,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":20,"../render/makeTemplate":37,"./instance":32,"./toLastOfUrl":35,"lodash":17}],34:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":31,"./instance":26,"./toLastOfUrl":29,"lodash":10}],28:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -12182,7 +10105,7 @@ module.exports = {
   }
 };
 
-},{"../render/makeTemplate":37,"./instance":32,"./toLastOfUrl":35,"lodash":17}],35:[function(require,module,exports){
+},{"../render/makeTemplate":31,"./instance":26,"./toLastOfUrl":29,"lodash":10}],29:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -12190,7 +10113,7 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":13}],36:[function(require,module,exports){
+},{"url":6}],30:[function(require,module,exports){
 var _ = require('lodash'),
   show = function(el, msg) {
     el.innerHTML = msg;
@@ -12206,11 +10129,11 @@ module.exports = function(domId) {
   };
 }
 
-},{"lodash":17}],37:[function(require,module,exports){
+},{"lodash":10}],31:[function(require,module,exports){
 var _ = require('lodash'),
   multiline = require('multiline'),
   Hogan = require('hogan.js');
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":15,"lodash":17,"multiline":18}]},{},[23])
+},{"hogan.js":8,"lodash":10,"multiline":11}]},{},[16])

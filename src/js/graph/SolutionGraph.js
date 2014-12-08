@@ -2,6 +2,7 @@ var _ = require('lodash'),
   instance = require('../presentation/instance'),
   setFont = require('./setFont'),
   toRed = require('./toRed'),
+  fixNodePosition = require('./fixNodePosition'),
   transformIf = function(predicate, transform, object) {
     return predicate(object) ? transform(object) : object;
   },
@@ -126,89 +127,11 @@ var _ = require('lodash'),
   },
   addAnchoredPgpNodes = function(graph, addNodes, anchoredPgp) {
     var nodeIds = Object.keys(anchoredPgp.nodes),
-      extendIndex = function(a, index) {
-        a.index = index;
-        return a;
-      },
-      threeNodeOrders = {
-        t1: [1, 0, 2],
-        t2: [0, 1, 2],
-        t3: [0, 2, 1]
-      },
-      getNodeOrder = function(id) {
-        return threeNodeOrders[id];
-      },
-      getTwoEdgeNode = function(edgeCount) {
-        return _.first(Object.keys(edgeCount)
-          .map(function(id) {
-            return {
-              id: id,
-              count: edgeCount[id]
-            };
-          })
-          .filter(function(node) {
-            return node.count === 2;
-          })
-          .map(function(node) {
-            return node.id;
-          }));
-      },
-      countEdge = function(edges) {
-        return edges.reduce(function(edgeCount, edge) {
-          edgeCount[edge.subject] ++;
-          edgeCount[edge.object] ++;
-          return edgeCount;
-        }, {
-          t1: 0,
-          t2: 0,
-          t3: 0
-        });
-      },
-      getOrderWhenThreeNode = _.compose(getNodeOrder, getTwoEdgeNode, countEdge),
-      specialSort = function(nodeOrder, a, b) {
-        return nodeOrder[a.index] - nodeOrder[b.index];
-      },
-      simpleSort = function(a, b) {
-        return b.index - a.index;
-      },
-      sortFuc = nodeIds.length === 3 ?
-      _.partial(specialSort, getOrderWhenThreeNode(anchoredPgp.edges)) :
-      simpleSort,
-      anchoredPgpNodePositions = [
-        [],
-        [{
-          x: 0,
-          y: 0
-        }],
-        [{
-          x: -20,
-          y: 20
-        }, {
-          x: 20,
-          y: -20
-        }],
-        [{
-          x: -40,
-          y: 40
-        }, {
-          x: 0,
-          y: 0
-        }, {
-          x: 40,
-          y: -40
-        }]
-      ],
-      setPosition = function(number_of_nodes, term, index) {
-        return _.extend(term, {
-          position: anchoredPgpNodePositions[number_of_nodes][index]
-        });
-      },
       nodes = nodeIds
       .map(_.partial(toAnchoredPgpNodeTerm, anchoredPgp.nodes))
-      .map(toLabelAndSetFontNormal)
-      .map(extendIndex)
-      .sort(sortFuc)
-      .map(_.partial(setPosition, nodeIds.length));
+      .map(toLabelAndSetFontNormal);
+
+    nodes = fixNodePosition(nodes, anchoredPgp.edges);
 
     addNodes(
       graph,
