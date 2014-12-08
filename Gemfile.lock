@@ -91,6 +91,7 @@ GEM
       activesupport (>= 3.0.0)
     i18n (0.6.11)
     json (1.8.1)
+    kgio (2.9.2)
     mime-types (2.3)
     minitest (5.4.0)
     multi_json (1.10.1)
@@ -101,6 +102,7 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
+    raindrops (0.13.0)
     rdf (1.1.5)
     rest-client (1.7.2)
       mime-types (>= 1.16, < 3.0)
@@ -142,6 +144,10 @@ GEM
     tilt (1.4.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    unicorn (4.8.3)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
 
 PLATFORMS
   ruby
@@ -159,3 +165,4 @@ DEPENDENCIES
   sinatra-websocket
   sparql-client
   thin
+  unicorn
