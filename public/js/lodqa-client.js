@@ -9325,6 +9325,11 @@ module.exports = function (str) {
 };
 
 },{}],13:[function(require,module,exports){
+module.exports = function(a, element) {
+  return a.concat([element]);
+};
+
+},{}],14:[function(require,module,exports){
 module.exports = function(mappings) {
   makeTemplate = require('../render/makeTemplate'),
     regionTemplate = makeTemplate(function() {
@@ -9387,7 +9392,7 @@ module.exports = function(mappings) {
   return $region;
 }
 
-},{"../render/makeTemplate":24}],14:[function(require,module,exports){
+},{"../render/makeTemplate":25}],15:[function(require,module,exports){
 window.onload = function() {
   var _ = require('lodash'),
     bindWebsocketPresentation = function(loader) {
@@ -9453,7 +9458,7 @@ window.onload = function() {
   });
 };
 
-},{"./editor/mappingEditor":13,"./loader/loadSolution":15,"./presentation/anchoredPgpTablePresentation":17,"./presentation/graphPresentation":18,"./presentation/solutionTablePresentation":20,"./presentation/sparqlTablePresentation":21,"./presentation/websocketPresentation":23,"lodash":10}],15:[function(require,module,exports){
+},{"./editor/mappingEditor":14,"./loader/loadSolution":16,"./presentation/anchoredPgpTablePresentation":18,"./presentation/graphPresentation":19,"./presentation/solutionTablePresentation":21,"./presentation/sparqlTablePresentation":22,"./presentation/websocketPresentation":24,"lodash":10}],16:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter,
   _ = require('lodash');
 
@@ -9490,7 +9495,7 @@ module.exports = function() {
   });
 };
 
-},{"events":1,"lodash":10}],16:[function(require,module,exports){
+},{"events":1,"lodash":10}],17:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   transformIf = function(predicate, transform, object) {
@@ -9779,10 +9784,10 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"./instance":19,"./toLastOfUrl":22,"lodash":10}],17:[function(require,module,exports){
+},{"./instance":20,"./toLastOfUrl":23,"lodash":10}],18:[function(require,module,exports){
 var _ = require('lodash'),
   makeTemplate = require('../render/makeTemplate'),
-  tableTemplate = makeTemplate(function() {
+  template = makeTemplate(function() {
     /*
     <div class="result-region anchored_pgp-region">
         <table class="anchored_pgp-table">
@@ -9792,43 +9797,41 @@ var _ = require('lodash'),
                 <th>text</th>
                 <th>term</th>
             </tr>
-            {{{rows}}}
+            {{#nodes}}
+            <tr class="{{class}}">
+                <td>{{id}}</td>
+                <td>{{head}}</td>
+                <td>{{text}}</td>
+                <td>{{term}}</td>
+            </tr>
+            {{/nodes}}
         </table>
     </div>
     */
   }),
-  rowTemplate = makeTemplate(function() {
-    /*
-    <tr class="{{class}}">
-        <td>{{id}}</td>
-        <td>{{head}}</td>
-        <td>{{text}}</td>
-        <td>{{term}}</td>
-    </tr>
-    */
-  });
+  toViewParameters = function(anchored_pgp, node_id) {
+    return _.extend({}, anchored_pgp.nodes[node_id], {
+      id: node_id,
+      class: node_id === anchored_pgp.focus ? 'focus' : 'normal'
+    });
+  },
+  toArray = require('../collection/toArray');
 
 module.exports = {
   onAnchoredPgp: function(domId, anchored_pgp) {
-    var rows = Object.keys(anchored_pgp.nodes)
-      .map(function(node_id) {
-        return _.extend({}, anchored_pgp.nodes[node_id], {
-          id: node_id,
-          class: node_id === anchored_pgp.focus ? 'focus' : 'normal'
-        });
-      })
-      .map(function(node) {
-        return rowTemplate.render(node);
-      }),
-      table = tableTemplate.render({
-        rows: rows.join('')
+    var aa = _.partial(toViewParameters, anchored_pgp),
+      nodes = Object.keys(anchored_pgp.nodes)
+      .map(aa)
+      .reduce(toArray, []),
+      table = template.render({
+        nodes: nodes
       });
 
     $('#' + domId).append(table);
   }
 };
 
-},{"../render/makeTemplate":24,"lodash":10}],18:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":25,"lodash":10}],19:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   SolutionGraph = require('./SolutionGraph'),
@@ -9861,7 +9864,7 @@ module.exports = {
   }
 };
 
-},{"./SolutionGraph":16,"./instance":19,"lodash":10}],19:[function(require,module,exports){
+},{"./SolutionGraph":17,"./instance":20,"lodash":10}],20:[function(require,module,exports){
 module.exports = {
   is: function(id) {
     return id[0] === 'i';
@@ -9871,7 +9874,7 @@ module.exports = {
   }
 };
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -9949,7 +9952,7 @@ module.exports = {
   }
 };
 
-},{"../render/makeTemplate":24,"./instance":19,"./toLastOfUrl":22,"lodash":10}],21:[function(require,module,exports){
+},{"../render/makeTemplate":25,"./instance":20,"./toLastOfUrl":23,"lodash":10}],22:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -10010,7 +10013,7 @@ module.exports = {
   }
 };
 
-},{"../render/makeTemplate":24,"./instance":19,"./toLastOfUrl":22,"lodash":10}],22:[function(require,module,exports){
+},{"../render/makeTemplate":25,"./instance":20,"./toLastOfUrl":23,"lodash":10}],23:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -10018,7 +10021,7 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":6}],23:[function(require,module,exports){
+},{"url":6}],24:[function(require,module,exports){
 var _ = require('lodash'),
   show = function(el, msg) {
     el.innerHTML = msg;
@@ -10034,11 +10037,11 @@ module.exports = function(domId) {
   };
 }
 
-},{"lodash":10}],24:[function(require,module,exports){
+},{"lodash":10}],25:[function(require,module,exports){
 var _ = require('lodash'),
   multiline = require('multiline'),
   Hogan = require('hogan.js');
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":8,"lodash":10,"multiline":11}]},{},[14])
+},{"hogan.js":8,"lodash":10,"multiline":11}]},{},[15])
