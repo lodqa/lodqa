@@ -25,30 +25,10 @@ module.exports = function() {
   };
 
   return _.extend(emitter, {
-    beginSearch: function() {
+    beginSearch: function(pgp, mappings) {
       ws.send(JSON.stringify({
-        pgp: {
-          "nodes": {
-            "t1": {
-              "head": 2,
-              "text": "side effects"
-            },
-            "t2": {
-              "head": 6,
-              "text": "streptomycin"
-            }
-          },
-          "edges": [{
-            "subject": "t1",
-            "object": "t2",
-            "text": "associated with"
-          }],
-          "focus": "t1"
-        },
-        mappings: {
-          "side effects": ["http://www4.wiwiss.fu-berlin.de/sider/resource/sider/side_effects", "http://www4.wiwiss.fu-berlin.de/sider/resource/sider/sideEffectName"],
-          "streptomycin": ["http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB01082", "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5297", "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugs/DB00428", "http://www4.wiwiss.fu-berlin.de/sider/resource/drugs/5300"]
-        }
+        pgp: pgp,
+        mappings: mappings
       }));
     }
   });

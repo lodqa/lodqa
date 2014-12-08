@@ -46,6 +46,9 @@ window.onload = function() {
   bindParseRenderingPresentation(loader);
 
   loader.on('ws_open', function() {
-    loader.beginSearch();
+    var pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML),
+      mappirgs = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
+
+    loader.beginSearch(pgp, mappirgs);
   });
 };
