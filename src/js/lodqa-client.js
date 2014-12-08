@@ -31,6 +31,14 @@ window.onload = function() {
       loader
         .on('sparql', presentation.onSparql)
         .on('solution', presentation.onSolution);
+    },
+    bindMappingsEditor = function(mappings) {
+      var domId = 'lodqa-mappings',
+        $region = require('./editor/mappingEditor')(mappings);
+
+      document.getElementById(domId).innerHTML = '';
+      $("#" + domId)
+        .append($region);
     };
 
   var loader = require('./loader/loadSolution')();
@@ -45,10 +53,12 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  loader.on('ws_open', function() {
-    var pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML),
-      mappirgs = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
+  var mappings = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
+  bindMappingsEditor(mappings);
 
-    loader.beginSearch(pgp, mappirgs);
+  loader.on('ws_open', function() {
+    var pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML);
+
+    loader.beginSearch(pgp, mappings);
   });
 };

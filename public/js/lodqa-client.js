@@ -9325,6 +9325,69 @@ module.exports = function (str) {
 };
 
 },{}],13:[function(require,module,exports){
+module.exports = function(mappings) {
+  makeTemplate = require('../presentation/makeTemplate'),
+    regionTemplate = makeTemplate(function() {
+      /*
+      <div class="result-region mappings-region">
+          <table class="anchored_pgp-table">
+              <tr>
+                  <th>node</th>
+                  <th>mappings</th>
+              </tr>
+                  {{#node}}
+                  <tr class="mappings-node">
+                      <td>{{nade_name}}</td>
+                      <td>
+                          <ul class="mapping-list">
+                            {{#mappings}}
+                                <li>
+                                    <input class="mapping-checkbox" type="checkbox" checked="checked" node="{{nade_name}}" mapping="{{name}}"></input>
+                                    {{name}}
+                                </li>
+                            {{/mappings}}
+                          </ul>
+                      </td>
+                  </tr>
+              {{/node}}
+          </table>
+      </div>
+      */
+    }),
+    dataForTemplate = {
+      node: Object.keys(mappings)
+        .map(function(key) {
+          return {
+            nade_name: key,
+            mappings: mappings[key].map(function(name) {
+              return {
+                name: name
+              };
+            })
+          }
+        })
+    },
+    region = regionTemplate.render(dataForTemplate),
+    $region = $(region);
+
+  $region.on('change', '.mapping-checkbox', function(e) {
+    var $target = $(e.target),
+      node = $target.attr('node'),
+      mapping = $target.attr('mapping');
+
+    if ($target.is(':checked')) {
+      mappings[node] = mappings[node].concat([mapping]);
+    } else {
+      mappings[node] = mappings[node].filter(function(a) {
+        return a !== mapping;
+      });
+    }
+  });
+
+  return $region;
+}
+
+},{"../presentation/makeTemplate":20}],14:[function(require,module,exports){
 window.onload = function() {
   var _ = require('lodash'),
     bindWebsocketPresentation = function(loader) {
@@ -9358,6 +9421,14 @@ window.onload = function() {
       loader
         .on('sparql', presentation.onSparql)
         .on('solution', presentation.onSolution);
+    },
+    bindMappingsEditor = function(mappings) {
+      var domId = 'lodqa-mappings',
+        $region = require('./editor/mappingEditor')(mappings);
+
+      document.getElementById(domId).innerHTML = '';
+      $("#" + domId)
+        .append($region);
     };
 
   var loader = require('./loader/loadSolution')();
@@ -9372,15 +9443,17 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  loader.on('ws_open', function() {
-    var pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML),
-      mappirgs = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
+  var mappings = JSON.parse(document.getElementById('lodqa-mappings').innerHTML);
+  bindMappingsEditor(mappings);
 
-    loader.beginSearch(pgp, mappirgs);
+  loader.on('ws_open', function() {
+    var pgp = JSON.parse(document.getElementById('lodqa-pgp').innerHTML);
+
+    loader.beginSearch(pgp, mappings);
   });
 };
 
-},{"./loader/loadSolution":14,"./presentation/anchoredPgpTablePresentation":16,"./presentation/graphPresentation":17,"./presentation/solutionTablePresentation":20,"./presentation/sparqlTablePresentation":21,"./presentation/websocketPresentation":23,"lodash":10}],14:[function(require,module,exports){
+},{"./editor/mappingEditor":13,"./loader/loadSolution":15,"./presentation/anchoredPgpTablePresentation":17,"./presentation/graphPresentation":18,"./presentation/solutionTablePresentation":21,"./presentation/sparqlTablePresentation":22,"./presentation/websocketPresentation":24,"lodash":10}],15:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter,
   _ = require('lodash');
 
@@ -9417,7 +9490,7 @@ module.exports = function() {
   });
 };
 
-},{"events":1,"lodash":10}],15:[function(require,module,exports){
+},{"events":1,"lodash":10}],16:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   transformIf = function(predicate, transform, object) {
@@ -9706,7 +9779,7 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"./instance":18,"./toLastOfUrl":22,"lodash":10}],16:[function(require,module,exports){
+},{"./instance":19,"./toLastOfUrl":23,"lodash":10}],17:[function(require,module,exports){
 var _ = require('lodash'),
   makeTemplate = require('./makeTemplate'),
   tableTemplate = makeTemplate(function() {
@@ -9755,7 +9828,7 @@ module.exports = {
   }
 };
 
-},{"./makeTemplate":19,"lodash":10}],17:[function(require,module,exports){
+},{"./makeTemplate":20,"lodash":10}],18:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   SolutionGraph = require('./SolutionGraph'),
@@ -9788,7 +9861,7 @@ module.exports = {
   }
 };
 
-},{"./SolutionGraph":15,"./instance":18,"lodash":10}],18:[function(require,module,exports){
+},{"./SolutionGraph":16,"./instance":19,"lodash":10}],19:[function(require,module,exports){
 module.exports = {
   is: function(id) {
     return id[0] === 'i';
@@ -9798,14 +9871,14 @@ module.exports = {
   }
 };
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var _ = require('lodash'),
   multiline = require('multiline'),
   Hogan = require('hogan.js');
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":8,"lodash":10,"multiline":11}],20:[function(require,module,exports){
+},{"hogan.js":8,"lodash":10,"multiline":11}],21:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('./makeTemplate'),
@@ -9883,7 +9956,7 @@ module.exports = {
   }
 };
 
-},{"./instance":18,"./makeTemplate":19,"./toLastOfUrl":22,"lodash":10}],21:[function(require,module,exports){
+},{"./instance":19,"./makeTemplate":20,"./toLastOfUrl":23,"lodash":10}],22:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('./makeTemplate'),
@@ -9944,7 +10017,7 @@ module.exports = {
   }
 };
 
-},{"./instance":18,"./makeTemplate":19,"./toLastOfUrl":22,"lodash":10}],22:[function(require,module,exports){
+},{"./instance":19,"./makeTemplate":20,"./toLastOfUrl":23,"lodash":10}],23:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -9952,7 +10025,7 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":6}],23:[function(require,module,exports){
+},{"url":6}],24:[function(require,module,exports){
 var _ = require('lodash'),
   show = function(el, msg) {
     el.innerHTML = msg;
@@ -9968,4 +10041,4 @@ module.exports = function(domId) {
   };
 }
 
-},{"lodash":10}]},{},[13])
+},{"lodash":10}]},{},[14])
