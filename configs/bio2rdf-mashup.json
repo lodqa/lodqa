@@ -1,4 +1,5 @@
 {
+	"description":"It targets DrugBank, PharmGKB, and OMIM as included in Bio2RDF.",
 	"endpoint_url": "http://s2.semanticscience.org:13000/sparql",
 	"ignore_predicates":[
 		"http://rdfs.org/ns/void#inDataset",
@@ -6,10 +7,13 @@
 		"http://bio2rdf.org/omim_vocabulary:article",
 		"http://bio2rdf.org/omim_vocabulary:mapping-method"],
 	"sortal_predicates":[
-		 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-		 "http://www.w3.org/2000/01/rdf-schema#subClassOf"
+		"http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+		"http://www.w3.org/2000/01/rdf-schema#subClassOf"
 	 ],
 	"dictionary_url": "http://pubdictionaries.org:80/dictionaries/id_mapping?dictionaries=%5B%22bio2rdf-lodqa%22%5D&output_format=simple&threshold=0.5&top_n=0",
-	"query": "what genes are associated with parkinsonism?",
-	"max_hop": 2
+	"max_hop": 3,
+	"queries": [
+		"what genes are associated with parkinsonism?",
+		"what drugs are used for diseases associated with the gene ALD?"
+	]
 }
