@@ -13,7 +13,6 @@
 	"dictionary_url": "http://pubdictionaries.org:80/dictionaries/id_mapping?dictionaries=%5B%22bio2rdf-lodqa%22%5D&output_format=simple&threshold=0.5&top_n=0",
 	"max_hop": 3,
 	"queries": [
-		"what genes are associated with parkinsonism?",
-		"what drugs are used for diseases associated with the gene ALD?"
+		"what genes are associated with parkinsonism?"
 	]
 }
