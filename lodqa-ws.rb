@@ -42,6 +42,13 @@ class LodqaWS < Sinatra::Base
 			# lodqa.lookup(@config['dictionary_url']) unless @config['dictionary_url'].nil? || @config['dictionary_url'].empty?
 			@mappings = {}
 			@pgp[:nodes].each_value {|n| @mappings[n[:text]] = [n[:uri]]}
+
+			# heuristics
+			@mappings.each do |k, v|
+				v << 'http://dbpedia.org/ontology/President' if v.include?('http://ko.dbpedia.org/resource/President')
+				v << 'http://dbpedia.org/ontology/President' if v.include?('http://ko.dbpedia.org/resource/대통령')
+			end
+
 		else
 			@message = 'Endpoint is not specified.'
 		end
