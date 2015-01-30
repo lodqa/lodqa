@@ -103,7 +103,7 @@ class LodqaWS < Sinatra::Base
 
 	def get_config(params)
 		# default configuration
-		config_file = 'config/qald-biomed.json'
+		config_file = 'config/wisekb.json'
 		config = JSON.parse File.read(config_file) if File.file?(config_file)
 		config = {} if config.nil?
 

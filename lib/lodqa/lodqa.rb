@@ -2,7 +2,7 @@
 require 'net/http'
 require 'sparql/client'
 require 'json'
-require 'enju_access/enju_access'
+require 'etri_parser_access/etri_parser_access'
 require 'lodqa/graph_finder'
 require 'lodqa/dictionary'
 
@@ -20,7 +20,7 @@ class Lodqa::Lodqa
   end
 
   def parse(query, parser_url)
-    parser = EnjuAccess::CGIAccessor.new(parser_url)
+    parser = ETRIParserAccess::CGIAccessor.new(parser_url)
     parse = parser.parse(query)
     @parse_rendering = EnjuAccess::get_graph_rendering(parse)
 
