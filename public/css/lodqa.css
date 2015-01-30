@@ -20,14 +20,14 @@ a:hover {color:#222288}
 
 #logo {
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
     width: 250px;
     margin-right: 5px;
 }
 
 #slogan {
     display: inline-block;
-    font-size: small;
+    font-size: medium;
     font-style: italic;
     color: #8888ff;
 }

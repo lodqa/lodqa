@@ -54,6 +54,9 @@ class ETRIParserAccess::CGIAccessor
         nodes["t#{b["head"]}"] = {head:b["head"], uri:b["url"], text:b["url"].split(/[\/#]/)[-1]}
       end
 
+      nkeys = nodes.keys.map{|k| k[1..-1].to_i}
+      rel = rel.delete_if{|r| (r[1] & nkeys).size > 0}
+
       edges = rel.map{|r| {subject:"t#{r[0]}", object:"t#{r[2]}", text:"*"}}
 
       focus = nodes.keys.sort[-1]

@@ -1,6 +1,6 @@
 {
 	"parser_url":"http://143.248.135.60:17231/myapp/service/lodqa",
-	"endpoint_url":"http://ko.dbpedia.org/sparql",
+	"endpoint_url":"http://211.109.9.71:5001/sparql",
 	"ignore_predicates":[],
 	"sortal_predicates":[
 		 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",

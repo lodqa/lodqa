@@ -14,8 +14,6 @@ class GraphFinder
 
     @pgp = pgp
 
-    p @pgp
-    puts "-=-=-=-=-"
     @endpoint = endpoint
     @ignore_predicates = options[:ignore_predicates] || []
     @sortal_predicates = options[:sortal_predicates] || []
