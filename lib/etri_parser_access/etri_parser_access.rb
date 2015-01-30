@@ -28,18 +28,7 @@ class ETRIParserAccess::CGIAccessor
   # returns a hash that represent various aspects
   # of the PAS and syntactic structure of the sentence.
   def parse (sentence)
-    tokens, root     = get_parse(sentence)
-    base_noun_chunks = get_base_noun_chunks(tokens)
-    focus            = get_focus(tokens, base_noun_chunks)
-    relations        = get_relations(tokens, base_noun_chunks)
-
-    {
-      :tokens => tokens,  # The array of token parses
-      :root   => root,    # The index of the root word
-      :focus  => focus,   # The index of the focus word, i.e., the one modified by a _wh_-modifier
-      :base_noun_chunks => base_noun_chunks, # the array of base noun chunks
-      :relations => relations   # Shortest paths between two heads
-    }
+    apgp = get_parse(sentence)
   end
 
   private
@@ -48,12 +37,28 @@ class ETRIParserAccess::CGIAccessor
   def get_parse (sentence)
     return nil if sentence.nil? || sentence.strip.empty?
     sentence = sentence.strip
+    tokens = sentence.split
 
     response = @server.post sentence, :content_type => :txt
     case response.code
     when 200             # 200 means success
-      p response
-      puts "-----"
+
+      parse = (JSON.parse response)[0]
+      bn = parse["base_noun"]
+      rel = parse["relation"]
+
+      nodes  = {}
+      bn.each do |b|
+        text = b["url"].split(/[\/#]/)[-1]
+        next if text =~ /(무엇|누구|어디|언제)/
+        nodes["t#{b["head"]}"] = {head:b["head"], uri:b["url"], text:b["url"].split(/[\/#]/)[-1]}
+      end
+
+      edges = rel.map{|r| {subject:"t#{r[0]}", object:"t#{r[2]}", text:"*"}}
+
+      focus = nodes.keys.sort[-1]
+
+      apgp = {nodes:nodes, edges:edges, focus:focus}
     else
       raise "ETRI parser CGI server dose not respond."
     end

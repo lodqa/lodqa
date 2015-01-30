@@ -21,10 +21,9 @@ class Lodqa::Lodqa
 
   def parse(query, parser_url)
     parser = ETRIParserAccess::CGIAccessor.new(parser_url)
-    parse = parser.parse(query)
-    @parse_rendering = EnjuAccess::get_graph_rendering(parse)
-
-    @pgp = graphicate(parse)
+    @pgp = parser.parse(query)
+    @parse_rendering = nil
+    pgp
   end
 
   def lookup(dictionary_url)
