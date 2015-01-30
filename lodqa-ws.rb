@@ -40,7 +40,12 @@ class LodqaWS < Sinatra::Base
 			@pgp = lodqa.pgp
 
 			# lodqa.lookup(@config['dictionary_url']) unless @config['dictionary_url'].nil? || @config['dictionary_url'].empty?
-			@mappings = lodqa.mappings
+			@mappings = {}
+			@pgp[:nodes].each_value {|n| @mappings[n[:text]] = [n[:uri]]}
+			p @pgp
+			puts "-------"
+			p @mappings 
+			puts "-=-=-=-"
 		else
 			@message = 'Endpoint is not specified.'
 		end
