@@ -28,6 +28,10 @@ class LodqaWS < Sinatra::Base
 		erb :motivation
 	end
 
+	get '/test' do
+		erb :test
+	end
+
 	get '/analysis' do
 		@config = get_config(params)
 		@query = params['query']

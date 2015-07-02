@@ -6,7 +6,7 @@ gulp
   .task('browserify', function() {
     var browserify = require('gulp-browserify')
 
-    gulp.src(src + js)
+    gulp.src([src + js, src + 'lodqa-client2.js'])
       .pipe(browserify())
       .pipe(gulp.dest('public/js/'))
   })

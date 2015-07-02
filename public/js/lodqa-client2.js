@@ -9351,69 +9351,6 @@ var _ = require('lodash'),
 module.exports = bindResult;
 
 },{"lodash":10}],15:[function(require,module,exports){
-module.exports = function(mappings) {
-  makeTemplate = require('../render/makeTemplate'),
-    regionTemplate = makeTemplate(function() {
-      /*
-      <div class="result-region">
-          <table class="mapping-editor-table">
-              <tr>
-                  <th>node</th>
-                  <th>mappings</th>
-              </tr>
-                  {{#node}}
-                  <tr class="mappings-node">
-                      <td>{{nade_name}}</td>
-                      <td>
-                          <ul class="mapping-list list-in-table">
-                            {{#mappings}}
-                                <li>
-                                    <input class="mapping-checkbox" type="checkbox" checked="checked" node="{{nade_name}}" mapping="{{name}}"></input>
-                                    {{name}}
-                                </li>
-                            {{/mappings}}
-                          </ul>
-                      </td>
-                  </tr>
-              {{/node}}
-          </table>
-      </div>
-      */
-    }),
-    dataForTemplate = {
-      node: Object.keys(mappings)
-        .map(function(key) {
-          return {
-            nade_name: key,
-            mappings: mappings[key].map(function(name) {
-              return {
-                name: name
-              };
-            })
-          }
-        })
-    },
-    region = regionTemplate.render(dataForTemplate),
-    $region = $(region);
-
-  $region.on('change', '.mapping-checkbox', function(e) {
-    var $target = $(e.target),
-      node = $target.attr('node'),
-      mapping = $target.attr('mapping');
-
-    if ($target.is(':checked')) {
-      mappings[node] = mappings[node].concat([mapping]);
-    } else {
-      mappings[node] = mappings[node].filter(function(a) {
-        return a !== mapping;
-      });
-    }
-  });
-
-  return $region;
-}
-
-},{"../render/makeTemplate":31}],16:[function(require,module,exports){
 window.onload = function() {
   var bindWebsocketPresentation = function(loader) {
       var presentation = require('./presentation/websocketPresentation')('lodqa-messages');
@@ -9426,32 +9363,11 @@ window.onload = function() {
         document.getElementById('lodqa-parse_rendering').innerHTML = data;
       });
     },
-    bindMappingsEditor = function(mappings) {
-      var domId = 'lodqa-mappings',
-        mappings = JSON.parse(document.getElementById(domId).innerHTML),
-        $region = require('./editor/mappingEditor')(mappings);
-
-      document.getElementById(domId).innerHTML = '';
-      $("#" + domId)
-        .append($region);
-
-      return mappings;
-    },
     bindResult = require('./controller/bindResult'),
-    pgpGraph = require('./graph/pgpGraph'),
-    bindPgpPresentation = function() {
-      var domId = 'lodqa-pgp',
-        pgp = JSON.parse(document.getElementById(domId).innerHTML);
-      document.getElementById(domId).innerHTML = '';
-      pgpGraph(pgp);
-
-      return pgp;
-    };
+    pgpGraph = require('./graph/pgpGraph');
 
   var loader = require('./loader/loadSolution')();
-  // var loader = require('./loader/loadSolutionStub')();
 
-  // bindResult.all(loader, require('./presentation/debugPresentation'));
   bindResult.anchoredPgp(loader, require('./presentation/anchoredPgpTablePresentation'));
   bindResult.all(loader, require('./presentation/sparqlTablePresentation'));
   bindResult.all(loader, require('./presentation/solutionTablePresentation'));
@@ -9460,21 +9376,23 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  var pgp = bindPgpPresentation();
-  var mappings = bindMappingsEditor(mappings);
-
   $('#beginSerach').on('click', function(e) {
     var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');
-    loader.beginSearch(pgp, mappings);
+    var pgpElement = document.querySelector('.pgp')
+    var mappingsElement = document.querySelector('.mappings')
+    var pgp = JSON.parse(pgpElement.innerHTML)
+    var mappings = JSON.parse(mappingsElement.innerHTML)
+
+    loader.beginSearch(pgp, mappings, 'test');
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })
   });
 };
 
-},{"./controller/bindResult":14,"./editor/mappingEditor":15,"./graph/pgpGraph":20,"./loader/loadSolution":23,"./presentation/anchoredPgpTablePresentation":24,"./presentation/graphPresentation":25,"./presentation/solutionTablePresentation":27,"./presentation/sparqlTablePresentation":28,"./presentation/websocketPresentation":30}],17:[function(require,module,exports){
+},{"./controller/bindResult":14,"./graph/pgpGraph":19,"./loader/loadSolution":22,"./presentation/anchoredPgpTablePresentation":23,"./presentation/graphPresentation":24,"./presentation/solutionTablePresentation":26,"./presentation/sparqlTablePresentation":27,"./presentation/websocketPresentation":29}],16:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('../presentation/instance'),
   setFont = require('./setFont'),
@@ -9638,7 +9556,7 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"../presentation/instance":26,"../presentation/toLastOfUrl":29,"./fixNodePosition":18,"./lodqaGraph":19,"./setFont":21,"./toRed":22,"lodash":10}],18:[function(require,module,exports){
+},{"../presentation/instance":25,"../presentation/toLastOfUrl":28,"./fixNodePosition":17,"./lodqaGraph":18,"./setFont":20,"./toRed":21,"lodash":10}],17:[function(require,module,exports){
 var _ = require('lodash'),
   extendIndex = function(a, index) {
     a.index = index;
@@ -9726,7 +9644,7 @@ module.exports = function(nodes, edges) {
     .map(_.partial(setPosition, nodes.length))
 };
 
-},{"lodash":10}],19:[function(require,module,exports){
+},{"lodash":10}],18:[function(require,module,exports){
 var _ = require('lodash'),
   setFont = require('./setFont'),
   toRed = require('./toRed'),
@@ -9791,7 +9709,7 @@ module.exports = function(domId, options) {
   };
 };
 
-},{"./setFont":21,"./toRed":22,"lodash":10}],20:[function(require,module,exports){
+},{"./setFont":20,"./toRed":21,"lodash":10}],19:[function(require,module,exports){
 module.exports = function(pgp) {
   var graph = require('./lodqaGraph')('lodqa-pgp', {
     width: 690,
@@ -9818,7 +9736,7 @@ module.exports = function(pgp) {
   });
 };
 
-},{"./lodqaGraph":19}],21:[function(require,module,exports){
+},{"./lodqaGraph":18}],20:[function(require,module,exports){
 var _ = require('lodash');
 
 module.exports =  function(value, target) {
@@ -9827,7 +9745,7 @@ module.exports =  function(value, target) {
     })
 };
 
-},{"lodash":10}],22:[function(require,module,exports){
+},{"lodash":10}],21:[function(require,module,exports){
 var _ = require('lodash');
 
 module.exports = function(term) {
@@ -9836,7 +9754,7 @@ module.exports = function(term) {
     });
 };
 
-},{"lodash":10}],23:[function(require,module,exports){
+},{"lodash":10}],22:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter,
   _ = require('lodash');
 
@@ -9880,7 +9798,7 @@ module.exports = function() {
   });
 };
 
-},{"events":1,"lodash":10}],24:[function(require,module,exports){
+},{"events":1,"lodash":10}],23:[function(require,module,exports){
 var _ = require('lodash'),
   makeTemplate = require('../render/makeTemplate'),
   template = makeTemplate(function() {
@@ -9927,7 +9845,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":13,"../render/makeTemplate":31,"lodash":10}],25:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":30,"lodash":10}],24:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   SolutionGraph = require('../graph/SolutionGraph'),
@@ -9960,7 +9878,7 @@ module.exports = {
   }
 };
 
-},{"../graph/SolutionGraph":17,"./instance":26,"lodash":10}],26:[function(require,module,exports){
+},{"../graph/SolutionGraph":16,"./instance":25,"lodash":10}],25:[function(require,module,exports){
 module.exports = {
   is: function(id) {
     return id[0] === 'i';
@@ -9970,7 +9888,7 @@ module.exports = {
   }
 };
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -10044,7 +9962,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":13,"../render/makeTemplate":31,"./instance":26,"./toLastOfUrl":29,"lodash":10}],28:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":30,"./instance":25,"./toLastOfUrl":28,"lodash":10}],27:[function(require,module,exports){
 var _ = require('lodash'),
   instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
@@ -10105,7 +10023,7 @@ module.exports = {
   }
 };
 
-},{"../render/makeTemplate":31,"./instance":26,"./toLastOfUrl":29,"lodash":10}],29:[function(require,module,exports){
+},{"../render/makeTemplate":30,"./instance":25,"./toLastOfUrl":28,"lodash":10}],28:[function(require,module,exports){
 module.exports = function(srcUrl) {
   var parsedUrl = require('url').parse(srcUrl),
     paths = parsedUrl.pathname.split('/');
@@ -10113,14 +10031,14 @@ module.exports = function(srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":6}],30:[function(require,module,exports){
+},{"url":6}],29:[function(require,module,exports){
 var _ = require('lodash'),
   show = function(el, msg) {
     el.innerHTML = msg;
   };
 
 module.exports = function(domId) {
-  var onOpen = _.partial(show, document.getElementById(domId), 'lodqa running <img src="images/working.gif" alt="..."/>'),
+  var onOpen = _.partial(show, document.getElementById(domId), 'lodqa running ...'),
     onClose = _.partial(show, document.getElementById(domId), 'lodqa finished.');
 
   return {
@@ -10129,11 +10047,11 @@ module.exports = function(domId) {
   };
 }
 
-},{"lodash":10}],31:[function(require,module,exports){
+},{"lodash":10}],30:[function(require,module,exports){
 var _ = require('lodash'),
   multiline = require('multiline'),
   Hogan = require('hogan.js');
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":8,"lodash":10,"multiline":11}]},{},[16])
+},{"hogan.js":8,"lodash":10,"multiline":11}]},{},[15])

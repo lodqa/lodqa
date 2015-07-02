@@ -1,0 +1,173 @@
+/* node editor */
+.node-editor label {
+  font-size: 13px;
+}
+.node-editor .url {
+  width: 260px;
+}
+.node-editor .button {
+  box-shadow: 0 0 15px 4px #42ffb2;
+  -webkit-transition: box-shadow 0.3s ease-in;
+  -moz-transition: box-shadow 0.3s ease-in;
+  -o-transition: box-shadow 0.3s ease-in;
+  transition: box-shadow 0.3s ease-in;
+}
+.node-editor .button:disabled {
+  box-shadow: none;
+}
+/* graph */
+.jsPlumb-container {
+  height: 200px;
+  position: relative;
+  width: 600px;
+}
+/* graph node */
+.node {
+  border: 1px solid #2e6f9a;
+  border-radius: 8px;
+  box-shadow: 2px 2px 19px #e0e0e0;
+  box-sizing: border-box;
+  cursor: move;
+  font-size: 11px;
+  opacity: 0.8;
+  padding: 16px;
+  position: absolute;
+  max-width: 10em;
+  -webkit-transition: background-color 0.25s ease-in;
+  -moz-transition: background-color 0.25s ease-in;
+  -o-transition: background-color 0.25s ease-in;
+  transition: background-color 0.25s ease-in;
+  -webkit-transition: color 0.25s ease-in;
+  -moz-transition: color 0.25s ease-in;
+  -o-transition: color 0.25s ease-in;
+  transition: color 0.25s ease-in;
+  z-index: 4;
+}
+.node:hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.node.selected {
+  background-color: #df2020;
+  border-color: #ff0000;
+  color: white;
+}
+.nodeDragHover {
+  border: 2px solid orange;
+}
+.endPoint {
+  background-color: orange;
+  bottom: 37%;
+  box-shadow: 0 0 2px black;
+  cursor: pointer;
+  height: 1em;
+  right: 5px;
+  position: absolute;
+  -webkit-transition: box-shadow 0.25s ease-in;
+  -moz-transition: box-shadow 0.25s ease-in;
+  -o-transition: box-shadow 0.25s ease-in;
+  transition: box-shadow 0.25s ease-in;
+  width: 1em;
+}
+.endPoint:hover {
+  box-shadow: 0 0 6px black;
+}
+/* graph edge */
+.edgeLabel.node_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.edgeLabel._jsPlumb_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.edgeLabel.selected {
+  background-color: #df2020;
+  border-color: #ff0000;
+  color: white;
+}
+._jsPlumb_source_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+._jsPlumb_target_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.edgeLabel {
+  background-color: white;
+  border: 1px solid #346789;
+  border-color: orange;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0.8;
+  padding: 0.3em;
+}
+._jsPlumb_connector path {
+  cursor: pointer;
+}
+._jsPlumb_connector.selected path:nth-child(2) {
+  stroke: #ff0000;
+}
+._jsPlumb_connector.selected path:nth-child(3) {
+  stroke: #ff0000;
+  fill: #ff0000;
+}
+._jsPlumb_connector.node_hover path:nth-child(2) {
+  stroke: #ffc0cb;
+}
+._jsPlumb_connector.node_hover path:nth-child(3) {
+  stroke: #ffc0cb;
+  fill: #ffc0cb;
+}
+._jsPlumb_hover path:nth-child(2) {
+  stroke: #ffc0cb;
+}
+._jsPlumb_hover path:nth-child(3) {
+  stroke: #ffc0cb;
+  fill: #ffc0cb;
+}
+/* node-tabel */
+.table:after {
+  clear: both;
+  content: " ";
+  display: table;
+}
+.table table {
+  border-collapse: collapse;
+  float: left;
+  font-size: 0.9em;
+  margin-right: 10px;
+  width: 300px;
+}
+.table table tr {
+  height: 30px;
+}
+.table table tr.selected td {
+  color: white;
+  background-color: #df2020;
+}
+.table table tr.hover td {
+  background-color: #ffc0cb;
+}
+.table table th {
+  border: 1px solid #b9b9b9;
+  padding: 3px;
+  background-color: #ddd;
+  color: #333;
+}
+.table table th.label {
+  width: 32px;
+}
+.table table th.url {
+  width: 50px;
+}
+.table table td {
+  border: 1px solid #b9b9b9;
+  padding: 3px;
+  background-color: #fff;
+}
+.hidden {
+  display: none;
+}

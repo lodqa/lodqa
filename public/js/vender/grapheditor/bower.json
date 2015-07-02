@@ -1,0 +1,36 @@
+{
+  "name": "graph-editor",
+  "description": "graph editor",
+  "version": "0.0.6",
+  "authors": [
+    "Jin-Dong Kim <jindong.kim@gmail.com>"
+  ],
+  "dependencies": {
+    "jsplumb": "~1.7.5"
+  },
+  "homepage": "https://github.com/lodqa/grapheditor",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "lib",
+    ".gitignore",
+    "index.less",
+    "graph-editor.js",
+    "index.html",
+    "demo.js",
+    "package.json",
+    "README.md"
+  ],
+  "keywords": [
+    "graph",
+    "editor"
+  ],
+  "license": "MIT",
+  "main": [
+    "index.js",
+    "index.css"
+  ]
+}

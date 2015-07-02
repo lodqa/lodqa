@@ -3,8 +3,8 @@ var EventEmitter = require('events').EventEmitter,
 
 module.exports = function() {
   var emitter = new EventEmitter,
-    openConnection = function() {
-      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace('analysis', 'solutions'));
+    openConnection = function(hoge) {
+      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace(hoge, 'solutions'));
 
       ws.onopen = function() {
         emitter.emit('ws_open');
@@ -29,8 +29,8 @@ module.exports = function() {
     };
 
   return _.extend(emitter, {
-    beginSearch: function(pgp, mappings) {
-      var ws = openConnection();
+    beginSearch: function(pgp, mappings, hoge) {
+      var ws = openConnection(hoge);
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
           pgp: pgp,
