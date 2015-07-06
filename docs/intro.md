@@ -1,7 +1,8 @@
 ---
-layout: default
-title: Motivation
-permalink: /motivation/
+layout: docs
+title: Intro
+next_section: architecture
+permalink: /docs/intro/
 ---
 
 As the popularity of linked open data (LOD) grows, more and more heterogeneous data sets are being integrated, which calls for potential users to use a complex query language, e.g., SPARQL, for search on the data sets. However, as SPARQL is not easy to write even for experienced users, many groups are developing assistive methods, e.g., visual SPARQL editor.

@@ -1,7 +1,7 @@
 ---
-layout: main
+layout: default
 title: People
-permalink: /people/
+permalink: /docs/people/
 ---
 
 The LODQA project is currently led by DBCLS (Database Center for Life Science), with participation of University of Colorado, Stanford University, and Bayer CropScience.

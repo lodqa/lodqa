@@ -1,5 +1,5 @@
 ---
-layout: main
+layout: default
 title: SWAT4LS Turorial
 permalink: /swat4ls-tutorial/
 ---

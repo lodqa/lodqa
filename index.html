@@ -1,5 +1,5 @@
 ---
-layout: main
+layout: page
 title: LODQA
 #lodqa_url: 'http://localhost:9292'
 lodqa_url: 'http://ws.lodqa.org'
@@ -30,30 +30,31 @@ LODQA (Linked Open Data Question Answering) is an open source project aiming at 
   <option value="{{ site.baseurl }}/configs/qald-biomed.json">QALD-Biomed</option>
   <option value="{{ site.baseurl }}/configs/bio2rdf-mashup.json">Bio2RDF-Meshup</option>
   <option value="{{ site.baseurl }}/configs/biogateway.json">BioGateway</option>
+  <option value="{{ site.baseurl }}/configs/plant-ld.json">Plant-LD</option>
 </select>
 <p class="description"></p>
 </fieldset>
 
-<a href="#config-detail" class="button">show/hide advanced configuation ..</a>
+<a href="#config-detail" class="button">show/hide detailed configuation ..</a>
 
 <fieldset id="config-detail">
-<legend>Advance configuration</legend>
+<legend>Detailed configuration</legend>
 <table>
 <tr>
 <th>End point</th>
-<td><input name="endpoint_url" id="endpoint_url" type="url" placeholder="URL" style="width:100%" /></td>
+<td><input name="endpoint_url" id="endpoint_url" type="url" placeholder="URL" style="width:99%" /></td>
 </tr>
 <tr>
 <th>Graph</th>
-<td><input name="graph_uri" id="graph_uri" type="url" placeholder="IRI" style="width:100%" /></td>
+<td><input name="graph_uri" id="graph_uri" type="url" placeholder="IRI" style="width:99%" /></td>
 </tr>
 <tr>
 <th>Dictionary</th>
-<td><input name="dictionary_url" id="dictionary_url" type="url" placeholder="URL" style="width:100%" /></td>
+<td><input name="dictionary_url" id="dictionary_url" type="url" placeholder="URL" style="width:99%" /></td>
 </tr>
 <tr>
 <th>Parser</th>
-<td><input name="parser_url" id="parser_url" type="url" placeholder="URL" style="width:100%" /></td>
+<td><input name="parser_url" id="parser_url" type="url" placeholder="URL" style="width:99%" /></td>
 </tr>
 <tr>
 <th>Ignore Predicates</th>

@@ -1,0 +1,7 @@
+- title: Documentation
+  docs:
+  - intro
+  - architecture
+  - graphicator
+  - termfinder
+  - graphfinder

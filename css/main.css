@@ -13,7 +13,16 @@ html, body {
 body {
     font-family: "Times New Roman", Times, serif;
     background-color: #bbbbbb;
-    color: #222288;
+    color: #111177;
+}
+
+p {
+    margin: 1em 0;
+    line-height: 1.5em;
+}
+
+section, div {
+    background-color: inherit;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -21,11 +30,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 { margin-bottom: 1em; }
-p { margin: 1em 0; }
 
 a {
     text-decoration:none;
-    color:#666666
+    color:#5555dd
 }
 
 a:hover {
@@ -37,17 +45,15 @@ a:hover {
 /**********************************************************************************/
 
 .frame {
-    position: relative;
     margin: auto;
-    padding: 5px;
     width: 800px;
     background-color: #ffffff;
     box-shadow: 4px 4px 4px #888888;
 }
 
 #main {
+    position: relative;
     top: 5px;
-    width: 800px;
 }
 
 /**********************************************************************************/
