@@ -1,7 +1,7 @@
 {
   "name": "graph-editor",
   "description": "graph editor",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>"
   ],
@@ -33,14 +33,14 @@
     "index.js",
     "index.css"
   ],
-  "_release": "0.0.9",
+  "_release": "0.0.10",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.9",
-    "commit": "498dfa7b29746dc92a81ddd69c026828a158e4a3"
+    "tag": "v0.0.10",
+    "commit": "3b88e2da1985736df69bdec08f05fd08d5283bc1"
   },
   "_source": "git://github.com/lodqa/grapheditor.git",
-  "_target": "~0.0.9",
+  "_target": "~0.0.10",
   "_originalSource": "grapheditor",
   "_direct": true
 }

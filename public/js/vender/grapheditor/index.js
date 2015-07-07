@@ -2371,7 +2371,7 @@ var _transform = require('./transform');
 
 var _transform2 = _interopRequireDefault(_transform);
 
-var TEMPLATE = '\n<table>\n  <caption>Edges.</caption>\n  <thead>\n    <tr>\n      <th class="label">label</th>\n      <th class="url">url</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#edges}}\n    <tr data-sourc-id="{{sourceId}}" data-target-id="{{targetId}}" class="{{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}">\n      <td>{{label}}</td>\n      <td>{{url}}</td>\n    </tr>\n    {{/edges}}\n</tbody>\n\n</table>';
+var TEMPLATE = '\n<table>\n  <caption>Edges.</caption>\n  <thead>\n    <tr>\n      <th class="label">label</th>\n      <th class="url">term</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#edges}}\n    <tr data-sourc-id="{{sourceId}}" data-target-id="{{targetId}}" class="{{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}">\n      <td>{{label}}</td>\n      <td>{{url}}</td>\n    </tr>\n    {{/edges}}\n</tbody>\n\n</table>';
 
 var template = _handlebars2['default'].compile(TEMPLATE);
 
@@ -3473,7 +3473,7 @@ var _transform = require('./transform');
 
 var _transform2 = _interopRequireDefault(_transform);
 
-var TEMPLATE = '\n<table>\n  <caption>Nodes.</caption>\n  <thead>\n    <tr>\n      <th class="label">label</th>\n      <th class="url">url</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#nodes}}\n    <tr data-id="{{id}}" class="{{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}">\n      <td>{{label}}</td>\n      <td>{{url}}</td>\n    </tr>\n    {{/nodes}}\n</tbody>\n\n</table>';
+var TEMPLATE = '\n<table>\n  <caption>Nodes.</caption>\n  <thead>\n    <tr>\n      <th class="label">label</th>\n      <th class="url">term</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#nodes}}\n    <tr data-id="{{id}}" class="{{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}">\n      <td>{{label}}</td>\n      <td>{{url}}</td>\n    </tr>\n    {{/nodes}}\n</tbody>\n\n</table>';
 
 var template = _handlebars2['default'].compile(TEMPLATE);
 
