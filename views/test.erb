@@ -26,13 +26,11 @@
     <div class="input-node">
         <label>Input Node</label><br>
         <input class="label" placeholder="label"></input>
-        <input class="url" placeholder="url"></input>
         <button class="button" disabled>+</button>
     </div>
     <div class="edit-node hidden">
         <label>Edit Node</label><br>
         <input class="label" placeholder="label"></input>
-        <input class="url" placeholder="url"></input>
         <button class="button" disabled>+</button>
         <button class="delete-button">delete</button>
         <button class="cancel-button">cancel</button>
@@ -40,7 +38,6 @@
     <div class="edit-edge hidden">
         <label>Edit Edge</label><br>
         <input class="label" placeholder="label"></input>
-        <input class="url" placeholder="url"></input>
         <button class="button" disabled>+</button>
         <button class="delete-button">delete</button>
         <button class="cancel-button">cancel</button>
@@ -48,12 +45,15 @@
     <span class="warn"></span>
 </div>
 <div class="jsPlumb-container"></div>
+<div class="pgp hidden"></div>
+<div class="lookup">
+    <button class="button">lookup all node</button>
+</div>
 <div class="table">
     <div class="node-table"></div>
     <div class="edge-table"></div>
 </div>
-<div class="pgp"></div>
-<div class="mappings"></div>
+<div class="mappings hidden"></div>
 
 <input id="beginSerach" type="button" value="Begin Search"></input>
 
@@ -69,5 +69,5 @@
 <script src="js/vender/jsPlumb/dist/js/dom.jsPlumb-1.7.5.js"></script>
 <script src="js/vender/grapheditor/index.js"></script>
 <script type="text/javascript">
-    graphEditor()
+    graphEditor('/lookup')
 </script>

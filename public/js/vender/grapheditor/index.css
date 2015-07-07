@@ -129,17 +129,11 @@
   fill: #ffc0cb;
 }
 /* node-tabel */
-.table:after {
-  clear: both;
-  content: " ";
-  display: table;
-}
 .table table {
   border-collapse: collapse;
-  float: left;
   font-size: 0.9em;
   margin-right: 10px;
-  width: 300px;
+  min-width: 300px;
 }
 .table table tr {
   height: 30px;
