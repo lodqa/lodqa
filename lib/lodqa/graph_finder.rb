@@ -130,7 +130,7 @@ class GraphFinder
       p_variables = (1 .. split_scheme[i]).collect{|j| ("p#{i}#{j}").to_s}
 
       # terms including x_variables and the initial and the final terms
-      terms = [c[:subject], x_variables, c[:object]].flatten
+      terms = [c['subject'], x_variables, c['object']].flatten
 
       # triple patterns
       tps = (0 ... p_variables.length).collect{|i| [terms[i], p_variables[i], terms[i + 1]]}

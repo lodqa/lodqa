@@ -82,9 +82,9 @@ class LodqaWS < Sinatra::Base
 						json = JSON.parse(data)
 						lodqa = Lodqa::Lodqa.new(config['endpoint_url'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
 
-						lodqa.pgp = json['pgp']
+						lodqa.pgp = json['pgp'].symbolize_keys
 						lodqa.mappings = json['mappings']
-						lodqa.parse(query, config['parser_url'])
+						# lodqa.parse(query, config['parser_url'])
 
 						EM.defer do
 							ws.send("start")
