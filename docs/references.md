@@ -1,6 +1,8 @@
 ---
-layout: default
+layout: docs
 title: References
+prev_section: graphfinder
+next_section: people
 permalink: /docs/references/
 ---
 - Triple Pattern Variation Operations for Flexible Graph Search, Jin-Dong Kim and Kevin Bretonnel Cohen, [The 1'st Internatinal Workshop on Natural language interfaces for Web of Data (NLIWoD)](http://www.nliwod.org), 2014.

@@ -2,6 +2,7 @@
 layout: docs
 title: GraphFinder
 prev_section: termfinder
+next_section: references
 permalink: /docs/graphfinder/
 ---
 

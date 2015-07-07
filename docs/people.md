@@ -1,6 +1,7 @@
 ---
-layout: default
+layout: docs
 title: People
+prev_section: references
 permalink: /docs/people/
 ---
 
