@@ -5,6 +5,7 @@ require 'sinatra-websocket'
 require 'erb'
 require 'lodqa'
 require 'json'
+require 'multi_json'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -104,6 +105,19 @@ class LodqaWS < Sinatra::Base
 		config = get_config(params)
 		dictionary = Lodqa::Dictionary.new(config['dictionary_url'], config['endpoint_url'])
 		mappings = dictionary.lookup(params['query'].split('_'))
+
+		headers \
+			"Access-Control-Allow-Origin" => "*"
+		content_type :json
+		mappings.to_json
+	end
+
+	# Command for test: curl 'http://localhost:9292/lookup' -d '["drug", "genes"]'
+	post '/lookup' do
+		config = get_config(params)
+		dictionary = Lodqa::Dictionary.new(config['dictionary_url'], config['endpoint_url'])
+		query = MultiJson.decode(request.body)
+		mappings = dictionary.lookup(query)
 
 		headers \
 			"Access-Control-Allow-Origin" => "*"
