@@ -100,18 +100,6 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	# Command for test: curl 'http://localhost:9292/lookup?query=genes_alzheimer%20disease'
-	get '/lookup' do
-		config = get_config(params)
-		dictionary = Lodqa::Dictionary.new(config['dictionary_url'], config['endpoint_url'])
-		mappings = dictionary.lookup(params['query'].split('_'))
-
-		headers \
-			"Access-Control-Allow-Origin" => "*"
-		content_type :json
-		mappings.to_json
-	end
-
 	# Command for test: curl 'http://localhost:9292/lookup' -d '["drug", "genes"]'
 	post '/lookup' do
 		config = get_config(params)
