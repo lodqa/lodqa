@@ -1,7 +1,7 @@
 {
   "name": "graph-editor",
   "description": "graph editor",
-  "version": "0.0.10",
+  "version": "0.0.12",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>"
   ],
@@ -22,7 +22,9 @@
     "index.html",
     "demo.js",
     "package.json",
-    "README.md"
+    "README.md",
+    "gulpfile.js",
+    "gulpfile.es6"
   ],
   "keywords": [
     "graph",
@@ -33,14 +35,18 @@
     "index.js",
     "index.css"
   ],
-  "_release": "0.0.10",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lodqa/grapheditor.git"
+  },
+  "_release": "0.0.12",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.10",
-    "commit": "3b88e2da1985736df69bdec08f05fd08d5283bc1"
+    "tag": "v0.0.12",
+    "commit": "833c79d2614d7508742227ce8abb687ad69ac8f6"
   },
   "_source": "git://github.com/lodqa/grapheditor.git",
-  "_target": "~0.0.10",
+  "_target": "~0.0.12",
   "_originalSource": "grapheditor",
   "_direct": true
 }
