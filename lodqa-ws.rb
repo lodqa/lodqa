@@ -113,6 +113,12 @@ class LodqaWS < Sinatra::Base
 		mappings.to_json
 	end
 
+	options '/lookup' do
+		headers \
+			"Access-Control-Allow-Origin" => "*",
+			"Access-Control-Allow-Headers" => "Content-Type"
+	end
+
 	private
 
 	def ws_send(eventMachine, websocket, key, value)
