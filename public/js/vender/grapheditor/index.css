@@ -47,6 +47,10 @@
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
+.node.hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
 .node.selected {
   background-color: #df2020;
   border-color: #ff0000;
@@ -73,7 +77,7 @@
   box-shadow: 0 0 6px black;
 }
 /* graph edge */
-.edgeLabel.node_hover {
+.edgeLabel.hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
@@ -114,10 +118,10 @@
   stroke: #ff0000;
   fill: #ff0000;
 }
-._jsPlumb_connector.node_hover path:nth-child(2) {
+._jsPlumb_connector.hover path:nth-child(2) {
   stroke: #ffc0cb;
 }
-._jsPlumb_connector.node_hover path:nth-child(3) {
+._jsPlumb_connector.hover path:nth-child(3) {
   stroke: #ffc0cb;
   fill: #ffc0cb;
 }
@@ -161,6 +165,16 @@
   border: 1px solid #b9b9b9;
   padding: 3px;
   background-color: #fff;
+}
+.table table td.label {
+  text-align: center;
+  width: 220px;
+}
+.table table td.term {
+  width: 460px;
+}
+.table table td.term .term {
+  width: 400px;
 }
 .hidden {
   display: none;
