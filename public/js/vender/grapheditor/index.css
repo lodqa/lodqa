@@ -20,9 +20,10 @@
   height: 200px;
   position: relative;
   width: 600px;
+  /* graph node */
+  /* graph edge */
 }
-/* graph node */
-.node {
+.jsPlumb-container .node {
   border: 1px solid #2e6f9a;
   border-radius: 8px;
   box-shadow: 2px 2px 19px #e0e0e0;
@@ -43,23 +44,23 @@
   transition: color 0.25s ease-in;
   z-index: 4;
 }
-.node:hover {
+.jsPlumb-container .node:hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-.node.hover {
+.jsPlumb-container .node.hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-.node.selected {
+.jsPlumb-container .node.selected {
   background-color: #df2020;
   border-color: #ff0000;
   color: white;
 }
-.nodeDragHover {
+.jsPlumb-container .nodeDragHover {
   border: 2px solid orange;
 }
-.endPoint {
+.jsPlumb-container .endPoint {
   background-color: orange;
   bottom: 37%;
   box-shadow: 0 0 2px black;
@@ -73,32 +74,31 @@
   transition: box-shadow 0.25s ease-in;
   width: 1em;
 }
-.endPoint:hover {
+.jsPlumb-container .endPoint:hover {
   box-shadow: 0 0 6px black;
 }
-/* graph edge */
-.edgeLabel.hover {
+.jsPlumb-container .edgeLabel.hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-.edgeLabel._jsPlumb_hover {
+.jsPlumb-container .edgeLabel._jsPlumb_hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-.edgeLabel.selected {
+.jsPlumb-container .edgeLabel.selected {
   background-color: #df2020;
   border-color: #ff0000;
   color: white;
 }
-._jsPlumb_source_hover {
+.jsPlumb-container ._jsPlumb_source_hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-._jsPlumb_target_hover {
+.jsPlumb-container ._jsPlumb_target_hover {
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-.edgeLabel {
+.jsPlumb-container .edgeLabel {
   background-color: white;
   border: 1px solid #346789;
   border-color: orange;
@@ -108,27 +108,27 @@
   opacity: 0.8;
   padding: 0.3em;
 }
-._jsPlumb_connector path {
+.jsPlumb-container ._jsPlumb_connector path {
   cursor: pointer;
 }
-._jsPlumb_connector.selected path:nth-child(2) {
+.jsPlumb-container ._jsPlumb_connector.selected path:nth-child(2) {
   stroke: #ff0000;
 }
-._jsPlumb_connector.selected path:nth-child(3) {
+.jsPlumb-container ._jsPlumb_connector.selected path:nth-child(3) {
   stroke: #ff0000;
   fill: #ff0000;
 }
-._jsPlumb_connector.hover path:nth-child(2) {
+.jsPlumb-container ._jsPlumb_connector.hover path:nth-child(2) {
   stroke: #ffc0cb;
 }
-._jsPlumb_connector.hover path:nth-child(3) {
+.jsPlumb-container ._jsPlumb_connector.hover path:nth-child(3) {
   stroke: #ffc0cb;
   fill: #ffc0cb;
 }
-._jsPlumb_hover path:nth-child(2) {
+.jsPlumb-container ._jsPlumb_hover path:nth-child(2) {
   stroke: #ffc0cb;
 }
-._jsPlumb_hover path:nth-child(3) {
+.jsPlumb-container ._jsPlumb_hover path:nth-child(3) {
   stroke: #ffc0cb;
   fill: #ffc0cb;
 }
@@ -168,13 +168,20 @@
 }
 .table table td.label {
   text-align: center;
-  width: 220px;
+  vertical-align: top;
+  width: 185px;
+}
+.table table td.label input {
+  width: 110px;
 }
 .table table td.term {
   width: 460px;
 }
-.table table td.term .term {
+.table table td.term input.term {
   width: 400px;
+}
+.table table td.term .add {
+  margin-left: 23px;
 }
 .hidden {
   display: none;
