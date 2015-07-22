@@ -43,6 +43,6 @@
     "commit": "583fd068a70105a147b41b9898a56794980af039"
   },
   "_source": "git://github.com/sporritt/jsPlumb.git",
-  "_target": "~1.7.5",
+  "_target": "1.7.5",
   "_originalSource": "jsplumb"
 }

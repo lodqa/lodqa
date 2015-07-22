@@ -1,12 +1,12 @@
 {
   "name": "graph-editor",
   "description": "graph editor",
-  "version": "0.0.14",
+  "version": "0.0.17",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>"
   ],
   "dependencies": {
-    "jsplumb": "~1.7.5",
+    "jsplumb": "1.7.5",
     "font-awesome": "~4.3.0",
     "js-polyfills": "~0.1.6"
   },
@@ -41,14 +41,14 @@
     "type": "git",
     "url": "git://github.com/lodqa/grapheditor.git"
   },
-  "_release": "0.0.14",
+  "_release": "0.0.17",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.14",
-    "commit": "88b4e602209bb955f9ea16d219c7014c731b14b3"
+    "tag": "v0.0.17",
+    "commit": "4c0ba543a0b941f3455224c879466ae5cecbf575"
   },
   "_source": "git://github.com/lodqa/grapheditor.git",
-  "_target": "~0.0.14",
+  "_target": "~0.0.17",
   "_originalSource": "grapheditor",
   "_direct": true
 }
