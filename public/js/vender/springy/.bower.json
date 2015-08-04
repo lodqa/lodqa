@@ -16,12 +16,12 @@
   "dependencies": {
     "eventemitter2": "~0.4.14"
   },
-  "_release": "5c7e0c67d1",
+  "_release": "25710c13cd",
   "_resolution": {
     "type": "commit",
-    "commit": "5c7e0c67d116b882a6730a068d5192d076f1af3f"
+    "commit": "25710c13cd8c8c6670fc11310d93f63ed609b17b"
   },
   "_source": "git@github.com:shigeruNakajima/springy.git",
-  "_target": "5c7e0c67d116b882a6730a068d5192d076f1af3f",
+  "_target": "25710c13cd8c8c6670fc11310d93f63ed609b17b",
   "_originalSource": "git@github.com:shigeruNakajima/springy.git"
 }

@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "dependencies": {
     "jQuery": "~2.1.1",
-    "Springy": "git@github.com:shigeruNakajima/springy.git#5c7e0c67d116b882a6730a068d5192d076f1af3f"
+    "Springy": "git@github.com:shigeruNakajima/springy.git#25710c13cd8c8c6670fc11310d93f63ed609b17b"
   }
 }
