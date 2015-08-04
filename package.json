@@ -1,13 +1,29 @@
 {
-  "repository": "https://github.com/lodqa/lodqa.git",
-  "devDependencies": {
-    "gulp": "^3.8.10",
-    "gulp-browserify": "^0.5.0"
-  },
+  "name": "LODQA",
+  "description": "LODQA (Linked Open Data Question-Answering) is a system to generate SPARQL queries from natural language queries.",
+  "version": "0.0.1",
+  "author": "jdkim",
+  "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {
     "hogan.js": "^3.0.2",
     "lodash": "^2.4.1",
     "multiline": "^1.0.1",
     "promise": "^6.0.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "gulp-browserify": "^0.5.0"
+  },
+  "homepage": "https://github.com/lodqa/lodqa.git",
+  "keywords": [
+    "DBCLS",
+    "Linked Open Data",
+    "SPARQL"
+  ],
+  "license": "MIT",
+  "main": "config.ru",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lodqa/lodqa.git"
   }
 }
