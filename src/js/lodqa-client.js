@@ -51,7 +51,7 @@ window.onload = function() {
     var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');
-    loader.beginSearch(pgp, mappings);
+    loader.beginSearch(pgp, mappings, 'analysis');
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })

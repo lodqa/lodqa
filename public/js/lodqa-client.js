@@ -9467,7 +9467,7 @@ window.onload = function() {
     var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');
-    loader.beginSearch(pgp, mappings);
+    loader.beginSearch(pgp, mappings, 'analysis');
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })
@@ -9842,8 +9842,8 @@ var EventEmitter = require('events').EventEmitter,
 
 module.exports = function() {
   var emitter = new EventEmitter,
-    openConnection = function(hoge) {
-      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace(hoge, 'solutions'));
+    openConnection = function(page_name) {
+      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace(page_name, 'solutions'));
 
       ws.onopen = function() {
         emitter.emit('ws_open');
@@ -9868,8 +9868,8 @@ module.exports = function() {
     };
 
   return _.extend(emitter, {
-    beginSearch: function(pgp, mappings, hoge) {
-      var ws = openConnection(hoge);
+    beginSearch: function(pgp, mappings, page_name) {
+      var ws = openConnection(page_name);
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
           pgp: pgp,
