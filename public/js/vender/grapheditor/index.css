@@ -185,6 +185,7 @@
 }
 .table table td.term input.term {
   width: 400px;
+  box-sizing: border-box;
 }
 .table table td.term .add [type="checkbox"] {
   visibility: hidden;
