@@ -31,6 +31,7 @@ class GraphFinder
     end
 
     bgps = generate_split_variations(pgp[:edges], max_hop)
+
     if @debug
       puts "=== [split variations] ====="
       bgps.each {|bgp| p bgp}
@@ -110,11 +111,12 @@ class GraphFinder
   private
 
   def generate_split_variations(connections, max_hop)
+    return [] if connections.empty?
+
     bgps = []
 
     # split and make bgps
-    split_scheme = []
-    (1 .. max_hop).collect{|e| e}.repeated_permutation(connections.length) do |split_scheme|
+    (1 .. max_hop).to_a.repeated_permutation(connections.length) do |split_scheme|
       bgps << generate_split_bgp(connections, split_scheme)
     end
 
@@ -159,18 +161,24 @@ class GraphFinder
     end
 
     ibgps = []
-    bgps.each do |bgp|
-      [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
-        # id of the terms to be instantiated
-        itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
+    [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
+      # id of the terms to be instantiated
+      itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
+      next unless itids.include?(pgp[:focus])
 
-        # initialize the instantiated bgp with the triple patterns for term instantiation
+      if bgps.empty? && !itids.empty?
         ibgp = itids.collect{|t| [iids[t], 's' + t, t]}
-
-        # add update triples
-        bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e] : e}}
-
         ibgps << ibgp
+      else
+        bgps.each do |bgp|
+          # initialize the instantiated bgp with the triple patterns for term instantiation
+          ibgp = itids.collect{|t| [iids[t], 's' + t, t]}
+
+          # add update triples
+          bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e] : e}}
+
+          ibgps << ibgp
+        end
       end
     end
 
