@@ -1,0 +1,16 @@
+{
+	"description":"It targets DrugBank, SIDER, and Diseasome as included in QALD.",
+	"parser_url":"http://bionlp.dbcls.jp/enju",
+	"endpoint_url":"http://rdf.pubannotation.org/sparql",
+	"ignore_predicates":[],
+	"sortal_predicates":[
+		 "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+		 "http://www.w3.org/2000/01/rdf-schema#subClassOf"
+	],
+	"dictionary_url":"http://pubdictionaries.org:80/dictionaries/id_mapping?dictionaries=%5B%22qald-drugbank%22%2C%22qald-diseasome%22%2C%22qald-sider%22%5D&output_format=simple&threshold=0.5&top_n=0",
+	"max_hop":3,
+	"queries":[
+		"what genes are associated with alzheimer disease?",
+		"what drugs are used for diseases associated with the gene ALD?"
+	]
+}

@@ -10120,7 +10120,7 @@ var _ = require('lodash'),
   };
 
 module.exports = function(domId) {
-  var onOpen = _.partial(show, document.getElementById(domId), 'lodqa running ...'),
+  var onOpen = _.partial(show, document.getElementById(domId), 'lodqa running <img src="images/working.gif" alt="..."/>'),
     onClose = _.partial(show, document.getElementById(domId), 'lodqa finished.');
 
   return {

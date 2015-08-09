@@ -18,7 +18,7 @@ class << EnjuAccess
 
     g = GraphViz.new(:G, :type => :digraph)
     g.node[:shape] = "box"
-    g.node[:fontsize] = 11
+    g.node[:fontsize] = 10
     g.edge[:fontsize] = 9
 
     n = []

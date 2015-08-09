@@ -238,7 +238,7 @@ class GraphFinder
     s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
 
     # query += "}"
-    query += "} LIMIT 10"
+    query += "} LIMIT 20"
   end
 
   def stringify_term (t)
