@@ -62,13 +62,14 @@ a:hover {
 
 #logo {
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
     width: 250px;
-    margin-right: 5px;
+    margin-right: 10px;
 }
 
 #slogan {
     display: inline-block;
+    vertical-align: top;
     font-size: small;
     font-style: italic;
     color: #8888ff;
