@@ -172,6 +172,9 @@
   padding: 3px;
   background-color: #fff;
 }
+.table table td.focus {
+  text-align: center;
+}
 .table table td.label {
   text-align: center;
   vertical-align: top;
