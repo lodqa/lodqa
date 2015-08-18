@@ -30,25 +30,66 @@ _global2['default'].graphEditor = function (lookupUrl) {
 
   topStream.pipe((0, _libStreamModelStream2['default'])(lookupUrl)).pipe((0, _libStreamRenderStream2['default'])());
 
-  topStream.addNodes = function (nodes) {
-    return addNodes(topStream, nodes);
+  topStream.addPgp = function (pgp) {
+    return addPgp(topStream, pgp);
   };
 
   return topStream;
 };
 
-function addNodes(stream, nodes) {
-  nodes.forEach(function (n) {
-    return addNode(stream, n);
-  });
-}
+function addPgp(stream, pgp) {
+  for (var id in pgp.nodes) {
+    stream.push({
+      source: ['graph-editor.js'],
+      target: _libStreamConst.target.MODEL_NODE,
+      type: _libStreamConst.actionType.CREATE,
+      id: id,
+      label: pgp.nodes[id].text
+    });
+  }
 
-function addNode(stream, node) {
-  stream.push(Object.assign({
-    source: ['index.js'],
+  stream.push({
+    source: ['graph-editor.js'],
     target: _libStreamConst.target.MODEL_NODE,
-    type: _libStreamConst.actionType.CREATE
-  }, node));
+    type: _libStreamConst.actionType.FOCUS,
+    id: pgp.focus
+  });
+
+  if (pgp.edges) {
+    // Wait for creations of nodes.
+    _global2['default'].setTimeout(function () {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = pgp.edges[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var edge = _step.value;
+
+          stream.push({
+            source: ['graph-editor.js'],
+            target: _libStreamConst.target.VIEW_EDGE,
+            type: _libStreamConst.actionType.CREATE,
+            sourceId: edge.subject,
+            targetId: edge.object
+          });
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator['return']) {
+            _iterator['return']();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }, 1);
+  }
 }
 
 },{"./lib/stream/actionStream":15,"./lib/stream/const":17,"./lib/stream/modelStream":25,"./lib/stream/renderStream":32,"babel/polyfill":230,"global":245}],2:[function(require,module,exports){
@@ -1457,17 +1498,38 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _const = require('../../const');
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
-exports['default'] = function (edges) {
-  return [[_const.actionType.HOVER, function (action, push) {
-    return toEdge(edges, action, push);
-  }], [_const.actionType.UNHOVER, function (action, push) {
-    return toEdge(edges, action, push);
-  }], [_const.actionType.DELETE, function (action, push) {
-    return deleteEdge(edges, action, push);
-  }]];
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _actionStream = require('action-stream');
+
+var _const = require('../const');
+
+var _default = (function (_ActionTransform) {
+  _inherits(_default, _ActionTransform);
+
+  function _default(edges) {
+    _classCallCheck(this, _default);
+
+    _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
+    this.name = 'DataModelAssociatedEdgeStream';
+
+    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.HOVER, function (action, push) {
+      return toEdge(edges, action, push);
+    }], [_const.actionType.UNHOVER, function (action, push) {
+      return toEdge(edges, action, push);
+    }], [_const.actionType.DELETE, function (action, push) {
+      return deleteEdge(edges, action, push);
+    }]]);
+  }
+
+  return _default;
+})(_actionStream.ActionTransform);
+
+exports['default'] = _default;
 
 function toEdge(edges, action, push) {
   var es = edges.arms(action.id);
@@ -1500,22 +1562,43 @@ function deleteEdge(edges, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../../const":17}],19:[function(require,module,exports){
+},{"../const":17,"action-stream":57}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _const = require('../../const');
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
-exports['default'] = function (nodes, action, push) {
-  var edgeToNode = function edgeToNode(action, push) {
-    return toNode(nodes, action, push);
-  };
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-  return [[_const.actionType.HOVER, edgeToNode], [_const.actionType.UNHOVER, edgeToNode]];
-};
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _actionStream = require('action-stream');
+
+var _const = require('../const');
+
+var _default = (function (_ActionTransform) {
+  _inherits(_default, _ActionTransform);
+
+  function _default(nodes, edges, lookupUrl) {
+    _classCallCheck(this, _default);
+
+    _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
+    this.name = 'DataModelAssociatedNodeStream';
+
+    var edgeToNode = function edgeToNode(action, push) {
+      return toNode(nodes, action, push);
+    };
+
+    this.bindActions(_const.target.MODEL_EDGE, [[_const.actionType.HOVER, edgeToNode], [_const.actionType.UNHOVER, edgeToNode]]);
+  }
+
+  return _default;
+})(_actionStream.ActionTransform);
+
+exports['default'] = _default;
 
 function toNode(nodes, action, push) {
   push({
@@ -1530,26 +1613,47 @@ function toNode(nodes, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../../const":17}],20:[function(require,module,exports){
+},{"../const":17,"action-stream":57}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _const = require('../../const');
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
-exports['default'] = function (model, nodes) {
-  return [[_const.actionType.CREATE, function (action, push) {
-    return createEdge(model, action, push);
-  }], [_const.actionType.DELETE, function (action, push) {
-    return deleteEdge(model, action, push);
-  }], [_const.actionType.HOVER, function (action, push) {
-    return push(_const.target.VIEW_EDGE);
-  }], [_const.actionType.UNHOVER, function (action, push) {
-    return push(_const.target.VIEW_EDGE);
-  }]];
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _actionStream = require('action-stream');
+
+var _const = require('../const');
+
+var _default = (function (_ActionTransform) {
+  _inherits(_default, _ActionTransform);
+
+  function _default(edges) {
+    _classCallCheck(this, _default);
+
+    _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
+    this.name = 'DataModelEdgeStream';
+
+    this.bindActions(_const.target.MODEL_EDGE, [[_const.actionType.CREATE, function (action, push) {
+      return createEdge(edges, action, push);
+    }], [_const.actionType.DELETE, function (action, push) {
+      return deleteEdge(edges, action, push);
+    }], [_const.actionType.HOVER, function (action, push) {
+      return push(_const.target.VIEW_EDGE);
+    }], [_const.actionType.UNHOVER, function (action, push) {
+      return push(_const.target.VIEW_EDGE);
+    }]]);
+  }
+
+  return _default;
+})(_actionStream.ActionTransform);
+
+exports['default'] = _default;
 
 function createEdge(model, action, push) {
   if (model.has(action)) {
@@ -1608,34 +1712,157 @@ function snapShot(push, model) {
 }
 module.exports = exports['default'];
 
-},{"../../const":17}],21:[function(require,module,exports){
+},{"../const":17,"action-stream":57}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _actionStream = require('action-stream');
+
 var _const = require('../../const');
 
-exports['default'] = function (model) {
-  return [[_const.actionType.CREATE, function (action, push) {
-    return createNode(model, action, push);
-  }], [_const.actionType.FOCUS, function (action, push) {
-    return setFocus(model, action, push);
-  }], [_const.actionType.DELETE, function (action, push) {
-    return deleteNode(model, action, push);
-  }], [_const.actionType.HOVER, function (action, push) {
-    return push(_const.target.VIEW_NODE);
-  }], [_const.actionType.UNHOVER, function (action, push) {
-    return push(_const.target.VIEW_NODE);
-  }], [_const.actionType.UPDATE_LABEL, function (action, push) {
-    return updateNodeLabel(model, action, push);
-  }], [_const.actionType.UPDATE_TERM, function (action, push) {
-    return updateNodeTerm(model, action, push);
-  }], [_const.actionType.VALIDATE, function (action, push) {
-    return validateNode(model, action, push);
-  }]];
+var _lookupNode = require('./lookupNode');
+
+var _lookupNode2 = _interopRequireDefault(_lookupNode);
+
+var _default = (function (_ActionTransform) {
+  _inherits(_default, _ActionTransform);
+
+  function _default(nodes, edges, lookupUrl) {
+    _classCallCheck(this, _default);
+
+    _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
+    this.name = 'DataModelLookupStream';
+
+    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.LOOKUP, function (action, push) {
+      return lookup(action, nodes, lookupUrl, push);
+    }]]);
+  }
+
+  return _default;
+})(_actionStream.ActionTransform);
+
+exports['default'] = _default;
+
+function lookup(action, nodes, lookupUrl, push) {
+  var labels = undefined,
+      callback = function callback(newAction) {
+    return asyncPush(action, newAction);
+  };
+
+  if (action.id) {
+    labels = [nodes.getLabel(action.id)];
+  } else {
+    labels = nodes.getLabels();
+  }
+
+  push((0, _lookupNode2['default'])(nodes, lookupUrl, labels, callback));
+}
+module.exports = exports['default'];
+
+},{"../../const":17,"./lookupNode":22,"action-stream":57}],22:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _superagent = require('superagent');
+
+var _superagent2 = _interopRequireDefault(_superagent);
+
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
+var _const = require('../../const');
+
+exports['default'] = function (nodes, lookupUrl, labels) {
+  return new _bluebird2['default'](function (resolve, reject) {
+    _superagent2['default'].post(lookupUrl).send(labels).end(function (err, res) {
+      if (!err) {
+        nodes.setUrl(res.body);
+
+        resolve({
+          target: _const.target.VIEW_NODE,
+          type: _const.actionType.SNAPSHOT,
+          data: nodes.snapshot
+        });
+      } else {
+        console.error('lookup error!', lookupUrl, err);
+        reject(err);
+      }
+    });
+  });
 };
+
+module.exports = exports['default'];
+
+},{"../../const":17,"bluebird":231,"superagent":265}],23:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _actionStream = require('action-stream');
+
+var _const = require('../const');
+
+var _default = (function (_ActionTransform) {
+  _inherits(_default, _ActionTransform);
+
+  function _default(nodes) {
+    _classCallCheck(this, _default);
+
+    _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
+    this.name = 'DataModelNodeStream';
+
+    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.CREATE, function (action, push) {
+      return createNode(nodes, action, push);
+    }], [_const.actionType.CREATE, function (action, push) {
+      return autoEdgeCreation(action, nodes, push);
+    }], [_const.actionType.FOCUS, function (action, push) {
+      return setFocus(nodes, action, push);
+    }], [_const.actionType.DELETE, function (action, push) {
+      return deleteNode(nodes, action, push);
+    }], [_const.actionType.HOVER, function (action, push) {
+      return push(_const.target.VIEW_NODE);
+    }], [_const.actionType.UNHOVER, function (action, push) {
+      return push(_const.target.VIEW_NODE);
+    }], [_const.actionType.UPDATE_LABEL, function (action, push) {
+      return updateNodeLabel(nodes, action, push);
+    }], [_const.actionType.UPDATE_TERM, function (action, push) {
+      return updateNodeTerm(nodes, action, push);
+    }], [_const.actionType.VALIDATE, function (action, push) {
+      return validateNode(nodes, action, push);
+    }]]);
+  }
+
+  return _default;
+})(_actionStream.ActionTransform);
+
+exports['default'] = _default;
 
 function setFocus(model, action, push) {
   model.focus = action.id;
@@ -1696,79 +1923,12 @@ function validateNode(model, action, push) {
     target: _const.target.EDITOR
   }, model.verify(action)));
 }
-module.exports = exports['default'];
-
-},{"../../const":17}],22:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
-
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var _actionStream = require('action-stream');
-
-var _const = require('../../const');
-
-var _handleNode = require('./handleNode');
-
-var _handleNode2 = _interopRequireDefault(_handleNode);
-
-var _handleEdge = require('./handleEdge');
-
-var _handleEdge2 = _interopRequireDefault(_handleEdge);
-
-var _handleAssociatedEdge = require('./handleAssociatedEdge');
-
-var _handleAssociatedEdge2 = _interopRequireDefault(_handleAssociatedEdge);
-
-var _handleAssociatedNode = require('./handleAssociatedNode');
-
-var _handleAssociatedNode2 = _interopRequireDefault(_handleAssociatedNode);
-
-var _lookupNode = require('./lookupNode');
-
-var _lookupNode2 = _interopRequireDefault(_lookupNode);
-
-var _default = (function (_ActionTransform) {
-  _inherits(_default, _ActionTransform);
-
-  function _default(nodes, edges, lookupUrl) {
-    _classCallCheck(this, _default);
-
-    _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
-    this.name = 'DataModelStream';
-
-    this.bindActions(_const.target.MODEL_NODE, (0, _handleNode2['default'])(nodes));
-    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.LOOKUP, function (action, push) {
-      return lookup(action, nodes, lookupUrl, push);
-    }], [_const.actionType.CREATE, function (action, push) {
-      return autoEdgeCreation(action, nodes, push);
-    }]]);
-    this.bindActions(_const.target.MODEL_NODE, (0, _handleAssociatedEdge2['default'])(edges));
-    this.bindActions(_const.target.MODEL_EDGE, (0, _handleEdge2['default'])(edges, nodes));
-    this.bindActions(_const.target.MODEL_EDGE, (0, _handleAssociatedNode2['default'])(nodes));
-  }
-
-  return _default;
-})(_actionStream.ActionTransform);
-
-exports['default'] = _default;
 
 function autoEdgeCreation(action, nodes, push) {
   // A new node is created already.
   var nodeList = nodes.snapshot.list;
 
-  if (nodeList.length > 1) {
+  if (nodeList.length > 1 && action.createEdge) {
     var _getArms = getArms(nodeList, action.selectedNode, action.createEdge);
 
     var _getArms2 = _slicedToArray(_getArms, 2);
@@ -1779,8 +1939,7 @@ function autoEdgeCreation(action, nodes, push) {
     push({
       target: _const.target.VIEW_EDGE,
       sourceId: sourceId,
-      targetId: targetId,
-      label: null
+      targetId: targetId
     });
   }
 }
@@ -1798,64 +1957,9 @@ function getArms(nodeList, selectedNode, createEdge) {
 
   return [sourceId, nodeList[nodeList.length - 1].id];
 }
-
-function lookup(action, nodes, lookupUrl, push) {
-  var labels = undefined,
-      callback = function callback(newAction) {
-    return asyncPush(action, newAction);
-  };
-
-  if (action.id) {
-    labels = [nodes.getLabel(action.id)];
-  } else {
-    labels = nodes.getLabels();
-  }
-
-  push((0, _lookupNode2['default'])(nodes, lookupUrl, labels, callback));
-}
 module.exports = exports['default'];
 
-},{"../../const":17,"./handleAssociatedEdge":18,"./handleAssociatedNode":19,"./handleEdge":20,"./handleNode":21,"./lookupNode":23,"action-stream":57}],23:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _superagent = require('superagent');
-
-var _superagent2 = _interopRequireDefault(_superagent);
-
-var _bluebird = require('bluebird');
-
-var _bluebird2 = _interopRequireDefault(_bluebird);
-
-var _const = require('../../const');
-
-exports['default'] = function (nodes, lookupUrl, labels) {
-  return new _bluebird2['default'](function (resolve, reject) {
-    _superagent2['default'].post(lookupUrl).send(labels).end(function (err, res) {
-      if (!err) {
-        nodes.setUrl(res.body);
-
-        resolve({
-          target: _const.target.VIEW_NODE,
-          type: _const.actionType.SNAPSHOT,
-          data: nodes.snapshot
-        });
-      } else {
-        console.error('lookup error!', lookupUrl, err);
-        reject(err);
-      }
-    });
-  });
-};
-
-module.exports = exports['default'];
-
-},{"../../const":17,"bluebird":231,"superagent":265}],24:[function(require,module,exports){
+},{"../const":17,"action-stream":57}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1995,9 +2099,25 @@ var _SelectionModelStream = require('./SelectionModelStream');
 
 var _SelectionModelStream2 = _interopRequireDefault(_SelectionModelStream);
 
-var _DataModelStream = require('./DataModelStream');
+var _DataModelLookupStream = require('./DataModelLookupStream');
 
-var _DataModelStream2 = _interopRequireDefault(_DataModelStream);
+var _DataModelLookupStream2 = _interopRequireDefault(_DataModelLookupStream);
+
+var _DataModelNodeStream = require('./DataModelNodeStream');
+
+var _DataModelNodeStream2 = _interopRequireDefault(_DataModelNodeStream);
+
+var _DataModelEdgeStream = require('./DataModelEdgeStream');
+
+var _DataModelEdgeStream2 = _interopRequireDefault(_DataModelEdgeStream);
+
+var _DataModelAssociatedEdgeStream = require('./DataModelAssociatedEdgeStream');
+
+var _DataModelAssociatedEdgeStream2 = _interopRequireDefault(_DataModelAssociatedEdgeStream);
+
+var _DataModelAssociatedNodeStream = require('./DataModelAssociatedNodeStream');
+
+var _DataModelAssociatedNodeStream2 = _interopRequireDefault(_DataModelAssociatedNodeStream);
 
 var _modelNodes = require('../../model/nodes');
 
@@ -2008,15 +2128,17 @@ var _modelEdges = require('../../model/edges');
 var _modelEdges2 = _interopRequireDefault(_modelEdges);
 
 exports['default'] = function (lookupUrl) {
-  var headStream = new _SelectionModelStream2['default'](),
-      tailStream = headStream.pipe(new _DataModelStream2['default']((0, _modelNodes2['default'])(), (0, _modelEdges2['default'])(), lookupUrl));
+  var nodeModel = (0, _modelNodes2['default'])(),
+      edgeModel = (0, _modelEdges2['default'])(),
+      headStream = new _SelectionModelStream2['default'](),
+      tailStream = headStream.pipe(new _DataModelNodeStream2['default'](nodeModel)).pipe(new _DataModelLookupStream2['default'](nodeModel, edgeModel, lookupUrl)).pipe(new _DataModelAssociatedNodeStream2['default'](nodeModel)).pipe(new _DataModelEdgeStream2['default'](edgeModel)).pipe(new _DataModelAssociatedEdgeStream2['default'](edgeModel));
 
   return (0, _duplexer2['default'])(headStream, tailStream);
 };
 
 module.exports = exports['default'];
 
-},{"../../model/edges":3,"../../model/nodes":5,"./DataModelStream":22,"./SelectionModelStream":24,"duplexer":244}],26:[function(require,module,exports){
+},{"../../model/edges":3,"../../model/nodes":5,"./DataModelAssociatedEdgeStream":18,"./DataModelAssociatedNodeStream":19,"./DataModelEdgeStream":20,"./DataModelLookupStream":21,"./DataModelNodeStream":23,"./SelectionModelStream":24,"duplexer":244}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

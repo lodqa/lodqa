@@ -1,3 +1,6 @@
+<div class="pgp hidden">
+    {"nodes":{"t1":{"head":1,"text":"genes"},"t2":{"head":6,"text":"alzheimer disease"}},"edges":[{"subject":"t1","object":"t2","text":"associated with"}],"focus":"t1"}
+</div>
 <h1>Node example</h1>
 <div class="result-region" id="lodqa-mappings">
     <table class="mapping-editor-table">
@@ -62,5 +65,6 @@
 <script src="js/vender/js-polyfills/keyboard.js"></script>
 <script src="js/vender/grapheditor/index.js"></script>
 <script type="text/javascript">
-    graphEditor('/lookup')
+    var editor = graphEditor('/lookup')
+    editor.addPgp(JSON.parse(document.querySelector('.pgp').innerHTML))
 </script>

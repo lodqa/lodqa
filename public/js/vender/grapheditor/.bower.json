@@ -1,7 +1,7 @@
 {
   "name": "graph-editor",
   "description": "graph editor",
-  "version": "0.0.21",
+  "version": "0.1.2",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>",
     "Shigeru Nakajima <shigeru.nakajima@luxiar.com>"
@@ -42,14 +42,14 @@
     "type": "git",
     "url": "git://github.com/lodqa/grapheditor.git"
   },
-  "_release": "0.0.21",
+  "_release": "0.1.2",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.21",
-    "commit": "42e96a2f326fa30a6eecea0f6735a2b711226a5f"
+    "tag": "v0.1.2",
+    "commit": "00d8662f5b3a087d81fb6a75246f0424ce62b316"
   },
   "_source": "git://github.com/lodqa/grapheditor.git",
-  "_target": "~0.0.21",
+  "_target": "~0.1.2",
   "_originalSource": "grapheditor",
   "_direct": true
 }
