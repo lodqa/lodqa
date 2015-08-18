@@ -186,6 +186,10 @@
 .table table td.term {
   width: 460px;
 }
+.table table td.term .term.hover input.term {
+  background-color: rgba(255, 0, 0, 0.5);
+  text-decoration: line-through;
+}
 .table table td.term input.term {
   width: 400px;
   box-sizing: border-box;

@@ -1205,6 +1205,15 @@ var _default = (function (_ActionReadable) {
           addTerm(component, e.target, push);
         }
       });
+      container.on('click', '.term .delete-button', function (e) {
+        return delTermButtonClick(e, component, push);
+      });
+      container.on('mouseover', '.term .delete-button', function (e) {
+        return pushTermId(e, component, _const.actionType.HOVER_TERM, push);
+      });
+      container.on('mouseout', '.term .delete-button', function (e) {
+        return pushTermId(e, component, _const.actionType.UNHOVER_TERM, push);
+      });
       container.on('click', '.term .add-button', function (e) {
         return addTermButtonClick(e, component, push);
       });
@@ -1238,15 +1247,28 @@ function updateLabel(component, index, push) {
 }
 
 function updateTerm(component, index, push) {
-  var node = component.getNodeValue(index);
+  if (component.has(index)) {
+    var node = component.getNodeValue(index);
 
-  pushUpdateTerm(push, node.id, node.terms);
+    pushUpdateTerm(push, node.id, node.terms);
+  }
+}
+
+function delTermButtonClick(e, component, push) {
+  var button = getButton(e.target),
+      nodeIndex = component.getNodeIndex(button),
+      termIndex = component.getTermIndex(button),
+      node = component.getNodeValue(nodeIndex),
+      newTerms = node.terms.filter(function (e, index) {
+    return index != termIndex;
+  });
+
+  pushUpdateTerm(push, node.id, newTerms);
 }
 
 function addTermButtonClick(e, component, push) {
   var button = getButton(e.target),
-      input = button.previousElementSibling,
-      newValue = input.value;
+      input = button.previousElementSibling;
 
   addTerm(component, input, push);
 }
@@ -1282,6 +1304,18 @@ function getButton(element) {
   } else {
     return element;
   }
+}
+
+function pushTermId(event, component, type, push) {
+  var nodeId = component.getNodeId(event.target),
+      termIndex = component.getTermIndex(event.target);
+
+  if (nodeId && termIndex) push({
+    target: _const.target.VIEW_NODE,
+    type: type,
+    id: nodeId,
+    index: termIndex
+  });
 }
 
 function pushNodeId(event, component, type, push) {
@@ -1382,12 +1416,14 @@ module.exports={
     "DRAG": "drag",
     "FOCUS": "focus",
     "HOVER": "hover",
+    "HOVER_TERM": "hover-term",
     "INPUT": "input",
     "LOOKUP": "lookup",
     "MOVE": "move",
     "SELECT": "select",
     "SNAPSHOT": "snapshot",
     "UNHOVER": "unhover",
+    "UNHOVER_TERM": "unhover-term",
     "UNSELECT": "unselect",
     "UPDATE_LABEL": "update-label",
     "UPDATE_TERM": "update-term",
@@ -2221,12 +2257,16 @@ var _default = (function (_ActionTransform) {
 
     this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.HOVER, function (action, push) {
       return component.hover(action.id);
+    }], [_const.actionType.HOVER_TERM, function (action, push) {
+      return component.hoverTerm(action.id, action.index);
     }], [_const.actionType.SELECT, function (action, push) {
       return component.select(action.id);
     }], [_const.actionType.SNAPSHOT, function (action, push) {
       return component.set(action.data);
     }], [_const.actionType.UNHOVER, function (action, push) {
       return component.unhover(action.id);
+    }], [_const.actionType.UNHOVER_TERM, function (action, push) {
+      return component.unhoverTerm();
     }], [_const.actionType.UNSELECT, function (action, push) {
       return component.unselect();
     }]]);
@@ -3376,7 +3416,7 @@ var _ractive = require('ractive');
 
 var _ractive2 = _interopRequireDefault(_ractive);
 
-var TEMPLATE = '\n{{#if nodes}}\n<table>\n  <thead>\n    <tr>\n      <th>focus</th>\n      <th class="label">\n        <span class="title">nodes</span>\n        <button class="lookup-all-button" title="lookup all node"><i class="fa fa-search"></i></button>\n        <button class="delete-all-button" title="delete all node"><i class="fa fa-trash-o"></i></button>\n      </th>\n      <th class="url">term</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#nodes}}\n    <tr data-id="{{id}}" data-index={{@index}} class="node {{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}">\n      <td class="focus">\n        <input type="radio" name="focus" value="{{id}}">\n      </td>\n      <td class="label">\n        <input value="{{label}}">\n        <button class="lookup-button" title="lookup"><i class="fa fa-search"></i></button>\n        <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>\n      </td>\n      <td class="term">\n          {{#terms}}\n          <div>\n            <input type="checkbox" checked="{{enable}}">\n            <input class="term" value="{{value}}">\n            <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>\n          </div>\n          {{/terms}}\n          <div class="add">\n            <input type="checkbox">\n            <input class="term">\n            <button class="add-button" title="add"><i class="fa fa-plus"></i></button>\n          </div>\n      </td>\n    </tr>\n    {{/nodes}}\n</tbody>\n\n</table>\n{{/if}}';
+var TEMPLATE = '\n{{#if nodes}}\n<table>\n  <thead>\n    <tr>\n      <th>focus</th>\n      <th class="label">\n        <span class="title">nodes</span>\n        <button class="lookup-all-button" title="lookup all node"><i class="fa fa-search"></i></button>\n        <button class="delete-all-button" title="delete all node"><i class="fa fa-trash-o"></i></button>\n      </th>\n      <th class="url">term</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#nodes}}\n    <tr data-id="{{id}}" data-index={{@index}} class="node {{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}">\n      <td class="focus">\n        <input type="radio" name="focus" value="{{id}}">\n      </td>\n      <td class="label">\n        <input value="{{label}}">\n        <button class="lookup-button" title="lookup"><i class="fa fa-search"></i></button>\n        <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>\n      </td>\n      <td class="term">\n          {{#terms}}\n          <div data-index={{@index}} class="term {{#if id==hover_term.node && @index==hover_term.index}}hover{{/if}}">\n            <input type="checkbox" checked="{{enable}}">\n            <input class="term" value="{{value}}">\n            <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>\n          </div>\n          {{/terms}}\n          <div class="add">\n            <input type="checkbox">\n            <input class="term">\n            <button class="add-button" title="add"><i class="fa fa-plus"></i></button>\n          </div>\n      </td>\n    </tr>\n    {{/nodes}}\n</tbody>\n\n</table>\n{{/if}}';
 
 // To be singleton.
 var ractive = undefined;
@@ -3412,11 +3452,17 @@ exports['default'] = function (selector) {
       console.assert(ractive.get('nodes.' + index), 'The node is not in tabel. index :', index, ractive.get('nodes'));
       return Object.assign({}, ractive.get('nodes.' + index));
     },
+    getTermIndex: function getTermIndex(element) {
+      var termElement = element.closest('.term');
+
+      return termElement ? termElement.getAttribute('data-index') : '';
+    },
     has: function has(index) {
       return ractive.get('nodes.' + index) !== undefined;
     },
     set: function set(nodes) {
       updateDisplay(ractive, component, nodes);
+      unhoverTerm(ractive);
       nodesCache = nodes;
     },
     select: (function (_select) {
@@ -3474,6 +3520,32 @@ exports['default'] = function (selector) {
     })(function (id) {
       nodesCache = unhover(nodesCache, id);
       updateDisplay(ractive, component, nodesCache);
+    }),
+    hoverTerm: (function (_hoverTerm) {
+      function hoverTerm(_x4, _x5) {
+        return _hoverTerm.apply(this, arguments);
+      }
+
+      hoverTerm.toString = function () {
+        return _hoverTerm.toString();
+      };
+
+      return hoverTerm;
+    })(function (id, index) {
+      hoverTerm(ractive, id, index);
+    }),
+    unhoverTerm: (function (_unhoverTerm) {
+      function unhoverTerm(_x6, _x7) {
+        return _unhoverTerm.apply(this, arguments);
+      }
+
+      unhoverTerm.toString = function () {
+        return _unhoverTerm.toString();
+      };
+
+      return unhoverTerm;
+    })(function (id, index) {
+      unhoverTerm(ractive);
     })
   };
 };
@@ -3508,6 +3580,17 @@ function unhover(nodes, id) {
   }, {
     hover: false
   });
+}
+
+function hoverTerm(ractive, id, index) {
+  ractive.set('hover_term', {
+    node: id,
+    index: index
+  });
+}
+
+function unhoverTerm(ractive, id, index) {
+  ractive.set('hover_term', {});
 }
 
 function updateDisplay(ractive, component, data) {
