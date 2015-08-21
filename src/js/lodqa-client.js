@@ -10,27 +10,7 @@ window.onload = function() {
         document.getElementById('lodqa-parse_rendering').innerHTML = data;
       });
     },
-    bindMappingsEditor = function(mappings) {
-      var domId = 'lodqa-mappings',
-        mappings = JSON.parse(document.getElementById(domId).innerHTML),
-        $region = require('./editor/mappingEditor')(mappings);
-
-      document.getElementById(domId).innerHTML = '';
-      $("#" + domId)
-        .append($region);
-
-      return mappings;
-    },
-    bindResult = require('./controller/bindResult'),
-    pgpGraph = require('./graph/pgpGraph'),
-    bindPgpPresentation = function() {
-      var domId = 'lodqa-pgp',
-        pgp = JSON.parse(document.getElementById(domId).innerHTML);
-      document.getElementById(domId).innerHTML = '';
-      pgpGraph(pgp);
-
-      return pgp;
-    };
+    bindResult = require('./controller/bindResult');
 
   var loader = require('./loader/loadSolution')();
   // var loader = require('./loader/loadSolutionStub')();
@@ -44,13 +24,15 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  var pgp = bindPgpPresentation();
-  var mappings = bindMappingsEditor(mappings);
-
   $('#beginSerach').on('click', function(e) {
     var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');
+    var pgpElement = document.querySelector('.pgp')
+    var mappingsElement = document.querySelector('.mappings')
+    var pgp = JSON.parse(pgpElement.innerHTML)
+    var mappings = JSON.parse(mappingsElement.innerHTML)
+
     loader.beginSearch(pgp, mappings, 'analysis');
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
