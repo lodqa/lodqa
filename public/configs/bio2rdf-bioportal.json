@@ -1,0 +1,16 @@
+{
+	"description": "Bio2RDF-BioPortal",
+	"parser_url": "http://bionlp.dbcls.jp/enju",
+	"endpoint_url": "http://cu.bioportal.bio2rdf.org/sparql",
+	"sortal_predicates": [
+		"http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+		"http://www.w3.org/2000/01/rdf-schema#subClassOf"
+	],
+	"dictionary_url": "http://pubdictionaries.org/mapping/term_to_id?dictionaries=BioPortal&output_format=simple&threshold=0.6&top_n=0",
+	"queries": [
+		"genes",
+		"genes, exon",
+		"what annotations does PHYLLOCHRON have?",
+		"what evidences does ABI2 have?"
+	]
+}
