@@ -8,9 +8,8 @@ module Lodqa; end unless defined? Lodqa
 
 # An instance of this class is initialized with a dictionary.
 class Lodqa::Dictionary
-  def initialize (dictionary_url, endpoint)
+  def initialize (dictionary_url)
     @dictionary = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}
-    @endpoint = endpoint
   end
 
   def lookup (terms)

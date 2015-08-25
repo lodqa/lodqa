@@ -103,7 +103,7 @@ class LodqaWS < Sinatra::Base
 	# Command for test: curl 'http://localhost:9292/lookup' -d '["drug", "genes"]'
 	post '/lookup' do
 		config = get_config(params)
-		dictionary = Lodqa::Dictionary.new(config['dictionary_url'], config['endpoint_url'])
+		dictionary = Lodqa::Dictionary.new(config['dictionary_url'])
 		query = MultiJson.decode(request.body)
 		mappings = dictionary.lookup(query)
 

@@ -28,7 +28,7 @@ class Lodqa::Lodqa
   end
 
   def lookup(dictionary_url)
-    dictionary = Lodqa::Dictionary.new(dictionary_url, @endpoint)
+    dictionary = Lodqa::Dictionary.new(dictionary_url)
     @mappings   = dictionary.lookup(@pgp[:nodes].values.collect{|n| n[:text]})
   end
 

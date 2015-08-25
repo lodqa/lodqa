@@ -7,7 +7,7 @@ describe Lodqa::Dictionary do
   end
 
   it "should open" do
-    expect(@dictionary.lookup("genes")).to eq(nil)
+    expect(@dictionary.lookup("genes")).to eq({"genes"=>["http://bio2rdf.org/omim_vocabulary:Gene"]})
   end
 end
 
