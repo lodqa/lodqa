@@ -47,6 +47,6 @@
 <script src="js/vender/js-polyfills/keyboard.js"></script>
 <script src="js/vender/grapheditor/index.js"></script>
 <script type="text/javascript">
-    var editor = graphEditor('/lookup')
+    var editor = graphEditor('/lookup?dictionary_url=' + encodeURI('<%= @dictionary_url %>'))
     editor.addPgp(JSON.parse(document.querySelector('#lodqa-pgp').innerHTML))
 </script>
