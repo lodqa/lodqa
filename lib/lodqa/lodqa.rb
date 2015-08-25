@@ -27,11 +27,6 @@ class Lodqa::Lodqa
     @pgp = graphicate(parse)
   end
 
-  def lookup(dictionary_url)
-    dictionary = Lodqa::Dictionary.new(dictionary_url)
-    @mappings   = dictionary.lookup(@pgp[:nodes].values.collect{|n| n[:text]})
-  end
-
   def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil)
     terms = @pgp[:nodes].values.map{|n| @mappings[n['text']]}
 
