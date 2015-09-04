@@ -344,12 +344,12 @@ div.atext {
     color: #FF512C;
 }
 
-/* solution-table */
-.hide {
-    height: 0;
-    opacity: 0;
-    visibility: hidden;
-}
 .solution-region {
-    transition: all 0.5s ease 0.1s;
+    max-height: 1000px;
+    overflow: hidden;
+    transition: all 1s ease-in;
+}
+.solution-region.hide{
+    max-height: 0;
+    transition: all 0.6s ease-out;
 }

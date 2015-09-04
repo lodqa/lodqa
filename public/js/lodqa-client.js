@@ -9906,8 +9906,14 @@ var _ = require('lodash'),
   SolutionLsit = function(domId) {
     var $region = $(reigonTemplate.render())
       .on('click', 'input', function(event) {
-        $region.removeClass('hide');
-        $(event.target).hide();
+        $region[0].classList.toggle('hide');
+
+        var $input = $(event.target);
+        if($input.val() === 'Show solutions in table'){
+          $input.val('Hide solutions in table');
+        } else {
+          $input.val('Show solutions in table');
+        }
       });
 
     $('#' + domId)
