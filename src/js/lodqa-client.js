@@ -24,18 +24,31 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  $('#beginSerach').on('click', function(e) {
+  $('#beginSearch').on('click', function(e) {
+    document.getElementById("container").innerHTML = '<h1>Results</h1><div id="lodqa-results"></div>';
+
     var $target = $(e.target);
-
     $target.attr('disabled', 'disabled');
-    var pgpElement = document.querySelector('.pgp')
-    var mappingsElement = document.querySelector('.mappings')
-    var pgp = JSON.parse(pgpElement.innerHTML)
-    var mappings = JSON.parse(mappingsElement.innerHTML)
-
-    loader.beginSearch(pgp, mappings, 'analysis');
+    var pgpElement = document.querySelector('.pgp');
+    var mappingsElement = document.querySelector('.mappings');
+    var pgp = JSON.parse(pgpElement.innerHTML);
+    var mappings = JSON.parse(mappingsElement.innerHTML);
+    var config_url = document.querySelector('#target').value;
+    console.log(config_url);
+    loader.beginSearch(pgp, mappings, '/solutions', config_url);
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })
   });
+
+  $('#dashboard').on('click', function(e) {
+    $(this).css("z-index", "1")
+    $('#main').css("z-index", "-1")
+  });
+
+  $('#main').on('click', function(e) {
+    $(this).css("z-index", "1")
+    $('#dashboard').css("z-index", "-1")
+  });
+
 };

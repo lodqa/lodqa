@@ -133,7 +133,7 @@ class GraphFinder
       terms = [c['subject'], x_variables, c['object']].flatten
 
       # triple patterns
-      tps = (0 ... p_variables.length).collect{|i| [terms[i], p_variables[i], terms[i + 1]]}
+      tps = (0 ... p_variables.length).collect{|j| [terms[j], p_variables[j], terms[j + 1]]}
       bgp += tps
     end
     bgp
@@ -238,7 +238,7 @@ class GraphFinder
     s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
 
     # query += "}"
-    query += "} LIMIT 20"
+    query += "} LIMIT 10"
   end
 
   def stringify_term (t)

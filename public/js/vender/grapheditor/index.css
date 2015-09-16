@@ -17,9 +17,12 @@
 }
 /* graph */
 .jsPlumb-container {
-  height: 200px;
+  margin: 3px 0;
+  border: solid 1px #cccccc;
+  height: 150px;
   position: relative;
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   /* graph node */
   /* graph edge */
 }
@@ -139,7 +142,9 @@
   border-collapse: collapse;
   font-size: 0.9em;
   margin-right: 10px;
+  width: 100%;
   min-width: 300px;
+  max-width: 600px;
 }
 .table table tr {
   height: 30px;
@@ -157,15 +162,15 @@
   background-color: #ddd;
   color: #333;
 }
+.table table th.focus {
+  width: 16px;
+}
 .table table th.label {
-  width: 32px;
+  width: 180px;
 }
 .table table th.label .title {
   display: inline-block;
-  width: 116px;
-}
-.table table th.url {
-  width: 50px;
+  width: 106px;
 }
 .table table td {
   border: 1px solid #b9b9b9;
@@ -178,23 +183,19 @@
 .table table td.label {
   text-align: center;
   vertical-align: top;
-  width: 185px;
 }
 .table table td.label input {
-  width: 110px;
+  width: 100px;
 }
-.table table td.term {
-  width: 460px;
-}
-.table table td.term .term.hover input.term {
+.table table td.url .term.hover input.term {
   background-color: rgba(255, 0, 0, 0.5);
   text-decoration: line-through;
 }
-.table table td.term input.term {
-  width: 400px;
+.table table td.url input.term {
+  width: 80%;
   box-sizing: border-box;
 }
-.table table td.term .add [type="checkbox"] {
+.table table td.url .add [type="checkbox"] {
   visibility: hidden;
 }
 .hidden {

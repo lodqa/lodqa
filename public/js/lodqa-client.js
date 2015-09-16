@@ -9377,20 +9377,33 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  $('#beginSerach').on('click', function(e) {
+  $('#beginSearch').on('click', function(e) {
+    document.getElementById("container").innerHTML = '<h1>Results</h1><div id="lodqa-results"></div>';
+
     var $target = $(e.target);
-
     $target.attr('disabled', 'disabled');
-    var pgpElement = document.querySelector('.pgp')
-    var mappingsElement = document.querySelector('.mappings')
-    var pgp = JSON.parse(pgpElement.innerHTML)
-    var mappings = JSON.parse(mappingsElement.innerHTML)
-
-    loader.beginSearch(pgp, mappings, 'analysis');
+    var pgpElement = document.querySelector('.pgp');
+    var mappingsElement = document.querySelector('.mappings');
+    var pgp = JSON.parse(pgpElement.innerHTML);
+    var mappings = JSON.parse(mappingsElement.innerHTML);
+    var config_url = document.querySelector('#target').value;
+    console.log(config_url);
+    loader.beginSearch(pgp, mappings, '/solutions', config_url);
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })
   });
+
+  $('#dashboard').on('click', function(e) {
+    $(this).css("z-index", "1")
+    $('#main').css("z-index", "-1")
+  });
+
+  $('#main').on('click', function(e) {
+    $(this).css("z-index", "1")
+    $('#dashboard').css("z-index", "-1")
+  });
+
 };
 
 },{"./controller/bindResult":14,"./loader/loadSolution":21,"./presentation/anchoredPgpTablePresentation":22,"./presentation/graphPresentation":23,"./presentation/solutionTablePresentation":25,"./presentation/sparqlTablePresentation":26,"./presentation/websocketPresentation":28}],16:[function(require,module,exports){
@@ -9734,8 +9747,10 @@ var EventEmitter = require('events').EventEmitter,
 
 module.exports = function() {
   var emitter = new EventEmitter,
-    openConnection = function(page_name) {
-      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace(page_name, 'solutions'));
+    openConnection = function(pathname, config_url) {
+      var ws_url = 'ws://' + location.host + pathname + '?config=' + config_url;
+      console.log(ws_url);
+      var ws = new WebSocket('ws://' + location.host + pathname + '?config=' + config_url)
 
       ws.onopen = function() {
         emitter.emit('ws_open');
@@ -9760,8 +9775,8 @@ module.exports = function() {
     };
 
   return _.extend(emitter, {
-    beginSearch: function(pgp, mappings, page_name) {
-      var ws = openConnection(page_name);
+    beginSearch: function(pgp, mappings, pathname, config_url) {
+      var ws = openConnection(pathname, config_url);
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
           pgp: pgp,
@@ -10012,8 +10027,8 @@ var _ = require('lodash'),
   };
 
 module.exports = function(domId) {
-  var onOpen = _.partial(show, document.getElementById(domId), 'lodqa running ...'),
-    onClose = _.partial(show, document.getElementById(domId), 'lodqa finished.');
+  var onOpen = _.partial(show, document.getElementById(domId), '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>'),
+    onClose = _.partial(show, document.getElementById(domId), '<div class="lodqa-message">lodqa finished.</div>');
 
   return {
     onOpen: onOpen,

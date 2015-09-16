@@ -1,0 +1,21 @@
+<h1>Natural Language Query</h1>
+<!-- 
+<form action="/"
+      method="get"
+      entype="multipart/form-data"
+      oninput="max_hop_value.value=max_hop.value">
+ -->
+<form	action="/graphicator"
+     	method="get"
+     	entype="multipart/form-data">
+
+<input	name="query" id="query" type="text"
+		required="required"
+		<% if @query %>
+		value="<%= @query %>"
+		<% end %>
+	   placeholder="Enter a natural language query." />
+
+<input id="graphicateButton" type="submit"
+	   value="Graphicate!" />
+</form>

@@ -4,7 +4,7 @@ require 'sparql/client'
 require 'json'
 require 'enju_access/enju_access'
 require 'lodqa/graph_finder'
-require 'lodqa/dictionary'
+require 'lodqa/termfinder'
 
 module Lodqa; end unless defined? Lodqa
 
@@ -19,16 +19,33 @@ class Lodqa::Lodqa
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
   end
 
-  def parse(query, parser_url)
-    parser = EnjuAccess::CGIAccessor.new(parser_url)
-    parse = parser.parse(query)
-    @parse_rendering = EnjuAccess::get_graph_rendering(parse)
-
-    @pgp = graphicate(parse)
-  end
-
   def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil)
+    # Join operation if there is a term mapping failure on a passing node
+    nodes_to_delete = []
+    @pgp[:nodes].each_key do |n|
+      if @mappings[@pgp[:nodes][n]['text']].nil? || @mappings[@pgp[:nodes][n]['text']].empty?
+        connected_nodes = []
+        @pgp[:edges].each{|e| connected_nodes << e['object'] if e['subject'] == n}
+        @pgp[:edges].each{|e| connected_nodes << e['subject'] if e['object'] == n}
+
+        # if it is a passing node
+        if connected_nodes.length == 2
+          nodes_to_delete << n
+          @pgp[:edges].each do |e|
+            e['object']  = connected_nodes[1] if e['subject'] == connected_nodes[0] && e['object']  == n
+            e['subject'] = connected_nodes[1] if e['subject'] == n && e['object']  == connected_nodes[0] 
+            e['object']  = connected_nodes[0] if e['subject'] == connected_nodes[1] && e['object']  == n
+            e['subject'] = connected_nodes[0] if e['subject'] == n && e['object']  == connected_nodes[1] 
+          end
+        end
+      end
+    end
+
+    @pgp[:nodes].delete_if{|n| nodes_to_delete.include? n}
+    @pgp[:edges].uniq!
+
     terms = @pgp[:nodes].values.map{|n| @mappings[n['text']]}
+    terms.map!{|t| t.nil? ? [] : t}
 
     anchored_pgps = terms.first.product(*terms.drop(1)).collect do |ts|
       anchored_pgp = pgp.dup
@@ -41,50 +58,6 @@ class Lodqa::Lodqa
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
       GraphFinder.new(anchored_pgp, @endpoint, @options).each_sparql_and_solution(proc_sparql, proc_solution)
-    end
-  end
-
-  private
-
-  def graphicate (parse)
-    nodes = get_nodes(parse)
-
-    node_index = {}
-    nodes.each_key{|k| node_index[nodes[k][:head]] = k}
-
-    focus = node_index[parse[:focus]]
-    focus = node_index.values.first if focus.nil?
-
-    edges = get_edges(parse, node_index)
-    graph = {
-      :nodes => nodes,
-      :edges => edges,
-      :focus => focus
-    }
-  end
-
-  def get_nodes (parse)
-    nodes = {}
-
-    variable = 't0'
-    parse[:base_noun_chunks].each do |c|
-      variable = variable.next;
-      nodes[variable] = {
-        :head => c[:head],
-        :text => parse[:tokens][c[:beg] .. c[:end]].collect{|t| t[:lex]}.join(' ')
-      }
-    end
-
-    nodes
-  end
-
-  def get_edges (parse, node_index)
-    edges = parse[:relations].collect do |s, p, o|
-      {
-        :subject => node_index[s],
-        :object => node_index[o],
-        :text => p.collect{|i| parse[:tokens][i][:lex]}.join(' ')
-      }
     end
   end
 

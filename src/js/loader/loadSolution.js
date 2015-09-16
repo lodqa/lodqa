@@ -3,8 +3,10 @@ var EventEmitter = require('events').EventEmitter,
 
 module.exports = function() {
   var emitter = new EventEmitter,
-    openConnection = function(page_name) {
-      var ws = new WebSocket(location.href.replace('http://', 'ws://').replace(page_name, 'solutions'));
+    openConnection = function(pathname, config_url) {
+      var ws_url = 'ws://' + location.host + pathname + '?config=' + config_url;
+      console.log(ws_url);
+      var ws = new WebSocket('ws://' + location.host + pathname + '?config=' + config_url)
 
       ws.onopen = function() {
         emitter.emit('ws_open');
@@ -29,8 +31,8 @@ module.exports = function() {
     };
 
   return _.extend(emitter, {
-    beginSearch: function(pgp, mappings, page_name) {
-      var ws = openConnection(page_name);
+    beginSearch: function(pgp, mappings, pathname, config_url) {
+      var ws = openConnection(pathname, config_url);
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
           pgp: pgp,

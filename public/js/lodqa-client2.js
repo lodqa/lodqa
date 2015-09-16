@@ -9376,7 +9376,7 @@ window.onload = function() {
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
 
-  $('#beginSerach').on('click', function(e) {
+  $('#beginSearch').on('click', function(e) {
     var $target = $(e.target);
 
     $target.attr('disabled', 'disabled');

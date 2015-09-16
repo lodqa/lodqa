@@ -9,6 +9,8 @@ module EnjuAccess; end unless defined? EnjuAccess
 
 # An instance of this class connects to an Enju CGI server to parse a sentence.
 class EnjuAccess::CGIAccessor
+  attr_reader :enju
+
   # Noun-chunk elements
   # (Note that PRP is not included. For dialog analysis however PRP (personal pronoun) would need to be included.)
   NC_CAT      = ["NN", "NNP", "CD", "FW", "JJ"]
@@ -172,8 +174,8 @@ end
 if __FILE__ == $0
   parser = EnjuAccess::CGIAccessor.new("http://bionlp.dbcls.jp/enju")
   parse  = parser.parse("what genes are related to alzheimer?")
-  p parse
-  exit
+  # p parse
+  # exit
   parse[:tokens].each do |t|
     p t
   end
