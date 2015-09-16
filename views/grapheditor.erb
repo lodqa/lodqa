@@ -43,16 +43,42 @@
     editor.addPgp(JSON.parse(document.querySelector('#lodqa-pgp').innerHTML))
     selector = document.querySelector('#target');
     selector.addEventListener('change', function() {
+        target    = selector.options[selector.selectedIndex].text;
         targetUrl = selector.value;
+        changeTarget(target, targetUrl)
+    });
+
+    function changeTarget(label, targetUrl) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = function() {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 var target = JSON.parse(xmlHttp.responseText);
+
                 var dicUrl = target["dictionary_url"];
                 editor.setDictionaryUrl(dicUrl);
+
+                var sample_queries = target["sample_queries"];
+                if (sample_queries) {
+                    $("#sample_queries").html("<h1>Sample queries for " + label + "</h1><ul><li><a>" + target.sample_queries.join("</a></li><li><a>") + "</a></li></ul>");
+                   setQueriesCopiable();
+                } else {
+                    $("#sample_queries").html('');
+                }
             }
         }
         xmlHttp.open("GET", targetUrl, true); // true for asynchronous 
-        xmlHttp.send(null);
-    });
+        xmlHttp.send(null);       
+    }
+
+    function setQueriesCopiable () {
+        $('#sample_queries a').on('click', function() {
+            $("#query").val($(this).text());
+        });     
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        defaultTarget    = document.querySelector('#target').options[0].text;
+        defaultTargetUrl = document.querySelector('#target').options[0].value;
+        changeTarget(defaultTarget, defaultTargetUrl);
+    }, false);
 </script>

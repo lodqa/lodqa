@@ -3,13 +3,19 @@
 	<h1>Parsing result (by <a href="http://kmcs.nii.ac.jp/enju/">Enju</a>)</h1>
 	<div id="lodqa-parse_rendering"><%= @parse_rendering %></div>
 <% else %>
-	<h1>Caveats</h1>
-	<ul style="color:#555555">
-		<li>It is a demo system which is meant to show how current state of LODQA works for a given query.</li>
+	<div id="sample_queries"></div>
+	<h1>Announcement</h1>
+	<ul>
+		<li>LODQA is newly released. (17th September, 2015)</li>
 		<ul style="color:red; font-weight:bold">
 			<li>Currently, the system is tested only wich Chrome.</li>
 			<li>There is a known problem with FireFox, which we are working to solve.</li>
+			<li>System may be unstable, and minor updates will be followed.</li>
 		</ul>
+	</ul>
+	<h1>Caveats</h1>
+	<ul style="color:#555555">
+		<li>It is a demo system which is meant to show how current state of LODQA works for a given query.</li>
 		<li>The current interface is designed for developers, not for end users.</li>
 		<ul>
 			<li>It will show all the intermediate results including parsing results, lexical mappings, and automatically generated SPARQL queries.</li>
