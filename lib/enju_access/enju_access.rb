@@ -36,7 +36,6 @@ class << EnjuAccess
 
     g.get_node(root.to_s).set {|_n| _n.color = "blue"} if root >= 0
     g.get_node(focus.to_s).set {|_n| _n.color = "red"} if focus >= 0
-
-    graph_rendering = g.output(:svg => String)
+    g.output(:svg => String)
   end
 end

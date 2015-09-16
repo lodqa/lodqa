@@ -1,0 +1,203 @@
+/* node editor */
+.node-editor label {
+  font-size: 13px;
+}
+.node-editor .url {
+  width: 260px;
+}
+.node-editor .button {
+  box-shadow: 0 0 15px 4px #42ffb2;
+  -webkit-transition: box-shadow 0.3s ease-in;
+  -moz-transition: box-shadow 0.3s ease-in;
+  -o-transition: box-shadow 0.3s ease-in;
+  transition: box-shadow 0.3s ease-in;
+}
+.node-editor .button:disabled {
+  box-shadow: none;
+}
+/* graph */
+.jsPlumb-container {
+  margin: 3px 0;
+  border: solid 1px #cccccc;
+  height: 150px;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  /* graph node */
+  /* graph edge */
+}
+.jsPlumb-container .node {
+  border: 1px solid #2e6f9a;
+  border-radius: 8px;
+  box-shadow: 2px 2px 19px #e0e0e0;
+  box-sizing: border-box;
+  cursor: move;
+  font-size: 11px;
+  opacity: 0.8;
+  padding: 16px;
+  position: absolute;
+  max-width: 10em;
+  -webkit-transition: background-color 0.25s ease-in;
+  -moz-transition: background-color 0.25s ease-in;
+  -o-transition: background-color 0.25s ease-in;
+  transition: background-color 0.25s ease-in;
+  -webkit-transition: color 0.25s ease-in;
+  -moz-transition: color 0.25s ease-in;
+  -o-transition: color 0.25s ease-in;
+  transition: color 0.25s ease-in;
+}
+.jsPlumb-container .node:hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container .node.hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container .node.selected {
+  background-color: #df2020;
+  border-color: #ff0000;
+  color: white;
+}
+.jsPlumb-container .nodeDragHover {
+  border: 2px solid orange;
+}
+.jsPlumb-container .sourcePoint {
+  background-color: orange;
+  bottom: 37%;
+  box-shadow: 0 0 2px black;
+  cursor: pointer;
+  height: 1em;
+  right: 5px;
+  position: absolute;
+  -webkit-transition: box-shadow 0.25s ease-in;
+  -moz-transition: box-shadow 0.25s ease-in;
+  -o-transition: box-shadow 0.25s ease-in;
+  transition: box-shadow 0.25s ease-in;
+  width: 1em;
+}
+.jsPlumb-container .sourcePoint:hover {
+  box-shadow: 0 0 6px black;
+}
+.jsPlumb-container .edgeLabel.hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container .edgeLabel._jsPlumb_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container .edgeLabel.selected {
+  background-color: #df2020;
+  border-color: #ff0000;
+  color: white;
+}
+.jsPlumb-container ._jsPlumb_source_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container ._jsPlumb_target_hover {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container .edgeLabel {
+  background-color: white;
+  border: 1px solid #346789;
+  border-color: orange;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font-size: 11px;
+  opacity: 0.8;
+  padding: 0.3em;
+}
+.jsPlumb-container ._jsPlumb_connector path {
+  cursor: pointer;
+}
+.jsPlumb-container ._jsPlumb_connector.selected path:nth-child(2) {
+  stroke: #ff0000;
+}
+.jsPlumb-container ._jsPlumb_connector.selected path:nth-child(3) {
+  stroke: #ff0000;
+  fill: #ff0000;
+}
+.jsPlumb-container ._jsPlumb_connector.hover path:nth-child(2) {
+  stroke: #ffc0cb;
+}
+.jsPlumb-container ._jsPlumb_connector.hover path:nth-child(3) {
+  stroke: #ffc0cb;
+  fill: #ffc0cb;
+}
+.jsPlumb-container ._jsPlumb_hover path:nth-child(2) {
+  stroke: #ffc0cb;
+}
+.jsPlumb-container ._jsPlumb_hover path:nth-child(3) {
+  stroke: #ffc0cb;
+  fill: #ffc0cb;
+}
+.jsPlumb-container ._jsPlumb_endpoint {
+  cursor: pointer;
+}
+/* node-tabel */
+.table table {
+  border-collapse: collapse;
+  font-size: 0.9em;
+  margin-right: 10px;
+  width: 100%;
+  min-width: 300px;
+  max-width: 600px;
+}
+.table table tr {
+  height: 30px;
+}
+.table table tr.selected td {
+  color: white;
+  background-color: #df2020;
+}
+.table table tr.hover td {
+  background-color: #ffc0cb;
+}
+.table table th {
+  border: 1px solid #b9b9b9;
+  padding: 3px;
+  background-color: #ddd;
+  color: #333;
+}
+.table table th.focus {
+  width: 16px;
+}
+.table table th.label {
+  width: 180px;
+}
+.table table th.label .title {
+  display: inline-block;
+  width: 106px;
+}
+.table table td {
+  border: 1px solid #b9b9b9;
+  padding: 3px;
+  background-color: #fff;
+}
+.table table td.focus {
+  text-align: center;
+}
+.table table td.label {
+  text-align: center;
+  vertical-align: top;
+}
+.table table td.label input {
+  width: 100px;
+}
+.table table td.url .term.hover input.term {
+  background-color: rgba(255, 0, 0, 0.5);
+  text-decoration: line-through;
+}
+.table table td.url input.term {
+  width: 80%;
+  box-sizing: border-box;
+}
+.table table td.url .add [type="checkbox"] {
+  visibility: hidden;
+}
+.hidden {
+  display: none;
+}

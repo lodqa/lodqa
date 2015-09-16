@@ -1,0 +1,52 @@
+<h1>Result</h1>
+
+<h2>Query</h2>
+<div class="atext"><%= @query %></div>
+
+<h2>Parsing result (by <a href="http://kmcs.nii.ac.jp/enju/">Enju</a>)</h2>
+<div id="lodqa-parse_rendering"><%= @parse_rendering %></div>
+
+<h2>PGP (pesudo graph pattern) Editor</h2>
+<div id="lodqa-pgp" class="hidden"><%= @pgp.to_json %></div>
+
+<div class="node-editor">
+    <div class="input-node">
+        <input class="label" placeholder="New Node"></input>
+        <button class="button" disabled title="create"><i class="fa fa-plus"></i></button> to be connected as
+        <label>
+            <i>chain</i><input checked/ name="create-edge" type="radio" value="chain"></label> or
+        <label>
+            <i>star</i><input name="create-edge" type="radio" value="star"/></label>.
+    </div>
+    <div class="edit-edge hidden">
+        <label>Delete Edge</label>
+        <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>
+    </div>
+    <span class="warn"></span>
+</div>
+<div class="jsPlumb-container"></div>
+<div class="pgp hidden"></div>
+<div class="table">
+    <div class="node-table"></div>
+</div>
+<div class="mappings hidden"></div>
+
+<input id="beginSearch" type="button" value="Begin Search"></input>
+
+<h2>Search results</h2>
+<div id="lodqa-messages"></div>
+<div id="lodqa-results"></div>
+
+<script src="js/vender/springy/springy.js"></script>
+<script src="js/vender/jQuery/dist/jquery.min.js"></script>
+<script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
+<script src="js/vender/springy/springyui.js"></script>
+<script src="js/lodqa-client.js"></script>
+
+<script src="js/vender/jsplumb/dist/js/dom.jsPlumb-1.7.8.js"></script>
+<script src="js/vender/js-polyfills/keyboard.js"></script>
+<script src="js/vender/grapheditor/index.js"></script>
+<script type="text/javascript">
+    var editor = graphEditor('/lookup?dictionary_url=' + encodeURI('<%= @dictionary_url %>'))
+    editor.addPgp(JSON.parse(document.querySelector('#lodqa-pgp').innerHTML))
+</script>

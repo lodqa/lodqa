@@ -1,28 +1,2 @@
-<h1>Result</h1>
-
-<h2>Query</h2>
-<div class="atext"><%= @query %></div>
-
-<h2>Parsing result (by <a href="http://kmcs.nii.ac.jp/enju/">Enju</a>)</h2>
+<h1>Parsing result (by <a href="http://kmcs.nii.ac.jp/enju/">Enju</a>)</h1>
 <div id="lodqa-parse_rendering"><%= @parse_rendering %></div>
-
-<h2>PGP (pesudo graph pattern)</h2>
-<div id="lodqa-pgp"><%= @pgp.to_json %></div>
-
-<h2>Lexical mapping</h2>
-<ul style="color:red">
-<li>Uncheck unnecessary mappings and click the button <i>Begin Search</i>.</li>
-</ul>
-<div id="lodqa-mappings"><%= @mappings.to_json %></div>
-<br/>
-<input id="beginSerach" type="button" value="Begin Search"></input>
-
-<h2>Search results</h2>
-<div id="lodqa-messages"></div>
-<div id="lodqa-results"></div>
-
-<script src="js/vender/springy/springy.js"></script>
-<script src="js/vender/jQuery/dist/jquery.min.js"></script>
-<script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
-<script src="js/vender/springy/springyui.js"></script>
-<script src="js/lodqa-client.js"></script>
