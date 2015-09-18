@@ -5,7 +5,6 @@ require 'sinatra-websocket'
 require 'erb'
 require 'lodqa'
 require 'json'
-require 'multi_json'
 
 class LodqaWS < Sinatra::Base
 	configure do
