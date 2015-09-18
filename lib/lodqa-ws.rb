@@ -12,7 +12,7 @@ class LodqaWS < Sinatra::Base
 		set :root, File.dirname(__FILE__).gsub(/\/lib/, '')
 		set :protection, :except => :frame_options
 		set :server, 'thin'
-		set :target_db, 'http://localhost:3000/targets'
+		set :target_db, 'http://targets.lodqa.org/targets'
 
 		response = RestClient.get settings.target_db + '.json'
 		if response.code == 200
