@@ -20,7 +20,12 @@ class LodqaWS < Sinatra::Base
 		else
 			raise "target db does not respond."
 		end
+	end
 
+	configure :production do
+		logger = Logger.new(settings.root + "/log/production.log")
+		enable :logging
+		logger.level = Logger::INFO
 	end
 
 	before do
@@ -131,20 +136,21 @@ class LodqaWS < Sinatra::Base
 
 	def get_config(params)
 		# default configuration
-		config_file = 'public/configs/qald-biomed.json'
+		config_file = settings.root + '/config/default-setting.json'
 		config = JSON.parse File.read(config_file) if File.file?(config_file)
 		config = {} if config.nil?
 
 		# configuration file passed through params
 		unless params.nil?
 			unless params['config'].nil? || params['config'].empty?
+				config_url = params['config']
 				begin
 					config_add = RestClient.get config_url do |response, request, result|
 			      case response.code
 			      when 200 then JSON.parse response end
 		    	end
 		    rescue
-		    	warn "invalid url"
+		    	warn "invalid url: #{params['config']}"
 		    end
 
 		    config.merge! config_add unless config_add.nil?
