@@ -142,8 +142,8 @@ nav a {
 
 #lodqa-messages {
     position: fixed;
-    top: 40px;
-    left: 425px;
+    top: 5px;
+    right: 5px;
     width: 150px;
     height: 30px;
     text-align: center;
