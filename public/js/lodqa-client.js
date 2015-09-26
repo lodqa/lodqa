@@ -10034,7 +10034,7 @@ var _ = require('lodash'),
 
 module.exports = function(domId) {
   var onOpen = _.partial(show, document.getElementById(domId), '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>'),
-    onClose = _.partial(show, document.getElementById(domId), '<div class="lodqa-message">lodqa finished.</div>');
+    onClose = _.partial(show, document.getElementById(domId), '');
 
   return {
     onOpen: onOpen,
