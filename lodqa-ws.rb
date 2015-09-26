@@ -12,14 +12,6 @@ class LodqaWS < Sinatra::Base
 		set :protection, :except => :frame_options
 		set :server, 'thin'
 		set :target_db, 'http://targets.lodqa.org/targets'
-
-		response = RestClient.get settings.target_db + '.json'
-		if response.code == 200
-			set :targets, (JSON.parse response)
-			set :target_names, settings.targets.map{|t| t["name"]}
-		else
-			raise "target db does not respond."
-		end
 	end
 
 	configure :production do
@@ -43,12 +35,15 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/' do
+		@targets = get_targets
+
 		erb :index
 	end
 
 	get '/graphicator' do
 		config = get_config(params)
 		@query = params['query']
+		@targets = get_targets
 
 		if @query
 			parser_url = config["parser_url"]
@@ -132,6 +127,15 @@ class LodqaWS < Sinatra::Base
 
 	def ws_send(eventMachine, websocket, key, value)
 		eventMachine.add_timer(1){websocket.send({key => value}.to_json)}
+	end
+
+	def get_targets
+		response = RestClient.get settings.target_db + '.json'
+		if response.code == 200
+			JSON.parse response
+		else
+			raise "target db does not respond."
+		end
 	end
 
 	def get_config(params)

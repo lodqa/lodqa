@@ -22,10 +22,8 @@
 <h1>Term Finder</h1>
 <label for="target">Target: </label>
 <select name="target" id="target">
-<% settings.target_names.each do |n| %>
-    <% t = settings.targets.find{|t| t["name"]==n} %>
-    <% id = t["id"] %>
-    <option value="<%= settings.target_db + '/' + id.to_s + '.json' %>"><%= n %></option>
+<% @targets.each do |t| %>
+    <option value="<%= settings.target_db + '/' + t["id"].to_s + '.json' %>"><%= t["name"] %></option>
 <% end %>
 </select>
 
