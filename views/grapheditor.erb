@@ -1,4 +1,6 @@
-<h1>Graph Editor</h1>
+<h1>Graph Editor
+<i title="2. Edit the graph generated from a natural language query, or compose a new graph from scratch." class="help-icon fa fa-info-circle"></i>
+</h1>
 <div id="lodqa-pgp" class="hidden"><%= @pgp.to_json %></div>
 
 <div class="node-editor">
@@ -19,7 +21,9 @@
 <div class="jsPlumb-container"></div>
 <div class="pgp hidden"></div>
 
-<h1>Term Finder</h1>
+<h1>Term Finder
+<i title="3. Find the terms corresponding to the parts of your graph. Do not forget to choose the focus node of your query." class="help-icon fa fa-info-circle"></i>
+</h1>
 <label for="target">Target: </label>
 <select name="target" id="target">
 <% @targets.each do |t| %>

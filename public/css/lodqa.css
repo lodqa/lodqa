@@ -257,12 +257,13 @@ h3 {
     font-size: medium;
 }
 
-
-
+.help-icon {
+    margin: 0 10px;
+    color: #88f;
+}
 
 #buttons {text-align:right; margin:5px; padding:5px}
 #pages   {text-align:center; margin:5px; padding:5px}
-
 
 
 table.list {
@@ -288,21 +289,6 @@ div.atext {
     width:800px;
     line-height:120%
 }
-
-.Focus {
-    display:inline-block;
-    margin-top:1px;
-    margin-bottom:1px;
-    background-color:#EECCCC;
-}
-
-.BNC {
-    display:inline-block;
-    margin-top:1px;
-    margin-bottom:1px;
-    background-color:#EEEECC;
-}
-
 
 #config {background-color: #EEEEEE}
 
