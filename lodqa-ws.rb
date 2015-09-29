@@ -21,7 +21,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	before do
-		if request.content_type && request.content_type.downcase == 'application/json'
+		if request.content_type && request.content_type.downcase.include?('application/json')
 			body = request.body.read
 			begin
 				json_params = JSON.parse body unless body.empty?
