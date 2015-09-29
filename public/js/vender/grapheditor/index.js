@@ -512,6 +512,8 @@ function hasTermChange(newTerms, currentTerms) {
 }
 
 function setUrl(nodeMap, mappings) {
+  console.assert(mappings, 'mappings is required to setUrl');
+
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
   var _iteratorError = undefined;
@@ -1835,6 +1837,10 @@ exports['default'] = function (nodes, lookupUrl, dictionaryUrl, labels) {
       "keywords": labels
     }).end(function (err, res) {
       if (!err) {
+        if (!res.body) {
+          console.warn('lookup result is empty.', url);
+          return;
+        }
         nodes.setUrl(res.body);
 
         resolve({
