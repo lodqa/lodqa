@@ -1,5 +1,8 @@
 <div id="logo">
 <a href="<%= request.base_url %>"><img src="images/logo.svg" alt="LODQA" id='logo' title="Question-Answering over Linked Open Data" /></a>
+<% if !params['for'].nil? && !params['for'].empty? %>
+	@<%= target['name'] %>
+<% end %>
 </div>
 
 <nav id="main-nav">
@@ -9,5 +12,3 @@
   <li><a href="https://github.com/lodqa/lodqa">github</a></li>
 </ul>
 </nav>
-<br/>
-<br/>
