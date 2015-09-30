@@ -20,22 +20,34 @@ a:hover {color:#222288}
 
 #dashboard {
     position:fixed;
-    left: 2px;
-    top: 2px;
-    width: 550px;
+    left: 0px;
+    top: 0px;
+    width: 570px;
     max-height: 97%;
     overflow: auto;
 }
 
 #header {
-    height: 40px;
+    display:block;
+    height: 50px;
+    margin: 0;
+    margin-bottom: 20px;
+}
+
+#logo-box {
+    display: inline-block;
+    vertical-align: top;
+    height: 100%;
+    margin-right: 5px;
 }
 
 #logo {
-    display: inline-block;
-    vertical-align: top;
-    width: 120px;
-    margin-right: 5px;
+    vertical-align: bottom;
+    height: 100%;
+}
+
+#target-display {
+    font-size: x-large;
 }
 
 #slogan {
@@ -83,37 +95,38 @@ a:hover {color:#222288}
 @media (max-width: 1350px) {
     #subboard {
         position: absolute;
-        top: 4px;
-        right: 4px;
+        top: 20px;
+        right: 54px;
         width: 700px;
         padding-left: 30px;
         z-index: -1;
     }
     #results {
         position: absolute;
-        top: 20px;
+        top: 40px;
         right: 4px;
-        width: 750px;
+        width: 740px;
         padding-left: 30px;
+        z-index: -2;
     }
 }
 
 @media (min-width: 1351px) {
     #subboard {
         position: absolute;
-        top: 4px;
-        left: 550px;
+        top: 20px;
+        left: 560px;
         width: 700px;
         padding-left: 30px;
         z-index: -1;
     }
     #results {
         position: absolute;
-        top: 20px;
-        left: 555px;
-        width: 750px;
+        top: 40px;
+        left: 570px;
+        width: 740px;
         padding-left: 30px;
-        z-index: -1;
+        z-index: -2;
     }
 }
 
@@ -158,8 +171,8 @@ nav a {
 
 #lodqa-messages {
     position: fixed;
-    top: 5px;
-    right: 5px;
+    top: 4px;
+    right: 4px;
     width: 150px;
     height: 30px;
     text-align: center;

@@ -170,7 +170,7 @@
 }
 .table table th.label .title {
   display: inline-block;
-  width: 106px;
+  width: 96px;
 }
 .table table td {
   border: 1px solid #b9b9b9;
@@ -185,7 +185,7 @@
   vertical-align: top;
 }
 .table table td.label input {
-  width: 100px;
+  width: 88px;
 }
 .table table td.url .term.hover input.term {
   background-color: rgba(255, 0, 0, 0.5);

@@ -33,9 +33,8 @@ window.onload = function() {
     var mappingsElement = document.querySelector('.mappings');
     var pgp = JSON.parse(pgpElement.innerHTML);
     var mappings = JSON.parse(mappingsElement.innerHTML);
-    var config_url = document.querySelector('#target').value;
-    console.log(config_url);
-    loader.beginSearch(pgp, mappings, '/solutions', config_url);
+    var config = document.querySelector('#target').value;
+    loader.beginSearch(pgp, mappings, '/solutions', config);
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })

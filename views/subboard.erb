@@ -1,0 +1,80 @@
+<h1>Target Configuration</h1>
+<label for="target">Choose a target: </label>
+<select name="target" id="target">
+<% @targets.each do |t| %>
+    <option value="<%= t["name"] %>"><%= t["name"] %></option>
+<% end %>
+</select>
+
+<div id="sample_queries"></div>
+
+<h1>Caveats</h1>
+<ul style="color:#555555">
+	<li>It is a demo system which is meant to show how current state of LODQA works for a given query.</li>
+	<li>The current interface is designed for developers, not for end users.</li>
+	<ul>
+		<li>It will show all the intermediate results including parsing results, lexical mappings, and automatically generated SPARQL queries.</li>
+		<li>The automatically generated SPARQL queries will get only <u>10 results</u> at most.<br/>See the last part of each query (<i>LIMIT 10</i>).</li>
+		<li>To get the full results, the query without the LIMIT modifier has be to excuted, which however will be implemented in the upcoming interface for end users.</li>
+	</ul>
+</ul>
+
+
+<script type="text/javascript">
+    var targets = <%= @targets.to_json %>;
+    var targeth = {};
+    for (var i=0; i<targets.length; i++) {
+    	targeth[targets[i]["name"]] = targets[i];
+    }
+
+    var param_target = '<%= @target %>';
+    var target = document.querySelector('#target').options[0].value;
+    if (param_target) {
+    	target = param_target;
+    }
+
+	document.querySelector('#target').value = target;
+
+    var editor = graphEditor('/termfinder');
+    editor.addPgp(JSON.parse(document.querySelector('#lodqa-pgp').innerHTML));
+
+    changeTarget(editor, targeth[target]);
+
+    var selector = document.querySelector('#target');
+    selector.addEventListener('change', function() {
+        changeTarget(editor, targeth[selector.value]);
+    });
+
+
+    function changeTarget(editor, config) {
+		var dicUrl = config["dictionary_url"];
+		editor.setDictionaryUrl(dicUrl);
+
+		// to setup sample queries
+		var sample_queries = config["sample_queries"];
+		if (sample_queries) {
+		    $("#sample_queries").html('<fieldset style="display:inline-block"><legend>Sample queries</legend><ul><li><a>' + sample_queries.join('</a></li><li><a>') + '</a></li></ul></fieldset>');
+		   setQueriesCopiable();
+		} else {
+		    $("#sample_queries").html('');
+		}
+
+		// to setup target in NLQ form
+		document.querySelector('#nlqform input[name="target"]').value = config["name"];
+        if (config["home"]) {
+            document.querySelector('#target-display').innerHTML = '@<a href="' + config["home"] + '">' + config["name"] + '</a>';
+        }
+        else {
+            document.querySelector('#target-display').innerHTML = "@" + config["name"];
+        }
+    }
+
+    function setQueriesCopiable () {
+        $('#sample_queries a').on('click', function() {
+            $("#query").val($(this).text());
+        });     
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    }, false);
+</script>

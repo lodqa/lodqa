@@ -1,8 +1,6 @@
-<div id="logo">
+<div id="logo-box">
 <a href="<%= request.base_url %>"><img src="images/logo.svg" alt="LODQA" id='logo' title="Question-Answering over Linked Open Data" /></a>
-<% if !params['for'].nil? && !params['for'].empty? %>
-	@<%= target['name'] %>
-<% end %>
+<span id="target-display"></span>
 </div>
 
 <nav id="main-nav">

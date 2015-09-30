@@ -1,6 +1,6 @@
 {
   "name": "js-polyfills",
-  "version": "0.1.6",
+  "version": "0.1.11",
   "homepage": "https://github.com/inexorabletash/polyfill",
   "authors": [
     "Joshua Bell <inexorabletash@gmail.com>"
@@ -9,11 +9,15 @@
   "main": [
     "es5.js",
     "es6.js",
-    "web.js",
-    "keyboard.js",
-    "typedarray.js",
+    "html.js",
+    "dom.js",
+    "xhr.js",
     "url.js",
-    "fetch.js"
+    "fetch.js",
+    "cssom.js",
+    "timing.js",
+    "keyboard.js",
+    "typedarray.js"
   ],
   "keywords": [
     "polyfill",
@@ -27,11 +31,11 @@
     "obsolete",
     "tests"
   ],
-  "_release": "0.1.6",
+  "_release": "0.1.11",
   "_resolution": {
     "type": "version",
-    "tag": "v0.1.6",
-    "commit": "81869b2e5190bc67a67904a6c16c11cdc1be036c"
+    "tag": "v0.1.11",
+    "commit": "85f2c88e2e324cdfd786985285d79af5b925d141"
   },
   "_source": "git://github.com/inexorabletash/polyfill.git",
   "_target": "~0.1.6",

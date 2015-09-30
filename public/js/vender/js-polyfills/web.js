@@ -34,8 +34,11 @@
         var attr = this.attributes[i];
         if (attr.specified && attr.name.substring(0, 5) === 'data-') {
           (function(element, name) {
-            result[name] = element.getAttribute('data-' + name); // Read-only, for IE8-
-            Object.defineProperty(result, name, {
+            var prop = name.replace(/-([a-z])/g, function(m, p) {
+              return p.toUpperCase();
+            });
+            result[prop] = element.getAttribute('data-' + name); // Read-only, for IE8-
+            Object.defineProperty(result, prop, {
               get: function() {
                 return element.getAttribute('data-' + name);
               },
@@ -750,7 +753,7 @@
       if (init)
         pairs = parse(init);
 
-      this._setPairs = function (list) { pairs = list; };
+      this._setPairs = function (list) { if (!updating) pairs = list; };
       this._updateSteps = function () { updateSteps(); };
 
       var updating = false;
@@ -759,6 +762,11 @@
         updating = true;
 
         // TODO: For all associated url objects
+
+        // Partial workaround for IE issue with 'about:'
+        if (url_object.protocol === 'about:' && url_object.pathname.indexOf('?') !== -1)
+          url_object.pathname = url_object.pathname.split('?')[0];
+
         url_object.search = serialize(pairs);
 
         updating = false;
@@ -1359,7 +1367,8 @@
 
   // Constructor(optional FetchBodyInit body, optional ResponseInit init)
   function Response(body, init) {
-    if (arguments.length < 1) throw TypeError('Not enough arguments');
+    if (arguments.length < 1)
+      body = '';
 
     this.headers = new Headers();
     this.headers._guard = 'response';
@@ -1370,6 +1379,7 @@
       this.type = 'basic'; // TODO: ResponseType
       this.url = ScalarValueString(xhr._url);
       this.status = xhr.status;
+      this.ok = 200 <= this.status && this.status <= 299;
       this.statusText = xhr.statusText;
       xhr.getAllResponseHeaders()
         .split(/\r?\n/)
@@ -1390,14 +1400,18 @@
     this.url = '';
 
     // readonly attribute unsigned short status;
-    if ('status' in init) {
-      if (ushort(init.status) < 200 || ushort(init.status) > 599) throw RangeError();
-      this.status = ushort(init.status);
-    }
+    var status = 'status' in init ? ushort(init.status) : 200;
+    if (status < 200 || status > 599) throw RangeError();
+    this.status = status;
+
+    // readonly attribute boolean ok;
+    this.ok = 200 <= this.status && this.status <= 299;
 
     // readonly attribute ByteString statusText;
-    if ('statusText' in init)
-      this.statusText = String(init.statusText); // TODO: Validate
+    var statusText = 'statusText' in init ? String(init.statusText) : 'OK';
+    console.log(JSON.stringify(statusText));
+    if (/[^\x00-\xFF]/.test(statusText)) throw TypeError();
+    this.statusText = statusText;
 
     // readonly attribute Headers headers;
     if ('headers' in init) fill(this.headers, init);
@@ -1689,7 +1703,7 @@
       if (init)
         pairs = parse(init);
 
-      this._setPairs = function (list) { pairs = list; };
+      this._setPairs = function (list) { if (!updating) pairs = list; };
       this._updateSteps = function () { updateSteps(); };
 
       var updating = false;
@@ -1698,6 +1712,11 @@
         updating = true;
 
         // TODO: For all associated url objects
+
+        // Partial workaround for IE issue with 'about:'
+        if (url_object.protocol === 'about:' && url_object.pathname.indexOf('?') !== -1)
+          url_object.pathname = url_object.pathname.split('?')[0];
+
         url_object.search = serialize(pairs);
 
         updating = false;
@@ -2298,7 +2317,8 @@
 
   // Constructor(optional FetchBodyInit body, optional ResponseInit init)
   function Response(body, init) {
-    if (arguments.length < 1) throw TypeError('Not enough arguments');
+    if (arguments.length < 1)
+      body = '';
 
     this.headers = new Headers();
     this.headers._guard = 'response';
@@ -2309,6 +2329,7 @@
       this.type = 'basic'; // TODO: ResponseType
       this.url = ScalarValueString(xhr._url);
       this.status = xhr.status;
+      this.ok = 200 <= this.status && this.status <= 299;
       this.statusText = xhr.statusText;
       xhr.getAllResponseHeaders()
         .split(/\r?\n/)
@@ -2329,14 +2350,18 @@
     this.url = '';
 
     // readonly attribute unsigned short status;
-    if ('status' in init) {
-      if (ushort(init.status) < 200 || ushort(init.status) > 599) throw RangeError();
-      this.status = ushort(init.status);
-    }
+    var status = 'status' in init ? ushort(init.status) : 200;
+    if (status < 200 || status > 599) throw RangeError();
+    this.status = status;
+
+    // readonly attribute boolean ok;
+    this.ok = 200 <= this.status && this.status <= 299;
 
     // readonly attribute ByteString statusText;
-    if ('statusText' in init)
-      this.statusText = String(init.statusText); // TODO: Validate
+    var statusText = 'statusText' in init ? String(init.statusText) : 'OK';
+    console.log(JSON.stringify(statusText));
+    if (/[^\x00-\xFF]/.test(statusText)) throw TypeError();
+    this.statusText = statusText;
 
     // readonly attribute Headers headers;
     if ('headers' in init) fill(this.headers, init);

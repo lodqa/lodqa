@@ -9386,9 +9386,8 @@ window.onload = function() {
     var mappingsElement = document.querySelector('.mappings');
     var pgp = JSON.parse(pgpElement.innerHTML);
     var mappings = JSON.parse(mappingsElement.innerHTML);
-    var config_url = document.querySelector('#target').value;
-    console.log(config_url);
-    loader.beginSearch(pgp, mappings, '/solutions', config_url);
+    var config = document.querySelector('#target').value;
+    loader.beginSearch(pgp, mappings, '/solutions', config);
     loader.once('ws_close', function() {
       $target.removeAttr('disabled');
     })
@@ -9754,10 +9753,9 @@ var EventEmitter = require('events').EventEmitter,
 
 module.exports = function() {
   var emitter = new EventEmitter,
-    openConnection = function(pathname, config_url) {
-      var ws_url = 'ws://' + location.host + pathname + '?config=' + config_url;
-      console.log(ws_url);
-      var ws = new WebSocket('ws://' + location.host + pathname + '?config=' + config_url)
+    openConnection = function(pathname, config) {
+      var ws_url = 'ws://' + location.host + pathname + '?target=' + config;
+      var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config)
 
       ws.onopen = function() {
         emitter.emit('ws_open');
@@ -9782,8 +9780,8 @@ module.exports = function() {
     };
 
   return _.extend(emitter, {
-    beginSearch: function(pgp, mappings, pathname, config_url) {
-      var ws = openConnection(pathname, config_url);
+    beginSearch: function(pgp, mappings, pathname, config) {
+      var ws = openConnection(pathname, config);
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
           pgp: pgp,

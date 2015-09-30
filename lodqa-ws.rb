@@ -161,6 +161,8 @@ class LodqaWS < Sinatra::Base
 	    config.merge! config_add unless config_add.nil?
 	  end
 
+	  config['dictionary_url']    = params['dictionary_url']    unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
+
 	  config
 	end
 end

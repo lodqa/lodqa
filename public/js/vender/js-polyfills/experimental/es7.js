@@ -141,6 +141,20 @@
   var SameValue = Object.is;
 
   //----------------------------------------
+  // 7.3 Operations on Objects
+  //----------------------------------------
+
+  // 7.3.4
+  function CreateDataProperty(O, P, V) {
+    Object.defineProperty(O, P, {
+      value: V,
+      writable: true,
+      enumerable: true,
+      configurable: true
+    });
+  }
+
+  //----------------------------------------
   // 9 ECMAScript Ordinary and Exotic Objects Behaviors
   //----------------------------------------
 
@@ -197,12 +211,16 @@
     Object, 'getOwnPropertyDescriptors',
     function getOwnPropertyDescriptors(o) {
       var obj = ToObject(o);
+      // ReturnIfAbrupt(obj)
       var keys = Object.getOwnPropertyNames(obj);
+      // ReturnIfAbrupt(keys)
       var descriptors = {};
       for (var i = 0; i < keys.length; ++i) {
         var nextKey = keys[i];
-        var desc = Object.getOwnPropertyDescriptor(obj, nextKey);
-        descriptors[nextKey] = desc;
+        var descriptor = Object.getOwnPropertyDescriptor(obj, nextKey);
+        // ReturnIfAbrupt(desc)
+        // ReturnIfAbrupt(descriptor)
+        CreateDataProperty(descriptors, nextKey, descriptor);
       }
       return descriptors;
     });
@@ -271,13 +289,6 @@
       return Object.keys(o).map(function(p) { return [p, o[p]]; });
     });
 
-  // http://esdiscuss.org/topic/regexp-escape
-  define(
-    RegExp, 'escape',
-    function escape(s) {
-      return String(s).replace(/[^a-zA-Z0-9]/g, '\\$&');
-    });
-
   // http://wiki.ecmascript.org/doku.php?id=strawman:string_at
   define(
     String.prototype, 'at',
@@ -298,43 +309,68 @@
 
   // http://wiki.ecmascript.org/doku.php?id=strawman:string_padding
   define(
-    String.prototype, 'lpad',
-    function lpad() {
-      var minLength = arguments[0];
-      var fillStr = arguments[1];
+    String.prototype, 'padLeft',
+    function padLeft(maxLength) {
+      var fillString = arguments[1];
 
+      var o = this;
+      // ReturnIfAbrupt(o)
       var s = String(this);
-      if (minLength === undefined) return s; // NOTE: Wiki is bogus here
-      var intMinLength = ToInteger(minLength);
-      var fillLen = intMinLength - s.length; // NOTE: Wiki is bogus here
-      if (fillLen < 0) throw RangeError();
-      if (fillLen === Infinity) throw RangeError();
-      var sFillStr = String(fillStr);
-      if (fillStr === undefined) sFillStr = ' '; // NOTE: Wiki is bogus here
-      var sFillVal = '';
-      while (sFillVal.length < fillLen) sFillVal += sFillStr;
-      return sFillVal + s;
+      // ReturnIfAbrupt(s)
+      var stringLength = s.length;
+      if (fillString === undefined) var fillStr = '';
+      else fillStr = String(fillString);
+      // ReturnIfAbrupt(fillStr)
+      if (fillStr === '') fillStr = ' ';
+      var intMaxLength = ToLength(maxLength);
+      // ReturnIfAbrupt(intMaxLength)
+      if (intMaxLength <= stringLength) return s;
+      var fillLen = intMaxLength - stringLength;
+      var stringFiller = '';
+      while (stringFiller.length < fillLen)
+        stringFiller = stringFiller + fillStr;
+      return stringFiller.substring(0, fillLen) + s;
     });
 
   // http://wiki.ecmascript.org/doku.php?id=strawman:string_padding
   define(
-    String.prototype, 'rpad',
-    function rpad() {
-      var minLength = arguments[0];
-      var fillStr = arguments[1];
+    String.prototype, 'padRight',
+    function padRight(maxLength) {
+      var fillString = arguments[1];
 
+      var o = this;
+      // ReturnIfAbrupt(o)
       var s = String(this);
-      if (minLength === undefined) return s; // NOTE: Wiki is bogus here
-      var intMinLength = ToInteger(minLength);
-      var fillLen = intMinLength - s.length; // NOTE: Wiki is bogus here
-      if (fillLen < 0) throw RangeError();
-      if (fillLen === Infinity) throw RangeError();
-      var sFillStr = String(fillStr);
-      if (fillStr === undefined) sFillStr = ' '; // NOTE: Wiki is bogus here
-      var sFillVal = '';
-      while (sFillVal.length < fillLen) sFillVal += sFillStr;
-      return s + sFillVal;
+      // ReturnIfAbrupt(s)
+      var stringLength = s.length;
+      if (fillString === undefined) var fillStr = '';
+      else fillStr = String(fillString);
+      // ReturnIfAbrupt(fillStr)
+      if (fillStr === '') fillStr = ' ';
+      var intMaxLength = ToLength(maxLength);
+      // ReturnIfAbrupt(intMaxLength)
+      if (intMaxLength <= stringLength) return s;
+      var fillLen = intMaxLength - stringLength;
+      var stringFiller = '';
+      while (stringFiller.length < fillLen)
+        stringFiller = stringFiller + fillStr;
+      return s + stringFiller.substring(0, fillLen);
     });
+
+  // https://gist.github.com/DmitrySoshnikov/65a2070477fffb465048
+  define(
+    String.prototype, 'trimLeft',
+    function trimLeft() {
+      return String(this).replace(/^\s+/, '');
+    });
+
+  // https://gist.github.com/DmitrySoshnikov/65a2070477fffb465048
+  define(
+    String.prototype, 'trimRight',
+    function trimRight() {
+      return String(this).replace(/\s+$/, '');
+    });
+
 
   var MIN_NORMALIZED_F32 = Math.pow(2,-126);
   var MIN_NORMALIZED_F64 = Math.pow(2,-1022);
