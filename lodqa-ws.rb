@@ -11,7 +11,8 @@ class LodqaWS < Sinatra::Base
 		set :root, File.dirname(__FILE__).gsub(/\/lib/, '')
 		set :protection, :except => :frame_options
 		set :server, 'thin'
-		set :target_db, 'http://targets.lodqa.org/targets'
+		# set :target_db, 'http://targets.lodqa.org/targets'
+		set :target_db, 'http://localhost:3000/targets'
 	end
 
 	configure :production do
@@ -35,18 +36,21 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/' do
+		@config  = get_config(params)
 		@targets = get_targets
 
 		erb :index
 	end
 
 	get '/graphicator' do
-		config = get_config(params)
-		@query = params['query']
+		@config = get_config(params)
 		@targets = get_targets
 
+		@query  = params['query'] unless params['query'].nil?
+		@target = params['target'] unless params['target'].nil?
+
 		if @query
-			parser_url = config["parser_url"]
+			parser_url = @config["parser_url"]
 			g = Lodqa::Graphicator.new(parser_url)
 			g.parse(@query)
 			@parse_rendering = g.get_rendering
@@ -75,10 +79,6 @@ class LodqaWS < Sinatra::Base
 		headers \
 			"Access-Control-Allow-Origin" => "*",
 			"Access-Control-Allow-Headers" => "Content-Type"
-	end
-
-	get '/test' do
-		erb :test
 	end
 
 	get '/solutions' do
@@ -132,7 +132,7 @@ class LodqaWS < Sinatra::Base
 	def get_targets
 		response = RestClient.get settings.target_db + '.json'
 		if response.code == 200
-			JSON.parse response
+			(JSON.parse response).delete_if{|t| t["publicity"] == false}
 		else
 			raise "target db does not respond."
 		end
@@ -144,30 +144,22 @@ class LodqaWS < Sinatra::Base
 		config = JSON.parse File.read(config_file) if File.file?(config_file)
 		config = {} if config.nil?
 
-		# configuration file passed through params
-		unless params.nil?
-			unless params['config'].nil? || params['config'].empty?
-				config_url = params['config']
-				begin
-					config_add = RestClient.get config_url do |response, request, result|
-			      case response.code
-			      when 200 then JSON.parse response end
-		    	end
-		    rescue
-		    	warn "invalid url: #{params['config']}"
-		    end
+		# target name passed through params
+		unless params['target'].nil?
+			target_url = settings.target_db + '/' + params['target'] + '.json'
+			begin
+				config_add = RestClient.get target_url do |response, request, result|
+		      case response.code
+		      	when 200 then JSON.parse response
+		      	else raise IOError, "invalid target"
+		      end
+	    	end
+	    rescue
+	    	raise IOError, "invalid target"
+	    end
 
-		    config.merge! config_add unless config_add.nil?
-		  end
-
-		  config['endpoint_url']      = params['endpoint_url']      unless params['endpoint_url'].nil?   || params['endpoint_url'].strip.empty?
-		  config['graph_uri']         = params['graph_uri']         unless params['graph_uri'].nil?      || params['graph_uri'].strip.empty?
-		  config['dictionary_url']    = params['dictionary_url']    unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
-		  config['parser_url']        = params['parser_url']        unless params['parser_url'].nil?     || params['parser_url'].strip.empty?
-		  config['max_hop']           = params['max_hop'].to_i      unless params['max_hop'].nil?        || params['max_hop'].strip.empty?
-		  config['ignore_predicates'] = params['ignore_predicates'].split unless params['ignore_predicates'].nil? || params['ignore_predicates'].strip.empty?
-		  config['sortal_predicates'] = params['sortal_predicates'].split unless params['sortal_predicates'].nil? || params['sortal_predicates'].strip.empty?
-		end
+	    config.merge! config_add unless config_add.nil?
+	  end
 
 	  config
 	end

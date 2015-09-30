@@ -53,13 +53,13 @@ a:hover {color:#222288}
 }
 
 #main-nav li {
-    margin-right: 3px;
+    margin: 0;
 }
 
 #main-nav li a {
     border-radius: 5px;
     font-weight: 800;
-    padding: 0.2em 1em;
+    padding: 0.2em 0.4em;
     text-shadow: none;
     text-transform: uppercase;
     transition: all .25s;
@@ -68,7 +68,7 @@ a:hover {color:#222288}
 }
 
 #main-nav li a:hover {
-  background: #959595;
+  background: #ffffee;
   box-shadow: inset 0 1px 3px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.1);
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
 }
@@ -81,21 +81,36 @@ a:hover {color:#222288}
 }
 
 @media (max-width: 1350px) {
-    #main {
+    #subboard {
         position: absolute;
         top: 4px;
         right: 4px;
-        width: 750px;
+        width: 700px;
         padding-left: 30px;
         z-index: -1;
+    }
+    #results {
+        position: absolute;
+        top: 20px;
+        right: 4px;
+        width: 750px;
+        padding-left: 30px;
     }
 }
 
 @media (min-width: 1351px) {
-    #main {
+    #subboard {
         position: absolute;
         top: 4px;
         left: 550px;
+        width: 700px;
+        padding-left: 30px;
+        z-index: -1;
+    }
+    #results {
+        position: absolute;
+        top: 20px;
+        left: 555px;
         width: 750px;
         padding-left: 30px;
         z-index: -1;
@@ -122,12 +137,13 @@ nav a {
 
 #query {
     display: inline-block;
-    width: 440px;
+    width: 420px;
     height: 30px;
     padding: 0;
 }
 
 #graphicateButton {
+    display: inline-block;
     height: 34px;
 }
 

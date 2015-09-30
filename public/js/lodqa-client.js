@@ -9378,7 +9378,7 @@ window.onload = function() {
   bindParseRenderingPresentation(loader);
 
   $('#beginSearch').on('click', function(e) {
-    document.getElementById("container").innerHTML = '<h1>Results</h1><div id="lodqa-results"></div>';
+    document.getElementById("results").innerHTML = '<h1>Results</h1><div id="lodqa-results"></div>';
 
     var $target = $(e.target);
     $target.attr('disabled', 'disabled');
@@ -9395,15 +9395,22 @@ window.onload = function() {
   });
 
   $('#dashboard').on('click', function(e) {
-    $(this).css("z-index", "1")
-    $('#main').css("z-index", "-1")
+    $(this).css("z-index", 1);
+    $('#subboard').css("z-index", -1);
+    $('#results').css("z-index", -1);
   });
 
-  $('#main').on('click', function(e) {
-    $(this).css("z-index", "1")
-    $('#dashboard').css("z-index", "-1")
+  $('#subboard').on('click', function(e) {
+    $(this).css("z-index", 1);
+    $('#dashboard').css("z-index", -1);
+    $('#results').css("z-index", -1);
   });
 
+  $('#results').on('click', function(e) {
+    $(this).css("z-index", 1);
+    $('#dashboard').css("z-index", -1);
+    $('#subboard').css("z-index", -1);
+  });
 };
 
 },{"./controller/bindResult":14,"./loader/loadSolution":21,"./presentation/anchoredPgpTablePresentation":22,"./presentation/graphPresentation":23,"./presentation/solutionTablePresentation":25,"./presentation/sparqlTablePresentation":26,"./presentation/websocketPresentation":28}],16:[function(require,module,exports){

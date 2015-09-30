@@ -10,29 +10,17 @@
 <body>
 
 <div id="dashboard" class="frame">
-
-<div id="header">
-	<%= erb :header %>
+	<%= erb :dashboard %>
 </div>
 
-<div id="nlq">
-	<%= erb :nlq %>
+<div id="subboard" class="frame">
+	<%= erb :subboard %>
 </div>
 
-<div id="grapheditor">
-	<%= erb :grapheditor %>
+<div id="results" class="frame">
+	<%= erb :results %>
 </div>
 
-<div id="runner">
-	<%= erb :runner %>
-</div>
-
-</div>
-
-<div id="main" class="frame">
-<div id="lodqa-messages"></div>
-<%= erb :container %>
-</div>
 
 </body>
 </html>

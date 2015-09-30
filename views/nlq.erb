@@ -1,13 +1,8 @@
 <h1>Natural Language Query
-<i title="1. Begin with a natural language query, then graphicate it!" class="help-icon fa fa-info-circle"></i>
+<i title="Begin with a natural language query, then graphicate it!" class="help-icon fa fa-info-circle"></i>
 </h1>
-<!-- 
-<form action="/"
-      method="get"
-      entype="multipart/form-data"
-      oninput="max_hop_value.value=max_hop.value">
- -->
-<form	action="/graphicator"
+<form	id="nlqform"
+		action="/graphicator"
      	method="get"
      	entype="multipart/form-data">
 
@@ -16,9 +11,11 @@
 		<% if @query %>
 		value="<%= @query %>"
 		<% end %>
-	   placeholder="Enter a natural language query." />
+		placeholder="Enter a natural language query." />
+
+<input	name = "target"
+		hidden = "hidden" />
 
 <input id="graphicateButton" type="submit"
 	   value="Graphicate!" />
 </form>
-
