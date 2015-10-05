@@ -10,6 +10,7 @@
     "multiline": "^1.0.1"
   },
   "devDependencies": {
+    "babelify": "^6.3.0",
     "eslint": "^1.6.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.1",
