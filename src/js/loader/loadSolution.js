@@ -1,10 +1,8 @@
-var EventEmitter = require('events').EventEmitter,
-  _ = require('lodash')
+var EventEmitter = require('events').EventEmitter
 
 module.exports = function() {
   var emitter = new EventEmitter,
     openConnection = function(pathname, config) {
-      var ws_url = 'ws://' + location.host + pathname + '?target=' + config
       var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config)
 
       ws.onopen = function() {
@@ -29,7 +27,7 @@ module.exports = function() {
       return ws
     }
 
-  return _.extend(emitter, {
+  return Object.assign(emitter, {
     beginSearch: function(pgp, mappings, pathname, config) {
       var ws = openConnection(pathname, config)
       emitter.once('ws_open', function() {

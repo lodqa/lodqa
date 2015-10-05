@@ -1640,7 +1640,7 @@ var data_split_to_3 = {
 module.exports = function() {
   var emitter = new EventEmitter
 
-  return _.extend(emitter, {
+  return Object.assign(emitter, {
     beginSearch: _.partial(start, emitter)
   })
 }

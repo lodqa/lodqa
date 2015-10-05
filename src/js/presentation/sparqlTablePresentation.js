@@ -23,23 +23,23 @@ var _ = require('lodash'),
     */
   }),
   toLastOfUrl = require('./toLastOfUrl'),
-  privateData = {};
+  privateData = {}
 
 module.exports = {
   onAnchoredPgp: function(domId, anchored_pgp) {
-    privateData.domId = domId;
-    privateData.focus = anchored_pgp.focus;
+    privateData.domId = domId
+    privateData.focus = anchored_pgp.focus
   },
   onSparql: function(sparql) {
     var html = reigonTemplate.render({
         sparql: sparql
       }),
-      $region = $(html);
+      $region = $(html)
 
-    privateData.currentAnswerList = $region.find('.answer-list');
+    privateData.currentAnswerList = $region.find('.answer-list')
 
     $('#' + privateData.domId)
-      .append($region);
+      .append($region)
   },
   onSolution: function(solution) {
     var focusInstanceId = _.first(
@@ -47,13 +47,13 @@ module.exports = {
         .filter(instance.is)
         .filter(_.partial(instance.isNodeId, privateData.focus))
       ),
-      label = toLastOfUrl(solution[focusInstanceId]);
+      label = toLastOfUrl(solution[focusInstanceId])
 
     privateData.currentAnswerList
       .append(
         instanceTemplate.render({
           instance: label
         })
-      );
+      )
   }
-};
+}

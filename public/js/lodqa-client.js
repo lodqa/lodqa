@@ -9335,11 +9335,12 @@ module.exports = function (a, element) {
 },{}],14:[function(require,module,exports){
 'use strict';
 
-var _ = require('lodash'),
-    bindAnchoredPgpPresentation = function bindAnchoredPgpPresentation(loader, presentation) {
+var bindAnchoredPgpPresentation = function bindAnchoredPgpPresentation(loader, presentation) {
   var domId = 'lodqa-results';
 
-  loader.on('anchored_pgp', _.partial(presentation.onAnchoredPgp, domId));
+  loader.on('anchored_pgp', function (anchoredPgp) {
+    return presentation.onAnchoredPgp(domId, anchoredPgp);
+  });
 },
     bindResultPresentation = function bindResultPresentation(loader, presentation) {
   bindAnchoredPgpPresentation(loader, presentation);
@@ -9352,7 +9353,7 @@ var _ = require('lodash'),
 
 module.exports = bindResult;
 
-},{"lodash":5}],15:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -9552,8 +9553,7 @@ var _ = require('lodash'),
   };
 },
     toLeftId = function toLeftId(edge, pathInfo) {
-  var anchoredPgpNodeId = edge.subject,
-      instanceNodeId = 'i' + anchoredPgpNodeId;
+  var anchoredPgpNodeId = edge.subject;
 
   return {
     transitNodeId: 'x' + pathInfo.no + (pathInfo.childNo - 1),
@@ -9562,8 +9562,7 @@ var _ = require('lodash'),
   };
 },
     toRightId = function toRightId(edge, pathInfo) {
-  var anchoredPgpNodeId = edge.object,
-      instanceNodeId = 'i' + anchoredPgpNodeId;
+  var anchoredPgpNodeId = edge.object;
 
   return {
     transitNodeId: 'x' + pathInfo.no + pathInfo.childNo,
@@ -9701,7 +9700,7 @@ var _ = require('lodash'),
   y: -40
 }]],
     setPosition = function setPosition(number_of_nodes, term, index) {
-  return _.extend(term, {
+  return Object.assign(term, {
     position: anchoredPgpNodePositions[number_of_nodes][index]
   });
 };
@@ -9753,7 +9752,7 @@ var _ = require('lodash'),
   nodes.map(_.partial(setFocus, focus)).map(toNode).forEach(_.partial(addNode, graph));
 },
     addEdge = function addEdge(graph, edge, node1, node2, color) {
-  edge = _.extend(edge, {
+  edge = Object.assign(edge, {
     color: color
   });
 
@@ -9771,37 +9770,31 @@ module.exports = function (domId, options) {
 };
 
 },{"./setFont":19,"./toRed":20,"lodash":5}],19:[function(require,module,exports){
-'use strict';
-
-var _ = require('lodash');
+"use strict";
 
 module.exports = function (value, target) {
-    return _.extend(target, {
-        font: value
-    });
+  return Object.assign(target, {
+    font: value
+  });
 };
 
-},{"lodash":5}],20:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
-
-var _ = require('lodash');
 
 module.exports = function (term) {
-    return _.extend(term, {
-        color: '#FF512C'
-    });
+  return Object.assign(term, {
+    color: '#FF512C'
+  });
 };
 
-},{"lodash":5}],21:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
-var EventEmitter = require('events').EventEmitter,
-    _ = require('lodash');
+var EventEmitter = require('events').EventEmitter;
 
 module.exports = function () {
   var emitter = new EventEmitter(),
       openConnection = function openConnection(pathname, config) {
-    var ws_url = 'ws://' + location.host + pathname + '?target=' + config;
     var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config);
 
     ws.onopen = function () {
@@ -9825,7 +9818,7 @@ module.exports = function () {
     return ws;
   };
 
-  return _.extend(emitter, {
+  return Object.assign(emitter, {
     beginSearch: function beginSearch(pgp, mappings, pathname, config) {
       var ws = openConnection(pathname, config);
       emitter.once('ws_open', function () {
@@ -9838,7 +9831,7 @@ module.exports = function () {
   });
 };
 
-},{"events":1,"lodash":5}],22:[function(require,module,exports){
+},{"events":1}],22:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9866,7 +9859,7 @@ var _ = require('lodash'),
   */
 }),
     toViewParameters = function toViewParameters(anchored_pgp, node_id) {
-  return _.extend({}, anchored_pgp.nodes[node_id], {
+  return Object.assign({}, anchored_pgp.nodes[node_id], {
     id: node_id,
     'class': node_id === anchored_pgp.focus ? 'focus' : 'normal'
   });
@@ -9900,7 +9893,7 @@ module.exports = {
     privateData.focus = anchored_pgp.focus;
     privateData.edges = anchored_pgp.edges;
   },
-  onSparql: function onSparql(sparql) {
+  onSparql: function onSparql() {
     privateData.graph = null;
   },
   onSolution: function onSolution(solution) {
@@ -9936,7 +9929,6 @@ module.exports = {
 'use strict';
 
 var _ = require('lodash'),
-    instance = require('./instance'),
     makeTemplate = require('../render/makeTemplate'),
     reigonTemplate = makeTemplate(function () {
   /*
@@ -9995,10 +9987,10 @@ var _ = require('lodash'),
     privateData = {};
 
 module.exports = {
-  onAnchoredPgp: function onAnchoredPgp(domId, anchored_pgp) {
+  onAnchoredPgp: function onAnchoredPgp(domId) {
     privateData.domId = domId;
   },
-  onSparql: function onSparql(sparql) {
+  onSparql: function onSparql() {
     privateData.currentSolutionList = null;
   },
   onSolution: function onSolution(solution) {
@@ -10010,7 +10002,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":13,"../render/makeTemplate":29,"./instance":24,"./toLastOfUrl":27,"lodash":5}],26:[function(require,module,exports){
+},{"../collection/toArray":13,"../render/makeTemplate":29,"./toLastOfUrl":27,"lodash":5}],26:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
