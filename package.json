@@ -10,7 +10,9 @@
     "multiline": "^1.0.1"
   },
   "devDependencies": {
+    "eslint": "^1.6.0",
     "gulp": "^3.9.0",
+    "gulp-babel": "^5.2.1",
     "gulp-browserify": "^0.5.0"
   },
   "homepage": "https://github.com/lodqa/lodqa.git",

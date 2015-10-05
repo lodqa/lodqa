@@ -81,43 +81,40 @@ class LodqaWS < Sinatra::Base
 			"Access-Control-Allow-Headers" => "Content-Type"
 	end
 
+	# Websocket only!
 	get '/solutions' do
 		config = get_config(params)
 		query = params['query']
 
-		if !request.websocket?
-			erb :solutions
-		else
-			request.websocket do |ws|
-				proc_anchored_pgp = Proc.new do |anchored_pgp|
-					ws_send(EM, ws, :anchored_pgp, anchored_pgp)
-				end
+		request.websocket do |ws|
+			proc_anchored_pgp = Proc.new do |anchored_pgp|
+				ws_send(EM, ws, :anchored_pgp, anchored_pgp)
+			end
 
-				proc_sparql = Proc.new do |sparql|
-					ws_send(EM, ws, :sparql, sparql)
-				end
+			proc_sparql = Proc.new do |sparql|
+				ws_send(EM, ws, :sparql, sparql)
+			end
 
-				proc_solution = Proc.new do |solution|
-					ws_send(EM, ws, :solution, solution.to_h)
-				end
+			proc_solution = Proc.new do |solution|
+				ws_send(EM, ws, :solution, solution.to_h)
+			end
 
-				ws.onmessage do |data|
-					begin
-						json = JSON.parse(data)
-						lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
+			ws.onmessage do |data|
+				begin
+					json = JSON.parse(data)
+					lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
 
-						lodqa.pgp = json['pgp'].symbolize_keys
-						lodqa.mappings = json['mappings']
-						# lodqa.parse(query, config['parser_url'])
+					lodqa.pgp = json['pgp'].symbolize_keys
+					lodqa.mappings = json['mappings']
+					# lodqa.parse(query, config['parser_url'])
 
-						EM.defer do
-							ws.send("start")
-							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
-							ws.close_connection
-						end
-					rescue JSON::ParserError => e
-						p e.message
+					EM.defer do
+						ws.send("start")
+						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution)
+						ws.close_connection
 					end
+				rescue JSON::ParserError => e
+					p e.message
 				end
 			end
 		end
