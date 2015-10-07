@@ -247,10 +247,15 @@ exports['default'] = function () {
 
 function arms(edgeMap, nodeId) {
   var ret = [];
-  edgeMap.forEach(function (edge) {
-    if (edge.sourceId === nodeId) ret.push(edge);
 
-    if (edge.targetId === nodeId) ret.push(edge);
+  edgeMap.forEach(function (edge) {
+    if (edge.sourceId === nodeId) {
+      ret.push(edge);
+    }
+
+    if (edge.targetId === nodeId) {
+      ret.push(edge);
+    }
   });
 
   return ret;
@@ -464,7 +469,9 @@ function getLabels(nodeMap) {
 }
 
 function focusMustBeInMap(nodeMap, focus) {
-  if (nodeMap.get(focus)) return focus;
+  if (nodeMap.get(focus)) {
+    return focus;
+  }
 }
 
 function del(nodeMap, id) {
@@ -475,17 +482,18 @@ function setLabel(nodeMap, id, label) {
   console.assert(id, 'id is required to setLabel a node.');
 
   // There is no node to update.
-  if (!nodeMap.has(id)) return false;
-
+  if (!nodeMap.has(id)) {
+    return false;
+  }
   var node = get(nodeMap, id);
 
   if (node.label !== label) {
     node.label = label;
     nodeMap.set(id, node);
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
 function setTerm(nodeMap, id, terms) {
@@ -493,20 +501,23 @@ function setTerm(nodeMap, id, terms) {
   console.assert(terms, 'terms is required to setTerm node');
 
   var node = get(nodeMap, id);
+
   if (hasTermChange(terms, node.terms)) {
     node.terms = terms;
     nodeMap.set(id, node);
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
 function hasTermChange(newTerms, currentTerms) {
   return newTerms.length !== currentTerms.length || newTerms.reduce(function (result, t, index) {
     var c = currentTerms[index];
-    if (t.enable !== c.enable || t.value !== c.value) return true;
 
+    if (t.enable !== c.enable || t.value !== c.value) {
+      return true;
+    }
     return result;
   }, false);
 }
@@ -532,12 +543,14 @@ function setUrl(nodeMap, mappings) {
         for (var _iterator2 = nodeMap.values()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var node = _step2.value;
 
-          if (node.label === label) node.terms = terms.map(function (term) {
-            return {
-              value: term,
-              enable: true
-            };
-          });
+          if (node.label === label) {
+            node.terms = terms.map(function (term) {
+              return {
+                value: term,
+                enable: true
+              };
+            });
+          }
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -571,10 +584,12 @@ function setUrl(nodeMap, mappings) {
 }
 
 function verify(nodeMap, action) {
-  if (!action.label) return {
-    isValid: false,
-    reason: 'no label.'
-  };
+  if (!action.label) {
+    return {
+      isValid: false,
+      reason: 'no label.'
+    };
+  }
 
   return {
     isValid: true
@@ -597,6 +612,7 @@ var _clone2 = _interopRequireDefault(_clone);
 
 exports['default'] = function (map) {
   var ret = [];
+
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
   var _iteratorError = undefined;
@@ -737,17 +753,23 @@ var _default = (function (_ActionReadable) {
 exports['default'] = _default;
 
 function toValue(connection) {
+  var realConnection = connection;
+
   // When an event is occurs on the label.
-  if (connection.component) connection = connection.component;
+  if (connection.component) {
+    realConnection = connection.component;
+  }
 
   // When an event is occurs on the endpoint.
-  if (connection.connections && connection.connections[0]) connection = connection.connections[0];
+  if (connection.connections && connection.connections[0]) {
+    realConnection = connection.connections[0];
+  }
 
-  console.assert(connection instanceof jsPlumb.Connection, 'This is not conneciton: ', connection);
+  console.assert(realConnection instanceof jsPlumb.Connection, 'This is not conneciton: ', realConnection);
 
   return {
-    sourceId: connection.sourceId,
-    targetId: connection.targetId
+    sourceId: realConnection.sourceId,
+    targetId: realConnection.targetId
   };
 }
 module.exports = exports['default'];
@@ -797,7 +819,7 @@ var _default = (function (_ActionReadable) {
       var component = (0, _viewNodeEditorEditEdgeComponent2['default'])(selector),
           container = (0, _domDelegate2['default'])(component.component);
 
-      container.on('click', '.delete-button', function (e) {
+      container.on('click', '.delete-button', function () {
         return push({
           target: _const.target.MODEL,
           type: _const.actionType.DELETE
@@ -855,7 +877,9 @@ var _default = (function (_ActionReadable) {
       var component = (0, _viewGraphComponent2['default'])(selector);
 
       component.container.addEventListener('click', function (e) {
-        if (e.currentTarget !== e.target) return;
+        if (e.currentTarget !== e.target) {
+          return;
+        }
 
         push({
           target: _const.target.MODEL,
@@ -919,7 +943,7 @@ var _default = (function (_ActionReadable) {
     value: function _bindComponent(selector, push) {
       var component = (0, _viewNodeEditorInputNodeComponent2['default'])(selector),
           container = (0, _domDelegate2['default'])(component.component),
-          pushValidate = function pushValidate(e) {
+          pushValidate = function pushValidate() {
         return (0, _putValue2['default'])(component, _const.target.MODEL_NODE, _const.actionType.VALIDATE, push);
       },
           pushCreate = function pushCreate() {
@@ -934,7 +958,7 @@ var _default = (function (_ActionReadable) {
         }
       });
 
-      component.component.querySelector('button').addEventListener('click', function (e) {
+      component.component.querySelector('button').addEventListener('click', function () {
         return pushCreate();
       });
     }
@@ -995,7 +1019,6 @@ var _default = (function (_ActionReadable) {
             });
             break;
           default:
-
         }
       });
     }
@@ -1108,7 +1131,9 @@ var _default = (function (_ActionReadable) {
           container = (0, _domDelegate2['default'])(component.container);
 
       container.on('click', '.node', function (e) {
-        if (e.target.className === 'sourcePoint') return;
+        if (e.target.className === 'sourcePoint') {
+          return;
+        }
 
         push({
           target: _const.target.MODEL_NODE,
@@ -1210,14 +1235,14 @@ var _default = (function (_ActionReadable) {
           container = (0, _domDelegate2['default'])(component.component);
 
       // headers
-      container.on('click', '.lookup-all-button', function (e) {
+      container.on('click', '.lookup-all-button', function () {
         return push({
           target: _const.target.MODEL_NODE,
           type: _const.actionType.LOOKUP
         });
       });
 
-      container.on('click', '.delete-all-button', function (e) {
+      container.on('click', '.delete-all-button', function () {
         var _iteratorNormalCompletion = true;
         var _didIteratorError = false;
         var _iteratorError = undefined;
@@ -1331,7 +1356,7 @@ function delTermButtonClick(e, component, push) {
       termIndex = component.getTermIndex(button),
       node = component.getNodeValue(nodeIndex),
       newTerms = node.terms.filter(function (e, index) {
-    return index != termIndex;
+    return index !== termIndex;
   });
 
   pushUpdateTerm(push, node.id, newTerms);
@@ -1370,33 +1395,37 @@ function pushUpdateTerm(push, id, terms) {
 }
 
 function getButton(element) {
-  if (element.tagName === "I") {
+  if (element.tagName === 'I') {
     return element.parentElement;
-  } else {
-    return element;
   }
+
+  return element;
 }
 
 function pushTermId(event, component, type, push) {
   var nodeId = component.getNodeId(event.target),
       termIndex = component.getTermIndex(event.target);
 
-  if (nodeId && termIndex) push({
-    target: _const.target.VIEW_NODE,
-    type: type,
-    id: nodeId,
-    index: termIndex
-  });
+  if (nodeId && termIndex) {
+    push({
+      target: _const.target.VIEW_NODE,
+      type: type,
+      id: nodeId,
+      index: termIndex
+    });
+  }
 }
 
 function pushNodeId(event, component, type, push) {
   var nodeId = component.getNodeId(event.target);
 
-  if (nodeId) push({
-    target: _const.target.MODEL_NODE,
-    type: type,
-    id: nodeId
-  });
+  if (nodeId) {
+    push({
+      target: _const.target.MODEL_NODE,
+      type: type,
+      id: nodeId
+    });
+  }
 }
 module.exports = exports['default'];
 
@@ -1613,7 +1642,7 @@ var _const = require('../const');
 var _default = (function (_ActionTransform) {
   _inherits(_default, _ActionTransform);
 
-  function _default(nodes, edges, lookupUrl) {
+  function _default(nodes) {
     _classCallCheck(this, _default);
 
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
@@ -1780,7 +1809,7 @@ var _default = (function (_ActionTransform) {
 
     this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.LOOKUP, function (action, push) {
       return lookup(action, nodes, lookupUrl, _this._dictionaryUrl, push);
-    }], [_const.actionType.SET_DICTIONARY_URL, function (action, push) {
+    }], [_const.actionType.SET_DICTIONARY_URL, function (action) {
       _this._dictionaryUrl = action.dictionaryUrl;
     }]]);
   }
@@ -1791,10 +1820,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 
 function lookup(action, nodes, lookupUrl, dictionaryUrl, push) {
-  var labels = undefined,
-      callback = function callback(newAction) {
-    return asyncPush(action, newAction);
-  };
+  var labels = undefined;
 
   if (action.id) {
     labels = [nodes.getLabel(action.id)];
@@ -1802,7 +1828,7 @@ function lookup(action, nodes, lookupUrl, dictionaryUrl, push) {
     labels = nodes.getLabels();
   }
 
-  push((0, _lookupNode2['default'])(nodes, lookupUrl, dictionaryUrl, labels, callback));
+  push((0, _lookupNode2['default'])(nodes, lookupUrl, dictionaryUrl, labels));
 }
 module.exports = exports['default'];
 
@@ -1826,15 +1852,15 @@ var _bluebird2 = _interopRequireDefault(_bluebird);
 var _const = require('../../const');
 
 exports['default'] = function (nodes, lookupUrl, dictionaryUrl, labels) {
-
   var url = lookupUrl;
+
   if (dictionaryUrl) {
     url = url + '?dictionary_url=' + encodeURI(dictionaryUrl);
   }
 
   return new _bluebird2['default'](function (resolve, reject) {
     _superagent2['default'].post(url).send({
-      "keywords": labels
+      keywords: labels
     }).end(function (err, res) {
       if (!err) {
         if (!res.body) {
@@ -1947,7 +1973,9 @@ function updateNodeLabel(model, action, push) {
 
 function updateNodeTerm(model, action, push) {
   // Push actions only when the terms are changed.
-  if (model.setTerm(action)) snapsoht(push, model);
+  if (model.setTerm(action)) {
+    snapsoht(push, model);
+  }
 }
 
 function deleteNode(model, action, push) {
@@ -2043,7 +2071,7 @@ var _default = (function (_ActionTransform) {
 
     this.bindActions(_const.target.MODEL_NODE, [
     // Record an egde creation type.
-    [_const.actionType.CREATE, function (action, push) {
+    [_const.actionType.CREATE, function (action) {
       autoCreateEgdeType = action.createEdge;
       action.selectedNode = selectedNode;
     }], [_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectNode]]);
@@ -2064,8 +2092,6 @@ var _default = (function (_ActionTransform) {
           type: _const.actionType.SELECT,
           id: selectedNode
         });
-
-        autoCreateEgdeType === null;
       }
     }], [_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectEdge]]);
 
@@ -2078,9 +2104,11 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 
 function deleteSelected(action, push) {
-  if (selectedEdge) Object.assign(action, selectedEdge, {
-    target: _const.target.VIEW_EDGE
-  });
+  if (selectedEdge) {
+    Object.assign(action, selectedEdge, {
+      target: _const.target.VIEW_EDGE
+    });
+  }
 
   unselectAll(push);
 }
@@ -2213,17 +2241,17 @@ var _default = (function (_ActionTransform) {
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = (0, _viewGraphComponent2['default'])(selector);
 
-    this.bindActions(_const.target.VIEW_EDGE, [[_const.actionType.CREATE, function (action, push) {
+    this.bindActions(_const.target.VIEW_EDGE, [[_const.actionType.CREATE, function (action) {
       return component.createEdge(action);
-    }], [_const.actionType.SELECT, function (action, push) {
+    }], [_const.actionType.SELECT, function (action) {
       return component.selectEdge(action);
-    }], [_const.actionType.DELETE, function (action, push) {
+    }], [_const.actionType.DELETE, function (action) {
       return component.deleteEdge(action);
-    }], [_const.actionType.UNSELECT, function (action, push) {
+    }], [_const.actionType.UNSELECT, function () {
       return component.unselectEdge();
-    }], [_const.actionType.HOVER, function (action, push) {
+    }], [_const.actionType.HOVER, function (action) {
       return component.hoverEdge(action);
-    }], [_const.actionType.UNHOVER, function (action, push) {
+    }], [_const.actionType.UNHOVER, function () {
       return component.unhoverEdge();
     }]]);
   }
@@ -2266,17 +2294,17 @@ var _default = (function (_ActionTransform) {
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = (0, _viewForceDirectedLayoutComponent2['default'])();
 
-    this.bindActions(_const.target.LAYOUT_NODE, [[_const.actionType.CREATE, function (action, push) {
+    this.bindActions(_const.target.LAYOUT_NODE, [[_const.actionType.CREATE, function (action) {
       return component.addNode(action.id);
-    }], [_const.actionType.DELETE, function (action, push) {
+    }], [_const.actionType.DELETE, function (action) {
       return component.delNode(action.id);
-    }], [_const.actionType.DRAG, function (action, push) {
+    }], [_const.actionType.DRAG, function (action) {
       return component.drag(action.id, action.x, action.y);
     }]]);
 
-    this.bindActions(_const.target.LAYOUT_EDGE, [[_const.actionType.CREATE, function (action, push) {
+    this.bindActions(_const.target.LAYOUT_EDGE, [[_const.actionType.CREATE, function (action) {
       return component.addEdge(action.sourceId, action.targetId);
-    }], [_const.actionType.DELETE, function (action, push) {
+    }], [_const.actionType.DELETE, function (action) {
       component.delEdge(action.sourceId, action.targetId);
     }]]);
   }
@@ -2319,7 +2347,7 @@ var _default = (function (_ActionTransform) {
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = (0, _viewMappingsComponent2['default'])(selector);
 
-    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.SNAPSHOT, function (action, push) {
+    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.SNAPSHOT, function (action) {
       return component.setNode(action.data);
     }]]);
   }
@@ -2363,21 +2391,21 @@ var _default = (function (_ActionTransform) {
 
     var component = (0, _viewGraphComponent2['default'])(selector);
 
-    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.CREATE, function (action, push) {
+    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.CREATE, function (action) {
       return component.createNode(action.id, action.label);
-    }], [_const.actionType.UPDATE_LABEL, function (action, push) {
+    }], [_const.actionType.UPDATE_LABEL, function (action) {
       return component.updateNode(action.id, action.label);
-    }], [_const.actionType.DELETE, function (action, push) {
+    }], [_const.actionType.DELETE, function (action) {
       return component.deleteNode(action.id);
-    }], [_const.actionType.MOVE, function (action, push) {
+    }], [_const.actionType.MOVE, function (action) {
       return component.moveNode(action.id, action.x, action.y);
-    }], [_const.actionType.SELECT, function (action, push) {
+    }], [_const.actionType.SELECT, function (action) {
       return component.selectNode(action.id);
-    }], [_const.actionType.UNSELECT, function (action, push) {
+    }], [_const.actionType.UNSELECT, function () {
       return component.unselectNode();
-    }], [_const.actionType.HOVER, function (action, push) {
+    }], [_const.actionType.HOVER, function (action) {
       return component.hoverNode(action.id);
-    }], [_const.actionType.UNHOVER, function (action, push) {
+    }], [_const.actionType.UNHOVER, function () {
       return component.unhoverNode();
     }]]);
   }
@@ -2420,19 +2448,19 @@ var _default = (function (_ActionTransform) {
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = (0, _viewNodeTableComponent2['default'])(selector);
 
-    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.HOVER, function (action, push) {
+    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.HOVER, function (action) {
       return component.hover(action.id);
-    }], [_const.actionType.HOVER_TERM, function (action, push) {
+    }], [_const.actionType.HOVER_TERM, function (action) {
       return component.hoverTerm(action.id, action.index);
-    }], [_const.actionType.SELECT, function (action, push) {
+    }], [_const.actionType.SELECT, function (action) {
       return component.select(action.id);
-    }], [_const.actionType.SNAPSHOT, function (action, push) {
+    }], [_const.actionType.SNAPSHOT, function (action) {
       return component.set(action.data);
-    }], [_const.actionType.UNHOVER, function (action, push) {
+    }], [_const.actionType.UNHOVER, function (action) {
       return component.unhover(action.id);
-    }], [_const.actionType.UNHOVER_TERM, function (action, push) {
+    }], [_const.actionType.UNHOVER_TERM, function () {
       return component.unhoverTerm();
-    }], [_const.actionType.UNSELECT, function (action, push) {
+    }], [_const.actionType.UNSELECT, function () {
       return component.unselect();
     }]]);
   }
@@ -2475,10 +2503,10 @@ var _default = (function (_ActionTransform) {
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = (0, _viewPgpComponent2['default'])(selector);
 
-    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.SNAPSHOT, function (action, push) {
+    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.SNAPSHOT, function (action) {
       return component.setNode(action.data);
     }]]);
-    this.bindActions(_const.target.VIEW_EDGE, [[_const.actionType.SNAPSHOT, function (action, push) {
+    this.bindActions(_const.target.VIEW_EDGE, [[_const.actionType.SNAPSHOT, function (action) {
       return component.setEdge(action.edges);
     }]]);
   }
@@ -2573,9 +2601,9 @@ var _default = (function (_ActionTransform) {
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = (0, _viewNodeEditorInputNodeComponent2['default'])(selector);
 
-    this.bindActions(_const.target.EDITOR, [[_const.actionType.CREATE, function (action, push) {
+    this.bindActions(_const.target.EDITOR, [[_const.actionType.CREATE, function () {
       return component.reset();
-    }], [_const.actionType.VALIDATE, function (action, push) {
+    }], [_const.actionType.VALIDATE, function (action) {
       return component.enabled = action.isValid;
     }]]);
   }
@@ -2617,11 +2645,11 @@ var _default = (function (_ActionTransform) {
 
     _get(Object.getPrototypeOf(_default.prototype), 'constructor', this).call(this);
     var component = this._component = (0, _viewMessageComponent2['default'])(selector),
-        clear = function clear(action, push) {
+        clear = function clear() {
       return component.reset();
     };
 
-    this.bindActions(_const.target.EDITOR, [[_const.actionType.SELECT, clear], [_const.actionType.UNSELECT, clear], [_const.actionType.VALIDATE, function (action, push) {
+    this.bindActions(_const.target.EDITOR, [[_const.actionType.SELECT, clear], [_const.actionType.UNSELECT, clear], [_const.actionType.VALIDATE, function (action) {
       return showValidation(component, action);
     }]]);
   }
@@ -2632,7 +2660,11 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 
 function showValidation(component, action) {
-  if (!action.isValid) component.warn(action.reason);else component.reset();
+  if (!action.isValid) {
+    component.warn(action.reason);
+  } else {
+    component.reset();
+  }
 }
 module.exports = exports['default'];
 
@@ -2673,9 +2705,9 @@ var _default = (function (_ActionTransform) {
     var inputNode = (0, _viewNodeEditorInputNodeComponent2['default'])(inputNodeSelector),
         editEdge = (0, _viewNodeEditorEditEdgeComponent2['default'])(editEdgeSelector);
 
-    this.bindActions(_const.target.EDITOR, [[_const.actionType.SELECT, function (action, push) {
+    this.bindActions(_const.target.EDITOR, [[_const.actionType.SELECT, function () {
       return showEditEdge(inputNode, editEdge);
-    }], [_const.actionType.UNSELECT, function (action, push) {
+    }], [_const.actionType.UNSELECT, function () {
       return reset(inputNode, editEdge);
     }]]);
   }
@@ -2749,20 +2781,7 @@ var _springy2 = _interopRequireDefault(_springy);
 var graph = new _springy2['default'].Graph(),
     layout = new _springy2['default'].Layout.ForceDirected(graph, 400.0, 400.0, 0.5),
     onMove = undefined,
-    renderer = new _springy2['default'].Renderer(layout, function () {}, function () {}, function drawNode(node, p) {
-  var currentBB = layout.getBoundingBox(),
-      size = currentBB.topright.subtract(currentBB.bottomleft),
-      x = p.subtract(currentBB.bottomleft).divide(size.x).x,
-      y = p.subtract(currentBB.bottomleft).divide(size.y).y;
-
-  if (onMove) {
-    onMove({
-      id: node.id,
-      x: x,
-      y: y
-    });
-  }
-});
+    renderer = new _springy2['default'].Renderer(layout, function () {}, function () {}, drawNode);
 
 // For debug
 // graph.addGraphListener({
@@ -2864,6 +2883,21 @@ function dragNode(graph, layout, id, x, y) {
 
   renderer.start();
 }
+
+function drawNode(node, p) {
+  var currentBB = layout.getBoundingBox(),
+      size = currentBB.topright.subtract(currentBB.bottomleft),
+      x = p.subtract(currentBB.bottomleft).divide(size.x).x,
+      y = p.subtract(currentBB.bottomleft).divide(size.y).y;
+
+  if (onMove) {
+    onMove({
+      id: node.id,
+      x: x,
+      y: y
+    });
+  }
+}
 module.exports = exports['default'];
 
 },{"springy":263}],39:[function(require,module,exports){
@@ -2891,8 +2925,8 @@ exports['default'] = function (emitter, container) {
           x: x,
           y: y
         });
-      } catch (e) {
-        console.error(e, e.stack);
+      } catch (err) {
+        console.error(err, err.stack);
       }
     },
     connectionMouseover: function connectionMouseover(connection, originalEvent) {
@@ -2926,32 +2960,34 @@ function fromScreen(container, id, left, top) {
 module.exports = exports['default'];
 
 },{}],40:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-exports["default"] = function (container, instance, id, name, callbacks) {
-  container.insertAdjacentHTML('beforeend', "\n  <div id=\"" + id + "\" class=\"node\"\">\n      " + name + "\n      <div class=\"sourcePoint\"></div>\n  </div>");
+exports['default'] = function (container, instance, id, name, callbacks) {
+  container.insertAdjacentHTML('beforeend', '\n  <div id="' + id + '" class="node"">\n      ' + name + '\n      <div class="sourcePoint"></div>\n  </div>');
 
   instance.draggable(id, callbacks).makeSource(id, {
-    filter: ".sourcePoint",
+    filter: '.sourcePoint',
     connectorStyle: {
-      strokeStyle: "#5c96bc",
+      strokeStyle: '#5c96bc',
       lineWidth: 2,
-      outlineColor: "transparent",
+      outlineColor: 'transparent',
       outlineWidth: 4
     }
   }).makeTarget(id, {
     dropOptions: {
-      hoverClass: "nodeDragHover"
+      hoverClass: 'nodeDragHover'
     },
     allowLoopback: false
   });
+
+  container.querySelector('.placeholder').classList.add('hidden');
 };
 
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 },{}],41:[function(require,module,exports){
 'use strict';
@@ -3003,10 +3039,14 @@ function select(container, instance, sourceId, targetId) {
   unselect(container);
 
   var connection = toConnection(instance, sourceId, targetId);
+
   connection.canvas.classList.add('selected');
 
   var labelOverlay = connection.getOverlay('label');
-  if (labelOverlay) labelOverlay.canvas.classList.add('selected');
+
+  if (labelOverlay) {
+    labelOverlay.canvas.classList.add('selected');
+  }
 }
 
 function unselect(container) {
@@ -3018,12 +3058,17 @@ function hover(instance, sourceId, targetId) {
   var connection = toConnection(instance, sourceId, targetId);
 
   // Connections cannot be get when they are being dragging.
-  if (!connection) return;
+  if (!connection) {
+    return;
+  }
 
   connection.canvas.classList.add('hover');
 
   var labelOverlay = connection.getOverlay('label');
-  if (labelOverlay) labelOverlay.canvas.classList.add('hover');
+
+  if (labelOverlay) {
+    labelOverlay.canvas.classList.add('hover');
+  }
 }
 
 function unhover(container) {
@@ -3057,10 +3102,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 var _events = require('events');
 
-var _createNode = require('./createNode');
-
-var _createNode2 = _interopRequireDefault(_createNode);
-
 var _jsPlumbOption = require('./jsPlumbOption');
 
 var _jsPlumbOption2 = _interopRequireDefault(_jsPlumbOption);
@@ -3086,7 +3127,9 @@ exports['default'] = function (selector) {
   var container = document.querySelector(selector),
       callbacks = new _Callbacks2['default'](emitter, container);
 
-  if (!instance) instance = jsPlumb.getInstance(_jsPlumbOption2['default']);
+  if (!instance) {
+    instance = jsPlumb.getInstance(_jsPlumbOption2['default']);
+  }
 
   instance.setContainer(container);
 
@@ -3094,10 +3137,10 @@ exports['default'] = function (selector) {
     instance: instance,
     container: container,
     emitter: emitter,
-    createNode: function createNode(id, name, url) {
+    createNode: function createNode(id, name) {
       return nodeApi.create(container, instance, id, name, callbacks);
     },
-    updateNode: function updateNode(id, name, url) {
+    updateNode: function updateNode(id, name) {
       return nodeApi.update(container, id, name);
     },
     deleteNode: function deleteNode(id) {
@@ -3118,7 +3161,7 @@ exports['default'] = function (selector) {
     unhoverNode: function unhoverNode() {
       return nodeApi.unhover(container);
     },
-    createEdge: function createEdge(edge, label, url) {
+    createEdge: function createEdge(edge) {
       return edgeApi.create(instance, edge.sourceId, edge.targetId, callbacks.connectionMouseover, callbacks.connectionMouseout);
     },
     deleteEdge: function deleteEdge(edge) {
@@ -3141,7 +3184,7 @@ exports['default'] = function (selector) {
 
 module.exports = exports['default'];
 
-},{"./Callbacks":39,"./createNode":40,"./edgeApi":41,"./jsPlumbOption":43,"./nodeApi":44,"events":253}],43:[function(require,module,exports){
+},{"./Callbacks":39,"./edgeApi":41,"./jsPlumbOption":43,"./nodeApi":44,"events":253}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3202,6 +3245,7 @@ exports.unhover = unhover;
 
 function update(container, id, name) {
   var node = container.querySelector('#' + id);
+
   node.firstChild.nodeValue = name;
 }
 
@@ -3224,7 +3268,12 @@ function remove(container, id) {
   console.assert(id, 'id MUST be not empty.');
 
   var div = container.querySelector('#' + id);
+
   container.removeChild(div);
+
+  if (container.querySelectorAll('.node').length === 0) {
+    container.querySelector('.placeholder').classList.remove('hidden');
+  }
 }
 
 function select(container, id) {
@@ -3310,7 +3359,9 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = function (selector) {
   var component = document.querySelector(selector);
 
-  if (!component) throw new Error("No dom is find by selector: '" + selector + "'");
+  if (!component) {
+    throw new Error("No dom is find by selector: '" + selector + "'");
+  }
 
   return {
     setNode: (function (_setNode) {
@@ -3334,7 +3385,9 @@ function setNode(component, nodes) {
     return node.terms.length > 0;
   }).reduce(function (ret, node) {
     ret[node.label] = node.terms.reduce(function (a, b) {
-      if (b.enable) a.push(b.value);
+      if (b.enable) {
+        a.push(b.value);
+      }
 
       return a;
     }, []);
@@ -3458,9 +3511,13 @@ Object.defineProperty(exports, '__esModule', {
 });
 
 exports['default'] = function (label, button) {
-  if (label) label.value = '';
+  if (label) {
+    label.value = '';
+  }
 
-  if (button) button.disabled = true;
+  if (button) {
+    button.disabled = true;
+  }
 };
 
 module.exports = exports['default'];
@@ -3495,15 +3552,19 @@ exports['default'] = function (selector) {
   var component = document.querySelector(selector),
       nodesCache = new _modelNodeData2['default']();
 
-  if (!component) throw new Error('No dom is find by selector: \'' + selector + '\'');
+  if (!component) {
+    throw new Error('No dom is find by selector: \'' + selector + '\'');
+  }
 
-  if (!ractive) ractive = new _ractive2['default']({
-    el: component,
-    template: TEMPLATE,
-    data: {
-      nodes: []
-    }
-  });
+  if (!ractive) {
+    ractive = new _ractive2['default']({
+      el: component,
+      template: TEMPLATE,
+      data: {
+        nodes: []
+      }
+    });
+  }
 
   return {
     component: component,
@@ -3511,12 +3572,20 @@ exports['default'] = function (selector) {
     getNodeId: function getNodeId(element) {
       var nodeElement = getNode(element);
 
-      return nodeElement ? nodeElement.getAttribute('data-id') : '';
+      if (nodeElement) {
+        return nodeElement.getAttribute('data-id');
+      }
+
+      return '';
     },
     getNodeIndex: function getNodeIndex(element) {
       var nodeElement = getNode(element);
 
-      return nodeElement ? nodeElement.getAttribute('data-index') : '';
+      if (nodeElement) {
+        return nodeElement.getAttribute('data-index');
+      }
+
+      return '';
     },
     getNodeValue: function getNodeValue(index) {
       console.assert(ractive.get('nodes.' + index), 'The node is not in tabel. index :', index, ractive.get('nodes'));
@@ -3525,10 +3594,14 @@ exports['default'] = function (selector) {
     getTermIndex: function getTermIndex(element) {
       var termElement = element.closest('.term');
 
-      return termElement ? termElement.getAttribute('data-index') : '';
+      if (termElement) {
+        return termElement.getAttribute('data-index');
+      }
+
+      return '';
     },
     has: function has(index) {
-      return ractive.get('nodes.' + index) !== undefined;
+      return ractive.get('nodes.' + index);
     },
     set: function set(nodes) {
       updateDisplay(ractive, component, nodes);
@@ -3605,7 +3678,7 @@ exports['default'] = function (selector) {
       hoverTerm(ractive, id, index);
     }),
     unhoverTerm: (function (_unhoverTerm) {
-      function unhoverTerm(_x6, _x7) {
+      function unhoverTerm() {
         return _unhoverTerm.apply(this, arguments);
       }
 
@@ -3614,7 +3687,7 @@ exports['default'] = function (selector) {
       };
 
       return unhoverTerm;
-    })(function (id, index) {
+    })(function () {
       unhoverTerm(ractive);
     })
   };
@@ -3659,15 +3732,19 @@ function hoverTerm(ractive, id, index) {
   });
 }
 
-function unhoverTerm(ractive, id, index) {
+function unhoverTerm(ractive) {
   ractive.set('hover_term', {});
 }
 
 function updateDisplay(ractive, component, data) {
   data.list.sort(function (a, b) {
-    if (a.id > b.id) return 1;
+    if (a.id > b.id) {
+      return 1;
+    }
 
-    if (b.id > a.id) return -1;
+    if (b.id > a.id) {
+      return -1;
+    }
 
     return 0;
   });
@@ -3681,6 +3758,12 @@ function updateDisplay(ractive, component, data) {
     Array.from(component.querySelectorAll('.focus input')).forEach(function (el) {
       return el.checked = false;
     });
+  }
+
+  if (data.list.length === 0) {
+    component.previousElementSibling.classList.remove('hidden');
+  } else {
+    component.previousElementSibling.classList.add('hidden');
   }
 }
 
@@ -3706,7 +3789,9 @@ exports['default'] = function (origin, predicate, params) {
   console.assert(origin instanceof _modelNodeData2['default'], 'The origin MUST be NodeData.');
 
   origin.list = origin.list.map(function (n) {
-    if (predicate(n)) n = Object.assign({}, n, params);
+    if (predicate(n)) {
+      return Object.assign({}, n, params);
+    }
 
     return n;
   });
@@ -3729,7 +3814,9 @@ pgpIdMap = undefined; // The map of original node id and id on the pgg.
 exports["default"] = function (selector) {
   var component = document.querySelector(selector);
 
-  if (!component) throw new Error("No dom is find by selector: '" + selector + "'");
+  if (!component) {
+    throw new Error("No dom is find by selector: '" + selector + "'");
+  }
 
   return {
     setNode: (function (_setNode) {
@@ -3786,9 +3873,7 @@ function update(component, pgp) {
 }
 
 function getNodesForPgp(nodes) {
-  return nodes.reduce(function (ret, node, index) {
-    var pgpId = "t" + (index + 1);
-
+  return nodes.reduce(function (ret, node) {
     ret[pgpIdMap.get(node.id)] = {
       text: node.label
     };

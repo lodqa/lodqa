@@ -26,6 +26,9 @@
   /* graph node */
   /* graph edge */
 }
+.jsPlumb-container .placeholder {
+  color: #aaaaaa;
+}
 .jsPlumb-container .node {
   border: 1px solid #2e6f9a;
   border-radius: 8px;
@@ -138,6 +141,14 @@
   cursor: pointer;
 }
 /* node-tabel */
+.table {
+  border: solid 1px #cccccc;
+  max-width: 600px;
+  min-height: 60px;
+}
+.table .placeholder {
+  color: #aaaaaa;
+}
 .table table {
   border-collapse: collapse;
   font-size: 0.9em;
