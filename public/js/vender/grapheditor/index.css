@@ -2,17 +2,14 @@
 .node-editor label {
   font-size: 13px;
 }
-.node-editor .url {
-  width: 260px;
-}
-.node-editor .button {
+.node-editor button {
   box-shadow: 0 0 15px 4px #42ffb2;
   -webkit-transition: box-shadow 0.3s ease-in;
   -moz-transition: box-shadow 0.3s ease-in;
   -o-transition: box-shadow 0.3s ease-in;
   transition: box-shadow 0.3s ease-in;
 }
-.node-editor .button:disabled {
+.node-editor button:disabled {
   box-shadow: none;
 }
 /* graph */
@@ -27,7 +24,7 @@
   /* graph edge */
 }
 .jsPlumb-container .placeholder {
-  color: #aaaaaa;
+  color: #aaa;
 }
 .jsPlumb-container .node {
   border: 1px solid #2e6f9a;
@@ -59,7 +56,7 @@
 }
 .jsPlumb-container .node.selected {
   background-color: #df2020;
-  border-color: #ff0000;
+  border-color: #f00;
   color: white;
 }
 .jsPlumb-container .nodeDragHover {
@@ -92,7 +89,7 @@
 }
 .jsPlumb-container .edgeLabel.selected {
   background-color: #df2020;
-  border-color: #ff0000;
+  border-color: #f00;
   color: white;
 }
 .jsPlumb-container ._jsPlumb_source_hover {
@@ -117,11 +114,11 @@
   cursor: pointer;
 }
 .jsPlumb-container ._jsPlumb_connector.selected path:nth-child(2) {
-  stroke: #ff0000;
+  stroke: #f00;
 }
 .jsPlumb-container ._jsPlumb_connector.selected path:nth-child(3) {
-  stroke: #ff0000;
-  fill: #ff0000;
+  stroke: #f00;
+  fill: #f00;
 }
 .jsPlumb-container ._jsPlumb_connector.hover path:nth-child(2) {
   stroke: #ffc0cb;
@@ -147,7 +144,7 @@
   min-height: 60px;
 }
 .table .placeholder {
-  color: #aaaaaa;
+  color: #aaa;
 }
 .table table {
   border-collapse: collapse;
@@ -174,12 +171,12 @@
   color: #333;
 }
 .table table th.focus {
-  width: 16px;
+  width: 21px;
 }
-.table table th.label {
+.table table th.text {
   width: 180px;
 }
-.table table th.label .title {
+.table table th.text .title {
   display: inline-block;
   width: 96px;
 }
@@ -190,23 +187,25 @@
 }
 .table table td.focus {
   text-align: center;
+  width: 21px;
 }
-.table table td.label {
+.table table td.text {
   text-align: center;
   vertical-align: top;
+  width: 180px;
 }
-.table table td.label input {
+.table table td.text input {
   width: 88px;
 }
-.table table td.url .term.hover input.term {
+.table table td.terms .term.hover input.term {
   background-color: rgba(255, 0, 0, 0.5);
   text-decoration: line-through;
 }
-.table table td.url input.term {
+.table table td.terms input.term {
   width: 80%;
   box-sizing: border-box;
 }
-.table table td.url .add [type="checkbox"] {
+.table table td.terms .add [type="checkbox"] {
   visibility: hidden;
 }
 .hidden {
