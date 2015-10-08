@@ -60,24 +60,10 @@ function search(event, loader, pgpElement, mappingsElement) {
 }
 
 function validateToSearch(beginSearch, pgpElement, mappingsElement) {
-  const observer = new MutationObserver(() => {
-    const pgp = JSON.parse(pgpElement.innerHTML),
-      mappings = JSON.parse(mappingsElement.innerHTML)
+  const enableSearchButton = () => enableIfValid(beginSearch, pgpElement, mappingsElement),
+    observer = new MutationObserver(enableSearchButton)
 
-    let hasTerm = false
-    if (mappings) {
-      Object.keys(mappings).forEach(k => {
-        if (mappings[k].filter(t => t).length > 0)
-          hasTerm = true
-      })
-    }
-
-    if (pgp.focus && hasTerm) {
-      beginSearch.removeAttribute('disabled')
-    } else {
-      beginSearch.setAttribute('disabled', 'disabled')
-    }
-  })
+  enableSearchButton()
 
   const config = {
     attributes: true,
@@ -87,4 +73,35 @@ function validateToSearch(beginSearch, pgpElement, mappingsElement) {
   }
   observer.observe(pgpElement, config)
   observer.observe(mappingsElement, config)
+}
+
+function enableIfValid(beginSearch, pgpElement, mappingsElement) {
+  if (hasFocus(pgpElement) && hasTerm(mappingsElement)) {
+    beginSearch.removeAttribute('disabled')
+  } else {
+    beginSearch.setAttribute('disabled', 'disabled')
+  }
+}
+
+function hasFocus(pgpElement) {
+  if (!pgpElement.innerHTML) {
+    return false
+  }
+
+  const pgp = JSON.parse(pgpElement.innerHTML)
+
+  return Boolean(pgp.focus)
+}
+
+function hasTerm(mappingsElement) {
+  if (!mappingsElement.innerHTML) {
+    return false
+  }
+
+  const mappings = JSON.parse(mappingsElement.innerHTML)
+
+  let hasTerm = Object.keys(mappings)
+    .filter((key) => mappings[key].filter((term) => term).length > 0)
+
+  return Boolean(hasTerm.length)
 }

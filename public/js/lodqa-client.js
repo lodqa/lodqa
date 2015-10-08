@@ -9411,7 +9411,7 @@ function init() {
     return search(e, loader, pgpElement, mappingsElement);
   });
 
-  validateToSearce(beginSearch, pgpElement, mappingsElement);
+  validateToSearch(beginSearch, pgpElement, mappingsElement);
 }
 
 function bindWebsocketPresentation(loader) {
@@ -9439,26 +9439,13 @@ function search(event, loader, pgpElement, mappingsElement) {
   });
 }
 
-function validateToSearce(beginSearch, pgpElement, mappingsElement) {
-  var observer = new MutationObserver(function () {
-    var pgp = JSON.parse(pgpElement.innerHTML),
-        mappings = JSON.parse(mappingsElement.innerHTML);
+function validateToSearch(beginSearch, pgpElement, mappingsElement) {
+  var enableSearchButton = function enableSearchButton() {
+    return enableIfValid(beginSearch, pgpElement, mappingsElement);
+  },
+      observer = new MutationObserver(enableSearchButton);
 
-    var hasTerm = false;
-    if (mappings) {
-      Object.keys(mappings).forEach(function (k) {
-        if (mappings[k].filter(function (t) {
-          return t;
-        }).length > 0) hasTerm = true;
-      });
-    }
-
-    if (pgp.focus && hasTerm) {
-      beginSearch.removeAttribute('disabled');
-    } else {
-      beginSearch.setAttribute('disabled', 'disabled');
-    }
-  });
+  enableSearchButton();
 
   var config = {
     attributes: true,
@@ -9468,6 +9455,40 @@ function validateToSearce(beginSearch, pgpElement, mappingsElement) {
   };
   observer.observe(pgpElement, config);
   observer.observe(mappingsElement, config);
+}
+
+function enableIfValid(beginSearch, pgpElement, mappingsElement) {
+  if (hasFocus(pgpElement) && hasTerm(mappingsElement)) {
+    beginSearch.removeAttribute('disabled');
+  } else {
+    beginSearch.setAttribute('disabled', 'disabled');
+  }
+}
+
+function hasFocus(pgpElement) {
+  if (!pgpElement.innerHTML) {
+    return false;
+  }
+
+  var pgp = JSON.parse(pgpElement.innerHTML);
+
+  return Boolean(pgp.focus);
+}
+
+function hasTerm(mappingsElement) {
+  if (!mappingsElement.innerHTML) {
+    return false;
+  }
+
+  var mappings = JSON.parse(mappingsElement.innerHTML);
+
+  var hasTerm = Object.keys(mappings).filter(function (key) {
+    return mappings[key].filter(function (term) {
+      return term;
+    }).length > 0;
+  });
+
+  return Boolean(hasTerm.length);
 }
 
 },{"./controller/bindResult":14,"./loader/loadSolution":21,"./presentation/anchoredPgpTablePresentation":22,"./presentation/graphPresentation":23,"./presentation/solutionTablePresentation":25,"./presentation/sparqlTablePresentation":26,"./presentation/websocketPresentation":28}],16:[function(require,module,exports){
