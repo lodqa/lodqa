@@ -8,12 +8,13 @@ require 'sparql/client'
 class GraphFinder
   # This constructor takes the URL of an end point to be searched
   # optionally options can be passed to the server of the end point.
-  def initialize (pgp, endpoint, options = {})
+  def initialize (pgp, endpoint, graph_uri, options = {})
     options ||= {}
     @debug = options[:debug] || false
 
     @pgp = pgp
     @endpoint = endpoint
+    @graph_uri = graph_uri
     @ignore_predicates = options[:ignore_predicates] || []
     @sortal_predicates = options[:sortal_predicates] || []
 
@@ -187,7 +188,9 @@ class GraphFinder
 
   def class?(term)
     if /^http:/.match(term)
-      sparql = "SELECT ?p WHERE {?s ?p <#{term}> FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
+      sparql  = "SELECT ?p\n"
+      sparql += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
+      sparql += "WHERE {?s ?p <#{term}> FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
       result = @endpoint.query(sparql)
       return true if result.length > 0
     end
@@ -201,7 +204,9 @@ class GraphFinder
     variables = bgp.flatten.uniq - nodes.keys
 
     # initialize the query
-    query = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')} WHERE {"
+    query  = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')}\n"
+    query += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
+    query += "WHERE {"
 
     # stringify the bgp
     query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e)? "<#{nodes[e][:term]}>" : '?' + e}.join(' ')}.join(' . ') + ' .'

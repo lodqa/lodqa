@@ -13,12 +13,11 @@ class LodqaWS < Sinatra::Base
 		set :server, 'thin'
 		set :target_db, 'http://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
-	end
 
-	configure :production do
-		logger = Logger.new(settings.root + "/log/production.log")
-		enable :logging
-		logger.level = Logger::INFO
+    enable :logging
+    file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
+    file.sync = true
+    use Rack::CommonLogger, file
 	end
 
 	before do
@@ -36,6 +35,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/' do
+		logger.info "access"
 		@config  = get_config(params)
 		@targets = get_targets
 
@@ -104,7 +104,7 @@ class LodqaWS < Sinatra::Base
 				ws.onmessage do |data|
 					begin
 						json = JSON.parse(data)
-						lodqa = Lodqa::Lodqa.new(config['endpoint_url'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
+						lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
 
 						lodqa.pgp = json['pgp'].symbolize_keys
 						lodqa.mappings = json['mappings']

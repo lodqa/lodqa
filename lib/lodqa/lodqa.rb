@@ -13,7 +13,8 @@ class Lodqa::Lodqa
   attr_accessor :pgp
   attr_accessor :mappings
 
-  def initialize(ep_url, options = {})
+  def initialize(ep_url, graph_uri, options = {})
+    @graph_uri = graph_uri
     @options = options || {}
     @debug = @options[:debug] || false
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
@@ -57,7 +58,7 @@ class Lodqa::Lodqa
 
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-      GraphFinder.new(anchored_pgp, @endpoint, @options).each_sparql_and_solution(proc_sparql, proc_solution)
+      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_sparql, proc_solution)
     end
   end
 
