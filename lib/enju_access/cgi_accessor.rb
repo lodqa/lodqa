@@ -137,7 +137,7 @@ class EnjuAccess::CGIAccessor
   # 
   # What devices are used to treat heart failure?
   #
-  # ...it will return 1 (devides).
+  # ...it will return 1 (devices).
   def get_focus (tokens, base_noun_chunks)
     # find the wh-word
     # assumption: one query has one wh-word
