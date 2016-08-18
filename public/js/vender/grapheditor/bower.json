@@ -1,7 +1,7 @@
 {
   "name": "grapheditor",
   "description": "graph editor",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>",
     "Shigeru Nakajima <shigeru.nakajima@luxiar.com>"
