@@ -9432,9 +9432,10 @@ function search(event, loader, pgpElement, mappingsElement) {
 
   var pgp = JSON.parse(pgpElement.innerHTML),
       mappings = JSON.parse(mappingsElement.innerHTML),
-      config = document.querySelector('#target').value;
+      config = document.querySelector('#target').value,
+      verbose = event.target.nextElementSibling.children[0].checked;
 
-  loader.beginSearch(pgp, mappings, '/solutions', config);
+  loader.beginSearch(pgp, mappings, '/solutions', config, verbose);
   loader.once('ws_close', function () {
     return event.target.removeAttribute('disabled');
   });
@@ -9819,12 +9820,14 @@ module.exports = function () {
   };
 
   return Object.assign(emitter, {
-    beginSearch: function beginSearch(pgp, mappings, pathname, config) {
+    beginSearch: function beginSearch(pgp, mappings, pathname, config, verbose) {
       var ws = openConnection(pathname, config);
+
       emitter.once('ws_open', function () {
         ws.send(JSON.stringify({
           pgp: pgp,
-          mappings: mappings
+          mappings: mappings,
+          verbose: verbose
         }));
       });
     }
