@@ -4,28 +4,32 @@ var _ = require('lodash'),
   privateData = {}
 
 module.exports = {
-  onAnchoredPgp: function(domId, anchored_pgp) {
+  onAnchoredPgp(domId, anchored_pgp) {
     privateData.domId = domId
     privateData.anchoredPgp = anchored_pgp
     privateData.focus = anchored_pgp.focus
     privateData.edges = anchored_pgp.edges
   },
-  onSparql: function() {
-    privateData.graph = null
-  },
-  onSolution: function(solution) {
-    if (!privateData.graph) {
-      privateData.graph = new SolutionGraph(privateData.domId, {
-        width: 690,
-        height: 400
-      })
-      privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp)
+  onSparql() {},
+  onSolution(solutions) {
+    if(!Array.isArray(solutions))
+      return
+
+    if(solutions.length === 0)
+      return
+
+    const graph = new SolutionGraph(privateData.domId, {
+      width: 690,
+      height: 400
+    })
+    graph.addAnchoredPgpNodes(privateData.anchoredPgp)
+
+    for (const solution of solutions) {
+      var isFocus = _.partial(instance.isNodeId, privateData.focus),
+        instanceNodes = graph.addInstanceNode(isFocus, solution),
+        transitNodes = graph.addTransitNode(solution)
+
+      graph.addPath(solution, privateData.edges, transitNodes, instanceNodes)
     }
-
-    var isFocus = _.partial(instance.isNodeId, privateData.focus),
-      instanceNodes = privateData.graph.addInstanceNode(isFocus, solution),
-      transitNodes = privateData.graph.addTransitNode(solution)
-
-    privateData.graph.addPath(solution, privateData.edges, transitNodes, instanceNodes)
   }
 }

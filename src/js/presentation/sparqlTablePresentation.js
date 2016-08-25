@@ -26,12 +26,12 @@ var _ = require('lodash'),
   privateData = {}
 
 module.exports = {
-  onAnchoredPgp: function(domId, anchored_pgp) {
+  onAnchoredPgp(domId, anchored_pgp) {
     privateData.domId = domId
     privateData.focus = anchored_pgp.focus
   },
-  onSparql: function(sparql) {
-    var html = reigonTemplate.render({
+  onSparql(sparql) {
+    const html = reigonTemplate.render({
         sparql: sparql
       }),
       $region = $(html)
@@ -41,19 +41,24 @@ module.exports = {
     $('#' + privateData.domId)
       .append($region)
   },
-  onSolution: function(solution) {
-    var focusInstanceId = _.first(
-        Object.keys(solution)
-        .filter(instance.is)
-        .filter(_.partial(instance.isNodeId, privateData.focus))
-      ),
-      label = toLastOfUrl(solution[focusInstanceId])
+  onSolution(solutions) {
+    if(!Array.isArray(solutions))
+      return
 
-    privateData.currentAnswerList
-      .append(
-        instanceTemplate.render({
-          instance: label
-        })
-      )
+    for (const solution of solutions) {
+      const focusInstanceId = _.first(
+          Object.keys(solution)
+          .filter(instance.is)
+          .filter(_.partial(instance.isNodeId, privateData.focus))
+        ),
+        label = toLastOfUrl(solution[focusInstanceId])
+
+      privateData.currentAnswerList
+        .append(
+          instanceTemplate.render({
+            instance: label
+          })
+        )
+    }
   }
 }

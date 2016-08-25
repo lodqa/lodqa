@@ -61,17 +61,22 @@ var _ = require('lodash'),
   privateData = {}
 
 module.exports = {
-  onAnchoredPgp: function(domId) {
+  onAnchoredPgp(domId) {
     privateData.domId = domId
   },
-  onSparql: function() {　　
-    privateData.currentSolutionList = null
+  onSparql() {
   },
-  onSolution: function(solution) {
-    if (!privateData.currentSolutionList) {
-      privateData.currentSolutionList = new SolutionLsit(privateData.domId)
-    }
+  onSolution(solutions) {
+    if(!Array.isArray(solutions))
+      return
 
-    privateData.currentSolutionList.append(toSolutionRow(solution))
+    if(solutions.length === 0)
+      return
+
+    const currentSolutionList = new SolutionLsit(privateData.domId)
+
+    for (const solution of solutions) {
+      currentSolutionList.append(toSolutionRow(solution))
+    }
   }
 }
