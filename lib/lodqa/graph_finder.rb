@@ -104,9 +104,8 @@ class GraphFinder
         proc_sparql.call(sparql)
       end
 
-      result.each_solution do |solution|
-        proc_solution.call(solution) unless proc_solution.nil?
-      end
+      proc_solution.call(result.map{ |solution| solution.to_h }) if proc_solution
+
       if @debug
         puts "==========\n"
       end

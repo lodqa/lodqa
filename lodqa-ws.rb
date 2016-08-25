@@ -96,7 +96,7 @@ class LodqaWS < Sinatra::Base
 			end
 
 			proc_solution = Proc.new do |solution|
-				ws_send(EM, ws, :solution, solution.to_h)
+				ws_send(EM, ws, :solution, solution)
 			end
 
 			ws.onmessage do |data|
