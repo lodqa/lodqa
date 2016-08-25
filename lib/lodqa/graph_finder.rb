@@ -80,9 +80,11 @@ class GraphFinder
   end
 
   def each_sparql_and_solution(proc_sparql = nil, proc_solution = nil, verbose = false)
-    @bgps.each do |bgp|
-      sparql = compose_sparql(bgp, @pgp)
+    sparqls = @bgps.map do |bgp|
+      compose_sparql(bgp, @pgp)
+    end
 
+    sparqls.each do |sparql|
       if @debug
         puts "#{sparql}\n++++++++++"
       end
@@ -102,7 +104,6 @@ class GraphFinder
         proc_sparql.call(sparql)
       end
 
-      p result.length
       result.each_solution do |solution|
         proc_solution.call(solution) unless proc_solution.nil?
       end
