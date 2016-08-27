@@ -2,7 +2,7 @@ var EventEmitter = require('events').EventEmitter
 
 module.exports = function() {
   var emitter = new EventEmitter,
-    openConnection = function(pathname, config) {
+    openConnection = function(pathname, config, verbose) {
       var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config)
 
       ws.onopen = function() {
@@ -16,11 +16,14 @@ module.exports = function() {
 
         var jsondata = JSON.parse(m.data);
 
-        ['anchored_pgp', 'sparql', 'solution', 'parse_rendering']
+        ['anchored_pgp', 'solution', 'parse_rendering']
         .forEach(function(event) {
           if (jsondata.hasOwnProperty(event)) {
             if(event === 'solution'){
-              emitter.emit(event, jsondata[event].solutions)
+              if(jsondata[event].solutions.length > 0 || verbose){
+                emitter.emit('sparql', jsondata[event].sparql)
+                emitter.emit(event, jsondata[event].solutions)
+              }
             }else{
               emitter.emit(event, jsondata[event])
             }
@@ -33,13 +36,12 @@ module.exports = function() {
 
   return Object.assign(emitter, {
     beginSearch: function(pgp, mappings, pathname, config, verbose) {
-      const ws = openConnection(pathname, config)
+      const ws = openConnection(pathname, config, verbose)
 
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
           pgp,
-          mappings,
-          verbose
+          mappings
         }))
       })
     }
