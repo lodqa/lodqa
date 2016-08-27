@@ -10,26 +10,25 @@ module.exports = {
     privateData.focus = anchored_pgp.focus
     privateData.edges = anchored_pgp.edges
   },
-  onSparql() {},
-  onSolution(solutions) {
-    if(!Array.isArray(solutions))
-      return
+  onSolution(data) {
+    const {solutions} = data
 
-    if(solutions.length === 0)
-      return
+    if(solutions.length > 0)
+    {
+      const graph = new SolutionGraph(privateData.domId, {
+        width: 690,
+        height: 400
+      })
 
-    const graph = new SolutionGraph(privateData.domId, {
-      width: 690,
-      height: 400
-    })
-    graph.addAnchoredPgpNodes(privateData.anchoredPgp)
+      graph.addAnchoredPgpNodes(privateData.anchoredPgp)
 
-    for (const solution of solutions) {
-      var isFocus = _.partial(instance.isNodeId, privateData.focus),
-        instanceNodes = graph.addInstanceNode(isFocus, solution),
-        transitNodes = graph.addTransitNode(solution)
+      for (const solution of solutions) {
+        var isFocus = _.partial(instance.isNodeId, privateData.focus),
+          instanceNodes = graph.addInstanceNode(isFocus, solution),
+          transitNodes = graph.addTransitNode(solution)
 
-      graph.addPath(solution, privateData.edges, transitNodes, instanceNodes)
+        graph.addPath(solution, privateData.edges, transitNodes, instanceNodes)
+      }
     }
   }
 }

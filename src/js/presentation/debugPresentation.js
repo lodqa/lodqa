@@ -8,9 +8,6 @@ module.exports = {
     document.getElementById(domId).appendChild(privateData.currentRegion)
     privateData.currentRegion.innerHTML = JSON.stringify(anchored_pgp)
   },
-  onSparql: function(sparql) {
-    privateData.currentRegion.innerHTML += '<br />' + JSON.stringify(sparql)
-  },
   onSolution: function(solution) {
     privateData.currentRegion.innerHTML += '<br />' + JSON.stringify(solution)
   }

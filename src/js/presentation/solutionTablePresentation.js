@@ -64,19 +64,15 @@ module.exports = {
   onAnchoredPgp(domId) {
     privateData.domId = domId
   },
-  onSparql() {
-  },
-  onSolution(solutions) {
-    if(!Array.isArray(solutions))
-      return
+  onSolution(data) {
+    const {solutions} = data
 
-    if(solutions.length === 0)
-      return
+    if(solutions.length > 0){
+      const currentSolutionList = new SolutionLsit(privateData.domId)
 
-    const currentSolutionList = new SolutionLsit(privateData.domId)
-
-    for (const solution of solutions) {
-      currentSolutionList.append(toSolutionRow(solution))
+      for (const solution of solutions) {
+        currentSolutionList.append(toSolutionRow(solution))
+      }
     }
   }
 }

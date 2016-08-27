@@ -21,8 +21,7 @@ module.exports = function() {
           if (jsondata.hasOwnProperty(event)) {
             if(event === 'solution'){
               if(jsondata[event].solutions.length > 0 || verbose){
-                emitter.emit('sparql', jsondata[event].sparql)
-                emitter.emit(event, jsondata[event].solutions)
+                emitter.emit(event, jsondata[event])
               }
             }else{
               emitter.emit(event, jsondata[event])

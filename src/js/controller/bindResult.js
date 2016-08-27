@@ -7,7 +7,6 @@ var bindAnchoredPgpPresentation = function(loader, presentation) {
   bindResultPresentation = function(loader, presentation) {
     bindAnchoredPgpPresentation(loader, presentation)
     loader
-      .on('sparql', presentation.onSparql)
       .on('solution', presentation.onSolution)
   },
   bindResult = {

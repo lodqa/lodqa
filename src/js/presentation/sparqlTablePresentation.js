@@ -30,35 +30,41 @@ module.exports = {
     privateData.domId = domId
     privateData.focus = anchored_pgp.focus
   },
-  onSparql(sparql) {
-    const html = reigonTemplate.render({
-        sparql: sparql
-      }),
-      $region = $(html)
+  onSolution(data) {
+    const {sparql, solutions} = data
+    const $resultTable = createTable(sparql)
+    appendAnswers($resultTable, solutions)
 
-    privateData.currentAnswerList = $region.find('.answer-list')
-
+    // Add a table to the dom tree
     $('#' + privateData.domId)
-      .append($region)
-  },
-  onSolution(solutions) {
-    if(!Array.isArray(solutions))
-      return
+      .append($resultTable)
+  }
+}
 
-    for (const solution of solutions) {
-      const focusInstanceId = _.first(
-          Object.keys(solution)
-          .filter(instance.is)
-          .filter(_.partial(instance.isNodeId, privateData.focus))
-        ),
-        label = toLastOfUrl(solution[focusInstanceId])
+function createTable(sparql) {
+  const html = reigonTemplate.render({
+    sparql
+  })
 
-      privateData.currentAnswerList
-        .append(
-          instanceTemplate.render({
-            instance: label
-          })
-        )
-    }
+  return $(html)
+}
+
+function appendAnswers($resultTable, solutions) {
+  const currentAnswerList = $resultTable.find('.answer-list')
+
+  for (const solution of solutions) {
+    const focusInstanceId = _.first(
+        Object.keys(solution)
+        .filter(instance.is)
+        .filter(_.partial(instance.isNodeId, privateData.focus))
+      ),
+      label = toLastOfUrl(solution[focusInstanceId])
+
+    currentAnswerList
+      .append(
+        instanceTemplate.render({
+          instance: label
+        })
+      )
   }
 }
