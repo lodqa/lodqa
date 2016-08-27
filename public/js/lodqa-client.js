@@ -9811,7 +9811,11 @@ module.exports = function () {
 
       ['anchored_pgp', 'sparql', 'solution', 'parse_rendering'].forEach(function (event) {
         if (jsondata.hasOwnProperty(event)) {
-          emitter.emit(event, jsondata[event]);
+          if (event === 'solution') {
+            emitter.emit(event, jsondata[event].solutions);
+          } else {
+            emitter.emit(event, jsondata[event]);
+          }
         }
       });
     };
