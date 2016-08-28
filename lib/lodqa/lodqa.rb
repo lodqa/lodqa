@@ -56,6 +56,11 @@ class Lodqa::Lodqa
       anchored_pgp
     end
 
+    p anchored_pgps
+      .map {|anchored_pgp| GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options) }
+      .map {|gf| gf.sparqls.length }
+      .inject {|sum, n| sum + n }
+
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
       GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution)
