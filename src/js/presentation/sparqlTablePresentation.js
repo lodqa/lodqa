@@ -1,35 +1,36 @@
-var _ = require('lodash'),
-  instance = require('./instance'),
-  makeTemplate = require('../render/makeTemplate'),
-  reigonTemplate = makeTemplate(function() {
-    /*
-    <div class="result-region">
-        <table class="sparql-table">
-            <tr>
-                <th>sparql</th>
-                <th>answer</th>
-            </tr>
-            <tr>
-                <td class="sparql">{{sparql}}</td>
-                <td><ul class="answer-list list-in-table"></ul></td>
-            </tr>
-        </table>
-    </div>
-    */
-  }),
-  instanceTemplate = makeTemplate(function() {
-    /*
-    <li>{{instance}}</li>
-    */
-  }),
-  toLastOfUrl = require('./toLastOfUrl'),
-  privateData = {}
+const _ = require('lodash')
+const instance = require('./instance')
+const makeTemplate = require('../render/makeTemplate')
+const reigonTemplate = makeTemplate(function() {
+  /*
+  <div class="result-region">
+      <table class="sparql-table">
+          <tr>
+              <th>sparql</th>
+              <th>answer</th>
+          </tr>
+          <tr>
+              <td class="sparql">{{sparql}}</td>
+              <td><ul class="answer-list list-in-table"></ul></td>
+          </tr>
+      </table>
+  </div>
+  */
+})
+const instanceTemplate = makeTemplate(function() {
+  /*
+  <li>{{instance}}</li>
+  */
+})
+const toLastOfUrl = require('./toLastOfUrl')
+const privateData = {}
 
-module.exports = {
+class SparqlTablePresentation {
   onAnchoredPgp(domId, anchored_pgp) {
     privateData.domId = domId
     privateData.focus = anchored_pgp.focus
-  },
+  }
+
   onSolution(data) {
     const {sparql, solutions} = data
     const $resultTable = createTable(sparql)
@@ -40,6 +41,8 @@ module.exports = {
       .append($resultTable)
   }
 }
+
+module.exports = new SparqlTablePresentation
 
 function createTable(sparql) {
   const html = reigonTemplate.render({

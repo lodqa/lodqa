@@ -1,20 +1,21 @@
-var _ = require('lodash'),
-  instance = require('./instance'),
-  SolutionGraph = require('../graph/SolutionGraph'),
-  privateData = {}
+const instance = require('./instance')
+const SolutionGraph = require('../graph/SolutionGraph')
 
-module.exports = {
+const privateData = {}
+
+class GraphPresentation {
   onAnchoredPgp(domId, anchored_pgp) {
     privateData.domId = domId
     privateData.anchoredPgp = anchored_pgp
     privateData.focus = anchored_pgp.focus
     privateData.edges = anchored_pgp.edges
-  },
+  }
   onSolution(data) {
-    const {solutions} = data
+    const {
+      solutions
+    } = data
 
-    if(solutions.length > 0)
-    {
+    if (solutions.length > 0) {
       const graph = new SolutionGraph(privateData.domId, {
         width: 690,
         height: 400
@@ -23,12 +24,14 @@ module.exports = {
       graph.addAnchoredPgpNodes(privateData.anchoredPgp)
 
       for (const solution of solutions) {
-        var isFocus = _.partial(instance.isNodeId, privateData.focus),
-          instanceNodes = graph.addInstanceNode(isFocus, solution),
-          transitNodes = graph.addTransitNode(solution)
+        const isFocus = (solution) => instance.isNodeId(privateData.focus, solution)
+        const instanceNodes = graph.addInstanceNode(isFocus, solution)
+        const transitNodes = graph.addTransitNode(solution)
 
         graph.addPath(solution, privateData.edges, transitNodes, instanceNodes)
       }
     }
   }
 }
+
+module.exports = new GraphPresentation

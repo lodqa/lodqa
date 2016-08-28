@@ -1,14 +1,13 @@
-var _ = require('lodash'),
-  show = function(el, msg) {
-    el.innerHTML = msg
-  }
-
 module.exports = function(domId) {
-  var onOpen = _.partial(show, document.getElementById(domId), '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>'),
-    onClose = _.partial(show, document.getElementById(domId), '')
+  const onOpen = () => show(document.getElementById(domId), '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>'),
+    onClose = () => show(document.getElementById(domId), '')
 
   return {
-    onOpen: onOpen,
-    onClose: onClose
+    onOpen,
+    onClose
   }
+}
+
+function show(el, msg) {
+  el.innerHTML = msg
 }

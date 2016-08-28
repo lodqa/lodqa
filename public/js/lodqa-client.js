@@ -9335,23 +9335,23 @@ module.exports = function (a, element) {
 },{}],14:[function(require,module,exports){
 'use strict';
 
-var bindAnchoredPgpPresentation = function bindAnchoredPgpPresentation(loader, presentation) {
+module.exports = {
+  all: all,
+  anchoredPgp: anchoredPgp
+};
+
+function anchoredPgp(loader, presentation) {
   var domId = 'lodqa-results';
 
   loader.on('anchored_pgp', function (anchoredPgp) {
     return presentation.onAnchoredPgp(domId, anchoredPgp);
   });
-},
-    bindResultPresentation = function bindResultPresentation(loader, presentation) {
-  bindAnchoredPgpPresentation(loader, presentation);
-  loader.on('solution', presentation.onSolution);
-},
-    bindResult = {
-  all: bindResultPresentation,
-  anchoredPgp: bindAnchoredPgpPresentation
-};
+}
 
-module.exports = bindResult;
+function all(loader, presentation) {
+  anchoredPgp(loader, presentation);
+  loader.on('solution', presentation.onSolution);
+}
 
 },{}],15:[function(require,module,exports){
 'use strict';
@@ -9805,7 +9805,7 @@ module.exports = function () {
 
       var jsondata = JSON.parse(m.data);
 
-      ['anchored_pgp', 'solution', 'parse_rendering'].forEach(function (event) {
+      ['sparql_count', 'anchored_pgp', 'solution', 'parse_rendering'].forEach(function (event) {
         if (jsondata.hasOwnProperty(event)) {
           if (event === 'solution') {
             if (jsondata[event].solutions.length > 0 || verbose) {
@@ -9828,8 +9828,7 @@ module.exports = function () {
       emitter.once('ws_open', function () {
         ws.send(JSON.stringify({
           pgp: pgp,
-          mappings: mappings,
-          verbose: verbose
+          mappings: mappings
         }));
       });
     }

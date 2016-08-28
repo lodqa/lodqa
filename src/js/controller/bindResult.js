@@ -1,17 +1,17 @@
-var bindAnchoredPgpPresentation = function(loader, presentation) {
-    var domId = 'lodqa-results'
+module.exports = {
+  all,
+  anchoredPgp
+}
 
-    loader
-      .on('anchored_pgp', (anchoredPgp) => presentation.onAnchoredPgp(domId, anchoredPgp))
-  },
-  bindResultPresentation = function(loader, presentation) {
-    bindAnchoredPgpPresentation(loader, presentation)
-    loader
-      .on('solution', presentation.onSolution)
-  },
-  bindResult = {
-    all: bindResultPresentation,
-    anchoredPgp: bindAnchoredPgpPresentation
-  }
+function anchoredPgp(loader, presentation) {
+  var domId = 'lodqa-results'
 
-module.exports = bindResult
+  loader
+    .on('anchored_pgp', (anchoredPgp) => presentation.onAnchoredPgp(domId, anchoredPgp))
+}
+
+function all(loader, presentation) {
+  anchoredPgp(loader, presentation)
+  loader
+    .on('solution', presentation.onSolution)
+}
