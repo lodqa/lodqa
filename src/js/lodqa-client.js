@@ -6,16 +6,11 @@ import solutionTablePresentation from './presentation/solutionTablePresentation'
 import graphPresentation from './presentation/graphPresentation'
 import websocketPresentation from './presentation/websocketPresentation'
 
-// for debug
-// import Loader from './loader/loadSolutionStub'
-// import debugPresentation from './presentation/debugPresentation'
-
 document.addEventListener('DOMContentLoaded', init)
 
 function init() {
   const loader = new Loader()
 
-  // bindResult.all(loader, debugPresentation)
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
   bindResult.all(loader, sparqlTablePresentation)
   bindResult.all(loader, solutionTablePresentation)

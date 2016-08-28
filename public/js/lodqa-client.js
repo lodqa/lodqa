@@ -9386,10 +9386,6 @@ var _presentationWebsocketPresentation = require('./presentation/websocketPresen
 
 var _presentationWebsocketPresentation2 = _interopRequireDefault(_presentationWebsocketPresentation);
 
-// for debug
-// import Loader from './loader/loadSolutionStub'
-// import debugPresentation from './presentation/debugPresentation'
-
 document.addEventListener('DOMContentLoaded', init);
 
 function init() {
