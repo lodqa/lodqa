@@ -5,4 +5,6 @@ module.exports = function bindWebsocketPresentation(loader) {
   loader
     .on('ws_open', presentation.onOpen)
     .on('ws_close', presentation.onClose)
+    .on('sparql_count', presentation.onSparqlCount)
+    .on('solution', presentation.onSolution)
 }

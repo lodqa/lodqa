@@ -169,7 +169,6 @@ nav a {
     position: fixed;
     top: 4px;
     right: 4px;
-    width: 150px;
     height: 30px;
     text-align: center;
     z-index: 2;
@@ -179,7 +178,7 @@ nav a {
     margin: auto;
     padding: 1px;
     border: 2px solid red;
-    border-radius: 5px; 
+    border-radius: 5px;
     background-color: #ffff66;
     text-align: center;
 }
@@ -250,7 +249,7 @@ h1 {
     font-size:medium;
     font-weight:bold;
 
-    background: linear-gradient(45deg, #ffff66, #ffffff); 
+    background: linear-gradient(45deg, #ffff66, #ffffff);
 }
 
 h2 {
