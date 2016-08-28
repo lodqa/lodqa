@@ -20,7 +20,7 @@ class Lodqa::Lodqa
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
   end
 
-  def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil, verbose = false)
+  def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_solution = nil)
     # Join operation if there is a term mapping failure on a passing node
     nodes_to_delete = []
     @pgp[:nodes].each_key do |n|
@@ -58,7 +58,7 @@ class Lodqa::Lodqa
 
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_sparql, proc_solution, verbose)
+      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution)
     end
   end
 

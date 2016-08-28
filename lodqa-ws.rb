@@ -91,10 +91,6 @@ class LodqaWS < Sinatra::Base
 				ws_send(EM, ws, :anchored_pgp, anchored_pgp)
 			end
 
-			proc_sparql = Proc.new do |sparql|
-				ws_send(EM, ws, :sparql, sparql)
-			end
-
 			proc_solution = Proc.new do |solution|
 				ws_send(EM, ws, :solution, solution)
 			end
@@ -106,12 +102,11 @@ class LodqaWS < Sinatra::Base
 
 					lodqa.pgp = json['pgp'].symbolize_keys
 					lodqa.mappings = json['mappings']
-					verbose = json['verbose']
 					# lodqa.parse(query, config['parser_url'])
 
 					EM.defer do
 						ws.send("start")
-						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_sparql, proc_solution, verbose)
+						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_solution)
 						ws.close_connection
 					end
 				rescue JSON::ParserError => e
