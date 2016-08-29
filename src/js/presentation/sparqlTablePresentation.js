@@ -33,12 +33,20 @@ class SparqlTablePresentation {
 
   onSolution(data) {
     const {sparql, solutions} = data
+
+    if(solutions.length === 0 && !privateData.verbose) {
+      return
+    }
     const $resultTable = createTable(sparql)
     appendAnswers($resultTable, solutions)
 
     // Add a table to the dom tree
     $('#' + privateData.domId)
       .append($resultTable)
+  }
+
+  setVerbose(value) {
+    privateData.verbose = value
   }
 }
 

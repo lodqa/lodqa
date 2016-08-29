@@ -21,4 +21,7 @@ function init() {
   bindWebsocketPresentation(loader)
   bindParseRenderingPresentation(loader)
   bindSearchButton(loader)
+
+  const checkbox = document.querySelector('#verbose')
+  checkbox.addEventListener('change', (event) => sparqlTablePresentation.setVerbose(event.target.checked))
 }
