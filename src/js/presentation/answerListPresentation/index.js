@@ -1,4 +1,4 @@
-const appendAnswers = require('./SparqlTablePresentation/appendAnswers')
+const appendAnswers = require('./appendAnswers')
 
 const regionHtml = `<div class="answer-list-region">
   <h2>Answers</h2>
@@ -14,7 +14,9 @@ class AnswerListPresentation {
   }
 
   onSolution(data, domId) {
-    const {solutions} = data
+    const {
+      solutions
+    } = data
 
     if (solutions.length === 0) {
       return
@@ -24,7 +26,8 @@ class AnswerListPresentation {
     appendAnswers($region, solutions, privateData.focus)
 
     // Add a list to the dom tree
-    $('#' + domId).append($region)
+    $(`#${domId}`)
+      .append($region)
   }
 }
 
