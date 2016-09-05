@@ -5,6 +5,7 @@ const bindParseRenderingPresentation = require('./controller/bindParseRenderingP
 const bindSearchButton = require('./controller/bindSearchButton')
 const bindStopSearchButton = require('./controller/bindStopSearchButton')
 const anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation')
+const answerListPresentation = require('./presentation/answerListPresentation')
 const sparqlTablePresentation = require('./presentation/sparqlTablePresentation')
 const solutionTablePresentation = require('./presentation/solutionTablePresentation')
 const graphPresentation = require('./presentation/graphPresentation')
@@ -15,6 +16,7 @@ function init() {
   const loader = new Loader()
 
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
+  bindResult.all(loader, answerListPresentation)
   bindResult.all(loader, sparqlTablePresentation)
   bindResult.solution(loader, solutionTablePresentation)
   bindResult.all(loader, graphPresentation)
