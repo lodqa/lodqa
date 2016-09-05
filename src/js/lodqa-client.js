@@ -16,7 +16,7 @@ function init() {
 
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
   bindResult.all(loader, sparqlTablePresentation)
-  bindResult.all(loader, solutionTablePresentation)
+  bindResult.solution(loader, solutionTablePresentation)
   bindResult.all(loader, graphPresentation)
 
   bindWebsocketPresentation(loader)

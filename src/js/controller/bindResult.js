@@ -1,17 +1,20 @@
 module.exports = {
   all,
-  anchoredPgp
+  anchoredPgp,
+  solution
 }
 
-function anchoredPgp(loader, presentation) {
-  var domId = 'lodqa-results'
+const domId = 'lodqa-results'
 
-  loader
-    .on('anchored_pgp', (anchoredPgp) => presentation.onAnchoredPgp(domId, anchoredPgp))
+function anchoredPgp(loader, presentation) {
+  loader.on('anchored_pgp', (anchoredPgp) => presentation.onAnchoredPgp(domId, anchoredPgp))
+}
+
+function solution(loader, presentation) {
+  loader.on('solution', (data) => presentation.onSolution(data, domId))
 }
 
 function all(loader, presentation) {
   anchoredPgp(loader, presentation)
-  loader
-    .on('solution', presentation.onSolution)
+  solution(loader, presentation)
 }
