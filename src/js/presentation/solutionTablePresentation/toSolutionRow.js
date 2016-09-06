@@ -1,21 +1,23 @@
-const _ = require('lodash')
 const Hogan = require('hogan.js')
 const toArray = require('../../collection/toArray')
 const toLastOfUrl = require('../toLastOfUrl')
 
 const trHtml = `<tr>
-    <td class="solution">{{#solutions}}{{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>{{/solutions}}</td>
+  <td class="solution">
+    {{#nodes}}
+      {{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
+    {{/nodes}}
+  </td>
 </tr>`
 const solutionRowTemplate = Hogan.compile(trHtml)
 
 module.exports = function toSolutionRow(solution) {
-  var toParams = _.partial(toViewParameters, solution),
-    solutionLinks = Object.keys(solution)
-    .map(toParams)
+  const nodes = Object.keys(solution)
+    .map((key) => toViewParameters(solution, key))
     .reduce(toArray, [])
 
   return solutionRowTemplate.render({
-    solutions: solutionLinks
+    nodes
   })
 }
 
