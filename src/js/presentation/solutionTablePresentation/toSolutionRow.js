@@ -3,11 +3,11 @@ const toArray = require('../../collection/toArray')
 const toLastOfUrl = require('../toLastOfUrl')
 
 const trHtml = `<tr>
-  <td class="solution">
-    {{#nodes}}
-      {{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
-    {{/nodes}}
-  </td>
+  {{#nodes}}
+    <td class="solution">
+      <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
+    </td>
+  {{/nodes}}
 </tr>`
 const solutionRowTemplate = Hogan.compile(trHtml)
 

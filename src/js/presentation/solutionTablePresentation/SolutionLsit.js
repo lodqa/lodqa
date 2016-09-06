@@ -1,16 +1,27 @@
-const reigonHtml = `<div class="result-region solution-region hide">
+const Hogan = require('Hogan.js')
+
+const regionHtml = `<div class="result-region solution-region hide">
       <table>
           <tr>
-              <th>solutions</th>
+            {{#keys}}
+              <th>{{key}}</th>
+            {{/keys}}
           </tr>
       </table>
   </div>
   <div>
      <input type="button" value="Show solutions in table"></input>
   </div>`
+const reigonTemplate = Hogan.compile(regionHtml)
 
-module.exports = function SolutionLsit(domId) {
-  const $region = $(reigonHtml)
+module.exports = function SolutionLsit(domId, solution) {
+  const data = {
+    keys: Object.keys(solution)
+      .map((key) => ({
+        key
+      }))
+  }
+  const $region = $(reigonTemplate.render(data))
 
   $region
     .on('click', 'input', (e) => {
