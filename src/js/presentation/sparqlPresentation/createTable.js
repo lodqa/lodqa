@@ -1,14 +1,8 @@
 const Hogan = require('hogan.js')
 
-const regionHtml = `<div class="result-region">
-  <table class="sparql-table">
-    <tr>
-      <th>sparql</th>
-    </tr>
-    <tr>
-      <td class="sparql">{{sparql}}</td>
-    </tr>
-  </table>
+const regionHtml = `<div class="result-region sparql-region">
+  <h2>Sparql</h2>
+  <span class="sparql">{{sparql}}</span>
 </div>
 `
 const reigonTemplate = Hogan.compile(regionHtml)

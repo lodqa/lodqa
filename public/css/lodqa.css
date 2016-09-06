@@ -345,6 +345,15 @@ div.atext {
     padding: 6px;
 }
 
+.sparql-region {
+    border: 0px;
+}
+
+.sparql-region .sparql{
+    font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+    font-size: 0.8em;
+}
+
 /* anchored_pgp-table */
 .anchored_pgp-region {
     margin: 16px 0 8px 0;

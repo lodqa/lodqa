@@ -2,7 +2,7 @@ const createTable = require('./createTable')
 
 const privateData = {}
 
-class SparqlTablePresentation {
+class SparqlPresentation {
   onSolution(data, domId) {
     const {
       sparql,
@@ -23,4 +23,4 @@ class SparqlTablePresentation {
   }
 }
 
-module.exports = new SparqlTablePresentation
+module.exports = new SparqlPresentation

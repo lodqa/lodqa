@@ -6,7 +6,7 @@ const bindSearchButton = require('./controller/bindSearchButton')
 const bindStopSearchButton = require('./controller/bindStopSearchButton')
 const anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation')
 const answerListPresentation = require('./presentation/answerListPresentation')
-const sparqlTablePresentation = require('./presentation/sparqlTablePresentation')
+const sparqlPresentation = require('./presentation/sparqlPresentation')
 const solutionTablePresentation = require('./presentation/solutionTablePresentation')
 const graphPresentation = require('./presentation/graphPresentation')
 
@@ -17,7 +17,7 @@ function init() {
 
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
   bindResult.all(loader, answerListPresentation)
-  bindResult.solution(loader, sparqlTablePresentation)
+  bindResult.solution(loader, sparqlPresentation)
   bindResult.solution(loader, solutionTablePresentation)
   bindResult.all(loader, graphPresentation)
 
@@ -27,5 +27,5 @@ function init() {
   bindStopSearchButton(loader)
 
   const checkbox = document.querySelector('#verbose')
-  checkbox.addEventListener('change', (event) => sparqlTablePresentation.setVerbose(event.target.checked))
+  checkbox.addEventListener('change', (event) => sparqlPresentation.setVerbose(event.target.checked))
 }
