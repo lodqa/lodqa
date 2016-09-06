@@ -10,15 +10,16 @@ const reigonHtml = `<div class="result-region solution-region hide">
   </div>`
 
 module.exports = function SolutionLsit(domId) {
-  var $region = $(reigonHtml)
-    .on('click', 'input', function(event) {
+  const $region = $(reigonHtml)
+
+  $region
+    .on('click', 'input', (e) => {
       $region[0].classList.toggle('hide')
 
-      var $input = $(event.target)
-      if ($input.val() === 'Show solutions in table') {
-        $input.val('Hide solutions in table')
+      if (e.target.val === 'Show solutions in table') {
+        e.target.val = 'Hide solutions in table'
       } else {
-        $input.val('Show solutions in table')
+        e.target.val = 'Show solutions in table'
       }
     })
 
