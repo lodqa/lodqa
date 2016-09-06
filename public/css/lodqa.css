@@ -323,10 +323,6 @@ div.atext {
 }
 
 /* result-region */
-.result-region {
-    border: 1px solid black;
-}
-
 .result-region table {
     border-collapse: collapse;
     width: 100%;
@@ -343,10 +339,6 @@ div.atext {
     background-color: #fff;
     border: 1px solid #b9b9b9;
     padding: 6px;
-}
-
-.sparql-region {
-    border: 0px;
 }
 
 .sparql-region .sparql{
