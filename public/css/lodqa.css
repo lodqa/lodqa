@@ -169,7 +169,6 @@ nav a {
     position: fixed;
     top: 4px;
     right: 4px;
-    width: 150px;
     height: 30px;
     text-align: center;
     z-index: 2;
@@ -179,7 +178,7 @@ nav a {
     margin: auto;
     padding: 1px;
     border: 2px solid red;
-    border-radius: 5px; 
+    border-radius: 5px;
     background-color: #ffff66;
     text-align: center;
 }
@@ -250,7 +249,7 @@ h1 {
     font-size:medium;
     font-weight:bold;
 
-    background: linear-gradient(45deg, #ffff66, #ffffff); 
+    background: linear-gradient(45deg, #ffff66, #ffffff);
 }
 
 h2 {
@@ -324,10 +323,6 @@ div.atext {
 }
 
 /* result-region */
-.result-region {
-    border: 1px solid black;
-}
-
 .result-region table {
     border-collapse: collapse;
     width: 100%;
@@ -346,6 +341,11 @@ div.atext {
     padding: 6px;
 }
 
+.sparql-region .sparql{
+    font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+    font-size: 0.8em;
+}
+
 /* anchored_pgp-table */
 .anchored_pgp-region {
     margin: 16px 0 8px 0;
@@ -355,11 +355,14 @@ div.atext {
     color: #FF512C;
 }
 
+.sparql-region,
 .solution-region {
     max-height: 1000px;
     overflow: hidden;
     transition: all 1s ease-in;
 }
+
+.sparql-region.hide,
 .solution-region.hide{
     max-height: 0;
     transition: all 0.6s ease-out;

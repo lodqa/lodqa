@@ -79,10 +79,12 @@ class GraphFinder
     end
   end
 
-  def each_sparql_and_solution(proc_sparql = nil, proc_solution = nil, verbose = false)
-    @bgps.each do |bgp|
-      sparql = compose_sparql(bgp, @pgp)
+  def sparqls
+    @bgps.map {|bgp| compose_sparql(bgp, @pgp) }
+  end
 
+  def each_sparql_and_solution(proc_solution = nil)
+    sparqls.each do |sparql|
       if @debug
         puts "#{sparql}\n++++++++++"
       end
@@ -98,14 +100,10 @@ class GraphFinder
         # print detail.backtrace.join("\n")
       end
 
-      if proc_sparql && (result.length > 0 || verbose)
-        proc_sparql.call(sparql)
+      if proc_solution
+        proc_solution.call({sparql: sparql, solutions: result.map{ |solution| solution.to_h }})
       end
 
-      p result.length
-      result.each_solution do |solution|
-        proc_solution.call(solution) unless proc_solution.nil?
-      end
       if @debug
         puts "==========\n"
       end

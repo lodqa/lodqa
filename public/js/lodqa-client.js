@@ -9335,23 +9335,23 @@ module.exports = function (a, element) {
 },{}],14:[function(require,module,exports){
 'use strict';
 
-var bindAnchoredPgpPresentation = function bindAnchoredPgpPresentation(loader, presentation) {
+module.exports = {
+  all: all,
+  anchoredPgp: anchoredPgp
+};
+
+function anchoredPgp(loader, presentation) {
   var domId = 'lodqa-results';
 
   loader.on('anchored_pgp', function (anchoredPgp) {
     return presentation.onAnchoredPgp(domId, anchoredPgp);
   });
-},
-    bindResultPresentation = function bindResultPresentation(loader, presentation) {
-  bindAnchoredPgpPresentation(loader, presentation);
-  loader.on('sparql', presentation.onSparql).on('solution', presentation.onSolution);
-},
-    bindResult = {
-  all: bindResultPresentation,
-  anchoredPgp: bindAnchoredPgpPresentation
-};
+}
 
-module.exports = bindResult;
+function all(loader, presentation) {
+  anchoredPgp(loader, presentation);
+  loader.on('solution', presentation.onSolution);
+}
 
 },{}],15:[function(require,module,exports){
 'use strict';
@@ -9385,10 +9385,6 @@ var _presentationGraphPresentation2 = _interopRequireDefault(_presentationGraphP
 var _presentationWebsocketPresentation = require('./presentation/websocketPresentation');
 
 var _presentationWebsocketPresentation2 = _interopRequireDefault(_presentationWebsocketPresentation);
-
-// for debug
-// import Loader from './loader/loadSolutionStub'
-// import debugPresentation from './presentation/debugPresentation'
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -9795,7 +9791,7 @@ var EventEmitter = require('events').EventEmitter;
 
 module.exports = function () {
   var emitter = new EventEmitter(),
-      openConnection = function openConnection(pathname, config) {
+      openConnection = function openConnection(pathname, config, verbose) {
     var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config);
 
     ws.onopen = function () {
@@ -9809,9 +9805,15 @@ module.exports = function () {
 
       var jsondata = JSON.parse(m.data);
 
-      ['anchored_pgp', 'sparql', 'solution', 'parse_rendering'].forEach(function (event) {
+      ['sparql_count', 'anchored_pgp', 'solution', 'parse_rendering'].forEach(function (event) {
         if (jsondata.hasOwnProperty(event)) {
-          emitter.emit(event, jsondata[event]);
+          if (event === 'solution') {
+            if (jsondata[event].solutions.length > 0 || verbose) {
+              emitter.emit(event, jsondata[event]);
+            }
+          } else {
+            emitter.emit(event, jsondata[event]);
+          }
         }
       });
     };
@@ -9821,13 +9823,12 @@ module.exports = function () {
 
   return Object.assign(emitter, {
     beginSearch: function beginSearch(pgp, mappings, pathname, config, verbose) {
-      var ws = openConnection(pathname, config);
+      var ws = openConnection(pathname, config, verbose);
 
       emitter.once('ws_open', function () {
         ws.send(JSON.stringify({
           pgp: pgp,
-          mappings: mappings,
-          verbose: verbose
+          mappings: mappings
         }));
       });
     }
@@ -9896,23 +9897,46 @@ module.exports = {
     privateData.focus = anchored_pgp.focus;
     privateData.edges = anchored_pgp.edges;
   },
-  onSparql: function onSparql() {
-    privateData.graph = null;
-  },
-  onSolution: function onSolution(solution) {
-    if (!privateData.graph) {
-      privateData.graph = new SolutionGraph(privateData.domId, {
+  onSolution: function onSolution(data) {
+    var solutions = data.solutions;
+
+    if (solutions.length > 0) {
+      var graph = new SolutionGraph(privateData.domId, {
         width: 690,
         height: 400
       });
-      privateData.graph.addAnchoredPgpNodes(privateData.anchoredPgp);
+
+      graph.addAnchoredPgpNodes(privateData.anchoredPgp);
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var solution = _step.value;
+
+          var isFocus = _.partial(instance.isNodeId, privateData.focus),
+              instanceNodes = graph.addInstanceNode(isFocus, solution),
+              transitNodes = graph.addTransitNode(solution);
+
+          graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator['return']) {
+            _iterator['return']();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
     }
-
-    var isFocus = _.partial(instance.isNodeId, privateData.focus),
-        instanceNodes = privateData.graph.addInstanceNode(isFocus, solution),
-        transitNodes = privateData.graph.addTransitNode(solution);
-
-    privateData.graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
   }
 };
 
@@ -9993,15 +10017,37 @@ module.exports = {
   onAnchoredPgp: function onAnchoredPgp(domId) {
     privateData.domId = domId;
   },
-  onSparql: function onSparql() {
-    privateData.currentSolutionList = null;
-  },
-  onSolution: function onSolution(solution) {
-    if (!privateData.currentSolutionList) {
-      privateData.currentSolutionList = new SolutionLsit(privateData.domId);
-    }
+  onSolution: function onSolution(data) {
+    var solutions = data.solutions;
 
-    privateData.currentSolutionList.append(toSolutionRow(solution));
+    if (solutions.length > 0) {
+      var currentSolutionList = new SolutionLsit(privateData.domId);
+
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var solution = _step.value;
+
+          currentSolutionList.append(toSolutionRow(solution));
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator['return']) {
+            _iterator['return']();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+    }
   }
 };
 
@@ -10040,25 +10086,59 @@ module.exports = {
     privateData.domId = domId;
     privateData.focus = anchored_pgp.focus;
   },
-  onSparql: function onSparql(sparql) {
-    var html = reigonTemplate.render({
-      sparql: sparql
-    }),
-        $region = $(html);
+  onSolution: function onSolution(data) {
+    var sparql = data.sparql;
+    var solutions = data.solutions;
 
-    privateData.currentAnswerList = $region.find('.answer-list');
+    var $resultTable = createTable(sparql);
+    appendAnswers($resultTable, solutions);
 
-    $('#' + privateData.domId).append($region);
-  },
-  onSolution: function onSolution(solution) {
-    var focusInstanceId = _.first(Object.keys(solution).filter(instance.is).filter(_.partial(instance.isNodeId, privateData.focus))),
-        label = toLastOfUrl(solution[focusInstanceId]);
-
-    privateData.currentAnswerList.append(instanceTemplate.render({
-      instance: label
-    }));
+    // Add a table to the dom tree
+    $('#' + privateData.domId).append($resultTable);
   }
 };
+
+function createTable(sparql) {
+  var html = reigonTemplate.render({
+    sparql: sparql
+  });
+
+  return $(html);
+}
+
+function appendAnswers($resultTable, solutions) {
+  var currentAnswerList = $resultTable.find('.answer-list');
+
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var solution = _step.value;
+
+      var focusInstanceId = _.first(Object.keys(solution).filter(instance.is).filter(_.partial(instance.isNodeId, privateData.focus))),
+          label = toLastOfUrl(solution[focusInstanceId]);
+
+      currentAnswerList.append(instanceTemplate.render({
+        instance: label
+      }));
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator['return']) {
+        _iterator['return']();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+}
 
 },{"../render/makeTemplate":29,"./instance":24,"./toLastOfUrl":27,"lodash":5}],27:[function(require,module,exports){
 'use strict';
