@@ -20,7 +20,7 @@ class Lodqa::Lodqa
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
   end
 
-  def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil)
+  def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp = nil, proc_sparql = nil, proc_solution = nil, verbose = false)
     # Join operation if there is a term mapping failure on a passing node
     nodes_to_delete = []
     @pgp[:nodes].each_key do |n|
@@ -34,9 +34,9 @@ class Lodqa::Lodqa
           nodes_to_delete << n
           @pgp[:edges].each do |e|
             e['object']  = connected_nodes[1] if e['subject'] == connected_nodes[0] && e['object']  == n
-            e['subject'] = connected_nodes[1] if e['subject'] == n && e['object']  == connected_nodes[0] 
+            e['subject'] = connected_nodes[1] if e['subject'] == n && e['object']  == connected_nodes[0]
             e['object']  = connected_nodes[0] if e['subject'] == connected_nodes[1] && e['object']  == n
-            e['subject'] = connected_nodes[0] if e['subject'] == n && e['object']  == connected_nodes[1] 
+            e['subject'] = connected_nodes[0] if e['subject'] == n && e['object']  == connected_nodes[1]
           end
         end
       end
@@ -58,7 +58,7 @@ class Lodqa::Lodqa
 
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_sparql, proc_solution)
+      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_sparql, proc_solution, verbose)
     end
   end
 
@@ -109,7 +109,7 @@ if __FILE__ == $0
   parser_url        = AppConfig.parser_url
   dictionary_url    = AppConfig.dictionary_url
   query             = AppConfig.query if query.nil?
-  
+
   ## query from the command line
   query = ARGV[0] unless ARGV[0].nil?
 

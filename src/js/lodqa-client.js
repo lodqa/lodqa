@@ -53,9 +53,10 @@ function search(event, loader, pgpElement, mappingsElement) {
 
   const pgp = JSON.parse(pgpElement.innerHTML),
     mappings = JSON.parse(mappingsElement.innerHTML),
-    config = document.querySelector('#target').value
+    config = document.querySelector('#target').value,
+    verbose = event.target.nextElementSibling.children[0].checked
 
-  loader.beginSearch(pgp, mappings, '/solutions', config)
+  loader.beginSearch(pgp, mappings, '/solutions', config, verbose)
   loader.once('ws_close', () => event.target.removeAttribute('disabled'))
 }
 

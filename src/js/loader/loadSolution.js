@@ -28,12 +28,14 @@ module.exports = function() {
     }
 
   return Object.assign(emitter, {
-    beginSearch: function(pgp, mappings, pathname, config) {
-      var ws = openConnection(pathname, config)
+    beginSearch: function(pgp, mappings, pathname, config, verbose) {
+      const ws = openConnection(pathname, config)
+
       emitter.once('ws_open', function() {
         ws.send(JSON.stringify({
-          pgp: pgp,
-          mappings: mappings
+          pgp,
+          mappings,
+          verbose
         }))
       })
     }
