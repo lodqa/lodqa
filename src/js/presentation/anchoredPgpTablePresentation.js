@@ -23,12 +23,12 @@ var _ = require('lodash'),
     */
   }),
   toViewParameters = function(anchored_pgp, node_id) {
-    return _.extend({}, anchored_pgp.nodes[node_id], {
+    return Object.assign({}, anchored_pgp.nodes[node_id], {
       id: node_id,
       class: node_id === anchored_pgp.focus ? 'focus' : 'normal'
-    });
+    })
   },
-  toArray = require('../collection/toArray');
+  toArray = require('../collection/toArray')
 
 module.exports = {
   onAnchoredPgp: function(domId, anchored_pgp) {
@@ -38,8 +38,8 @@ module.exports = {
       .reduce(toArray, []),
       table = template.render({
         nodes: nodes
-      });
+      })
 
-    $('#' + domId).append(table);
+    $('#' + domId).append(table)
   }
-};
+}

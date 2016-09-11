@@ -1,7 +1,5 @@
-var _ = require('lodash');
-
-module.exports =  function(value, target) {
-    return _.extend(target, {
-        font: value
-    })
-};
+module.exports = function(value, target) {
+  return Object.assign(target, {
+    font: value
+  })
+}

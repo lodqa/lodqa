@@ -1,5 +1,4 @@
 var _ = require('lodash'),
-  instance = require('./instance'),
   makeTemplate = require('../render/makeTemplate'),
   reigonTemplate = makeTemplate(function() {
     /*
@@ -26,53 +25,53 @@ var _ = require('lodash'),
   SolutionLsit = function(domId) {
     var $region = $(reigonTemplate.render())
       .on('click', 'input', function(event) {
-        $region[0].classList.toggle('hide');
+        $region[0].classList.toggle('hide')
 
-        var $input = $(event.target);
-        if($input.val() === 'Show solutions in table'){
-          $input.val('Hide solutions in table');
+        var $input = $(event.target)
+        if ($input.val() === 'Show solutions in table') {
+          $input.val('Hide solutions in table')
         } else {
-          $input.val('Show solutions in table');
+          $input.val('Show solutions in table')
         }
-      });
+      })
 
     $('#' + domId)
-      .append($region);
+      .append($region)
 
-    return $region.find('table');
+    return $region.find('table')
   },
   toViewParameters = function(solution, key) {
     return {
       id: key,
       url: solution[key],
       label: toLastOfUrl(solution[key])
-    };
+    }
   },
   toArray = require('../collection/toArray'),
   toSolutionRow = function(solution) {
     var toParams = _.partial(toViewParameters, solution),
       solutionLinks = Object.keys(solution)
       .map(toParams)
-      .reduce(toArray, []);
+      .reduce(toArray, [])
 
     return solutionRowTemplate.render({
       solutions: solutionLinks
-    });
+    })
   },
-  privateData = {};
+  privateData = {}
 
 module.exports = {
-  onAnchoredPgp: function(domId, anchored_pgp) {
-    privateData.domId = domId;
+  onAnchoredPgp: function(domId) {
+    privateData.domId = domId
   },
-  onSparql: function(sparql) {　　
-    privateData.currentSolutionList = null;
+  onSparql: function() {　　
+    privateData.currentSolutionList = null
   },
   onSolution: function(solution) {
     if (!privateData.currentSolutionList) {
-      privateData.currentSolutionList = new SolutionLsit(privateData.domId);
+      privateData.currentSolutionList = new SolutionLsit(privateData.domId)
     }
 
-    privateData.currentSolutionList.append(toSolutionRow(solution));
+    privateData.currentSolutionList.append(toSolutionRow(solution))
   }
-};
+}
