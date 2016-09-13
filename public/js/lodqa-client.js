@@ -1,307 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      }
-      throw TypeError('Uncaught, unspecified "error" event.');
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        len = arguments.length;
-        args = new Array(len - 1);
-        for (i = 1; i < len; i++)
-          args[i - 1] = arguments[i];
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    len = arguments.length;
-    args = new Array(len - 1);
-    for (i = 1; i < len; i++)
-      args[i - 1] = arguments[i];
-
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    var m;
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  var ret;
-  if (!emitter._events || !emitter._events[type])
-    ret = 0;
-  else if (isFunction(emitter._events[type]))
-    ret = 1;
-  else
-    ret = emitter._events[type].length;
-  return ret;
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}],2:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -726,7 +423,7 @@ function isUndefined(arg) {
   }
 })(typeof exports !== 'undefined' ? exports : Hogan);
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -749,7 +446,7 @@ Hogan.Template = require('./template').Template;
 Hogan.template = Hogan.Template;
 module.exports = Hogan;
 
-},{"./compiler":2,"./template":4}],4:[function(require,module,exports){
+},{"./compiler":1,"./template":3}],3:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -1092,7 +789,316 @@ var Hogan = {};
 
 })(typeof exports !== 'undefined' ? exports : Hogan);
 
+},{}],4:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
 },{}],5:[function(require,module,exports){
+module.exports=require(1)
+},{}],6:[function(require,module,exports){
+module.exports=require(2)
+},{"./compiler":5,"./template":7}],7:[function(require,module,exports){
+module.exports=require(3)
+},{}],8:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -7882,7 +7888,7 @@ var Hogan = {};
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 var stripIndent = require('strip-indent');
 
@@ -7908,7 +7914,7 @@ multiline.stripIndent = function (fn) {
 	return stripIndent(multiline(fn));
 };
 
-},{"strip-indent":11}],7:[function(require,module,exports){
+},{"strip-indent":14}],10:[function(require,module,exports){
 (function (global){
 /*! http://mths.be/punycode v1.2.4 by @mathias */
 ;(function(root) {
@@ -8419,7 +8425,7 @@ multiline.stripIndent = function (fn) {
 }(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8505,7 +8511,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8592,13 +8598,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":8,"./encode":9}],11:[function(require,module,exports){
+},{"./decode":11,"./encode":12}],14:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	var match = str.match(/^[ \t]*(?=\S)/gm);
@@ -8616,7 +8622,7 @@ module.exports = function (str) {
 	return indent > 0 ? str.replace(re, '') : str;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -9325,100 +9331,65 @@ function isNullOrUndefined(arg) {
   return  arg == null;
 }
 
-},{"punycode":7,"querystring":10}],13:[function(require,module,exports){
+},{"punycode":10,"querystring":13}],16:[function(require,module,exports){
 "use strict";
 
 module.exports = function (a, element) {
   return a.concat([element]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
+'use strict';
+
+module.exports = function (loader) {
+  loader.on('parse_rendering', function (data) {
+    document.getElementById('lodqa-parse_rendering').innerHTML = data;
+  });
+};
+
+},{}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = {
   all: all,
-  anchoredPgp: anchoredPgp
+  anchoredPgp: anchoredPgp,
+  solution: solution
 };
 
-function anchoredPgp(loader, presentation) {
-  var domId = 'lodqa-results';
+var domId = 'lodqa-results';
 
+function anchoredPgp(loader, presentation) {
   loader.on('anchored_pgp', function (anchoredPgp) {
     return presentation.onAnchoredPgp(domId, anchoredPgp);
   });
 }
 
-function all(loader, presentation) {
-  anchoredPgp(loader, presentation);
-  loader.on('solution', presentation.onSolution);
+function solution(loader, presentation) {
+  loader.on('solution', function (data) {
+    return presentation.onSolution(data, domId);
+  });
 }
 
-},{}],15:[function(require,module,exports){
+function all(loader, presentation) {
+  anchoredPgp(loader, presentation);
+  solution(loader, presentation);
+}
+
+},{}],19:[function(require,module,exports){
 'use strict';
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _controllerBindResult = require('./controller/bindResult');
-
-var _controllerBindResult2 = _interopRequireDefault(_controllerBindResult);
-
-var _loaderLoadSolution = require('./loader/loadSolution');
-
-var _loaderLoadSolution2 = _interopRequireDefault(_loaderLoadSolution);
-
-var _presentationAnchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation');
-
-var _presentationAnchoredPgpTablePresentation2 = _interopRequireDefault(_presentationAnchoredPgpTablePresentation);
-
-var _presentationSparqlTablePresentation = require('./presentation/sparqlTablePresentation');
-
-var _presentationSparqlTablePresentation2 = _interopRequireDefault(_presentationSparqlTablePresentation);
-
-var _presentationSolutionTablePresentation = require('./presentation/solutionTablePresentation');
-
-var _presentationSolutionTablePresentation2 = _interopRequireDefault(_presentationSolutionTablePresentation);
-
-var _presentationGraphPresentation = require('./presentation/graphPresentation');
-
-var _presentationGraphPresentation2 = _interopRequireDefault(_presentationGraphPresentation);
-
-var _presentationWebsocketPresentation = require('./presentation/websocketPresentation');
-
-var _presentationWebsocketPresentation2 = _interopRequireDefault(_presentationWebsocketPresentation);
-
-document.addEventListener('DOMContentLoaded', init);
-
-function init() {
-  var loader = new _loaderLoadSolution2['default']();
-
-  // bindResult.all(loader, debugPresentation)
-  _controllerBindResult2['default'].anchoredPgp(loader, _presentationAnchoredPgpTablePresentation2['default']);
-  _controllerBindResult2['default'].all(loader, _presentationSparqlTablePresentation2['default']);
-  _controllerBindResult2['default'].all(loader, _presentationSolutionTablePresentation2['default']);
-  _controllerBindResult2['default'].all(loader, _presentationGraphPresentation2['default']);
-
-  bindWebsocketPresentation(loader);
-  bindParseRenderingPresentation(loader);
-
+module.exports = function (loader) {
   var beginSearch = document.querySelector('#beginSearch'),
       pgpElement = document.querySelector('.pgp'),
       mappingsElement = document.querySelector('.mappings');
 
+  validateToSearch(beginSearch, pgpElement, mappingsElement);
+  bindSearch(beginSearch, loader, pgpElement, mappingsElement);
+};
+
+function bindSearch(beginSearch, loader, pgpElement, mappingsElement) {
   beginSearch.addEventListener('click', function (e) {
     return search(e, loader, pgpElement, mappingsElement);
-  });
-
-  validateToSearch(beginSearch, pgpElement, mappingsElement);
-}
-
-function bindWebsocketPresentation(loader) {
-  var presentation = (0, _presentationWebsocketPresentation2['default'])('lodqa-messages');
-  loader.on('ws_open', presentation.onOpen).on('ws_close', presentation.onClose);
-}
-
-function bindParseRenderingPresentation(loader) {
-  loader.on('parse_rendering', function (data) {
-    document.getElementById('lodqa-parse_rendering').innerHTML = data;
   });
 }
 
@@ -9428,10 +9399,9 @@ function search(event, loader, pgpElement, mappingsElement) {
 
   var pgp = JSON.parse(pgpElement.innerHTML),
       mappings = JSON.parse(mappingsElement.innerHTML),
-      config = document.querySelector('#target').value,
-      verbose = event.target.nextElementSibling.children[0].checked;
+      config = document.querySelector('#target').value;
 
-  loader.beginSearch(pgp, mappings, '/solutions', config, verbose);
+  loader.beginSearch(pgp, mappings, '/solutions', config);
   loader.once('ws_close', function () {
     return event.target.removeAttribute('disabled');
   });
@@ -9489,7 +9459,71 @@ function hasTerm(mappingsElement) {
   return Boolean(hasTerm.length);
 }
 
-},{"./controller/bindResult":14,"./loader/loadSolution":21,"./presentation/anchoredPgpTablePresentation":22,"./presentation/graphPresentation":23,"./presentation/solutionTablePresentation":25,"./presentation/sparqlTablePresentation":26,"./presentation/websocketPresentation":28}],16:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+'use strict';
+
+module.exports = function (loader) {
+  var button = document.querySelector('#sotpSearch');
+
+  loader.on('ws_open', function () {
+    return button.disabled = false;
+  }).on('ws_close', function () {
+    return button.disabled = true;
+  });
+
+  button.addEventListener('click', function () {
+    return loader.stopSearch();
+  });
+};
+
+},{}],21:[function(require,module,exports){
+'use strict';
+
+var websocketPresentation = require('../presentation/websocketPresentation');
+
+module.exports = function bindWebsocketPresentation(loader) {
+  var presentation = websocketPresentation('lodqa-messages');
+  loader.on('ws_open', presentation.onOpen).on('ws_close', presentation.onClose).on('sparql_count', presentation.onSparqlCount).on('solution', presentation.onSolution);
+};
+
+},{"../presentation/websocketPresentation":40}],22:[function(require,module,exports){
+'use strict';
+
+var Loader = require('./loader/loadSolution');
+var bindResult = require('./controller/bindResult');
+var bindWebsocketPresentation = require('./controller/bindWebsocketPresentation');
+var bindParseRenderingPresentation = require('./controller/bindParseRenderingPresentation');
+var bindSearchButton = require('./controller/bindSearchButton');
+var bindStopSearchButton = require('./controller/bindStopSearchButton');
+var anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation');
+var answerListPresentation = require('./presentation/answerListPresentation');
+var sparqlPresentation = require('./presentation/sparqlPresentation');
+var solutionTablePresentation = require('./presentation/solutionTablePresentation');
+var graphPresentation = require('./presentation/graphPresentation');
+
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+  var loader = new Loader();
+
+  bindResult.anchoredPgp(loader, anchoredPgpTablePresentation);
+  bindResult.all(loader, answerListPresentation);
+  bindResult.solution(loader, sparqlPresentation);
+  bindResult.solution(loader, solutionTablePresentation);
+  bindResult.all(loader, graphPresentation);
+
+  bindWebsocketPresentation(loader);
+  bindParseRenderingPresentation(loader);
+  bindSearchButton(loader);
+  bindStopSearchButton(loader);
+
+  var checkbox = document.querySelector('#verbose');
+  checkbox.addEventListener('change', function (event) {
+    return sparqlPresentation.setVerbose(event.target.checked);
+  });
+}
+
+},{"./controller/bindParseRenderingPresentation":17,"./controller/bindResult":18,"./controller/bindSearchButton":19,"./controller/bindStopSearchButton":20,"./controller/bindWebsocketPresentation":21,"./loader/loadSolution":28,"./presentation/anchoredPgpTablePresentation":29,"./presentation/answerListPresentation":31,"./presentation/graphPresentation":32,"./presentation/solutionTablePresentation":35,"./presentation/sparqlPresentation":38}],23:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9631,7 +9665,7 @@ module.exports = function (domId, options) {
   };
 };
 
-},{"../presentation/instance":24,"../presentation/toLastOfUrl":27,"./fixNodePosition":17,"./lodqaGraph":18,"./setFont":19,"./toRed":20,"lodash":5}],17:[function(require,module,exports){
+},{"../presentation/instance":33,"../presentation/toLastOfUrl":39,"./fixNodePosition":24,"./lodqaGraph":25,"./setFont":26,"./toRed":27,"lodash":8}],24:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9708,7 +9742,7 @@ module.exports = function (nodes, edges) {
   return nodes.map(extendIndex).sort(sortFuc).map(_.partial(setPosition, nodes.length));
 };
 
-},{"lodash":5}],18:[function(require,module,exports){
+},{"lodash":8}],25:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9766,7 +9800,7 @@ module.exports = function (domId, options) {
   };
 };
 
-},{"./setFont":19,"./toRed":20,"lodash":5}],19:[function(require,module,exports){
+},{"./setFont":26,"./toRed":27,"lodash":8}],26:[function(require,module,exports){
 "use strict";
 
 module.exports = function (value, target) {
@@ -9775,7 +9809,7 @@ module.exports = function (value, target) {
   });
 };
 
-},{}],20:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 module.exports = function (term) {
@@ -9784,58 +9818,77 @@ module.exports = function (term) {
   });
 };
 
-},{}],21:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var EventEmitter = require('events').EventEmitter;
 
-module.exports = function () {
-  var emitter = new EventEmitter(),
-      openConnection = function openConnection(pathname, config, verbose) {
-    var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config);
+module.exports = (function (_EventEmitter) {
+  _inherits(_class, _EventEmitter);
 
-    ws.onopen = function () {
-      emitter.emit('ws_open');
-    };
-    ws.onclose = function () {
-      emitter.emit('ws_close');
-    };
-    ws.onmessage = function (m) {
-      if (m.data === 'start') return;
+  function _class() {
+    _classCallCheck(this, _class);
 
-      var jsondata = JSON.parse(m.data);
+    _get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
+  }
 
-      ['sparql_count', 'anchored_pgp', 'solution', 'parse_rendering'].forEach(function (event) {
-        if (jsondata.hasOwnProperty(event)) {
-          if (event === 'solution') {
-            if (jsondata[event].solutions.length > 0 || verbose) {
-              emitter.emit(event, jsondata[event]);
-            }
-          } else {
-            emitter.emit(event, jsondata[event]);
-          }
-        }
-      });
-    };
+  _createClass(_class, [{
+    key: 'beginSearch',
+    value: function beginSearch(pgp, mappings, pathname, config) {
+      this.ws = openConnection(this, pathname, config);
 
-    return ws;
-  };
-
-  return Object.assign(emitter, {
-    beginSearch: function beginSearch(pgp, mappings, pathname, config, verbose) {
-      var ws = openConnection(pathname, config, verbose);
-
-      emitter.once('ws_open', function () {
-        ws.send(JSON.stringify({
+      this.once('ws_open', function () {
+        this.ws.send(JSON.stringify({
           pgp: pgp,
           mappings: mappings
         }));
       });
     }
-  });
-};
+  }, {
+    key: 'stopSearch',
+    value: function stopSearch() {
+      if (this.ws) {
+        this.ws.close();
+      }
+    }
+  }]);
 
-},{"events":1}],22:[function(require,module,exports){
+  return _class;
+})(EventEmitter);
+
+function openConnection(emitter, pathname, config) {
+  var ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config);
+
+  ws.onopen = function () {
+    emitter.emit('ws_open');
+  };
+  ws.onclose = function () {
+    emitter.emit('ws_close');
+  };
+  ws.onmessage = function (m) {
+    if (m.data === 'start') return;
+
+    var jsondata = JSON.parse(m.data);
+
+    ['sparql_count', 'anchored_pgp', 'solution', 'parse_rendering'].forEach(function (event) {
+      if (jsondata.hasOwnProperty(event)) {
+        emitter.emit(event, jsondata[event]);
+      }
+    });
+  };
+
+  return ws;
+}
+
+},{"events":4}],29:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9882,231 +9935,18 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":13,"../render/makeTemplate":29,"lodash":5}],23:[function(require,module,exports){
+},{"../collection/toArray":16,"../render/makeTemplate":41,"lodash":8}],30:[function(require,module,exports){
 'use strict';
 
-var _ = require('lodash'),
-    instance = require('./instance'),
-    SolutionGraph = require('../graph/SolutionGraph'),
-    privateData = {};
+var _ = require('lodash');
+var Hogan = require('Hogan.js');
+var instance = require('../instance');
+var toLastOfUrl = require('../toLastOfUrl');
 
-module.exports = {
-  onAnchoredPgp: function onAnchoredPgp(domId, anchored_pgp) {
-    privateData.domId = domId;
-    privateData.anchoredPgp = anchored_pgp;
-    privateData.focus = anchored_pgp.focus;
-    privateData.edges = anchored_pgp.edges;
-  },
-  onSolution: function onSolution(data) {
-    var solutions = data.solutions;
+var listHtml = '<li>{{instance}}</li>';
+var instanceTemplate = Hogan.compile(listHtml);
 
-    if (solutions.length > 0) {
-      var graph = new SolutionGraph(privateData.domId, {
-        width: 690,
-        height: 400
-      });
-
-      graph.addAnchoredPgpNodes(privateData.anchoredPgp);
-
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var solution = _step.value;
-
-          var isFocus = _.partial(instance.isNodeId, privateData.focus),
-              instanceNodes = graph.addInstanceNode(isFocus, solution),
-              transitNodes = graph.addTransitNode(solution);
-
-          graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator['return']) {
-            _iterator['return']();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-  }
-};
-
-},{"../graph/SolutionGraph":16,"./instance":24,"lodash":5}],24:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  is: function is(id) {
-    return id[0] === 'i';
-  },
-  isNodeId: function isNodeId(focus, instanceId) {
-    return instanceId.substr(1) === focus;
-  }
-};
-
-},{}],25:[function(require,module,exports){
-'use strict';
-
-var _ = require('lodash'),
-    makeTemplate = require('../render/makeTemplate'),
-    reigonTemplate = makeTemplate(function () {
-  /*
-  <div class="result-region solution-region hide">
-      <table>
-          <tr>
-              <th>solutions</th>
-          </tr>
-      </table>
-  </div>
-  <div>
-     <input type="button" value="Show solutions in table"></input>
-  </div>
-  */
-}),
-    solutionRowTemplate = makeTemplate(function () {
-  /*
-  <tr>
-      <td class="solution">{{#solutions}}{{id}}: <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>{{/solutions}}</td>
-  </tr>
-  */
-}),
-    toLastOfUrl = require('./toLastOfUrl'),
-    SolutionLsit = function SolutionLsit(domId) {
-  var $region = $(reigonTemplate.render()).on('click', 'input', function (event) {
-    $region[0].classList.toggle('hide');
-
-    var $input = $(event.target);
-    if ($input.val() === 'Show solutions in table') {
-      $input.val('Hide solutions in table');
-    } else {
-      $input.val('Show solutions in table');
-    }
-  });
-
-  $('#' + domId).append($region);
-
-  return $region.find('table');
-},
-    toViewParameters = function toViewParameters(solution, key) {
-  return {
-    id: key,
-    url: solution[key],
-    label: toLastOfUrl(solution[key])
-  };
-},
-    toArray = require('../collection/toArray'),
-    toSolutionRow = function toSolutionRow(solution) {
-  var toParams = _.partial(toViewParameters, solution),
-      solutionLinks = Object.keys(solution).map(toParams).reduce(toArray, []);
-
-  return solutionRowTemplate.render({
-    solutions: solutionLinks
-  });
-},
-    privateData = {};
-
-module.exports = {
-  onAnchoredPgp: function onAnchoredPgp(domId) {
-    privateData.domId = domId;
-  },
-  onSolution: function onSolution(data) {
-    var solutions = data.solutions;
-
-    if (solutions.length > 0) {
-      var currentSolutionList = new SolutionLsit(privateData.domId);
-
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var solution = _step.value;
-
-          currentSolutionList.append(toSolutionRow(solution));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator['return']) {
-            _iterator['return']();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }
-  }
-};
-
-},{"../collection/toArray":13,"../render/makeTemplate":29,"./toLastOfUrl":27,"lodash":5}],26:[function(require,module,exports){
-'use strict';
-
-var _ = require('lodash'),
-    instance = require('./instance'),
-    makeTemplate = require('../render/makeTemplate'),
-    reigonTemplate = makeTemplate(function () {
-  /*
-  <div class="result-region">
-      <table class="sparql-table">
-          <tr>
-              <th>sparql</th>
-              <th>answer</th>
-          </tr>
-          <tr>
-              <td class="sparql">{{sparql}}</td>
-              <td><ul class="answer-list list-in-table"></ul></td>
-          </tr>
-      </table>
-  </div>
-  */
-}),
-    instanceTemplate = makeTemplate(function () {
-  /*
-  <li>{{instance}}</li>
-  */
-}),
-    toLastOfUrl = require('./toLastOfUrl'),
-    privateData = {};
-
-module.exports = {
-  onAnchoredPgp: function onAnchoredPgp(domId, anchored_pgp) {
-    privateData.domId = domId;
-    privateData.focus = anchored_pgp.focus;
-  },
-  onSolution: function onSolution(data) {
-    var sparql = data.sparql;
-    var solutions = data.solutions;
-
-    var $resultTable = createTable(sparql);
-    appendAnswers($resultTable, solutions);
-
-    // Add a table to the dom tree
-    $('#' + privateData.domId).append($resultTable);
-  }
-};
-
-function createTable(sparql) {
-  var html = reigonTemplate.render({
-    sparql: sparql
-  });
-
-  return $(html);
-}
-
-function appendAnswers($resultTable, solutions) {
+module.exports = function ($resultTable, solutions, focus) {
   var currentAnswerList = $resultTable.find('.answer-list');
 
   var _iteratorNormalCompletion = true;
@@ -10117,7 +9957,7 @@ function appendAnswers($resultTable, solutions) {
     for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var solution = _step.value;
 
-      var focusInstanceId = _.first(Object.keys(solution).filter(instance.is).filter(_.partial(instance.isNodeId, privateData.focus))),
+      var focusInstanceId = _.first(Object.keys(solution).filter(instance.is).filter(_.partial(instance.isNodeId, focus))),
           label = toLastOfUrl(solution[focusInstanceId]);
 
       currentAnswerList.append(instanceTemplate.render({
@@ -10138,9 +9978,327 @@ function appendAnswers($resultTable, solutions) {
       }
     }
   }
+};
+
+},{"../instance":33,"../toLastOfUrl":39,"Hogan.js":2,"lodash":8}],31:[function(require,module,exports){
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var appendAnswers = require('./appendAnswers');
+
+var regionHtml = '<div class="answer-list-region">\n  <h2>Answers</h2>\n  <ul class="answer-list"></ul>\n</div>\n';
+
+var privateData = {};
+
+var AnswerListPresentation = (function () {
+  function AnswerListPresentation() {
+    _classCallCheck(this, AnswerListPresentation);
+  }
+
+  _createClass(AnswerListPresentation, [{
+    key: 'onAnchoredPgp',
+    value: function onAnchoredPgp(domId, anchored_pgp) {
+      privateData.focus = anchored_pgp.focus;
+    }
+  }, {
+    key: 'onSolution',
+    value: function onSolution(data, domId) {
+      var solutions = data.solutions;
+
+      if (solutions.length === 0) {
+        return;
+      }
+
+      var $region = $(regionHtml);
+      appendAnswers($region, solutions, privateData.focus);
+
+      // Add a list to the dom tree
+      $('#' + domId).append($region);
+    }
+  }]);
+
+  return AnswerListPresentation;
+})();
+
+module.exports = new AnswerListPresentation();
+
+},{"./appendAnswers":30}],32:[function(require,module,exports){
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var instance = require('./instance');
+var SolutionGraph = require('../graph/SolutionGraph');
+
+var privateData = {};
+
+var GraphPresentation = (function () {
+  function GraphPresentation() {
+    _classCallCheck(this, GraphPresentation);
+  }
+
+  _createClass(GraphPresentation, [{
+    key: 'onAnchoredPgp',
+    value: function onAnchoredPgp(domId, anchored_pgp) {
+      privateData.domId = domId;
+      privateData.anchoredPgp = anchored_pgp;
+      privateData.focus = anchored_pgp.focus;
+      privateData.edges = anchored_pgp.edges;
+    }
+  }, {
+    key: 'onSolution',
+    value: function onSolution(data) {
+      var solutions = data.solutions;
+
+      if (solutions.length > 0) {
+        var graph = new SolutionGraph(privateData.domId, {
+          width: 690,
+          height: 400
+        });
+
+        graph.addAnchoredPgpNodes(privateData.anchoredPgp);
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var solution = _step.value;
+
+            var isFocus = function isFocus(solution) {
+              return instance.isNodeId(privateData.focus, solution);
+            };
+            var instanceNodes = graph.addInstanceNode(isFocus, solution);
+            var transitNodes = graph.addTransitNode(solution);
+
+            graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator['return']) {
+              _iterator['return']();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+    }
+  }]);
+
+  return GraphPresentation;
+})();
+
+module.exports = new GraphPresentation();
+
+},{"../graph/SolutionGraph":23,"./instance":33}],33:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  is: function is(id) {
+    return id[0] === 'i';
+  },
+  isNodeId: function isNodeId(focus, instanceId) {
+    return instanceId.substr(1) === focus;
+  }
+};
+
+},{}],34:[function(require,module,exports){
+'use strict';
+
+var Hogan = require('Hogan.js');
+
+var regionHtml = '<div class="result-region solution-region hide">\n      <table>\n          <tr>\n            {{#keys}}\n              <th>{{key}}</th>\n            {{/keys}}\n          </tr>\n      </table>\n  </div>\n  <div>\n     <input type="button" value="Show solutions in table"></input>\n  </div>';
+var reigonTemplate = Hogan.compile(regionHtml);
+
+module.exports = function SolutionLsit(domId, solution) {
+  var data = {
+    keys: Object.keys(solution).map(function (key) {
+      return {
+        key: key
+      };
+    })
+  };
+  var $region = $(reigonTemplate.render(data));
+
+  $region.on('click', 'input', function (e) {
+    $region[0].classList.toggle('hide');
+
+    if (e.target.val === 'Show solutions in table') {
+      e.target.val = 'Hide solutions in table';
+    } else {
+      e.target.val = 'Show solutions in table';
+    }
+  });
+
+  $('#' + domId).append($region);
+
+  return $region.find('table');
+};
+
+},{"Hogan.js":2}],35:[function(require,module,exports){
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var SolutionLsit = require('./SolutionLsit');
+var toSolutionRow = require('./toSolutionRow');
+
+var SolutionTablePresentation = (function () {
+  function SolutionTablePresentation() {
+    _classCallCheck(this, SolutionTablePresentation);
+  }
+
+  _createClass(SolutionTablePresentation, [{
+    key: 'onSolution',
+    value: function onSolution(data, domId) {
+      var solutions = data.solutions;
+
+      if (solutions.length > 0) {
+        var currentSolutionList = new SolutionLsit(domId, solutions[0]);
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var solution = _step.value;
+
+            currentSolutionList.append(toSolutionRow(solution));
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator['return']) {
+              _iterator['return']();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+    }
+  }]);
+
+  return SolutionTablePresentation;
+})();
+
+module.exports = new SolutionTablePresentation();
+
+},{"./SolutionLsit":34,"./toSolutionRow":36}],36:[function(require,module,exports){
+'use strict';
+
+var Hogan = require('hogan.js');
+var toArray = require('../../collection/toArray');
+var toLastOfUrl = require('../toLastOfUrl');
+
+var trHtml = '<tr>\n  {{#nodes}}\n    <td class="solution">\n      <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>\n    </td>\n  {{/nodes}}\n</tr>';
+var solutionRowTemplate = Hogan.compile(trHtml);
+
+module.exports = function toSolutionRow(solution) {
+  var nodes = Object.keys(solution).map(function (key) {
+    return toViewParameters(solution, key);
+  }).reduce(toArray, []);
+
+  return solutionRowTemplate.render({
+    nodes: nodes
+  });
+};
+
+function toViewParameters(solution, key) {
+  return {
+    id: key,
+    url: solution[key],
+    label: toLastOfUrl(solution[key])
+  };
 }
 
-},{"../render/makeTemplate":29,"./instance":24,"./toLastOfUrl":27,"lodash":5}],27:[function(require,module,exports){
+},{"../../collection/toArray":16,"../toLastOfUrl":39,"hogan.js":6}],37:[function(require,module,exports){
+'use strict';
+
+var Hogan = require('hogan.js');
+
+var regionHtml = '<div class="result-region sparql-region hide">\n  <h2>Sparql</h2>\n  <span class="sparql">{{sparql}}</span>\n</div>\n<div>\n   <input type="button" value="Show sparql"></input>\n</div>\n';
+var reigonTemplate = Hogan.compile(regionHtml);
+
+module.exports = function (sparql) {
+  var $html = $(reigonTemplate.render({
+    sparql: sparql
+  }));
+
+  $html.on('click', 'input', function (e) {
+    $html[0].classList.toggle('hide');
+
+    if (e.target.value === 'Show sparql') {
+      e.target.value = 'Hide sparql';
+    } else {
+      e.target.value = 'Show sparql';
+    }
+  });
+
+  return $html;
+};
+
+},{"hogan.js":6}],38:[function(require,module,exports){
+'use strict';
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var createTable = require('./createTable');
+
+var privateData = {};
+
+var SparqlPresentation = (function () {
+  function SparqlPresentation() {
+    _classCallCheck(this, SparqlPresentation);
+  }
+
+  _createClass(SparqlPresentation, [{
+    key: 'onSolution',
+    value: function onSolution(data, domId) {
+      var sparql = data.sparql;
+      var solutions = data.solutions;
+
+      if (solutions.length === 0 && !privateData.verbose) {
+        return;
+      }
+
+      // Add a table to the dom tree
+      $('#' + domId).append(createTable(sparql));
+    }
+  }, {
+    key: 'setVerbose',
+    value: function setVerbose(value) {
+      privateData.verbose = value;
+    }
+  }]);
+
+  return SparqlPresentation;
+})();
+
+module.exports = new SparqlPresentation();
+
+},{"./createTable":37}],39:[function(require,module,exports){
 'use strict';
 
 module.exports = function (srcUrl) {
@@ -10150,25 +10308,51 @@ module.exports = function (srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":12}],28:[function(require,module,exports){
+},{"url":15}],40:[function(require,module,exports){
 'use strict';
 
-var _ = require('lodash'),
-    show = function show(el, msg) {
-  el.innerHTML = msg;
-};
-
 module.exports = function (domId) {
-  var onOpen = _.partial(show, document.getElementById(domId), '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>'),
-      onClose = _.partial(show, document.getElementById(domId), '');
+  var dom = document.getElementById(domId);
+
+  var hoge = 0;
+  var fuga = 0;
 
   return {
-    onOpen: onOpen,
-    onClose: onClose
+    onOpen: function onOpen() {
+      return show(dom);
+    },
+    onSparqlCount: function onSparqlCount(total) {
+      hoge = total;
+      showProgress(dom, 0, total);
+    },
+    onSolution: function onSolution() {
+      return showProgress(dom, ++fuga, hoge);
+    },
+    onClose: function onClose() {
+      hoge = 0;
+      fuga = 0;
+      hide(dom);
+    }
   };
 };
 
-},{"lodash":5}],29:[function(require,module,exports){
+function show(dom) {
+  updateDisplay(dom, '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>');
+}
+
+function showProgress(dom, count, total) {
+  updateDisplay(dom, '<div class="lodqa-message">loading ' + count + ' of ' + total + ' <img src="images/working.gif"/></div>');
+}
+
+function hide(dom) {
+  updateDisplay(dom, '');
+}
+
+function updateDisplay(el, msg) {
+  el.innerHTML = msg;
+}
+
+},{}],41:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -10177,4 +10361,4 @@ var _ = require('lodash'),
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":3,"lodash":5,"multiline":6}]},{},[15])
+},{"hogan.js":6,"lodash":8,"multiline":9}]},{},[22])
