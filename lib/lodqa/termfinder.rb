@@ -48,7 +48,8 @@ class Lodqa::TermFinder
       when 200
         JSON.parse response
       else
-        terms.map{|t| [t, []]}.to_h
+        # request to dictionary is not success
+        raise GatewayError
       end
     end
   end

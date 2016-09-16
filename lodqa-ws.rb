@@ -7,6 +7,7 @@ require 'lodqa'
 require 'json'
 require 'open-uri'
 require 'cgi/util'
+require "lodqa/gateway_error.rb"
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -69,12 +70,17 @@ class LodqaWS < Sinatra::Base
 		tf = Lodqa::TermFinder.new(config['dictionary_url'])
 
 		keywords = params['keywords']
-		mappings = tf.find(keywords)
+		begin
+			mappings = tf.find(keywords)
 
-		headers \
-			"Access-Control-Allow-Origin" => "*"
-		content_type :json
-		mappings.to_json
+			headers \
+				"Access-Control-Allow-Origin" => "*"
+			content_type :json
+			mappings.to_json
+		rescue GatewayError => e
+			status 502
+			body = e.message
+		end
 	end
 
 	options '/termfinder' do
