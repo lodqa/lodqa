@@ -9,7 +9,11 @@ module.exports = function(loader) {
 
 function bindSearch(beginSearch, loader, pgpElement, mappingsElement) {
   beginSearch
-    .addEventListener('click', (e) => search(e, loader, pgpElement, mappingsElement))
+    .addEventListener('click', (e) => {
+      e.target.classList.toggle('hidden')
+      document.querySelector('#stopSearch').classList.toggle('hidden')
+      search(e, loader, pgpElement, mappingsElement)
+    })
 }
 
 function search(event, loader, pgpElement, mappingsElement) {
