@@ -1,5 +1,5 @@
 module.exports = function(loader) {
-  const button = document.querySelector('#sotpSearch')
+  const button = document.querySelector('#stopSearch')
 
   loader
     .on('ws_open', () => button.disabled = false)
