@@ -9389,7 +9389,9 @@ module.exports = function (loader) {
 
 function bindSearch(beginSearch, loader, pgpElement, mappingsElement) {
   beginSearch.addEventListener('click', function (e) {
-    return search(e, loader, pgpElement, mappingsElement);
+    e.target.classList.toggle('hidden');
+    document.querySelector('#stopSearch').classList.toggle('hidden');
+    search(e, loader, pgpElement, mappingsElement);
   });
 }
 
@@ -9463,7 +9465,7 @@ function hasTerm(mappingsElement) {
 'use strict';
 
 module.exports = function (loader) {
-  var button = document.querySelector('#sotpSearch');
+  var button = document.querySelector('#stopSearch');
 
   loader.on('ws_open', function () {
     return button.disabled = false;
@@ -9471,8 +9473,10 @@ module.exports = function (loader) {
     return button.disabled = true;
   });
 
-  button.addEventListener('click', function () {
-    return loader.stopSearch();
+  button.addEventListener('click', function (e) {
+    document.querySelector('#beginSearch').classList.toggle('hidden');
+    e.target.classList.toggle('hidden');
+    loader.stopSearch();
   });
 };
 
