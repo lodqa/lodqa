@@ -1,7 +1,7 @@
 const Hogan = require('Hogan.js')
 const toAnswers = require('./toAnswers')
 
-const regionHtml = `<ul class="answer-list">
+const regionHtml = `<ul class="answers-region__answers-list">
   {{#answers}}
     <li>{{label}}</li>
   {{/answers}}

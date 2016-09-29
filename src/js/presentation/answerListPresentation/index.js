@@ -1,4 +1,6 @@
 const appendAnswers = require('../answerList')
+const solutionTable = require('../solutionTable')
+const button = require('../button')
 
 const privateData = {}
 
@@ -16,15 +18,29 @@ class AnswerListPresentation {
       return
     }
 
-    const region = `<div class="answer-list-region">
-      <h2>Answers</h2>
-      ${appendAnswers(solutions, privateData.focus)}
+    const region = `<div class="answers-region">
+      <div class="answers-region__title">
+        <h2 class="answers-region__title__heading">Answers</h2>
+      </div>
     </div>
     `
+    const list = $(appendAnswers(solutions, privateData.focus))
+    const table = solutionTable(solutions)
+    const tableButton = button(table[0], list[0])
+
+    const $region = $(region)
+
+    $region
+      .find('.answers-region__title')
+      .append(tableButton)
+
+    $region
+      .append(list)
+      .append(table)
 
     // Add a list to the dom tree
     $(`#${domId}`)
-      .append($(region))
+      .append($region)
   }
 }
 

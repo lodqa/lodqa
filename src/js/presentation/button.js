@@ -1,21 +1,25 @@
 const Hogan = require('Hogan.js')
 
-const regionHtml = `<div>
-     <input type="button" value="Show solutions in table"></input>
-  </div>`
+const regionHtml = `
+  <input type="button" value="table" class="answers-region__title__button"></input>
+`
 const reigonTemplate = Hogan.compile(regionHtml)
 
-module.exports = function SolutionLsit(target) {
+module.exports = function SolutionLsit(target, target2) {
   const $region = $(reigonTemplate.render())
 
   $region
-    .on('click', 'input', (e) => {
-      target.classList.toggle('hide')
+    .on('click', (e) => {
+      target.classList.toggle('answers-region__answers-table--hide')
 
-      if (e.target.val === 'Show solutions in table') {
-        e.target.val = 'Hide solutions in table'
+      if(target2){
+        target2.classList.toggle('answers-region__answers-list--hide')
+      }
+
+      if (e.target.value === 'table') {
+        e.target.value = 'list'
       } else {
-        e.target.val = 'Show solutions in table'
+        e.target.value = 'table'
       }
     })
 

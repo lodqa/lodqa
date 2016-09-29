@@ -7,7 +7,6 @@ const bindStopSearchButton = require('./controller/bindStopSearchButton')
 const anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation')
 const answerListPresentation = require('./presentation/answerListPresentation')
 const sparqlPresentation = require('./presentation/sparqlPresentation')
-const solutionTablePresentation = require('./presentation/solutionTablePresentation')
 const graphPresentation = require('./presentation/graphPresentation')
 
 document.addEventListener('DOMContentLoaded', init)
@@ -18,7 +17,6 @@ function init() {
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
   bindResult.solution(loader, sparqlPresentation)
   bindResult.all(loader, answerListPresentation)
-  bindResult.solution(loader, solutionTablePresentation)
   bindResult.all(loader, graphPresentation)
 
   bindWebsocketPresentation(loader)

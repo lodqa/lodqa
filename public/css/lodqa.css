@@ -4,10 +4,17 @@ body {
     color: #222288;
 }
 
-a {text-decoration:none}
-a {color:#6666ff}
-a:hover {color:#222288}
+a {
+    text-decoration: none
+}
 
+a {
+    color: #6666ff
+}
+
+a:hover {
+    color: #222288
+}
 
 .frame {
     position: relative;
@@ -19,7 +26,7 @@ a:hover {color:#222288}
 }
 
 #dashboard {
-    position:fixed;
+    position: fixed;
     left: 0px;
     top: 0px;
     width: 570px;
@@ -28,7 +35,7 @@ a:hover {color:#222288}
 }
 
 #header {
-    display:block;
+    display: block;
     height: 50px;
     margin: 0;
     margin-bottom: 20px;
@@ -80,32 +87,32 @@ a:hover {color:#222288}
 }
 
 #main-nav li a:hover {
-  background: #ffffee;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.1);
-  text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    background: #ffffee;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .5), 0 1px 0 rgba(255, 255, 255, .1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .5);
 }
 
 #main-nav li a:current {
-  background: #fc0;
-  color: #222;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 5px rgba(0,0,0,.5);
-  text-shadow: 0 1px 0 rgba(255,255,255,.3);
+    background: #fc0;
+    color: #222;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 1px 5px rgba(0, 0, 0, .5);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .3);
 }
 
 #subboard {
-        position: absolute;
-        top: 20px;
-        width: 700px;
-        padding-left: 30px;
-        z-index: -1;
+    position: absolute;
+    top: 20px;
+    width: 700px;
+    padding-left: 30px;
+    z-index: -1;
 }
 
 #results {
-        position: absolute;
-        top: 40px;
-        width: 740px;
-        padding-left: 30px;
-        z-index: -2;
+    position: absolute;
+    top: 40px;
+    width: 740px;
+    padding-left: 30px;
+    z-index: -2;
 }
 
 @media (max-width: 1350px) {
@@ -136,7 +143,7 @@ nav li {
 }
 
 nav a {
-    text-decoration:none;
+    text-decoration: none;
     color: #7777ff;
 }
 
@@ -157,7 +164,7 @@ nav a {
 }
 
 .jsPlumb-container {
-    border:1px solid green;
+    border: 1px solid green;
     margin: 5px 0;
 }
 
@@ -197,17 +204,16 @@ nav a {
     width: 40em;
     padding: 5px;
     margin-bottom: 20px;
-
     font-family: "Times New Roman", Times, sans-serif;
     font-size: medium;
-    color:#444477;
-    font-style:italic;
+    color: #444477;
+    font-style: italic;
     line-height: 140%;
 }
 
 .news {
-    border-style:solid;
-    border-color:#ddddbb;
+    border-style: solid;
+    border-color: #ddddbb;
     border-width: 1px;
     padding-bottom: 5px;
     margin-bottom: 30px;
@@ -216,9 +222,8 @@ nav a {
     background-color: #FFFFee;
 }
 
-
 .news:before {
-    position:relative;
+    position: relative;
     top: -10px;
     left: 5px;
     padding: 2px;
@@ -231,53 +236,45 @@ nav a {
     margin: 0px;
 }
 
-
 .attention {
-    font-style:italic;
-    color:red;
+    font-style: italic;
+    color: red;
 }
 
 h1 {
-    width:20em;
-
-    margin-top:10px;
-    margin-bottom:5px;
+    width: 20em;
+    margin-top: 10px;
+    margin-bottom: 5px;
     padding: 1px 5px;
-
-    white-space:nowrap;
-
-    font-size:medium;
-    font-weight:bold;
-
+    white-space: nowrap;
+    font-size: medium;
+    font-weight: bold;
     background: linear-gradient(45deg, #ffff66, #ffffff);
 }
 
 h2 {
-    width:30em;
-    border-style:solid;
-    border-color:#5555FF;
+    width: 30em;
+    border-style: solid;
+    border-color: #5555FF;
     border-width: 0px 0px 2px 10px;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-    padding-left:2px;
+    padding-left: 2px;
     margin-top: 30px;
     font-size: medium;
     color: #222288;
 }
 
 h3 {
-    width:32em;
-
-    margin-top:20px;
-    margin-bottom:10px;
-    padding:0px 2px;
-
-    border-style:solid;
-    border-color:#5555ff;
-    border-width:0px 0px 1px 10px;
-    border-top-left-radius:10px;
-    border-bottom-left-radius:10px;
-
+    width: 32em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 0px 2px;
+    border-style: solid;
+    border-color: #5555ff;
+    border-width: 0px 0px 1px 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     font-size: medium;
 }
 
@@ -286,9 +283,17 @@ h3 {
     color: #88f;
 }
 
-#buttons {text-align:right; margin:5px; padding:5px}
-#pages   {text-align:center; margin:5px; padding:5px}
+#buttons {
+    text-align: right;
+    margin: 5px;
+    padding: 5px
+}
 
+#pages {
+    text-align: center;
+    margin: 5px;
+    padding: 5px
+}
 
 table.list {
     border-style: none;
@@ -310,38 +315,46 @@ table.list {
 }
 
 div.atext {
-    width:800px;
-    line-height:120%
+    width: 800px;
+    line-height: 120%
 }
 
-#config {background-color: #EEEEEE}
+#config {
+    background-color: #EEEEEE
+}
+
 
 /* comon style */
+
 .list-in-table {
     list-style-type: none;
     padding-left: 0;
 }
 
+
 /* result-region */
-.result-region table {
+
+.result-region table, .answers-region__answers-table table {
     border-collapse: collapse;
     width: 100%;
 }
 
-.result-region th {
+.result-region th, .answers-region__answers-table th {
     background-color: #eee;
     border: 1px solid #b9b9b9;
     color: #333;
     padding: 6px;
 }
 
-.result-region td {
+.result-region td, .answers-region__answers-table td {
     background-color: #fff;
     border: 1px solid #b9b9b9;
     padding: 6px;
 }
 
+
 /* anchored_pgp-table */
+
 .anchored_pgp-region {
     margin: 16px 0 8px 0;
 }
@@ -350,34 +363,28 @@ div.atext {
     color: #FF512C;
 }
 
-.solution-region {
-    max-height: 1000px;
-    overflow: hidden;
-    transition: all 1s ease-in;
-}
-
-.solution-region.hide{
-    max-height: 0;
-    transition: all 0.6s ease-out;
-}
-
-.sparql-region {
+.answers-region, .sparql-region {
     margin-top: 30px;
 }
 
-.sparql-region__title {
-  display: flex;
+.answers-region__title, .sparql-region__title {
+    display: flex;
 }
 
-.sparql-region__title__heading{
+.answers-region__title__heading, .sparql-region__title__heading {
     margin-top: 0;
 }
 
-.sparql-region__title__button{
+.answers-region__title__button, .sparql-region__title__button {
     margin-top: 3px;
 }
 
-.sparql-region__sparql{
+.answers-region__answers-list--hide,
+.answers-region__answers-table--hide {
+  display: none;
+}
+
+.sparql-region__sparql {
     font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
     font-size: 0.8em;
     overflow: hidden;
@@ -385,7 +392,7 @@ div.atext {
     transition: all 1s ease-in;
 }
 
-.sparql-region__sparql--hide{
+.sparql-region__sparql--hide {
     max-height: 0;
     transition: all 0.3s ease-out;
 }
