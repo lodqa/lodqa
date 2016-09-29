@@ -341,11 +341,6 @@ div.atext {
     padding: 6px;
 }
 
-.sparql-region .sparql{
-    font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
-    font-size: 0.8em;
-}
-
 /* anchored_pgp-table */
 .anchored_pgp-region {
     margin: 16px 0 8px 0;
@@ -355,15 +350,42 @@ div.atext {
     color: #FF512C;
 }
 
-.sparql-region,
 .solution-region {
     max-height: 1000px;
     overflow: hidden;
     transition: all 1s ease-in;
 }
 
-.sparql-region.hide,
 .solution-region.hide{
     max-height: 0;
     transition: all 0.6s ease-out;
+}
+
+.sparql-region {
+    margin-top: 30px;
+}
+
+.sparql-region__title {
+  display: flex;
+}
+
+.sparql-region__title__heading{
+    margin-top: 0;
+}
+
+.sparql-region__title__button{
+    margin-top: 3px;
+}
+
+.sparql-region__sparql{
+    font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+    font-size: 0.8em;
+    overflow: hidden;
+    max-height: 100em;
+    transition: all 1s ease-in;
+}
+
+.sparql-region__sparql--hide{
+    max-height: 0;
+    transition: all 0.3s ease-out;
 }

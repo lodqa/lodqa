@@ -1,11 +1,11 @@
 const Hogan = require('hogan.js')
 
-const regionHtml = `<div class="result-region sparql-region hide">
-  <h2>Sparql</h2>
-  <span class="sparql">{{sparql}}</span>
-</div>
-<div>
-   <input type="button" value="Show sparql"></input>
+const regionHtml = `<div class="sparql-region">
+  <div class="sparql-region__title">
+    <h2 class="sparql-region__title__heading">Sparql</h2>
+    <input class="sparql-region__title__button" type="button" value="Show sparql"></input>
+  </div>
+  <div class="sparql-region__sparql sparql-region__sparql--hide">{{sparql}}</div>
 </div>
 `
 const reigonTemplate = Hogan.compile(regionHtml)
@@ -17,7 +17,7 @@ module.exports = function(sparql) {
 
   $html
     .on('click', 'input', (e) => {
-      $html[0].classList.toggle('hide')
+      $html.find('.sparql-region__sparql')[0].classList.toggle('sparql-region__sparql--hide')
 
       if (e.target.value === 'Show sparql') {
         e.target.value = 'Hide sparql'
