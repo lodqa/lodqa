@@ -1,5 +1,5 @@
-const SolutionLsit = require('./SolutionLsit')
-const toSolutionRow = require('./toSolutionRow')
+const solutionTable = require('../solutionTable')
+const button = require('../button')
 
 class SolutionTablePresentation {
   onSolution(data, domId) {
@@ -8,11 +8,13 @@ class SolutionTablePresentation {
     } = data
 
     if (solutions.length > 0) {
-      const currentSolutionList = new SolutionLsit(domId, solutions[0])
+      const currentSolutionList = solutionTable(solutions)
 
-      for (const solution of solutions) {
-        currentSolutionList.append(toSolutionRow(solution))
-      }
+      $('#' + domId)
+        .append(currentSolutionList)
+
+      $('#' + domId)
+        .append(button(currentSolutionList[0]))
     }
   }
 }

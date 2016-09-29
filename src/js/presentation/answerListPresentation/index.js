@@ -1,10 +1,4 @@
-const appendAnswers = require('./appendAnswers')
-
-const regionHtml = `<div class="answer-list-region">
-  <h2>Answers</h2>
-  <ul class="answer-list"></ul>
-</div>
-`
+const appendAnswers = require('../answerList')
 
 const privateData = {}
 
@@ -22,12 +16,15 @@ class AnswerListPresentation {
       return
     }
 
-    const $region = $(regionHtml)
-    appendAnswers($region, solutions, privateData.focus)
+    const region = `<div class="answer-list-region">
+      <h2>Answers</h2>
+      ${appendAnswers(solutions, privateData.focus)}
+    </div>
+    `
 
     // Add a list to the dom tree
     $(`#${domId}`)
-      .append($region)
+      .append($(region))
   }
 }
 
