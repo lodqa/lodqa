@@ -183,7 +183,7 @@ nav a {
     text-align: center;
 }
 
-#beginSearch {
+#beginSearch, #stopSearch {
     height: 34px;
     width: 100px;
 }
