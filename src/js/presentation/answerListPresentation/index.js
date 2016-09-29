@@ -20,7 +20,7 @@ class AnswerListPresentation {
 
     const region = `<div class="answers-region">
       <div class="answers-region__title">
-        <h2 class="answers-region__title__heading">Answers</h2>
+        <h3 class="answers-region__title__heading">Answers</h3>
       </div>
     </div>
     `
