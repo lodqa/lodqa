@@ -24,7 +24,7 @@ class EnjuAccess::CGIAccessor
   # It initializes an instance of RestClient::Resource to connect to an Enju cgi server
   def initialize (enju_url)
     @enju = RestClient::Resource.new enju_url
-    raise "An instance of RestClient::Resource has to be passed as the first argument." unless @enju.instance_of? RestClient::Resource
+    raise "The URL of a web service of enju has to be passed as the first argument." unless @enju.instance_of? RestClient::Resource
   end
 
   # It takes a plain-English sentence as input, and
@@ -55,12 +55,12 @@ class EnjuAccess::CGIAccessor
     response = @enju.get :params => {:sentence=>sentence, :format=>'conll'}
     case response.code
     when 200             # 200 means success
-      raise "Empty input." if response =~/^Empty line/
+      raise "Empty input." if response.body =~/^Empty line/
 
       tokens = []
 
       # response is a parsing result in CONLL format.
-      response.split(/\r?\n/).each_with_index do |t, i|  # for each token analysis
+      response.body.split(/\r?\n/).each_with_index do |t, i|  # for each token analysis
         dat = t.split(/\t/, 7)
         token = Hash.new
         token[:idx]  = i - 1   # use 0-oriented index
