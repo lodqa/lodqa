@@ -4,6 +4,7 @@
 #
 require 'enju_access/enju_access'
 require 'net/http'
+require 'pp'
 
 module Lodqa; end unless defined? Lodqa
 
@@ -31,13 +32,20 @@ class Lodqa::Graphicator
   def graphicate (parse)
     nodes = get_nodes(parse)
 
+    # index the nodes by their heads
     node_index = {}
     nodes.each_key{|k| node_index[nodes[k][:head]] = k}
 
+    # get the focus
     focus = node_index[parse[:focus]]
+
+    # default rule: take the first one as the focus, if no grammatical focus is found.
     focus = node_index.values.first if focus.nil?
 
     edges = get_edges(parse, node_index)
+
+    post_processing!(edges)
+
     graph = {
       :nodes => nodes,
       :edges => edges,
@@ -69,5 +77,12 @@ class Lodqa::Graphicator
       }
     end
   end
+
+  # post_processing may be dependent on Enju
+  def post_processing! (edges)
+    # 'and' coordination
+    edges.reject!{|e| e[:text] == 'and'}
+  end
+
 
 end
