@@ -37,8 +37,8 @@ class Graph
     p @g
   end
   
-  # based of wikipedia's pseudocode: http://en.wikipedia.org/wiki/Dijkstra's_algorithm
-  
+  # Dijkstra's shortest path algorithm
+  # implemented based on wikipedia's pseudocode: http://en.wikipedia.org/wiki/Dijkstra's_algorithm
   def dijkstra(s)
     @d = {}
     @prev = {}
@@ -72,7 +72,6 @@ class Graph
   end
   
   # To print the full shortest route to a node
-  
   def print_path(dest)
     if @prev[dest] != -1
       print_path @prev[dest]
@@ -104,6 +103,8 @@ class Graph
     @path << dest
   end
 
+
+  # get the shortest path between two nodes
   def shortest_path(s, d)
     dijkstra s
     @path = []
