@@ -31,7 +31,13 @@ class GraphFinder
       puts "=== [Maximum number of hops]: #{max_hop} ====="
     end
 
-    bgps = generate_split_variations(pgp[:edges], max_hop)
+    bgps = generate_instantiation_variations(pgp)
+    if @debug
+      puts "=== [instantiation variations] ====="
+      bgps.each {|bgp| pp bgp}
+    end
+
+    bgps = generate_split_variations(bgps, max_hop)
 
     if @debug
       puts "=== [split variations] ====="
@@ -44,11 +50,6 @@ class GraphFinder
       bgps.each {|bgp| p bgp}
     end
 
-    bgps = generate_instantiation_variations(bgps, pgp)
-    if @debug
-      puts "=== [instantiation variations] ====="
-      bgps.each {|bgp| p bgp}
-    end
     bgps
   end
 
@@ -111,36 +112,37 @@ class GraphFinder
     end
   end
 
-
   private
 
-  def generate_split_variations(connections, max_hop)
-    return [] if connections.empty?
+  def generate_split_variations(bgps, max_hop = 2)
+    return [] if bgps.empty?
 
-    bgps = []
-
-    # split and make bgps
-    (1 .. max_hop).to_a.repeated_permutation(connections.length) do |split_scheme|
-      bgps << generate_split_bgp(connections, split_scheme)
+    sbgps = []
+    bgps.each do |bgp|
+      sortal_tps, non_sortal_tps = bgp.partition{|tp| tp[1].start_with? 's'}
+      (1 .. max_hop).to_a.repeated_permutation(non_sortal_tps.length) do |split_scheme|
+        split_tps = generate_split_tps(non_sortal_tps, split_scheme)
+        sbgps << sortal_tps + split_tps
+      end
     end
 
-    bgps
+    sbgps
   end
 
-  def generate_split_bgp(connections, split_scheme)
-    bgp = []
-    connections.each_with_index do |c, i|
+  def generate_split_tps(tps, split_scheme)
+    split_tps = []
+    tps.each_with_index do |tp, i|
       x_variables = (1 ... split_scheme[i]).collect{|j| ("x#{i}#{j}").to_s}
       p_variables = (1 .. split_scheme[i]).collect{|j| ("p#{i}#{j}").to_s}
 
       # terms including x_variables and the initial and the final terms
-      terms = [c['subject'], x_variables, c['object']].flatten
+      terms = [tp[0], x_variables, tp[2]].flatten
 
       # triple patterns
-      tps = (0 ... p_variables.length).collect{|j| [terms[j], p_variables[j], terms[j + 1]]}
-      bgp += tps
+      stps = (0 ... p_variables.length).collect{|j| [terms[j], p_variables[j], terms[j + 1]]}
+      split_tps += stps
     end
-    bgp
+    split_tps
   end
 
   # make variations by inversing each triple pattern
@@ -148,8 +150,10 @@ class GraphFinder
     rbgps = []
 
     bgps.each do |bgp|
-      [false, true].repeated_permutation(bgp.length) do |inverse_scheme|
-        rbgps << bgp.map.with_index {|tp, i| inverse_scheme[i]? tp.reverse : tp}
+      sortal_tps, non_sortal_tps = bgp.partition{|tp| tp[1].start_with? 's'}
+
+      [false, true].repeated_permutation(non_sortal_tps.length) do |inverse_scheme|
+        rbgps << sortal_tps + non_sortal_tps.map.with_index {|tp, i| inverse_scheme[i]? tp.reverse : tp}
       end
     end
 
@@ -157,14 +161,20 @@ class GraphFinder
   end
 
   # make variations by instantiating terms
-  def generate_instantiation_variations(bgps, pgp)
+  def generate_instantiation_variations(pgp)
     iids = {}
     pgp[:nodes].each do |id, node|
       iid = class?(node[:term]) ? 'i' + id : nil
       iids[id] = iid unless iid.nil?
     end
 
+    connections = pgp[:edges]
+    return [] if connections.empty?
+    bgp = connections.map.with_index{|c, i| [c['subject'], "p#{i+1}", c['object']]}
+
+    # instantiated BGPs
     ibgps = []
+    bgps = [bgp]
     [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
       # id of the terms to be instantiated
       itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
@@ -187,6 +197,10 @@ class GraphFinder
     end
 
     ibgps
+  end
+
+  def uri?(term)
+    term.start_with? 'http://'
   end
 
   def class?(term)
@@ -303,7 +317,6 @@ if __FILE__ == $0
     "http://bioportal.bioontology.org/ontologies/umls/hasSTY"
   ]
 
-
   query_graph = {
     :nodes => {
       "t1" => {
@@ -325,20 +338,37 @@ if __FILE__ == $0
     :focus => "t1"
   }
 
-  max_hop = 2
+  apgp = {
+    :nodes=> {
+      "t1"=> {
+        "text" => "drugs",
+        :term => "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs"
+      },
+      "t2"=> {
+        "text" => "strokes",
+        :term => "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseases/1098"
+      },
+      "t3"=> {
+        "text" => "arthrosis",
+        :term => "http://www4.wiwiss.fu-berlin.de/sider/resource/side_effects/C0022408"
+      }
+    },
+    :focus=>"t1",
+    :edges=> [
+      {"object"=>"t2", "subject"=>"t1", "text"=>"associated with and"},
+      {"object"=>"t3", "subject"=>"t1", "text"=>"associated with and"}
+    ]
+  }
+
+  endpoint = SPARQL::Client.new('http://rdf.pubannotation.org/sparql')
+  max_hop = 3
+  options = {:max_hop => max_hop, :ignore_predicates => IGNORE_PREDICATES, :sortal_predicates => SORTAL_PREDICATES, :debug => true}
+  # options = {:max_hop => max_hop, :ignore_predicates => IGNORE_PREDICATES, :sortal_predicates => SORTAL_PREDICATES}
 
   query_graph = JSON.parse File.read (ARGV[0]) unless ARGV[0].nil?
   max_hop = ARGV[1] unless ARGV[1].nil?
 
-  gf = GraphFinder.new(query_graph, EP_URL, {
-                                  :endpoint_options => {:method => :get, :read_timeout => 600},
-                                  :debug => true,
-                                  :ignore_precates => IGNORE_PREDICATES,
-                                  :sortal_predicates => SORTAL_PREDICATES,
-                                  :max_hop => max_hop
-                                })
-
-  gf.each_solution do |s|
-    p s
-  end
+  gf = GraphFinder.new(apgp, endpoint, nil, options)
+  # sparqls = gf.sparqls
+  # puts sparqls.join("\n-----\n")
 end
