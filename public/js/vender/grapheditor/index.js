@@ -2071,20 +2071,18 @@ var _default = (function (_ActionTransform) {
     // Set by a binding aciton
     var dictionaryUrl = undefined;
 
-    var urls = [findTermUrl, dictionaryUrl];
-
     this.bindActions(_const.target.MODEL, [[_const.actionType.SET_DICTIONARY_URL, function (action) {
       return dictionaryUrl = action.dictionaryUrl;
     }], [_const.actionType.FIND_TERM, function (action, push) {
-      return (0, _done2['default'])(push, [_toInformation2['default'].apply(undefined, [nodes, nodes.texts, _const.target.VIEW_NODE].concat(urls)), _toInformation2['default'].apply(undefined, [edges, edges.texts, _const.target.VIEW_EDGE].concat(urls))]);
+      return (0, _done2['default'])(push, [(0, _toInformation2['default'])(nodes, nodes.texts, _const.target.VIEW_NODE, findTermUrl, dictionaryUrl), (0, _toInformation2['default'])(edges, edges.texts, _const.target.VIEW_EDGE, findTermUrl, dictionaryUrl)]);
     }]]);
 
     this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.FIND_TERM, function (action, push) {
-      return (0, _done2['default'])(push, [_toInformation2['default'].apply(undefined, [nodes, [nodes.getText(action.id)], _const.target.VIEW_NODE].concat(urls))]);
+      return (0, _done2['default'])(push, [(0, _toInformation2['default'])(nodes, [nodes.getText(action.id)], _const.target.VIEW_NODE, findTermUrl, dictionaryUrl)]);
     }]]);
 
     this.bindActions(_const.target.MODEL_EDGE, [[_const.actionType.FIND_TERM, function (action, push) {
-      return (0, _done2['default'])(push, [_toInformation2['default'].apply(undefined, [edges, [edges.getText(action.id)], _const.target.VIEW_EDGE].concat(urls))]);
+      return (0, _done2['default'])(push, [(0, _toInformation2['default'])(edges, [edges.getText(action.id)], _const.target.VIEW_EDGE, findTermUrl, dictionaryUrl)]);
     }]]);
   }
 
