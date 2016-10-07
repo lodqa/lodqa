@@ -9467,16 +9467,15 @@ function hasTerm(mappingsElement) {
 module.exports = function (loader) {
   var button = document.querySelector('#stopSearch');
 
-  loader.on('ws_open', function () {
-    return button.disabled = false;
-  }).on('ws_close', function () {
-    return button.disabled = true;
+  loader
+  // .on('ws_open', () => button.disabled = false)
+  .on('ws_close', function () {
+    document.querySelector('#beginSearch').classList.toggle('hidden');
+    document.querySelector('#stopSearch').classList.toggle('hidden');
   });
 
-  button.addEventListener('click', function (e) {
-    document.querySelector('#beginSearch').classList.toggle('hidden');
-    e.target.classList.toggle('hidden');
-    loader.stopSearch();
+  button.addEventListener('click', function () {
+    return loader.stopSearch();
   });
 };
 

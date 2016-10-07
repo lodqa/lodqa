@@ -2,12 +2,11 @@ module.exports = function(loader) {
   const button = document.querySelector('#stopSearch')
 
   loader
-    .on('ws_open', () => button.disabled = false)
-    .on('ws_close', () => button.disabled = true)
+    // .on('ws_open', () => button.disabled = false)
+    .on('ws_close', () => {
+      document.querySelector('#beginSearch').classList.toggle('hidden')
+      document.querySelector('#stopSearch').classList.toggle('hidden')
+    })
 
-  button.addEventListener('click', (e) => {
-    document.querySelector('#beginSearch').classList.toggle('hidden')
-    e.target.classList.toggle('hidden')
-    loader.stopSearch()
-  })
+  button.addEventListener('click', () => loader.stopSearch())
 }
