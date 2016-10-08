@@ -16,6 +16,19 @@ class SparqlPresentation {
     // Add a table to the dom tree
     $(`#${domId}`)
       .append(createTable(sparql))
+
+    // Enable syntax highlight of sparql
+    /*global CodeMirror:true*/
+    const sparqls = document.querySelectorAll(`#${domId} textarea`)
+    CodeMirror
+      .fromTextArea(sparqls[sparqls.length - 1], {
+        mode: 'application/sparql-query',
+        readOnly: true,
+        hardwrap: true
+      })
+      .wrapParagraph(undefined, {
+        column: 125
+      })
   }
 
   setVerbose(value) {

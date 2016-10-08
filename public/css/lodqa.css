@@ -353,6 +353,10 @@ div.atext {
 }
 
 
+.sparql-region .CodeMirror {
+    height: auto;
+}
+
 /* anchored_pgp-table */
 
 .anchored_pgp-region {
