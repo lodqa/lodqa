@@ -3,7 +3,7 @@ const toAnswers = require('./toAnswers')
 
 const regionHtml = `<ul class="answers-region__answers-list">
   {{#answers}}
-    <li>{{label}}</li>
+    <li><a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a></li>
   {{/answers}}
   </ul>
 `

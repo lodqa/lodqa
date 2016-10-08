@@ -8,7 +8,8 @@ module.exports = function toAnswers(solutions, focus) {
       .find((id) => instance.isNodeId(focus, id))
 
     return {
-      label: toLastOfUrl(solution[focusInstanceId])
+      label: toLastOfUrl(solution[focusInstanceId]),
+      url: solution[focusInstanceId]
     }
   })
 }
