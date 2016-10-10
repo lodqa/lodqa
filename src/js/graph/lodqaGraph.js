@@ -1,3 +1,4 @@
+/*global Springy:true*/
 var _ = require('lodash'),
   setFont = require('./setFont'),
   toRed = require('./toRed'),
@@ -9,23 +10,23 @@ var _ = require('lodash'),
           .attr('href', selected.node.data.url)
       })
   },
-  Graph = function(domId, options) {
-    var graph = new Springy.Graph(),
+  Graph = function(options, className) {
+    const graph = new Springy.Graph(),
       link = $('<a target="_blank">'),
       canvas = $('<canvas>')
       .attr(options)
 
-    $('#' + domId)
+    const dom = $(`<div class="${className.join(' ') || 'graph'}">`)
       .append(link)
       .append(canvas)
 
-    var springy = canvas.springy({
+    const springy = canvas.springy({
       graph: graph
     })
 
     updateLinkOnSelect(link, springy)
 
-    return graph
+    return [graph, dom]
   },
   toNode = function(term) {
     return new Springy.Node(term.id, term)
@@ -52,12 +53,13 @@ var _ = require('lodash'),
     return graph.newEdge(node1, node2, edge)
   }
 
-module.exports = function(domId, options) {
-  var graph = new Graph(domId, options)
+module.exports = function(options, className) {
+  var [graph, dom] = new Graph(options, className)
 
   return {
     graph: graph,
     addNodes: addNodes,
-    addEdge: addEdge
+    addEdge: addEdge,
+    dom
   }
 }

@@ -5,7 +5,7 @@ const regionHtml = `
 `
 const reigonTemplate = Hogan.compile(regionHtml)
 
-module.exports = function SolutionLsit(target, target2) {
+module.exports = function(target, target2) {
   const $region = $(reigonTemplate.render())
 
   $region

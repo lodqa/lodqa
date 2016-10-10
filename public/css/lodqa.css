@@ -384,7 +384,8 @@ div.atext {
 }
 
 .answers-region__answers-list--hide,
-.answers-region__answers-table--hide {
+.answers-region__answers-table--hide,
+.answers-region__graph--hide {
   display: none;
 }
 

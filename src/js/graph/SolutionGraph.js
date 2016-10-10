@@ -1,5 +1,5 @@
 var _ = require('lodash'),
-  instance = require('../presentation/instance'),
+  instance = require('../instance'),
   setFont = require('./setFont'),
   toRed = require('./toRed'),
   fixNodePosition = require('./fixNodePosition'),
@@ -9,7 +9,7 @@ var _ = require('lodash'),
   toLabel = function(term) {
     return {
       id: term.id,
-      label: require('../presentation/toLastOfUrl')(term.label),
+      label: require('../toLastOfUrl')(term.label),
       url: term.label
     }
   },
@@ -148,13 +148,14 @@ var _ = require('lodash'),
     return edge
   }
 
-module.exports = function(domId, options) {
-  var graph = require('./lodqaGraph')(domId, options)
+module.exports = function(options, className) {
+  const graph = require('./lodqaGraph')(options, className)
 
   return {
     addAnchoredPgpNodes: _.partial(addAnchoredPgpNodes, graph.graph, graph.addNodes),
     addInstanceNode: _.partial(addInstanceNode, graph.graph, graph.addEdge),
     addTransitNode: _.partial(addTransitNode, graph.graph),
-    addPath: _.partial(addPath, graph.graph, graph.addEdge)
+    addPath: _.partial(addPath, graph.graph, graph.addEdge),
+    dom: graph.dom
   }
 }

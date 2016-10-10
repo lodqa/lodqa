@@ -1,6 +1,6 @@
 const Hogan = require('hogan.js')
-const toArray = require('../../collection/toArray')
-const toLastOfUrl = require('../toLastOfUrl')
+const toArray = require('../../../collection/toArray')
+const toLastOfUrl = require('../../../toLastOfUrl')
 
 const trHtml = `<tr>
   {{#nodes}}

@@ -1,0 +1,21 @@
+const instance = require('../../instance')
+const SolutionGraph = require('../../graph/SolutionGraph')
+
+module.exports = function(anchoredPgp, solutions) {
+  const graph = new SolutionGraph({
+    width: 690,
+    height: 400
+  }, ['answers-region__graph', 'answers-region__graph--hide'])
+
+  graph.addAnchoredPgpNodes(anchoredPgp)
+
+  for (const solution of solutions) {
+    const isFocus = (solution) => instance.isNodeId(anchoredPgp.focus, solution)
+    const instanceNodes = graph.addInstanceNode(isFocus, solution)
+    const transitNodes = graph.addTransitNode(solution)
+
+    graph.addPath(solution, anchoredPgp.edges, transitNodes, instanceNodes)
+  }
+
+  return graph.dom
+}
