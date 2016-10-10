@@ -15,6 +15,7 @@ function init() {
   const loader = new Loader()
 
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
+  bindResult.sparqlCount(loader, sparqlPresentation)
   bindResult.solution(loader, sparqlPresentation)
   bindResult.all(loader, answerListPresentation)
   bindResult.all(loader, graphPresentation)

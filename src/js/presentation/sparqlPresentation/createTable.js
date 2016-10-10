@@ -2,7 +2,7 @@ const Hogan = require('hogan.js')
 
 const regionHtml = `<div class="sparql-region">
   <div class="sparql-region__title">
-    <h2 class="sparql-region__title__heading">Sparql</h2>
+    <h2 class="sparql-region__title__heading">Sparql {{count}}</h2>
     <input class="sparql-region__title__button" type="button" value="Show sparql"></input>
   </div>
   <div class="sparql-region__sparql sparql-region__sparql--hide">
@@ -12,9 +12,10 @@ const regionHtml = `<div class="sparql-region">
 `
 const reigonTemplate = Hogan.compile(regionHtml)
 
-module.exports = function(sparql) {
+module.exports = function(sparql, count) {
   const $html = $(reigonTemplate.render({
-    sparql
+    sparql,
+    count
   }))
 
   // Activate the show button

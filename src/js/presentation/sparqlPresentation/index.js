@@ -3,11 +3,18 @@ const createTable = require('./createTable')
 const privateData = {}
 
 class SparqlPresentation {
+  onSparqlCount() {
+    privateData.sparqlCount = 0
+  }
+
   onSolution(data, domId) {
     const {
       sparql,
       solutions
     } = data
+
+    // Count up even if without solutions
+    privateData.sparqlCount++
 
     if (solutions.length === 0 && !privateData.verbose) {
       return
@@ -15,7 +22,7 @@ class SparqlPresentation {
 
     // Add a table to the dom tree
     $(`#${domId}`)
-      .append(createTable(sparql))
+      .append(createTable(sparql, privateData.sparqlCount))
 
     // Enable syntax highlight of sparql
     /*global CodeMirror:true*/

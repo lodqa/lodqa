@@ -1,10 +1,15 @@
 module.exports = {
   all,
+  sparqlCount,
   anchoredPgp,
   solution
 }
 
 const domId = 'lodqa-results'
+
+function sparqlCount(loader, presentation) {
+  loader.on('sparql_count', (total) => presentation.onSparqlCount(total))
+}
 
 function anchoredPgp(loader, presentation) {
   loader.on('anchored_pgp', (anchoredPgp) => presentation.onAnchoredPgp(domId, anchoredPgp))
