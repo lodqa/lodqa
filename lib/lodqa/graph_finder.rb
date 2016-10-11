@@ -4,6 +4,7 @@
 #
 require 'json'
 require 'sparql/client'
+require 'pp'
 
 class GraphFinder
   # This constructor takes the URL of an end point to be searched
@@ -80,17 +81,17 @@ class GraphFinder
     end
   end
 
-  def sparqls
-    @bgps.map {|bgp| compose_sparql(bgp, @pgp) }
+  def queries
+    @bgps.map {|bgp| {bgp:bgp, sparql:compose_sparql(bgp, @pgp)} }
   end
 
   def each_sparql_and_solution(proc_solution = nil)
-    sparqls.each do |sparql|
+    queries.each do |query|
       if @debug
-        puts "#{sparql}\n++++++++++"
+        puts "#{query[:sparql]}\n++++++++++"
       end
       begin
-        result = @endpoint.query(sparql)
+        result = @endpoint.query(query[:sparql])
       rescue => detail
         if @debug
           p detail
@@ -102,7 +103,7 @@ class GraphFinder
       end
 
       if proc_solution
-        proc_solution.call({sparql: sparql, solutions: result.map{ |solution| solution.to_h }})
+        proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
       end
 
       if @debug

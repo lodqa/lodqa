@@ -59,7 +59,7 @@ class Lodqa::Lodqa
     # Send number of spaqls before search
     sparql_count = anchored_pgps
       .map {|anchored_pgp| GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options) }
-      .map {|gf| gf.sparqls.length }
+      .map {|gf| gf.queries.length }
       .inject {|sum, n| sum + n }
 
     proc_sparql_count.call(sparql_count) if proc_sparql_count
