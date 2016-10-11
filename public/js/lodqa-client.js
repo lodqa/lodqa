@@ -9352,11 +9352,18 @@ module.exports = function (loader) {
 
 module.exports = {
   all: all,
+  sparqlCount: sparqlCount,
   anchoredPgp: anchoredPgp,
   solution: solution
 };
 
 var domId = 'lodqa-results';
+
+function sparqlCount(loader, presentation) {
+  loader.on('sparql_count', function (total) {
+    return presentation.onSparqlCount(total);
+  });
+}
 
 function anchoredPgp(loader, presentation) {
   loader.on('anchored_pgp', function (anchoredPgp) {
@@ -9489,7 +9496,7 @@ module.exports = function bindWebsocketPresentation(loader) {
   loader.on('ws_open', presentation.onOpen).on('ws_close', presentation.onClose).on('sparql_count', presentation.onSparqlCount).on('solution', presentation.onSolution);
 };
 
-},{"../presentation/websocketPresentation":40}],22:[function(require,module,exports){
+},{"../presentation/websocketPresentation":41}],22:[function(require,module,exports){
 'use strict';
 
 var Loader = require('./loader/loadSolution');
@@ -9501,8 +9508,6 @@ var bindStopSearchButton = require('./controller/bindStopSearchButton');
 var anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation');
 var answerListPresentation = require('./presentation/answerListPresentation');
 var sparqlPresentation = require('./presentation/sparqlPresentation');
-var solutionTablePresentation = require('./presentation/solutionTablePresentation');
-var graphPresentation = require('./presentation/graphPresentation');
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -9510,10 +9515,9 @@ function init() {
   var loader = new Loader();
 
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation);
-  bindResult.all(loader, answerListPresentation);
+  bindResult.sparqlCount(loader, sparqlPresentation);
   bindResult.solution(loader, sparqlPresentation);
-  bindResult.solution(loader, solutionTablePresentation);
-  bindResult.all(loader, graphPresentation);
+  bindResult.all(loader, answerListPresentation);
 
   bindWebsocketPresentation(loader);
   bindParseRenderingPresentation(loader);
@@ -9526,11 +9530,11 @@ function init() {
   });
 }
 
-},{"./controller/bindParseRenderingPresentation":17,"./controller/bindResult":18,"./controller/bindSearchButton":19,"./controller/bindStopSearchButton":20,"./controller/bindWebsocketPresentation":21,"./loader/loadSolution":28,"./presentation/anchoredPgpTablePresentation":29,"./presentation/answerListPresentation":31,"./presentation/graphPresentation":32,"./presentation/solutionTablePresentation":35,"./presentation/sparqlPresentation":38}],23:[function(require,module,exports){
+},{"./controller/bindParseRenderingPresentation":17,"./controller/bindResult":18,"./controller/bindSearchButton":19,"./controller/bindStopSearchButton":20,"./controller/bindWebsocketPresentation":21,"./loader/loadSolution":29,"./presentation/anchoredPgpTablePresentation":30,"./presentation/answerListPresentation":35,"./presentation/sparqlPresentation":40}],23:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
-    instance = require('../presentation/instance'),
+    instance = require('../instance'),
     setFont = require('./setFont'),
     toRed = require('./toRed'),
     fixNodePosition = require('./fixNodePosition'),
@@ -9540,7 +9544,7 @@ var _ = require('lodash'),
     toLabel = function toLabel(term) {
   return {
     id: term.id,
-    label: require('../presentation/toLastOfUrl')(term.label),
+    label: require('../toLastOfUrl')(term.label),
     url: term.label
   };
 },
@@ -9657,18 +9661,19 @@ var _ = require('lodash'),
   return edge;
 };
 
-module.exports = function (domId, options) {
-  var graph = require('./lodqaGraph')(domId, options);
+module.exports = function (options, className) {
+  var graph = require('./lodqaGraph')(options, className);
 
   return {
     addAnchoredPgpNodes: _.partial(addAnchoredPgpNodes, graph.graph, graph.addNodes),
     addInstanceNode: _.partial(addInstanceNode, graph.graph, graph.addEdge),
     addTransitNode: _.partial(addTransitNode, graph.graph),
-    addPath: _.partial(addPath, graph.graph, graph.addEdge)
+    addPath: _.partial(addPath, graph.graph, graph.addEdge),
+    dom: graph.dom
   };
 };
 
-},{"../presentation/instance":33,"../presentation/toLastOfUrl":39,"./fixNodePosition":24,"./lodqaGraph":25,"./setFont":26,"./toRed":27,"lodash":8}],24:[function(require,module,exports){
+},{"../instance":28,"../toLastOfUrl":43,"./fixNodePosition":24,"./lodqaGraph":25,"./setFont":26,"./toRed":27,"lodash":8}],24:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9746,7 +9751,10 @@ module.exports = function (nodes, edges) {
 };
 
 },{"lodash":8}],25:[function(require,module,exports){
+/*global Springy:true*/
 'use strict';
+
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
 var _ = require('lodash'),
     setFont = require('./setFont'),
@@ -9756,12 +9764,12 @@ var _ = require('lodash'),
     link.text(selected.node.data.url).attr('href', selected.node.data.url);
   });
 },
-    Graph = function Graph(domId, options) {
+    Graph = function Graph(options, className) {
   var graph = new Springy.Graph(),
       link = $('<a target="_blank">'),
       canvas = $('<canvas>').attr(options);
 
-  $('#' + domId).append(link).append(canvas);
+  var dom = $('<div class="' + (className.join(' ') || 'graph') + '">').append(link).append(canvas);
 
   var springy = canvas.springy({
     graph: graph
@@ -9769,7 +9777,7 @@ var _ = require('lodash'),
 
   updateLinkOnSelect(link, springy);
 
-  return graph;
+  return [graph, dom];
 },
     toNode = function toNode(term) {
   return new Springy.Node(term.id, term);
@@ -9793,13 +9801,19 @@ var _ = require('lodash'),
   return graph.newEdge(node1, node2, edge);
 };
 
-module.exports = function (domId, options) {
-  var graph = new Graph(domId, options);
+module.exports = function (options, className) {
+  var _ref = new Graph(options, className);
+
+  var _ref2 = _slicedToArray(_ref, 2);
+
+  var graph = _ref2[0];
+  var dom = _ref2[1];
 
   return {
     graph: graph,
     addNodes: addNodes,
-    addEdge: addEdge
+    addEdge: addEdge,
+    dom: dom
   };
 };
 
@@ -9822,6 +9836,18 @@ module.exports = function (term) {
 };
 
 },{}],28:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  is: function is(id) {
+    return id[0] === 'i';
+  },
+  isNodeId: function isNodeId(focus, instanceId) {
+    return instanceId.substr(1) === focus;
+  }
+};
+
+},{}],29:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -9891,7 +9917,7 @@ function openConnection(emitter, pathname, config) {
   return ws;
 }
 
-},{"events":4}],29:[function(require,module,exports){
+},{"events":4}],30:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9938,19 +9964,79 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":16,"../render/makeTemplate":41,"lodash":8}],30:[function(require,module,exports){
+},{"../collection/toArray":16,"../render/makeTemplate":42,"lodash":8}],31:[function(require,module,exports){
 'use strict';
 
-var _ = require('lodash');
 var Hogan = require('Hogan.js');
-var instance = require('../instance');
-var toLastOfUrl = require('../toLastOfUrl');
+var toAnswers = require('./toAnswers');
 
-var listHtml = '<li>{{instance}}</li>';
-var instanceTemplate = Hogan.compile(listHtml);
+var regionHtml = '<ul class="answers-region__answers-list">\n  {{#answers}}\n    <li><a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a></li>\n  {{/answers}}\n  </ul>\n';
+var instanceTemplate = Hogan.compile(regionHtml);
 
-module.exports = function ($resultTable, solutions, focus) {
-  var currentAnswerList = $resultTable.find('.answer-list');
+module.exports = function (solutions, focus) {
+  var answers = toAnswers(solutions, focus);
+
+  return instanceTemplate.render({
+    answers: answers
+  });
+};
+
+},{"./toAnswers":32,"Hogan.js":2}],32:[function(require,module,exports){
+'use strict';
+
+var instance = require('../../../instance');
+var toLastOfUrl = require('../../../toLastOfUrl');
+
+module.exports = function toAnswers(solutions, focus) {
+  return solutions.map(function (solution) {
+    var focusInstanceId = Object.keys(solution).filter(instance.is).find(function (id) {
+      return instance.isNodeId(focus, id);
+    });
+
+    return {
+      label: toLastOfUrl(solution[focusInstanceId]),
+      url: solution[focusInstanceId]
+    };
+  });
+};
+
+},{"../../../instance":28,"../../../toLastOfUrl":43}],33:[function(require,module,exports){
+'use strict';
+
+var Hogan = require('Hogan.js');
+
+var regionHtml = '\n  <input type="button" value="show graph" class="answers-region__title__button"></input>\n';
+var reigonTemplate = Hogan.compile(regionHtml);
+
+module.exports = function (target) {
+  var $region = $(reigonTemplate.render());
+
+  $region.on('click', function (e) {
+    target.classList.toggle('answers-region__graph--hide');
+
+    if (e.target.value === 'show graph') {
+      e.target.value = 'hide graph';
+    } else {
+      e.target.value = 'show graph';
+    }
+  });
+
+  return $region;
+};
+
+},{"Hogan.js":2}],34:[function(require,module,exports){
+'use strict';
+
+var instance = require('../../instance');
+var SolutionGraph = require('../../graph/SolutionGraph');
+
+module.exports = function (anchoredPgp, solutions) {
+  var graph = new SolutionGraph({
+    width: 690,
+    height: 400
+  }, ['answers-region__graph', 'answers-region__graph--hide']);
+
+  graph.addAnchoredPgpNodes(anchoredPgp);
 
   var _iteratorNormalCompletion = true;
   var _didIteratorError = false;
@@ -9960,12 +10046,13 @@ module.exports = function ($resultTable, solutions, focus) {
     for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var solution = _step.value;
 
-      var focusInstanceId = _.first(Object.keys(solution).filter(instance.is).filter(_.partial(instance.isNodeId, focus))),
-          label = toLastOfUrl(solution[focusInstanceId]);
+      var isFocus = function isFocus(solution) {
+        return instance.isNodeId(anchoredPgp.focus, solution);
+      };
+      var instanceNodes = graph.addInstanceNode(isFocus, solution);
+      var transitNodes = graph.addTransitNode(solution);
 
-      currentAnswerList.append(instanceTemplate.render({
-        instance: label
-      }));
+      graph.addPath(solution, anchoredPgp.edges, transitNodes, instanceNodes);
     }
   } catch (err) {
     _didIteratorError = true;
@@ -9981,18 +10068,22 @@ module.exports = function ($resultTable, solutions, focus) {
       }
     }
   }
+
+  return graph.dom;
 };
 
-},{"../instance":33,"../toLastOfUrl":39,"Hogan.js":2,"lodash":8}],31:[function(require,module,exports){
+},{"../../graph/SolutionGraph":23,"../../instance":28}],35:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var appendAnswers = require('./appendAnswers');
-
-var regionHtml = '<div class="answer-list-region">\n  <h2>Answers</h2>\n  <ul class="answer-list"></ul>\n</div>\n';
+var answerList = require('./answerList');
+var solutionTable = require('./solutionTable');
+var listTableButton = require('./list-table-button');
+var graph = require('./graph');
+var graphButton = require('./graph-button');
 
 var privateData = {};
 
@@ -10004,7 +10095,7 @@ var AnswerListPresentation = (function () {
   _createClass(AnswerListPresentation, [{
     key: 'onAnchoredPgp',
     value: function onAnchoredPgp(domId, anchored_pgp) {
-      privateData.focus = anchored_pgp.focus;
+      privateData.anchoredPgp = anchored_pgp;
     }
   }, {
     key: 'onSolution',
@@ -10015,8 +10106,18 @@ var AnswerListPresentation = (function () {
         return;
       }
 
-      var $region = $(regionHtml);
-      appendAnswers($region, solutions, privateData.focus);
+      var region = '<div class="answers-region">\n      <div class="answers-region__title">\n        <h3 class="answers-region__title__heading">Answers</h3>\n      </div>\n    </div>\n    ';
+      var list = $(answerList(solutions, privateData.anchoredPgp.focus));
+      var table = solutionTable(solutions);
+      var tableButton = listTableButton(table[0], list[0]);
+      var solutionGraph = graph(privateData.anchoredPgp, solutions);
+      var showGraphButton = graphButton(solutionGraph[0]);
+
+      var $region = $(region);
+
+      $region.find('.answers-region__title').append(tableButton).append(showGraphButton);
+
+      $region.append(list).append(table).append(solutionGraph);
 
       // Add a list to the dom tree
       $('#' + domId).append($region);
@@ -10028,106 +10129,46 @@ var AnswerListPresentation = (function () {
 
 module.exports = new AnswerListPresentation();
 
-},{"./appendAnswers":30}],32:[function(require,module,exports){
-'use strict';
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var instance = require('./instance');
-var SolutionGraph = require('../graph/SolutionGraph');
-
-var privateData = {};
-
-var GraphPresentation = (function () {
-  function GraphPresentation() {
-    _classCallCheck(this, GraphPresentation);
-  }
-
-  _createClass(GraphPresentation, [{
-    key: 'onAnchoredPgp',
-    value: function onAnchoredPgp(domId, anchored_pgp) {
-      privateData.domId = domId;
-      privateData.anchoredPgp = anchored_pgp;
-      privateData.focus = anchored_pgp.focus;
-      privateData.edges = anchored_pgp.edges;
-    }
-  }, {
-    key: 'onSolution',
-    value: function onSolution(data) {
-      var solutions = data.solutions;
-
-      if (solutions.length > 0) {
-        var graph = new SolutionGraph(privateData.domId, {
-          width: 690,
-          height: 400
-        });
-
-        graph.addAnchoredPgpNodes(privateData.anchoredPgp);
-
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var solution = _step.value;
-
-            var isFocus = function isFocus(solution) {
-              return instance.isNodeId(privateData.focus, solution);
-            };
-            var instanceNodes = graph.addInstanceNode(isFocus, solution);
-            var transitNodes = graph.addTransitNode(solution);
-
-            graph.addPath(solution, privateData.edges, transitNodes, instanceNodes);
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator['return']) {
-              _iterator['return']();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      }
-    }
-  }]);
-
-  return GraphPresentation;
-})();
-
-module.exports = new GraphPresentation();
-
-},{"../graph/SolutionGraph":23,"./instance":33}],33:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  is: function is(id) {
-    return id[0] === 'i';
-  },
-  isNodeId: function isNodeId(focus, instanceId) {
-    return instanceId.substr(1) === focus;
-  }
-};
-
-},{}],34:[function(require,module,exports){
+},{"./answerList":31,"./graph":34,"./graph-button":33,"./list-table-button":36,"./solutionTable":37}],36:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('Hogan.js');
 
-var regionHtml = '<div class="result-region solution-region hide">\n      <table>\n          <tr>\n            {{#keys}}\n              <th>{{key}}</th>\n            {{/keys}}\n          </tr>\n      </table>\n  </div>\n  <div>\n     <input type="button" value="Show solutions in table"></input>\n  </div>';
+var regionHtml = '\n  <input type="button" value="table" class="answers-region__title__button"></input>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
-module.exports = function SolutionLsit(domId, solution) {
+module.exports = function (target, target2) {
+  var $region = $(reigonTemplate.render());
+
+  $region.on('click', function (e) {
+    target.classList.toggle('answers-region__answers-table--hide');
+
+    if (target2) {
+      target2.classList.toggle('answers-region__answers-list--hide');
+    }
+
+    if (e.target.value === 'table') {
+      e.target.value = 'list';
+    } else {
+      e.target.value = 'table';
+    }
+  });
+
+  return $region;
+};
+
+},{"Hogan.js":2}],37:[function(require,module,exports){
+'use strict';
+
+var Hogan = require('Hogan.js');
+var toSolutionRow = require('./toSolutionRow');
+
+var regionHtml = '<div class="answers-region__answers-table answers-region__answers-table--hide">\n      <table>\n          <tr>\n            {{#keys}}\n              <th>{{key}}</th>\n            {{/keys}}\n          </tr>\n      </table>\n  </div>';
+var reigonTemplate = Hogan.compile(regionHtml);
+
+module.exports = function (solutions) {
   var data = {
-    keys: Object.keys(solution).map(function (key) {
+    keys: Object.keys(solutions[0]).map(function (key) {
       return {
         key: key
       };
@@ -10135,83 +10176,40 @@ module.exports = function SolutionLsit(domId, solution) {
   };
   var $region = $(reigonTemplate.render(data));
 
-  $region.on('click', 'input', function (e) {
-    $region[0].classList.toggle('hide');
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
 
-    if (e.target.val === 'Show solutions in table') {
-      e.target.val = 'Hide solutions in table';
-    } else {
-      e.target.val = 'Show solutions in table';
+  try {
+    for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var solution = _step.value;
+
+      $region.find('table').append(toSolutionRow(solution));
     }
-  });
-
-  $('#' + domId).append($region);
-
-  return $region.find('table');
-};
-
-},{"Hogan.js":2}],35:[function(require,module,exports){
-'use strict';
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var SolutionLsit = require('./SolutionLsit');
-var toSolutionRow = require('./toSolutionRow');
-
-var SolutionTablePresentation = (function () {
-  function SolutionTablePresentation() {
-    _classCallCheck(this, SolutionTablePresentation);
-  }
-
-  _createClass(SolutionTablePresentation, [{
-    key: 'onSolution',
-    value: function onSolution(data, domId) {
-      var solutions = data.solutions;
-
-      if (solutions.length > 0) {
-        var currentSolutionList = new SolutionLsit(domId, solutions[0]);
-
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = solutions[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var solution = _step.value;
-
-            currentSolutionList.append(toSolutionRow(solution));
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator['return']) {
-              _iterator['return']();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator['return']) {
+        _iterator['return']();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
       }
     }
-  }]);
+  }
 
-  return SolutionTablePresentation;
-})();
+  return $region;
+};
 
-module.exports = new SolutionTablePresentation();
-
-},{"./SolutionLsit":34,"./toSolutionRow":36}],36:[function(require,module,exports){
+},{"./toSolutionRow":38,"Hogan.js":2}],38:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('hogan.js');
-var toArray = require('../../collection/toArray');
-var toLastOfUrl = require('../toLastOfUrl');
+var toArray = require('../../../collection/toArray');
+var toLastOfUrl = require('../../../toLastOfUrl');
 
 var trHtml = '<tr>\n  {{#nodes}}\n    <td class="solution">\n      <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>\n    </td>\n  {{/nodes}}\n</tr>';
 var solutionRowTemplate = Hogan.compile(trHtml);
@@ -10234,21 +10232,23 @@ function toViewParameters(solution, key) {
   };
 }
 
-},{"../../collection/toArray":16,"../toLastOfUrl":39,"hogan.js":6}],37:[function(require,module,exports){
+},{"../../../collection/toArray":16,"../../../toLastOfUrl":43,"hogan.js":6}],39:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('hogan.js');
 
-var regionHtml = '<div class="result-region sparql-region hide">\n  <h2>Sparql</h2>\n  <span class="sparql">{{sparql}}</span>\n</div>\n<div>\n   <input type="button" value="Show sparql"></input>\n</div>\n';
+var regionHtml = '<div class="sparql-region">\n  <div class="sparql-region__title">\n    <h2 class="sparql-region__title__heading">Sparql {{count}}</h2>\n    <input class="sparql-region__title__button" type="button" value="Show sparql"></input>\n  </div>\n  <div class="sparql-region__sparql sparql-region__sparql--hide">\n    <textarea>{{sparql}}</textarea>\n  </div>\n</div>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
-module.exports = function (sparql) {
+module.exports = function (sparql, count) {
   var $html = $(reigonTemplate.render({
-    sparql: sparql
+    sparql: sparql,
+    count: count
   }));
 
+  // Activate the show button
   $html.on('click', 'input', function (e) {
-    $html[0].classList.toggle('hide');
+    $html.find('.sparql-region__sparql')[0].classList.toggle('sparql-region__sparql--hide');
 
     if (e.target.value === 'Show sparql') {
       e.target.value = 'Hide sparql';
@@ -10260,7 +10260,7 @@ module.exports = function (sparql) {
   return $html;
 };
 
-},{"hogan.js":6}],38:[function(require,module,exports){
+},{"hogan.js":6}],40:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -10277,17 +10277,36 @@ var SparqlPresentation = (function () {
   }
 
   _createClass(SparqlPresentation, [{
+    key: 'onSparqlCount',
+    value: function onSparqlCount() {
+      privateData.sparqlCount = 0;
+    }
+  }, {
     key: 'onSolution',
     value: function onSolution(data, domId) {
       var sparql = data.sparql;
       var solutions = data.solutions;
+
+      // Count up even if without solutions
+      privateData.sparqlCount++;
 
       if (solutions.length === 0 && !privateData.verbose) {
         return;
       }
 
       // Add a table to the dom tree
-      $('#' + domId).append(createTable(sparql));
+      $('#' + domId).append(createTable(sparql, privateData.sparqlCount));
+
+      // Enable syntax highlight of sparql
+      /*global CodeMirror:true*/
+      var sparqls = document.querySelectorAll('#' + domId + ' textarea');
+      CodeMirror.fromTextArea(sparqls[sparqls.length - 1], {
+        mode: 'application/sparql-query',
+        readOnly: true,
+        hardwrap: true
+      }).wrapParagraph(undefined, {
+        column: 125
+      });
     }
   }, {
     key: 'setVerbose',
@@ -10301,17 +10320,7 @@ var SparqlPresentation = (function () {
 
 module.exports = new SparqlPresentation();
 
-},{"./createTable":37}],39:[function(require,module,exports){
-'use strict';
-
-module.exports = function (srcUrl) {
-  var parsedUrl = require('url').parse(srcUrl),
-      paths = parsedUrl.pathname.split('/');
-
-  return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
-};
-
-},{"url":15}],40:[function(require,module,exports){
+},{"./createTable":39}],41:[function(require,module,exports){
 'use strict';
 
 module.exports = function (domId) {
@@ -10355,7 +10364,7 @@ function updateDisplay(el, msg) {
   el.innerHTML = msg;
 }
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -10364,4 +10373,14 @@ var _ = require('lodash'),
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":6,"lodash":8,"multiline":9}]},{},[22])
+},{"hogan.js":6,"lodash":8,"multiline":9}],43:[function(require,module,exports){
+'use strict';
+
+module.exports = function (srcUrl) {
+  var parsedUrl = require('url').parse(srcUrl),
+      paths = parsedUrl.pathname.split('/');
+
+  return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
+};
+
+},{"url":15}]},{},[22])
