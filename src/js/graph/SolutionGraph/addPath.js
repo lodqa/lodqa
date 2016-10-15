@@ -1,11 +1,11 @@
 const toEdge = require('./toEdge')
 const toPath = require('./toPath')
 
-module.exports = function(graph, solution, edges, transitNodes, instanceNodes) {
+module.exports = function(graph, bgp, solution, edges, transitNodes, instanceNodes) {
   return Object.keys(solution)
     .filter((id) => id[0] === 'p')
     .map(toPathInfo)
-    .map((pathInfo) => toPath(graph.graph, edges, transitNodes, instanceNodes, pathInfo))
+    .map((pathInfo) => toPath(graph.graph, bgp, edges, transitNodes, instanceNodes, pathInfo))
     .reduce((result, path) => {
       const edge = toEdge(solution, path.id)
 

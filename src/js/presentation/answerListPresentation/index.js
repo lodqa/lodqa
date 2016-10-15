@@ -13,6 +13,7 @@ class AnswerListPresentation {
 
   onSolution(data, domId) {
     const {
+      bgp,
       solutions
     } = data
 
@@ -29,7 +30,7 @@ class AnswerListPresentation {
     const list = $(answerList(solutions, privateData.anchoredPgp.focus))
     const table = solutionTable(solutions)
     const tableButton = listTableButton(table[0], list[0])
-    const solutionGraph = graph(privateData.anchoredPgp, solutions)
+    const solutionGraph = graph(privateData.anchoredPgp, bgp, solutions)
     const showGraphButton = graphButton(solutionGraph[0])
 
     const $region = $(region)

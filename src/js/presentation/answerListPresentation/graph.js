@@ -1,7 +1,7 @@
 const instance = require('../../instance')
 const SolutionGraph = require('../../graph/SolutionGraph')
 
-module.exports = function(anchoredPgp, solutions) {
+module.exports = function(anchoredPgp, bgp, solutions) {
   const graph = new SolutionGraph({
     width: 690,
     height: 400
@@ -11,10 +11,10 @@ module.exports = function(anchoredPgp, solutions) {
 
   for (const solution of solutions) {
     const isFocus = (solution) => instance.isNodeId(anchoredPgp.focus, solution)
-    const instanceNodes = graph.addInstanceNode(isFocus, solution)
+    const instanceNodes = graph.addInstanceNode(isFocus, bgp, solution)
     const transitNodes = graph.addTransitNode(solution)
 
-    graph.addPath(solution, anchoredPgp.edges, transitNodes, instanceNodes)
+    graph.addPath(bgp, solution, anchoredPgp.edges, transitNodes, instanceNodes)
   }
 
   return graph.dom

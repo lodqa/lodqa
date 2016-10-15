@@ -1,10 +1,15 @@
-module.exports = function(graph, edges, transitNodes, instanceNodes, pathInfo) {
+const switchDirection = require('./switchDirection')
+
+module.exports = function(graph, bgp, edges, transitNodes, instanceNodes, pathInfo) {
   const edge = edges[pathInfo.no]
+  const subject = toIdAndNode(graph, transitNodes, instanceNodes, fromSubject(edge, pathInfo))
+  const object = toIdAndNode(graph, transitNodes, instanceNodes, fromObject(edge, pathInfo))
+  const [source, target] = switchDirection(bgp, subject, object)
 
   return {
     id: pathInfo.id,
-    source: toGraphNode(graph, toGraphId(transitNodes, instanceNodes, fromSubject(edge, pathInfo))),
-    target: toGraphNode(graph, toGraphId(transitNodes, instanceNodes, fromObject(edge, pathInfo)))
+    source,
+    target
   }
 }
 
@@ -28,16 +33,12 @@ function fromObject(edge, pathInfo) {
   }
 }
 
-function toGraphNode(graph, id) {
-  return graph.nodeSet[id]
-}
-
-function toGraphId(transitNodes, instanceNodes, canididateIds) {
+function toIdAndNode(graph, transitNodes, instanceNodes, canididateIds) {
   if (transitNodes[canididateIds.transitNodeId]) {
-    return transitNodes[canididateIds.transitNodeId].id
+    return [canididateIds.transitNodeId, transitNodes[canididateIds.transitNodeId]]
   } else if (instanceNodes[canididateIds.instanceNodeId]) {
-    return instanceNodes[canididateIds.instanceNodeId].id
+    return [canididateIds.instanceNodeId, instanceNodes[canididateIds.instanceNodeId]]
   } else {
-    return canididateIds.anchoredPgpNodeId
+    return [canididateIds.anchoredPgpNodeId, graph.nodeSet[canididateIds.anchoredPgpNodeId]]
   }
 }

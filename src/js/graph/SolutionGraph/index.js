@@ -9,9 +9,9 @@ module.exports = function(options, className) {
 
   return {
     addAnchoredPgpNodes: (anchoredPgp) => addAnchoredPgpNodes(graph.graph, graph.addNodes, anchoredPgp),
-    addInstanceNode: (isFocus, solution) => addInstanceNode(graph.graph, graph.addEdge, isFocus, solution),
+    addInstanceNode: (isFocus, bgp, solution) => addInstanceNode(graph.graph, graph.addEdge, isFocus, bgp, solution),
     addTransitNode: (solution) => addTransitNode(graph.graph, solution),
-    addPath: (solution, edges, transitNodes, instanceNodes) => addPath(graph, solution, edges, transitNodes, instanceNodes),
+    addPath: (bgp, solution, edges, transitNodes, instanceNodes) => addPath(graph, bgp, solution, edges, transitNodes, instanceNodes),
     dom: graph.dom
   }
 }
