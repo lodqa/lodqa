@@ -9496,7 +9496,7 @@ module.exports = function bindWebsocketPresentation(loader) {
   loader.on('ws_open', presentation.onOpen).on('ws_close', presentation.onClose).on('sparql_count', presentation.onSparqlCount).on('solution', presentation.onSolution);
 };
 
-},{"../presentation/websocketPresentation":41}],22:[function(require,module,exports){
+},{"../presentation/websocketPresentation":55}],22:[function(require,module,exports){
 'use strict';
 
 var Loader = require('./loader/loadSolution');
@@ -9530,67 +9530,249 @@ function init() {
   });
 }
 
-},{"./controller/bindParseRenderingPresentation":17,"./controller/bindResult":18,"./controller/bindSearchButton":19,"./controller/bindStopSearchButton":20,"./controller/bindWebsocketPresentation":21,"./loader/loadSolution":29,"./presentation/anchoredPgpTablePresentation":30,"./presentation/answerListPresentation":35,"./presentation/sparqlPresentation":40}],23:[function(require,module,exports){
+},{"./controller/bindParseRenderingPresentation":17,"./controller/bindResult":18,"./controller/bindSearchButton":19,"./controller/bindStopSearchButton":20,"./controller/bindWebsocketPresentation":21,"./loader/loadSolution":43,"./presentation/anchoredPgpTablePresentation":44,"./presentation/answerListPresentation":49,"./presentation/sparqlPresentation":54}],23:[function(require,module,exports){
 'use strict';
 
-var _ = require('lodash'),
-    instance = require('../instance'),
-    setFont = require('./setFont'),
-    toRed = require('./toRed'),
-    fixNodePosition = require('./fixNodePosition'),
-    transformIf = function transformIf(predicate, transform, object) {
-  return predicate(object) ? transform(object) : object;
-},
-    toLabel = function toLabel(term) {
-  return {
-    id: term.id,
-    label: require('../toLastOfUrl')(term.label),
-    url: term.label
-  };
-},
-    setFontNormal = _.partial(setFont, '8px Verdana, sans-serif'),
-    toLabelAndSetFontNormal = _.compose(setFontNormal, toLabel),
-    toTerm = function toTerm(solution, id) {
-  return {
-    id: id,
-    label: solution[id]
-  };
-},
-    addEdgeToInstance = function addEdgeToInstance(graph, addEdge, solution, instanceNode) {
-  var anchoredPgpNodeId = instanceNode.data.id.substr(1),
-      edgeId = 's' + anchoredPgpNodeId,
-      anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId],
-      edge = toEdge(solution, edgeId);
-  addEdge(graph, edge, anchoredPgpNode, instanceNode, '#999999');
-},
-    addInstanceNode = function addInstanceNode(graph, addEdge, isFocus, solution) {
-  var markIfFocus = _.partial(transformIf, _.compose(isFocus, function (term) {
-    return term.id;
-  }), toRed);
+var fixNodePosition = require('../fixNodePosition');
+var toLabelAndSetFontNormal = require('./toLabelAndSetFontNormal');
 
-  return Object.keys(solution).filter(instance.is).map(_.partial(toTerm, solution)).map(toLabelAndSetFontNormal).map(markIfFocus).reduce(function (result, term) {
-    var instanceNode = graph.newNode(term);
-    addEdgeToInstance(graph, addEdge, solution, instanceNode);
+module.exports = function (graph, addNodes, anchoredPgp) {
+  var nodeIds = Object.keys(anchoredPgp.nodes);
+  var nodes = nodeIds.map(function (id) {
+    return toAnchoredPgpNodeTerm(anchoredPgp.nodes, id);
+  }).map(toLabelAndSetFontNormal);
+
+  nodes = fixNodePosition(nodes, anchoredPgp.edges);
+
+  addNodes(graph, nodes, anchoredPgp.focus);
+};
+
+function toAnchoredPgpNodeTerm(nodes, key) {
+  return {
+    id: key,
+    label: nodes[key].term
+  };
+}
+
+},{"../fixNodePosition":35,"./toLabelAndSetFontNormal":31}],24:[function(require,module,exports){
+'use strict';
+
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+var instance = require('../../../instance');
+var toRed = require('../../toRed');
+var toTerm = require('../toTerm');
+var toEdge = require('../toEdge');
+var toLabelAndSetFontNormal = require('../toLabelAndSetFontNormal');
+var switchDirection = require('../switchDirection');
+
+module.exports = function (graph, addEdge, isFocus, bgp, solution) {
+  return Object.keys(solution).filter(instance.is).map(function (id) {
+    return toTerm(solution, id);
+  }).map(toLabelAndSetFontNormal).map(function (object) {
+    return transformIf(function (term) {
+      return isFocus(term.id);
+    }, toRed, object);
+  }).reduce(function (result, term) {
+    var instanceNode = addEdgeToInstance(graph, addEdge, bgp, solution, term);
     result[term.id] = instanceNode;
+
     return result;
   }, {});
-},
-    addTransitNode = function addTransitNode(graph, solution) {
+};
+
+function transformIf(predicate, transform, object) {
+  return predicate(object) ? transform(object) : object;
+}
+
+function addEdgeToInstance(graph, addEdge, bgp, solution, term) {
+  var instanceNode = graph.newNode(term);
+  var anchoredPgpNodeId = instanceNode.data.id.substr(1);
+  var edgeId = 's' + anchoredPgpNodeId;
+  var anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId];
+  var edge = toEdge(solution, edgeId);
+
+  var _switchDirection = switchDirection(bgp, [anchoredPgpNodeId, anchoredPgpNode], [term.id, instanceNode]);
+
+  var _switchDirection2 = _slicedToArray(_switchDirection, 2);
+
+  var source = _switchDirection2[0];
+  var target = _switchDirection2[1];
+
+  addEdge(graph, edge, source, target, '#999999');
+
+  return instanceNode;
+}
+
+},{"../../../instance":42,"../../toRed":41,"../switchDirection":28,"../toEdge":29,"../toLabelAndSetFontNormal":31,"../toTerm":34}],25:[function(require,module,exports){
+'use strict';
+
+var toEdge = require('./toEdge');
+var toPath = require('./toPath');
+
+module.exports = function (graph, bgp, solution, edges, transitNodes, instanceNodes) {
   return Object.keys(solution).filter(function (id) {
-    return id[0] === 'x';
-  }).map(_.partial(toTerm, solution)).map(toLabelAndSetFontNormal).reduce(function (result, term) {
-    result[term.id] = graph.newNode(term);
+    return id[0] === 'p';
+  }).map(toPathInfo).map(function (pathInfo) {
+    return toPath(graph.graph, bgp, edges, transitNodes, instanceNodes, pathInfo);
+  }).reduce(function (result, path) {
+    var edge = toEdge(solution, path.id);
+
+    result[path.id] = graph.addEdge(graph.graph, edge, path.source, path.target, '#2B5CFF');
+
     return result;
   }, {});
-},
-    toPathInfo = function toPathInfo(pathId) {
+};
+
+function toPathInfo(pathId) {
   return {
     id: pathId,
     no: pathId[1],
     childNo: parseInt(pathId[2])
   };
-},
-    toLeftId = function toLeftId(edge, pathInfo) {
+}
+
+},{"./toEdge":29,"./toPath":33}],26:[function(require,module,exports){
+'use strict';
+
+var toTerm = require('./toTerm');
+var toLabelAndSetFontNormal = require('./toLabelAndSetFontNormal');
+
+module.exports = function addTransitNode(graph, solution) {
+  return Object.keys(solution).filter(function (id) {
+    return id[0] === 'x';
+  }).map(function (id) {
+    return toTerm(solution, id);
+  }).map(toLabelAndSetFontNormal).reduce(function (result, term) {
+    result[term.id] = graph.newNode(term);
+
+    return result;
+  }, {});
+};
+
+},{"./toLabelAndSetFontNormal":31,"./toTerm":34}],27:[function(require,module,exports){
+'use strict';
+
+var lodqaGraph = require('../lodqaGraph');
+var _addAnchoredPgpNodes = require('./addAnchoredPgpNodes');
+var _addInstanceNode = require('./addInstanceNode');
+var _addTransitNode = require('./addTransitNode');
+var _addPath = require('./addPath');
+
+module.exports = function (options, className) {
+  var graph = lodqaGraph(options, className);
+
+  return {
+    addAnchoredPgpNodes: function addAnchoredPgpNodes(anchoredPgp) {
+      return _addAnchoredPgpNodes(graph.graph, graph.addNodes, anchoredPgp);
+    },
+    addInstanceNode: function addInstanceNode(isFocus, bgp, solution) {
+      return _addInstanceNode(graph.graph, graph.addEdge, isFocus, bgp, solution);
+    },
+    addTransitNode: function addTransitNode(solution) {
+      return _addTransitNode(graph.graph, solution);
+    },
+    addPath: function addPath(bgp, solution, edges, transitNodes, instanceNodes) {
+      return _addPath(graph, bgp, solution, edges, transitNodes, instanceNodes);
+    },
+    dom: graph.dom
+  };
+};
+
+},{"../lodqaGraph":39,"./addAnchoredPgpNodes":23,"./addInstanceNode":24,"./addPath":25,"./addTransitNode":26}],28:[function(require,module,exports){
+"use strict";
+
+module.exports = function switchDirection(bgp, first, second) {
+  if (bgp.find(function (direction) {
+    return direction[0] === first[0] && direction[2] === second[0];
+  })) {
+    return [first[1], second[1]];
+  }
+
+  if (bgp.find(function (direction) {
+    return direction[2] === first[0] && direction[0] === second[0];
+  })) {
+    return [second[1], first[1]];
+  }
+
+  throw new Error("what's wrong?");
+};
+
+},{}],29:[function(require,module,exports){
+'use strict';
+
+var toTerm = require('./toTerm');
+var toLabel = require('./toLabel');
+
+module.exports = function (solution, edgeId) {
+  var edge = Object.keys(solution).filter(function (id) {
+    return id === edgeId;
+  }).map(function (id) {
+    return toTerm(solution, id);
+  }).map(toLabel)[0];
+
+  return edge;
+};
+
+},{"./toLabel":30,"./toTerm":34}],30:[function(require,module,exports){
+'use strict';
+
+var toLastOfUrl = require('../../toLastOfUrl');
+
+module.exports = function (term) {
+  return {
+    id: term.id,
+    label: toLastOfUrl(term.label),
+    url: term.label
+  };
+};
+
+},{"../../toLastOfUrl":57}],31:[function(require,module,exports){
+'use strict';
+
+var setFontNormal = require('./setFontNormal');
+var toLabel = require('../toLabel');
+
+module.exports = function (term) {
+  return setFontNormal(toLabel(term));
+};
+
+},{"../toLabel":30,"./setFontNormal":32}],32:[function(require,module,exports){
+'use strict';
+
+var setFont = require('../../setFont');
+
+module.exports = function (target) {
+  return setFont('8px Verdana, sans-serif', target);
+};
+
+},{"../../setFont":40}],33:[function(require,module,exports){
+'use strict';
+
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+var switchDirection = require('./switchDirection');
+
+module.exports = function (graph, bgp, edges, transitNodes, instanceNodes, pathInfo) {
+  var edge = edges[pathInfo.no];
+  var subject = toIdAndNode(graph, transitNodes, instanceNodes, fromSubject(edge, pathInfo));
+  var object = toIdAndNode(graph, transitNodes, instanceNodes, fromObject(edge, pathInfo));
+
+  var _switchDirection = switchDirection(bgp, subject, object);
+
+  var _switchDirection2 = _slicedToArray(_switchDirection, 2);
+
+  var source = _switchDirection2[0];
+  var target = _switchDirection2[1];
+
+  return {
+    id: pathInfo.id,
+    source: source,
+    target: target
+  };
+};
+
+function fromSubject(edge, pathInfo) {
   var anchoredPgpNodeId = edge.subject;
 
   return {
@@ -9598,8 +9780,9 @@ var _ = require('lodash'),
     instanceNodeId: 'i' + anchoredPgpNodeId,
     anchoredPgpNodeId: anchoredPgpNodeId
   };
-},
-    toRightId = function toRightId(edge, pathInfo) {
+}
+
+function fromObject(edge, pathInfo) {
   var anchoredPgpNodeId = edge.object;
 
   return {
@@ -9607,73 +9790,29 @@ var _ = require('lodash'),
     instanceNodeId: 'i' + anchoredPgpNodeId,
     anchoredPgpNodeId: anchoredPgpNodeId
   };
-},
-    toGraphId = function toGraphId(transitNodes, instanceNodes, canididateIds) {
+}
+
+function toIdAndNode(graph, transitNodes, instanceNodes, canididateIds) {
   if (transitNodes[canididateIds.transitNodeId]) {
-    return transitNodes[canididateIds.transitNodeId].id;
+    return [canididateIds.transitNodeId, transitNodes[canididateIds.transitNodeId]];
   } else if (instanceNodes[canididateIds.instanceNodeId]) {
-    return instanceNodes[canididateIds.instanceNodeId].id;
+    return [canididateIds.instanceNodeId, instanceNodes[canididateIds.instanceNodeId]];
   } else {
-    return canididateIds.anchoredPgpNodeId;
+    return [canididateIds.anchoredPgpNodeId, graph.nodeSet[canididateIds.anchoredPgpNodeId]];
   }
-},
-    toPath = function toPath(graph, edges, transitNodes, instanceNodes, pathInfo) {
-  var edge = edges[pathInfo.no],
-      toGraphIdFromNodes = _.partial(toGraphId, transitNodes, instanceNodes),
-      toGraphNode = _.compose(function (id) {
-    return graph.nodeSet[id];
-  }, toGraphIdFromNodes);
+}
 
+},{"./switchDirection":28}],34:[function(require,module,exports){
+"use strict";
+
+module.exports = function (solution, id) {
   return {
-    id: pathInfo.id,
-    left: toGraphNode(toLeftId(edge, pathInfo)),
-    right: toGraphNode(toRightId(edge, pathInfo))
-  };
-},
-    addPath = function addPath(graph, addEdge, solution, edges, transitNodes, instanceNodes) {
-  return Object.keys(solution).filter(function (id) {
-    return id[0] === 'p';
-  }).map(toPathInfo).map(_.partial(toPath, graph, edges, transitNodes, instanceNodes)).reduce(function (result, path) {
-    var edge = toEdge(solution, path.id);
-    result[path.id] = addEdge(graph, edge, path.left, path.right, '#2B5CFF');
-    return result;
-  }, {});
-},
-    toAnchoredPgpNodeTerm = function toAnchoredPgpNodeTerm(nodes, key) {
-  return {
-    id: key,
-    label: nodes[key].term
-  };
-},
-    addAnchoredPgpNodes = function addAnchoredPgpNodes(graph, addNodes, anchoredPgp) {
-  var nodeIds = Object.keys(anchoredPgp.nodes),
-      nodes = nodeIds.map(_.partial(toAnchoredPgpNodeTerm, anchoredPgp.nodes)).map(toLabelAndSetFontNormal);
-
-  nodes = fixNodePosition(nodes, anchoredPgp.edges);
-
-  addNodes(graph, nodes, anchoredPgp.focus);
-},
-    toEdge = function toEdge(solution, edgeId) {
-  var edge = Object.keys(solution).filter(function (id) {
-    return id === edgeId;
-  }).map(_.partial(toTerm, solution)).map(toLabel)[0];
-
-  return edge;
-};
-
-module.exports = function (options, className) {
-  var graph = require('./lodqaGraph')(options, className);
-
-  return {
-    addAnchoredPgpNodes: _.partial(addAnchoredPgpNodes, graph.graph, graph.addNodes),
-    addInstanceNode: _.partial(addInstanceNode, graph.graph, graph.addEdge),
-    addTransitNode: _.partial(addTransitNode, graph.graph),
-    addPath: _.partial(addPath, graph.graph, graph.addEdge),
-    dom: graph.dom
+    id: id,
+    label: solution[id]
   };
 };
 
-},{"../instance":28,"../toLastOfUrl":43,"./fixNodePosition":24,"./lodqaGraph":25,"./setFont":26,"./toRed":27,"lodash":8}],24:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9750,26 +9889,14 @@ module.exports = function (nodes, edges) {
   return nodes.map(extendIndex).sort(sortFuc).map(_.partial(setPosition, nodes.length));
 };
 
-},{"lodash":8}],25:[function(require,module,exports){
+},{"lodash":8}],36:[function(require,module,exports){
 /*global Springy:true*/
 'use strict';
 
-var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
-
-var _ = require('lodash'),
-    setFont = require('./setFont'),
-    toRed = require('./toRed'),
-    updateLinkOnSelect = function updateLinkOnSelect(link, springy) {
-  springy.event.on('selected', function (selected) {
-    link.text(selected.node.data.url).attr('href', selected.node.data.url);
-  });
-},
-    Graph = function Graph(options, className) {
-  var graph = new Springy.Graph(),
-      link = $('<a target="_blank">'),
-      canvas = $('<canvas>').attr(options);
-
-  var dom = $('<div class="' + (className.join(' ') || 'graph') + '">').append(link).append(canvas);
+module.exports = function (options, className) {
+  var graph = new Springy.Graph();
+  var link = $('<a target="_blank">');
+  var canvas = $('<canvas>').attr(options);
 
   var springy = canvas.springy({
     graph: graph
@@ -9777,29 +9904,72 @@ var _ = require('lodash'),
 
   updateLinkOnSelect(link, springy);
 
+  var dom = $('<div class="' + (className.join(' ') || 'graph') + '">').append(link).append(canvas);
+
   return [graph, dom];
-},
-    toNode = function toNode(term) {
-  return new Springy.Node(term.id, term);
-},
-    addNode = function addNode(graph, node) {
-  graph.addNode(node);
-},
-    toBigFont = _.partial(setFont, '18px Verdana, sans-serif'),
-    toFocus = _.compose(toRed, toBigFont),
-    setFocus = function setFocus(focus, term) {
-  return term.id === focus ? toFocus(term) : term;
-},
-    addNodes = function addNodes(graph, nodes, focus) {
-  nodes.map(_.partial(setFocus, focus)).map(toNode).forEach(_.partial(addNode, graph));
-},
-    addEdge = function addEdge(graph, edge, node1, node2, color) {
-  edge = Object.assign(edge, {
+};
+
+function updateLinkOnSelect(link, springy) {
+  springy.event.on('selected', function (selected) {
+    link.text(selected.node.data.url).attr('href', selected.node.data.url);
+  });
+}
+
+},{}],37:[function(require,module,exports){
+"use strict";
+
+module.exports = function (graph, edge, sourceNode, targetNode, color) {
+  var data = Object.assign({}, edge, {
     color: color
   });
 
-  return graph.newEdge(node1, node2, edge);
+  return graph.newEdge(sourceNode, targetNode, data);
 };
+
+},{}],38:[function(require,module,exports){
+/*global Springy:true*/
+'use strict';
+
+var toRed = require('../toRed');
+var setFont = require('../setFont');
+
+module.exports = function (graph, nodes, focus) {
+  nodes.map(function (term) {
+    return setFocus(focus, term);
+  }).map(toNode).forEach(function (node) {
+    return addNode(graph, node);
+  });
+};
+
+function setFocus(focus, term) {
+  return term.id === focus ? toFocus(term) : term;
+}
+
+function toFocus(term) {
+  return toRed(toBigFont(term));
+}
+
+function toBigFont(term) {
+  setFont('18px Verdana, sans-serif', term);
+  return term;
+}
+
+function toNode(term) {
+  return new Springy.Node(term.id, term);
+}
+
+function addNode(graph, node) {
+  graph.addNode(node);
+}
+
+},{"../setFont":40,"../toRed":41}],39:[function(require,module,exports){
+'use strict';
+
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+var addNodes = require('./addNodes');
+var addEdge = require('./addEdge');
+var Graph = require('./Graph');
 
 module.exports = function (options, className) {
   var _ref = new Graph(options, className);
@@ -9817,7 +9987,7 @@ module.exports = function (options, className) {
   };
 };
 
-},{"./setFont":26,"./toRed":27,"lodash":8}],26:[function(require,module,exports){
+},{"./Graph":36,"./addEdge":37,"./addNodes":38}],40:[function(require,module,exports){
 "use strict";
 
 module.exports = function (value, target) {
@@ -9826,7 +9996,7 @@ module.exports = function (value, target) {
   });
 };
 
-},{}],27:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 module.exports = function (term) {
@@ -9835,7 +10005,7 @@ module.exports = function (term) {
   });
 };
 
-},{}],28:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -9847,7 +10017,7 @@ module.exports = {
   }
 };
 
-},{}],29:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -9917,7 +10087,7 @@ function openConnection(emitter, pathname, config) {
   return ws;
 }
 
-},{"events":4}],30:[function(require,module,exports){
+},{"events":4}],44:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -9964,7 +10134,7 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":16,"../render/makeTemplate":42,"lodash":8}],31:[function(require,module,exports){
+},{"../collection/toArray":16,"../render/makeTemplate":56,"lodash":8}],45:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('Hogan.js');
@@ -9981,7 +10151,7 @@ module.exports = function (solutions, focus) {
   });
 };
 
-},{"./toAnswers":32,"Hogan.js":2}],32:[function(require,module,exports){
+},{"./toAnswers":46,"Hogan.js":2}],46:[function(require,module,exports){
 'use strict';
 
 var instance = require('../../../instance');
@@ -10000,7 +10170,7 @@ module.exports = function toAnswers(solutions, focus) {
   });
 };
 
-},{"../../../instance":28,"../../../toLastOfUrl":43}],33:[function(require,module,exports){
+},{"../../../instance":42,"../../../toLastOfUrl":57}],47:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('Hogan.js');
@@ -10024,13 +10194,13 @@ module.exports = function (target) {
   return $region;
 };
 
-},{"Hogan.js":2}],34:[function(require,module,exports){
+},{"Hogan.js":2}],48:[function(require,module,exports){
 'use strict';
 
 var instance = require('../../instance');
 var SolutionGraph = require('../../graph/SolutionGraph');
 
-module.exports = function (anchoredPgp, solutions) {
+module.exports = function (anchoredPgp, bgp, solutions) {
   var graph = new SolutionGraph({
     width: 690,
     height: 400
@@ -10049,10 +10219,10 @@ module.exports = function (anchoredPgp, solutions) {
       var isFocus = function isFocus(solution) {
         return instance.isNodeId(anchoredPgp.focus, solution);
       };
-      var instanceNodes = graph.addInstanceNode(isFocus, solution);
+      var instanceNodes = graph.addInstanceNode(isFocus, bgp, solution);
       var transitNodes = graph.addTransitNode(solution);
 
-      graph.addPath(solution, anchoredPgp.edges, transitNodes, instanceNodes);
+      graph.addPath(bgp, solution, anchoredPgp.edges, transitNodes, instanceNodes);
     }
   } catch (err) {
     _didIteratorError = true;
@@ -10072,7 +10242,7 @@ module.exports = function (anchoredPgp, solutions) {
   return graph.dom;
 };
 
-},{"../../graph/SolutionGraph":23,"../../instance":28}],35:[function(require,module,exports){
+},{"../../graph/SolutionGraph":27,"../../instance":42}],49:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -10100,6 +10270,7 @@ var AnswerListPresentation = (function () {
   }, {
     key: 'onSolution',
     value: function onSolution(data, domId) {
+      var bgp = data.bgp;
       var solutions = data.solutions;
 
       if (solutions.length === 0) {
@@ -10110,7 +10281,7 @@ var AnswerListPresentation = (function () {
       var list = $(answerList(solutions, privateData.anchoredPgp.focus));
       var table = solutionTable(solutions);
       var tableButton = listTableButton(table[0], list[0]);
-      var solutionGraph = graph(privateData.anchoredPgp, solutions);
+      var solutionGraph = graph(privateData.anchoredPgp, bgp, solutions);
       var showGraphButton = graphButton(solutionGraph[0]);
 
       var $region = $(region);
@@ -10129,7 +10300,7 @@ var AnswerListPresentation = (function () {
 
 module.exports = new AnswerListPresentation();
 
-},{"./answerList":31,"./graph":34,"./graph-button":33,"./list-table-button":36,"./solutionTable":37}],36:[function(require,module,exports){
+},{"./answerList":45,"./graph":48,"./graph-button":47,"./list-table-button":50,"./solutionTable":51}],50:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('Hogan.js');
@@ -10157,7 +10328,7 @@ module.exports = function (target, target2) {
   return $region;
 };
 
-},{"Hogan.js":2}],37:[function(require,module,exports){
+},{"Hogan.js":2}],51:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('Hogan.js');
@@ -10204,7 +10375,7 @@ module.exports = function (solutions) {
   return $region;
 };
 
-},{"./toSolutionRow":38,"Hogan.js":2}],38:[function(require,module,exports){
+},{"./toSolutionRow":52,"Hogan.js":2}],52:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('hogan.js');
@@ -10232,7 +10403,7 @@ function toViewParameters(solution, key) {
   };
 }
 
-},{"../../../collection/toArray":16,"../../../toLastOfUrl":43,"hogan.js":6}],39:[function(require,module,exports){
+},{"../../../collection/toArray":16,"../../../toLastOfUrl":57,"hogan.js":6}],53:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('hogan.js');
@@ -10260,7 +10431,7 @@ module.exports = function (sparql, count) {
   return $html;
 };
 
-},{"hogan.js":6}],40:[function(require,module,exports){
+},{"hogan.js":6}],54:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -10320,7 +10491,7 @@ var SparqlPresentation = (function () {
 
 module.exports = new SparqlPresentation();
 
-},{"./createTable":39}],41:[function(require,module,exports){
+},{"./createTable":53}],55:[function(require,module,exports){
 'use strict';
 
 module.exports = function (domId) {
@@ -10364,7 +10535,7 @@ function updateDisplay(el, msg) {
   el.innerHTML = msg;
 }
 
-},{}],42:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -10373,7 +10544,7 @@ var _ = require('lodash'),
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":6,"lodash":8,"multiline":9}],43:[function(require,module,exports){
+},{"hogan.js":6,"lodash":8,"multiline":9}],57:[function(require,module,exports){
 'use strict';
 
 module.exports = function (srcUrl) {
