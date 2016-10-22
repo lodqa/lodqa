@@ -14,13 +14,13 @@ gulp
       .pipe(gulp.dest(dist))
   })
   .task('babel', function() {
-    return gulp.src([src + 'index.js', src + 'subboard.js'])
+    return gulp.src([src + 'index.js', src + 'dashboard.js'])
       .pipe(babel())
       .pipe(gulp.dest(dist))
   })
   .task('auto_compile', function() {
     gulp.watch(src + '**', ['browserify'])
     gulp.watch(src + 'index.js', ['babel'])
-    gulp.watch(src + 'subboard.js', ['babel'])
+    gulp.watch(src + 'dashboard.js', ['babel'])
   })
   .task('default', ['browserify', 'babel', 'auto_compile'])

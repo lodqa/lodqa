@@ -13,3 +13,6 @@
 <div id="runner">
 	<%= erb :'dashboard/runner' %>
 </div>
+
+<div id="targets" class="hidden"><%= @targets.to_json %></div>
+<script src="js/dashboard.js"></script>

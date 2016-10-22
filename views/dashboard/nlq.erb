@@ -2,20 +2,24 @@
 <i title="Begin with a natural language query, then graphicate it!" class="help-icon fa fa-info-circle"></i>
 </h1>
 <form	id="nlqform"
-		action="/graphicator"
-     	method="get"
-     	entype="multipart/form-data">
+    action="/graphicator"
+    method="get"
+    entype="multipart/form-data">
 
-<input	name="query" id="query" type="text"
-		required="required"
-		<% if @query %>
-		value="<%= @query %>"
-		<% end %>
-		placeholder="Enter a natural language query." />
+    <input name="query" id="query" type="text"
+        required="required"
+        <% if @query %>
+        value="<%= @query %>"
+        <% end %>
+        placeholder="Enter a natural language query." />
 
-<input	name = "target"
-		hidden = "hidden" />
+    <select id="sample_queries2">
+      <option>what side effects are associated with streptomycin?</option>
+    </select>
 
-<input id="graphicateButton" type="submit"
-	   value="Graphicate!" />
+    <input name = "target"
+       hidden = "hidden" />
+
+    <input id="graphicateButton" type="submit"
+        value="Graphicate!" />
 </form>

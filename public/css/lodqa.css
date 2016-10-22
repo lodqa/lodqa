@@ -29,7 +29,7 @@ a:hover {
     position: fixed;
     left: 0px;
     top: 0px;
-    width: 570px;
+    width: 600px;
     max-height: 97%;
     overflow: auto;
 }
@@ -64,10 +64,13 @@ a:hover {
     color: #8888ff;
 }
 
-#main-nav {
+#logo-sub-box {
     display: inline-block;
     position: absolute;
     right: 0px;
+}
+
+#main-nav {
     font-size: small;
 }
 
@@ -99,12 +102,8 @@ a:hover {
     text-shadow: 0 1px 0 rgba(255, 255, 255, .3);
 }
 
-#subboard {
-    position: absolute;
-    top: 20px;
-    width: 700px;
-    padding-left: 30px;
-    z-index: -1;
+#target-box {
+    margin-top: 15px;
 }
 
 #results {
@@ -116,18 +115,12 @@ a:hover {
 }
 
 @media (max-width: 1350px) {
-    #subboard {
-        right: 54px;
-    }
     #results {
         right: 4px;
     }
 }
 
 @media (min-width: 1351px) {
-    #subboard {
-        left: 560px;
-    }
     #results {
         left: 570px;
     }
@@ -156,6 +149,10 @@ nav a {
     width: 420px;
     height: 30px;
     padding: 0;
+}
+
+#sample_queries2 {
+    width: 60px;
 }
 
 #graphicateButton {

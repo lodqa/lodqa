@@ -1,11 +1,4 @@
 <h1>Target Configuration</h1>
-<label for="target">Choose a target: </label>
-<select name="target" id="target">
-<% @targets.each do |t| %>
-    <option value="<%= t["name"] %>" <%= t["name"] == @target ? "selected" : ""%>><%= t["name"] %></option>
-<% end %>
-</select>
-
 <div id="sample_queries"></div>
 
 <h1>Caveats</h1>

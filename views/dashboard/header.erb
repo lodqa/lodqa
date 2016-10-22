@@ -3,10 +3,20 @@
 <span id="target-display"></span>
 </div>
 
-<nav id="main-nav">
-<ul>
-  <li><a href="<%= request.base_url %>">start</a></li>
-  <li><a href="http://www.lodqa.org/docs/intro/">doc</a></li>
-  <li><a href="https://github.com/lodqa/lodqa">github</a></li>
-</ul>
-</nav>
+<div id="logo-sub-box">
+  <nav id="main-nav">
+  <ul>
+    <li><a href="<%= request.base_url %>">start</a></li>
+    <li><a href="http://www.lodqa.org/docs/intro/">doc</a></li>
+    <li><a href="https://github.com/lodqa/lodqa">github</a></li>
+  </ul>
+  </nav>
+  <div id="target-box">
+    <label for="target">target: </label>
+    <select name="target" id="target">
+    <% @targets.each do |t| %>
+        <option value="<%= t["name"] %>" <%= t["name"] == @target ? "selected" : ""%>><%= t["name"] %></option>
+    <% end %>
+    </select>
+  </div>
+</div>
