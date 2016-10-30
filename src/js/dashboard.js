@@ -1,4 +1,5 @@
-/* global graphEditor*/ ! function() {
+/* global graphEditor*/
+document.addEventListener('DOMContentLoaded', () => {
   const targets = JSON.parse(document.querySelector('#targets')
     .innerHTML)
   const targeth = targets.reduce(function(a, b) {
@@ -15,9 +16,14 @@
   const selector = document.querySelector('#target')
   selector.addEventListener('change', (e) => applayTarget(e.target, targeth, editor))
 
-  document.querySelector('#sample_queries2')
-    .addEventListener('change', (e) => document.querySelector('#query')
-      .value = e.target.value)
+  document.querySelector('.dashboard__exapmle-button')
+  .addEventListener('click', () => document.querySelector('.examples').classList.remove('examples--hidden'))
+
+  document.querySelector('.sample-queries')
+    .addEventListener('click', (e) => {
+      document.querySelector('#query').value = e.target.text
+      document.querySelector('.examples').classList.add('examples--hidden')
+    })
 
   // initial target
   applayTarget(selector, targeth, editor)
@@ -53,18 +59,17 @@
   }
 
   function updateExampleQeries(editor, config) {
-    const sample_queries = config.sample_queries
-    const sampleQueries2 = document.querySelector('#sample_queries2')
+    const {sample_queries} = config
+    const dom = document.querySelector('.sample-queries')
 
-    if (sample_queries) {
-      const options = sample_queries
-        .map((q) => `<option>${q}</option>`)
-        .join()
-      sampleQueries2.innerHTML = options
-      sampleQueries2.value = document.querySelector('#query')
-        .value
+    if(sample_queries){
+      const listItems = sample_queries
+        .map((q) => `<li><a href="#">${q}</a></li>`)
+        .join('')
+
+      dom.innerHTML = listItems
     } else {
-      sampleQueries2.innerHTML = ''
+      dom.innerHTML = ''
     }
   }
-}()
+})

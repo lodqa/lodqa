@@ -124,6 +124,18 @@ a:hover {
    z-index: -1;
 }
 
+.examples {
+    left: 7px;
+    padding-left: 15px;
+    position: fixed;
+    top: 135px;
+    width: 533px;
+}
+
+.examples--hidden {
+    display: none;
+}
+
 @media (max-width: 1350px) {
     #results {
         right: 4px;
