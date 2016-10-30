@@ -12,7 +12,7 @@
   "devDependencies": {
     "babelify": "^6.3.0",
     "eslint": "^1.6.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-babel": "^5.2.1",
     "gulp-browserify": "^0.5.0"
   },
