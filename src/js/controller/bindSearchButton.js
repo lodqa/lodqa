@@ -12,6 +12,12 @@ function bindSearch(beginSearch, loader, pgpElement, mappingsElement) {
     .addEventListener('click', (e) => {
       e.target.classList.toggle('hidden')
       document.querySelector('#stopSearch').classList.toggle('hidden')
+
+      document.querySelector('.dashboard').classList.add('dashboard--back')
+      document.querySelector('.results').classList.remove('results--hidden', 'results--back')
+      document.querySelector('.results').classList.remove('results--back')
+      e.stopPropagation()
+
       search(e, loader, pgpElement, mappingsElement)
     })
 }

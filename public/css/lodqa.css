@@ -25,13 +25,17 @@ a:hover {
     box-shadow: 4px 4px 4px #888888;
 }
 
-#dashboard {
+.dashboard {
     position: fixed;
     left: 0px;
     top: 0px;
     width: 600px;
     max-height: 97%;
     overflow: auto;
+}
+
+.dashboard--back {
+    z-index: -1;
 }
 
 #header {
@@ -106,12 +110,18 @@ a:hover {
     margin-top: 15px;
 }
 
-#results {
+.results {
     position: absolute;
-    top: 40px;
     width: 740px;
     padding-left: 30px;
-    z-index: -2;
+}
+
+.results--hidden {
+   display: none;
+}
+
+.results--back {
+   z-index: -1;
 }
 
 @media (max-width: 1350px) {
