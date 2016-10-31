@@ -15,6 +15,7 @@ module.exports = function(graph, addNodes, anchoredPgp) {
 function toAnchoredPgpNodeTerm(nodes, key) {
   return {
     id: key,
-    label: nodes[key].term
+    label: nodes[key].term,
+    labelFromEndopoint: nodes[key].label
   }
 }

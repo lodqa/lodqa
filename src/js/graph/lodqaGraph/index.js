@@ -9,6 +9,15 @@ module.exports = function(options, className) {
     graph,
     addNodes,
     addEdge,
+    updateLabel: (url, label) => {
+      graph.nodes
+        .filter((element) => element.data.url === url && element.data.label !== label)
+        .forEach((element) => element.data.label = label)
+
+      graph.edges
+        .filter((element) => element.data.url === url && element.data.label !== label)
+        .forEach((element) => element.data.label = label)
+    },
     dom
   }
 }

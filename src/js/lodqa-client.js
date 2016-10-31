@@ -7,6 +7,7 @@ const bindStopSearchButton = require('./controller/bindStopSearchButton')
 const anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation')
 const answerListPresentation = require('./presentation/answerListPresentation')
 const sparqlPresentation = require('./presentation/sparqlPresentation')
+const LabelFinder = require('./label-finder')
 
 document.addEventListener('DOMContentLoaded', init)
 
@@ -17,6 +18,7 @@ function init() {
   bindResult.sparqlCount(loader, sparqlPresentation)
   bindResult.solution(loader, sparqlPresentation)
   bindResult.all(loader, answerListPresentation)
+  bindResult.all(loader, new LabelFinder(answerListPresentation))
 
   bindWebsocketPresentation(loader)
   bindParseRenderingPresentation(loader)

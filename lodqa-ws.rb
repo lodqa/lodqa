@@ -5,6 +5,8 @@ require 'sinatra-websocket'
 require 'erb'
 require 'lodqa'
 require 'json'
+require 'open-uri'
+require 'cgi/util'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -117,6 +119,21 @@ class LodqaWS < Sinatra::Base
 					p e.message
 				end
 			end
+		end
+	end
+
+	# Comman for test: curl 'http://localhost:9292/proxy?endpoint=http://www.semantic-systems-biology.org/biogateway/endpoint&query=select%20%3Flabel%20where%20%7B%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2Fvario%23associated_with%3E%20%20rdfs%3Alabel%20%3Flabel%20%7D'
+	get '/proxy' do
+		endpoint = params['endpoint']
+		query = params['query']
+		begin
+			open("#{endpoint}?query=#{CGI.escape(query)}", 'accept' => 'application/json') {|f|
+				content_type :json
+			  f.string
+			}
+		rescue OpenURI::HTTPError => e
+			status 502
+			body = e.message
 		end
 	end
 

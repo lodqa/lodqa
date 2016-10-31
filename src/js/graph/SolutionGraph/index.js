@@ -12,6 +12,7 @@ module.exports = function(options, className) {
     addInstanceNode: (isFocus, bgp, solution) => addInstanceNode(graph.graph, graph.addEdge, isFocus, bgp, solution),
     addTransitNode: (solution) => addTransitNode(graph.graph, solution),
     addPath: (bgp, solution, edges, transitNodes, instanceNodes) => addPath(graph, bgp, solution, edges, transitNodes, instanceNodes),
+    updateLabel: (url, label) => graph.updateLabel(url, label),
     dom: graph.dom
   }
 }

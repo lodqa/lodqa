@@ -17,5 +17,5 @@ module.exports = function(anchoredPgp, bgp, solutions) {
     graph.addPath(bgp, solution, anchoredPgp.edges, transitNodes, instanceNodes)
   }
 
-  return graph.dom
+  return graph
 }

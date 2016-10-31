@@ -27,10 +27,15 @@ class AnswerListPresentation {
       </div>
     </div>
     `
-    const list = $(answerList(solutions, privateData.anchoredPgp.focus))
-    const table = solutionTable(solutions)
+    privateData.list = $(answerList(solutions, privateData.anchoredPgp.focus))
+    const list = privateData.list
+
+    privateData.table = solutionTable(solutions)
+    const table = privateData.table
     const tableButton = listTableButton(table[0], list[0])
-    const solutionGraph = graph(privateData.anchoredPgp, bgp, solutions)
+
+    privateData.graph = graph(privateData.anchoredPgp, bgp, solutions)
+    const solutionGraph = privateData.graph.dom
     const showGraphButton = graphButton(solutionGraph[0])
 
     const $region = $(region)
@@ -48,6 +53,35 @@ class AnswerListPresentation {
     // Add a list to the dom tree
     $(`#${domId}`)
       .append($region)
+  }
+
+  updateLabel(url, label) {
+    // Update labels in the list
+    if (privateData.list) {
+      privateData.list
+        .find('a')
+        .each((index, element) => {
+          if(element.href === url && element.innerText !==label){
+            element.innerText = label
+          }
+        })
+    }
+
+    // Update labels in the table
+    if (privateData.table) {
+      privateData.table
+        .find('a')
+        .each((index, element) => {
+          if(element.href === url && element.innerText !==label){
+            element.innerText = label
+          }
+        })
+    }
+
+    // Update labels in the graph
+    if (privateData.graph) {
+      privateData.graph.updateLabel(url, label)
+    }
   }
 }
 
