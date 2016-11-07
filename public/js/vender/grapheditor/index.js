@@ -2109,7 +2109,7 @@ exports['default'] = function (findTermUrl, dictionaryUrl, texts) {
   var url = findTermUrl;
 
   if (dictionaryUrl) {
-    url = url + '?dictionary_url=' + encodeURI(dictionaryUrl);
+    url = url + '?dictionary_url=' + encodeURIComponent(dictionaryUrl);
   }
 
   return new Promise(function (resolve, reject) {
