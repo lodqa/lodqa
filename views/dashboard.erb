@@ -14,5 +14,9 @@
 	<%= erb :'dashboard/runner' %>
 </div>
 
-<div id="targets" class="hidden"><%= @targets.to_json %></div>
+<script type="text/javascript">
+	function getTargets() {
+		return <%= @targets.to_json %>
+	}
+</script>
 <script src="js/dashboard.js"></script>

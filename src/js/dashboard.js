@@ -1,7 +1,6 @@
 /* global graphEditor*/
 document.addEventListener('DOMContentLoaded', () => {
-  const targets = JSON.parse(document.querySelector('#targets')
-    .innerHTML)
+  const targets = getTargets()
   const targeth = targets.reduce(function(a, b) {
     a[b.name] = b
     return a
