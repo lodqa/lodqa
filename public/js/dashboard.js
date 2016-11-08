@@ -1,7 +1,8 @@
-/* global graphEditor*/'use strict';
+/* global graphEditor*/
+'use strict';
 
-!(function () {
-  var targets = JSON.parse(document.querySelector('#targets').innerHTML);
+document.addEventListener('DOMContentLoaded', function () {
+  var targets = getTargets();
   var targeth = targets.reduce(function (a, b) {
     a[b.name] = b;
     return a;
@@ -17,8 +18,13 @@
     return applayTarget(e.target, targeth, editor);
   });
 
-  document.querySelector('#sample_queries2').addEventListener('change', function (e) {
-    return document.querySelector('#query').value = e.target.value;
+  document.querySelector('.dashboard__exapmle-button').addEventListener('click', function () {
+    return document.querySelector('.examples').classList.remove('examples--hidden');
+  });
+
+  document.querySelector('.sample-queries').addEventListener('click', function (e) {
+    document.querySelector('#query').value = e.target.text;
+    document.querySelector('.examples').classList.add('examples--hidden');
   });
 
   // initial target
@@ -30,6 +36,7 @@
     setTargetDisplay(config);
     setDictionaryUrl(editor, config);
     setNlqFormTarget(config);
+    setEndpoint(config);
     updateExampleQeries(editor, config);
   }
 
@@ -43,7 +50,12 @@
 
   function setNlqFormTarget(config) {
     // to setup target in NLQ form
-    document.querySelector('#nlqform input[name="target"]').value = config['name'];
+    document.querySelector('#nlqform input[name="target"]').value = config.name;
+  }
+
+  function setEndpoint(config) {
+    document.querySelector('#endpoint-url').value = config.endpoint_url;
+    document.querySelector('#need-proxy').value = config.name === 'biogateway';
   }
 
   function setDictionaryUrl(editor, config) {
@@ -53,16 +65,17 @@
 
   function updateExampleQeries(editor, config) {
     var sample_queries = config.sample_queries;
-    var sampleQueries2 = document.querySelector('#sample_queries2');
+
+    var dom = document.querySelector('.sample-queries');
 
     if (sample_queries) {
-      var options = sample_queries.map(function (q) {
-        return '<option>' + q + '</option>';
-      }).join();
-      sampleQueries2.innerHTML = options;
-      sampleQueries2.value = document.querySelector('#query').value;
+      var listItems = sample_queries.map(function (q) {
+        return '<li><a href="#">' + q + '</a></li>';
+      }).join('');
+
+      dom.innerHTML = listItems;
     } else {
-      sampleQueries2.innerHTML = '';
+      dom.innerHTML = '';
     }
   }
-})();
+});
