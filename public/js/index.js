@@ -6,6 +6,8 @@ var dashboard = document.querySelector('#dashboard'),
 dashboard.addEventListener('click', function () {
   dashboard.classList.remove('dashboard--back');
   results.classList.add('results--back');
+
+  document.querySelector('.examples').classList.add('examples--hidden');
 });
 
 results.addEventListener('click', function () {

@@ -1,4 +1,4 @@
-/* global graphEditor*/
+/* global graphEditor, getTargets*/
 'use strict';
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
     return applayTarget(e.target, targeth, editor);
   });
 
-  document.querySelector('.dashboard__exapmle-button').addEventListener('click', function () {
-    return document.querySelector('.examples').classList.remove('examples--hidden');
+  document.querySelector('.dashboard__exapmle-button').addEventListener('click', function (e) {
+    e.stopPropagation();
+    document.querySelector('.examples').classList.remove('examples--hidden');
   });
 
   document.querySelector('.sample-queries').addEventListener('click', function (e) {
