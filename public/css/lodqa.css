@@ -177,11 +177,16 @@ nav a {
     width: 60px;
 }
 
+.dashboard__exapmle-button,
 #graphicateButton {
     display: inline-block;
     height: 34px;
+    width: 80px;
 }
 
+#graphicateButton {
+  padding: 1px 0
+}
 .jsPlumb-container {
     border: 1px solid green;
     margin: 5px 0;
