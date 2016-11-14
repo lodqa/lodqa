@@ -114,6 +114,7 @@ a:hover {
     position: absolute;
     width: 740px;
     padding-left: 30px;
+    z-index: 2;
 }
 
 .results--hidden {

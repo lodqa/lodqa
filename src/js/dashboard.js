@@ -1,4 +1,4 @@
-/* global graphEditor*/
+/* global graphEditor, getTargets*/
 document.addEventListener('DOMContentLoaded', () => {
   const targets = getTargets()
   const targeth = targets.reduce(function(a, b) {
@@ -16,8 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
   selector.addEventListener('change', (e) => applayTarget(e.target, targeth, editor))
 
   document.querySelector('.dashboard__exapmle-button')
-    .addEventListener('click', () => document.querySelector('.examples')
-      .classList.remove('examples--hidden'))
+    .addEventListener('click', (e) => {
+      e.stopPropagation()
+      document.querySelector('.examples')
+        .classList.remove('examples--hidden')
+    })
 
   document.querySelector('.sample-queries')
     .addEventListener('click', (e) => {
