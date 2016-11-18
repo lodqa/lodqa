@@ -71,7 +71,8 @@ a:hover {
 #logo-sub-box {
     display: inline-block;
     position: absolute;
-    right: 0px;
+    right: 0;
+    margin: 0 2px;
 }
 
 #main-nav {
@@ -169,7 +170,7 @@ nav a {
 
 #query {
     display: inline-block;
-    width: 420px;
+    width: 410px;
     height: 30px;
     padding: 0;
 }
@@ -425,4 +426,13 @@ div.atext {
 .sparql-region__sparql--hide {
     max-height: 0;
     transition: all 0.3s ease-out;
+}
+
+input {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: small;
+}
+
+input [type="button"]{
+    font-family: Arial, Helvetica, sans-serif;
 }
