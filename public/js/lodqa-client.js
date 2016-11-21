@@ -12075,7 +12075,7 @@ module.exports = function toAnswers(solutions, focus) {
 
 var Hogan = require('Hogan.js');
 
-var regionHtml = '\n  <input type="button" value="show graph" class="answers-region__title__button"></input>\n';
+var regionHtml = '\n  <input type="button" value="Show graph" class="answers-region__title__button"></input>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
 module.exports = function (target) {
@@ -12084,10 +12084,10 @@ module.exports = function (target) {
   $region.on('click', function (e) {
     target.classList.toggle('answers-region__graph--hide');
 
-    if (e.target.value === 'show graph') {
-      e.target.value = 'hide graph';
+    if (e.target.value === 'Show graph') {
+      e.target.value = 'Hide graph';
     } else {
-      e.target.value = 'show graph';
+      e.target.value = 'Show graph';
     }
   });
 
@@ -12190,10 +12190,9 @@ var AnswerListPresentation = (function () {
       var showGraphButton = graphButton(solutionGraph[0]);
 
       var $region = $(region);
-
-      $region.find('.answers-region__title').append(tableButton).append(showGraphButton);
-
-      $region.append(list).append(table).append(solutionGraph);
+      $region.find('.answers-region__title__heading').append(tableButton).append(showGraphButton);
+      // var $region = $(region);
+      $region.find('.answers-region__title').append(list).append(table).append(solutionGraph);
 
       // Add a list to the dom tree
       $('#' + domId).append($region);
@@ -12236,7 +12235,7 @@ module.exports = new AnswerListPresentation();
 
 var Hogan = require('Hogan.js');
 
-var regionHtml = '\n  <input type="button" value="table" class="answers-region__title__button"></input>\n';
+var regionHtml = '\n  <input type="button" value="Table" class="answers-region__title__button"></input>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
 module.exports = function (target, target2) {
@@ -12249,10 +12248,10 @@ module.exports = function (target, target2) {
       target2.classList.toggle('answers-region__answers-list--hide');
     }
 
-    if (e.target.value === 'table') {
-      e.target.value = 'list';
+    if (e.target.value === 'Table') {
+      e.target.value = 'List';
     } else {
-      e.target.value = 'table';
+      e.target.value = 'Table';
     }
   });
 
@@ -12339,7 +12338,7 @@ function toViewParameters(solution, key) {
 
 var Hogan = require('hogan.js');
 
-var regionHtml = '<div class="sparql-region">\n  <div class="sparql-region__title">\n    <h2 class="sparql-region__title__heading">Sparql {{count}}</h2>\n    <input class="sparql-region__title__button" type="button" value="Show sparql"></input>\n  </div>\n  <div class="sparql-region__sparql sparql-region__sparql--hide">\n    <textarea>{{sparql}}</textarea>\n  </div>\n</div>\n';
+var regionHtml = '<div class="sparql-region">\n  <div class="sparql-region__title">\n    <h2 class="sparql-region__title__heading">SPARQL {{count}} <input class="sparql-region__title__button" type="button" value="Show"></input></h2>\n  </div>\n  <div class="sparql-region__sparql sparql-region__sparql--hide">\n    <textarea>{{sparql}}</textarea>\n  </div>\n</div>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
 module.exports = function (sparql, count) {
@@ -12352,10 +12351,10 @@ module.exports = function (sparql, count) {
   $html.on('click', 'input', function (e) {
     $html.find('.sparql-region__sparql')[0].classList.toggle('sparql-region__sparql--hide');
 
-    if (e.target.value === 'Show sparql') {
-      e.target.value = 'Hide sparql';
+    if (e.target.value === 'Show') {
+      e.target.value = 'Hide';
     } else {
-      e.target.value = 'Show sparql';
+      e.target.value = 'Show';
     }
   });
 

@@ -72,7 +72,7 @@ a:hover {
     display: inline-block;
     position: absolute;
     right: 0;
-    margin: 0 2px;
+    margin: 0 5px;
 }
 
 #main-nav {
@@ -114,7 +114,6 @@ a:hover {
 .results {
     position: absolute;
     width: 740px;
-    padding-left: 30px;
     z-index: 2;
 }
 
@@ -279,28 +278,23 @@ h1 {
 }
 
 h2 {
-    width: 30em;
+    margin-top: 30px;
+    width: 9em;
     border-style: solid;
     border-color: #5555FF;
     border-width: 0px 0px 2px 10px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
     padding-left: 2px;
-    margin-top: 30px;
     font-size: medium;
     color: #222288;
 }
 
 h3 {
-    width: 32em;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    padding: 0px 2px;
+    margin: 10px, 0, 10px, 10px;
+    width: 14em;
     border-style: solid;
     border-color: #5555ff;
-    border-width: 0px 0px 1px 10px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-width: 0px 0px 1px 0px;
+    padding: 0px 2px;
     font-size: medium;
 }
 
@@ -359,7 +353,6 @@ div.atext {
 
 
 /* result-region */
-
 .result-region table, .answers-region__answers-table table {
     border-collapse: collapse;
     width: 100%;
@@ -393,12 +386,21 @@ div.atext {
     color: #FF512C;
 }
 
-.answers-region, .sparql-region {
+.answers-region {
+  margin-left: 5px;
+  margin-top: 10px;
+}
+
+.sparql-region {
     margin-top: 30px;
 }
 
 .answers-region__title, .sparql-region__title {
-    display: flex;
+    display: block;
+}
+
+.answers-region__title__heading:before {
+  content: '>';
 }
 
 .answers-region__title__heading, .sparql-region__title__heading {
@@ -407,6 +409,7 @@ div.atext {
 
 .answers-region__title__button, .sparql-region__title__button {
     margin-top: 3px;
+    margin-left: 5px;
 }
 
 .answers-region__answers-list--hide,
