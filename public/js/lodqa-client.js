@@ -1,4 +1,472 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+
+/**
+ * Expose `Emitter`.
+ */
+
+if (typeof module !== 'undefined') {
+  module.exports = Emitter;
+}
+
+/**
+ * Initialize a new `Emitter`.
+ *
+ * @api public
+ */
+
+function Emitter(obj) {
+  if (obj) return mixin(obj);
+};
+
+/**
+ * Mixin the emitter properties.
+ *
+ * @param {Object} obj
+ * @return {Object}
+ * @api private
+ */
+
+function mixin(obj) {
+  for (var key in Emitter.prototype) {
+    obj[key] = Emitter.prototype[key];
+  }
+  return obj;
+}
+
+/**
+ * Listen on the given `event` with `fn`.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.on =
+Emitter.prototype.addEventListener = function(event, fn){
+  this._callbacks = this._callbacks || {};
+  (this._callbacks['$' + event] = this._callbacks['$' + event] || [])
+    .push(fn);
+  return this;
+};
+
+/**
+ * Adds an `event` listener that will be invoked a single
+ * time then automatically removed.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.once = function(event, fn){
+  function on() {
+    this.off(event, on);
+    fn.apply(this, arguments);
+  }
+
+  on.fn = fn;
+  this.on(event, on);
+  return this;
+};
+
+/**
+ * Remove the given callback for `event` or all
+ * registered callbacks.
+ *
+ * @param {String} event
+ * @param {Function} fn
+ * @return {Emitter}
+ * @api public
+ */
+
+Emitter.prototype.off =
+Emitter.prototype.removeListener =
+Emitter.prototype.removeAllListeners =
+Emitter.prototype.removeEventListener = function(event, fn){
+  this._callbacks = this._callbacks || {};
+
+  // all
+  if (0 == arguments.length) {
+    this._callbacks = {};
+    return this;
+  }
+
+  // specific event
+  var callbacks = this._callbacks['$' + event];
+  if (!callbacks) return this;
+
+  // remove all handlers
+  if (1 == arguments.length) {
+    delete this._callbacks['$' + event];
+    return this;
+  }
+
+  // remove specific handler
+  var cb;
+  for (var i = 0; i < callbacks.length; i++) {
+    cb = callbacks[i];
+    if (cb === fn || cb.fn === fn) {
+      callbacks.splice(i, 1);
+      break;
+    }
+  }
+  return this;
+};
+
+/**
+ * Emit `event` with the given args.
+ *
+ * @param {String} event
+ * @param {Mixed} ...
+ * @return {Emitter}
+ */
+
+Emitter.prototype.emit = function(event){
+  this._callbacks = this._callbacks || {};
+  var args = [].slice.call(arguments, 1)
+    , callbacks = this._callbacks['$' + event];
+
+  if (callbacks) {
+    callbacks = callbacks.slice(0);
+    for (var i = 0, len = callbacks.length; i < len; ++i) {
+      callbacks[i].apply(this, args);
+    }
+  }
+
+  return this;
+};
+
+/**
+ * Return array of callbacks for `event`.
+ *
+ * @param {String} event
+ * @return {Array}
+ * @api public
+ */
+
+Emitter.prototype.listeners = function(event){
+  this._callbacks = this._callbacks || {};
+  return this._callbacks['$' + event] || [];
+};
+
+/**
+ * Check if this emitter has `event` handlers.
+ *
+ * @param {String} event
+ * @return {Boolean}
+ * @api public
+ */
+
+Emitter.prototype.hasListeners = function(event){
+  return !! this.listeners(event).length;
+};
+
+},{}],2:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],3:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -423,7 +891,7 @@
   }
 })(typeof exports !== 'undefined' ? exports : Hogan);
 
-},{}],2:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -446,7 +914,7 @@ Hogan.Template = require('./template').Template;
 Hogan.template = Hogan.Template;
 module.exports = Hogan;
 
-},{"./compiler":1,"./template":3}],3:[function(require,module,exports){
+},{"./compiler":3,"./template":5}],5:[function(require,module,exports){
 /*
  *  Copyright 2011 Twitter, Inc.
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -789,481 +1257,7 @@ var Hogan = {};
 
 })(typeof exports !== 'undefined' ? exports : Hogan);
 
-},{}],4:[function(require,module,exports){
-
-/**
- * Expose `Emitter`.
- */
-
-if (typeof module !== 'undefined') {
-  module.exports = Emitter;
-}
-
-/**
- * Initialize a new `Emitter`.
- *
- * @api public
- */
-
-function Emitter(obj) {
-  if (obj) return mixin(obj);
-};
-
-/**
- * Mixin the emitter properties.
- *
- * @param {Object} obj
- * @return {Object}
- * @api private
- */
-
-function mixin(obj) {
-  for (var key in Emitter.prototype) {
-    obj[key] = Emitter.prototype[key];
-  }
-  return obj;
-}
-
-/**
- * Listen on the given `event` with `fn`.
- *
- * @param {String} event
- * @param {Function} fn
- * @return {Emitter}
- * @api public
- */
-
-Emitter.prototype.on =
-Emitter.prototype.addEventListener = function(event, fn){
-  this._callbacks = this._callbacks || {};
-  (this._callbacks['$' + event] = this._callbacks['$' + event] || [])
-    .push(fn);
-  return this;
-};
-
-/**
- * Adds an `event` listener that will be invoked a single
- * time then automatically removed.
- *
- * @param {String} event
- * @param {Function} fn
- * @return {Emitter}
- * @api public
- */
-
-Emitter.prototype.once = function(event, fn){
-  function on() {
-    this.off(event, on);
-    fn.apply(this, arguments);
-  }
-
-  on.fn = fn;
-  this.on(event, on);
-  return this;
-};
-
-/**
- * Remove the given callback for `event` or all
- * registered callbacks.
- *
- * @param {String} event
- * @param {Function} fn
- * @return {Emitter}
- * @api public
- */
-
-Emitter.prototype.off =
-Emitter.prototype.removeListener =
-Emitter.prototype.removeAllListeners =
-Emitter.prototype.removeEventListener = function(event, fn){
-  this._callbacks = this._callbacks || {};
-
-  // all
-  if (0 == arguments.length) {
-    this._callbacks = {};
-    return this;
-  }
-
-  // specific event
-  var callbacks = this._callbacks['$' + event];
-  if (!callbacks) return this;
-
-  // remove all handlers
-  if (1 == arguments.length) {
-    delete this._callbacks['$' + event];
-    return this;
-  }
-
-  // remove specific handler
-  var cb;
-  for (var i = 0; i < callbacks.length; i++) {
-    cb = callbacks[i];
-    if (cb === fn || cb.fn === fn) {
-      callbacks.splice(i, 1);
-      break;
-    }
-  }
-  return this;
-};
-
-/**
- * Emit `event` with the given args.
- *
- * @param {String} event
- * @param {Mixed} ...
- * @return {Emitter}
- */
-
-Emitter.prototype.emit = function(event){
-  this._callbacks = this._callbacks || {};
-  var args = [].slice.call(arguments, 1)
-    , callbacks = this._callbacks['$' + event];
-
-  if (callbacks) {
-    callbacks = callbacks.slice(0);
-    for (var i = 0, len = callbacks.length; i < len; ++i) {
-      callbacks[i].apply(this, args);
-    }
-  }
-
-  return this;
-};
-
-/**
- * Return array of callbacks for `event`.
- *
- * @param {String} event
- * @return {Array}
- * @api public
- */
-
-Emitter.prototype.listeners = function(event){
-  this._callbacks = this._callbacks || {};
-  return this._callbacks['$' + event] || [];
-};
-
-/**
- * Check if this emitter has `event` handlers.
- *
- * @param {String} event
- * @return {Boolean}
- * @api public
- */
-
-Emitter.prototype.hasListeners = function(event){
-  return !! this.listeners(event).length;
-};
-
-},{}],5:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      }
-      throw TypeError('Uncaught, unspecified "error" event.');
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        len = arguments.length;
-        args = new Array(len - 1);
-        for (i = 1; i < len; i++)
-          args[i - 1] = arguments[i];
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    len = arguments.length;
-    args = new Array(len - 1);
-    for (i = 1; i < len; i++)
-      args[i - 1] = arguments[i];
-
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    var m;
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  var ret;
-  if (!emitter._events || !emitter._events[type])
-    ret = 0;
-  else if (isFunction(emitter._events[type]))
-    ret = 1;
-  else
-    ret = emitter._events[type].length;
-  return ret;
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
 },{}],6:[function(require,module,exports){
-module.exports=require(1)
-},{}],7:[function(require,module,exports){
-module.exports=require(2)
-},{"./compiler":6,"./template":8}],8:[function(require,module,exports){
-module.exports=require(3)
-},{}],9:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -8053,7 +8047,7 @@ module.exports=require(3)
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 var stripIndent = require('strip-indent');
 
@@ -8079,7 +8073,7 @@ multiline.stripIndent = function (fn) {
 	return stripIndent(multiline(fn));
 };
 
-},{"strip-indent":16}],11:[function(require,module,exports){
+},{"strip-indent":13}],8:[function(require,module,exports){
 (function (global){
 /*! http://mths.be/punycode v1.2.4 by @mathias */
 ;(function(root) {
@@ -8590,7 +8584,7 @@ multiline.stripIndent = function (fn) {
 }(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8676,7 +8670,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],13:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8763,13 +8757,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":12,"./encode":13}],15:[function(require,module,exports){
+},{"./decode":9,"./encode":10}],12:[function(require,module,exports){
 const superagent = require('superagent')
 const pify = require('superagent-promise')
 
@@ -8819,7 +8813,7 @@ function fetch(endpoint, url, proxy, cache, withoutLabel) {
     })
 }
 
-},{"superagent":18,"superagent-promise":17}],16:[function(require,module,exports){
+},{"superagent":15,"superagent-promise":14}],13:[function(require,module,exports){
 'use strict';
 module.exports = function (str) {
 	var match = str.match(/^[ \t]*(?=\S)/gm);
@@ -8837,7 +8831,7 @@ module.exports = function (str) {
 	return indent > 0 ? str.replace(re, '') : str;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  * Promise wrapper for superagent
  */
@@ -8961,7 +8955,7 @@ function wrap(superagent, Promise) {
 
 module.exports = wrap;
 
-},{}],18:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /**
  * Root reference for iframes.
  */
@@ -9939,7 +9933,7 @@ request.put = function(url, data, fn){
   return req;
 };
 
-},{"./is-object":19,"./request":21,"./request-base":20,"emitter":4}],19:[function(require,module,exports){
+},{"./is-object":16,"./request":18,"./request-base":17,"emitter":1}],16:[function(require,module,exports){
 /**
  * Check if `obj` is an object.
  *
@@ -9954,7 +9948,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],20:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 /**
  * Module of mixed-in functions shared between node and client code
  */
@@ -10328,7 +10322,7 @@ exports.send = function(data){
   return this;
 };
 
-},{"./is-object":19}],21:[function(require,module,exports){
+},{"./is-object":16}],18:[function(require,module,exports){
 // The node and browser modules expose versions of this with the
 // appropriate constructor function bound as first argument
 /**
@@ -10362,7 +10356,7 @@ function request(RequestConstructor, method, url) {
 
 module.exports = request;
 
-},{}],22:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -11071,14 +11065,14 @@ function isNullOrUndefined(arg) {
   return  arg == null;
 }
 
-},{"punycode":11,"querystring":14}],23:[function(require,module,exports){
+},{"punycode":8,"querystring":11}],20:[function(require,module,exports){
 "use strict";
 
 module.exports = function (a, element) {
   return a.concat([element]);
 };
 
-},{}],24:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 module.exports = function (loader) {
@@ -11087,7 +11081,7 @@ module.exports = function (loader) {
   });
 };
 
-},{}],25:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -11122,7 +11116,7 @@ function all(loader, presentation) {
   solution(loader, presentation);
 }
 
-},{}],26:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 module.exports = function (loader) {
@@ -11214,7 +11208,7 @@ function hasTerm(mappingsElement) {
   return Boolean(hasTerm.length);
 }
 
-},{}],27:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 module.exports = function (loader) {
@@ -11232,7 +11226,7 @@ module.exports = function (loader) {
   });
 };
 
-},{}],28:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 var websocketPresentation = require('../presentation/websocketPresentation');
@@ -11242,7 +11236,7 @@ module.exports = function bindWebsocketPresentation(loader) {
   loader.on('ws_open', presentation.onOpen).on('ws_close', presentation.onClose).on('sparql_count', presentation.onSparqlCount).on('solution', presentation.onSolution);
 };
 
-},{"../presentation/websocketPresentation":63}],29:[function(require,module,exports){
+},{"../presentation/websocketPresentation":60}],26:[function(require,module,exports){
 'use strict';
 
 var Loader = require('./loader/loadSolution');
@@ -11278,7 +11272,7 @@ function init() {
   });
 }
 
-},{"./controller/bindParseRenderingPresentation":24,"./controller/bindResult":25,"./controller/bindSearchButton":26,"./controller/bindStopSearchButton":27,"./controller/bindWebsocketPresentation":28,"./label-finder":50,"./loader/loadSolution":51,"./presentation/anchoredPgpTablePresentation":52,"./presentation/answerListPresentation":57,"./presentation/sparqlPresentation":62}],30:[function(require,module,exports){
+},{"./controller/bindParseRenderingPresentation":21,"./controller/bindResult":22,"./controller/bindSearchButton":23,"./controller/bindStopSearchButton":24,"./controller/bindWebsocketPresentation":25,"./label-finder":47,"./loader/loadSolution":48,"./presentation/anchoredPgpTablePresentation":49,"./presentation/answerListPresentation":54,"./presentation/sparqlPresentation":59}],27:[function(require,module,exports){
 'use strict';
 
 var fixNodePosition = require('../fixNodePosition');
@@ -11303,7 +11297,7 @@ function toAnchoredPgpNodeTerm(nodes, key) {
   };
 }
 
-},{"../fixNodePosition":42,"./toLabelAndSetFontNormal":38}],31:[function(require,module,exports){
+},{"../fixNodePosition":39,"./toLabelAndSetFontNormal":35}],28:[function(require,module,exports){
 'use strict';
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
@@ -11353,7 +11347,7 @@ function addEdgeToInstance(graph, addEdge, bgp, solution, term) {
   return instanceNode;
 }
 
-},{"../../../instance":49,"../../toRed":48,"../switchDirection":35,"../toEdge":36,"../toLabelAndSetFontNormal":38,"../toTerm":41}],32:[function(require,module,exports){
+},{"../../../instance":46,"../../toRed":45,"../switchDirection":32,"../toEdge":33,"../toLabelAndSetFontNormal":35,"../toTerm":38}],29:[function(require,module,exports){
 'use strict';
 
 var toEdge = require('./toEdge');
@@ -11381,7 +11375,7 @@ function toPathInfo(pathId) {
   };
 }
 
-},{"./toEdge":36,"./toPath":40}],33:[function(require,module,exports){
+},{"./toEdge":33,"./toPath":37}],30:[function(require,module,exports){
 'use strict';
 
 var toTerm = require('./toTerm');
@@ -11399,7 +11393,7 @@ module.exports = function addTransitNode(graph, solution) {
   }, {});
 };
 
-},{"./toLabelAndSetFontNormal":38,"./toTerm":41}],34:[function(require,module,exports){
+},{"./toLabelAndSetFontNormal":35,"./toTerm":38}],31:[function(require,module,exports){
 'use strict';
 
 var lodqaGraph = require('../lodqaGraph');
@@ -11431,7 +11425,7 @@ module.exports = function (options, className) {
   };
 };
 
-},{"../lodqaGraph":46,"./addAnchoredPgpNodes":30,"./addInstanceNode":31,"./addPath":32,"./addTransitNode":33}],35:[function(require,module,exports){
+},{"../lodqaGraph":43,"./addAnchoredPgpNodes":27,"./addInstanceNode":28,"./addPath":29,"./addTransitNode":30}],32:[function(require,module,exports){
 "use strict";
 
 module.exports = function switchDirection(bgp, first, second) {
@@ -11450,7 +11444,7 @@ module.exports = function switchDirection(bgp, first, second) {
   throw new Error("what's wrong?");
 };
 
-},{}],36:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 var toTerm = require('./toTerm');
@@ -11466,7 +11460,7 @@ module.exports = function (solution, edgeId) {
   return edge;
 };
 
-},{"./toLabel":37,"./toTerm":41}],37:[function(require,module,exports){
+},{"./toLabel":34,"./toTerm":38}],34:[function(require,module,exports){
 'use strict';
 
 var toLastOfUrl = require('../../toLastOfUrl');
@@ -11479,7 +11473,7 @@ module.exports = function (term) {
   };
 };
 
-},{"../../toLastOfUrl":65}],38:[function(require,module,exports){
+},{"../../toLastOfUrl":62}],35:[function(require,module,exports){
 'use strict';
 
 var setFontNormal = require('./setFontNormal');
@@ -11489,7 +11483,7 @@ module.exports = function (term) {
   return setFontNormal(toLabel(term));
 };
 
-},{"../toLabel":37,"./setFontNormal":39}],39:[function(require,module,exports){
+},{"../toLabel":34,"./setFontNormal":36}],36:[function(require,module,exports){
 'use strict';
 
 var setFont = require('../../setFont');
@@ -11498,7 +11492,7 @@ module.exports = function (target) {
   return setFont('8px Verdana, sans-serif', target);
 };
 
-},{"../../setFont":47}],40:[function(require,module,exports){
+},{"../../setFont":44}],37:[function(require,module,exports){
 'use strict';
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
@@ -11554,7 +11548,7 @@ function toIdAndNode(graph, transitNodes, instanceNodes, canididateIds) {
   }
 }
 
-},{"./switchDirection":35}],41:[function(require,module,exports){
+},{"./switchDirection":32}],38:[function(require,module,exports){
 "use strict";
 
 module.exports = function (solution, id) {
@@ -11564,7 +11558,7 @@ module.exports = function (solution, id) {
   };
 };
 
-},{}],42:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -11641,7 +11635,7 @@ module.exports = function (nodes, edges) {
   return nodes.map(extendIndex).sort(sortFuc).map(_.partial(setPosition, nodes.length));
 };
 
-},{"lodash":9}],43:[function(require,module,exports){
+},{"lodash":6}],40:[function(require,module,exports){
 /*global Springy:true*/
 'use strict';
 
@@ -11667,7 +11661,7 @@ function updateLinkOnSelect(link, springy) {
   });
 }
 
-},{}],44:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 module.exports = function (graph, edge, sourceNode, targetNode, color) {
@@ -11678,7 +11672,7 @@ module.exports = function (graph, edge, sourceNode, targetNode, color) {
   return graph.newEdge(sourceNode, targetNode, data);
 };
 
-},{}],45:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /*global Springy:true*/
 'use strict';
 
@@ -11714,7 +11708,7 @@ function addNode(graph, node) {
   graph.addNode(node);
 }
 
-},{"../setFont":47,"../toRed":48}],46:[function(require,module,exports){
+},{"../setFont":44,"../toRed":45}],43:[function(require,module,exports){
 'use strict';
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
@@ -11752,7 +11746,7 @@ module.exports = function (options, className) {
   };
 };
 
-},{"./Graph":43,"./addEdge":44,"./addNodes":45}],47:[function(require,module,exports){
+},{"./Graph":40,"./addEdge":41,"./addNodes":42}],44:[function(require,module,exports){
 "use strict";
 
 module.exports = function (value, target) {
@@ -11761,7 +11755,7 @@ module.exports = function (value, target) {
   });
 };
 
-},{}],48:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 
 module.exports = function (term) {
@@ -11770,7 +11764,7 @@ module.exports = function (term) {
   });
 };
 
-},{}],49:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -11782,7 +11776,7 @@ module.exports = {
   }
 };
 
-},{}],50:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -11917,7 +11911,7 @@ function getEndPoint() {
   };
 }
 
-},{"sparql-fetch-label":15}],51:[function(require,module,exports){
+},{"sparql-fetch-label":12}],48:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -11987,7 +11981,7 @@ function openConnection(emitter, pathname, config) {
   return ws;
 }
 
-},{"events":5}],52:[function(require,module,exports){
+},{"events":2}],49:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -12034,10 +12028,10 @@ module.exports = {
   }
 };
 
-},{"../collection/toArray":23,"../render/makeTemplate":64,"lodash":9}],53:[function(require,module,exports){
+},{"../collection/toArray":20,"../render/makeTemplate":61,"lodash":6}],50:[function(require,module,exports){
 'use strict';
 
-var Hogan = require('Hogan.js');
+var Hogan = require('hogan.js');
 var toAnswers = require('./toAnswers');
 
 var regionHtml = '<ul class="answers-region__answers-list">\n  {{#answers}}\n    <li><a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a></li>\n  {{/answers}}\n  </ul>\n';
@@ -12051,7 +12045,7 @@ module.exports = function (solutions, focus) {
   });
 };
 
-},{"./toAnswers":54,"Hogan.js":2}],54:[function(require,module,exports){
+},{"./toAnswers":51,"hogan.js":4}],51:[function(require,module,exports){
 'use strict';
 
 var instance = require('../../../instance');
@@ -12070,12 +12064,12 @@ module.exports = function toAnswers(solutions, focus) {
   });
 };
 
-},{"../../../instance":49,"../../../toLastOfUrl":65}],55:[function(require,module,exports){
+},{"../../../instance":46,"../../../toLastOfUrl":62}],52:[function(require,module,exports){
 'use strict';
 
-var Hogan = require('Hogan.js');
+var Hogan = require('hogan.js');
 
-var regionHtml = '\n  <input type="button" value="Show graph" class="answers-region__title__button"></input>\n';
+var regionHtml = '\n  <input type="button" value="show graph" class="answers-region__title__button"></input>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
 module.exports = function (target) {
@@ -12084,17 +12078,17 @@ module.exports = function (target) {
   $region.on('click', function (e) {
     target.classList.toggle('answers-region__graph--hide');
 
-    if (e.target.value === 'Show graph') {
-      e.target.value = 'Hide graph';
+    if (e.target.value === 'show graph') {
+      e.target.value = 'hide graph';
     } else {
-      e.target.value = 'Show graph';
+      e.target.value = 'show graph';
     }
   });
 
   return $region;
 };
 
-},{"Hogan.js":2}],56:[function(require,module,exports){
+},{"hogan.js":4}],53:[function(require,module,exports){
 'use strict';
 
 var instance = require('../../instance');
@@ -12142,7 +12136,7 @@ module.exports = function (anchoredPgp, bgp, solutions) {
   return graph;
 };
 
-},{"../../graph/SolutionGraph":34,"../../instance":49}],57:[function(require,module,exports){
+},{"../../graph/SolutionGraph":31,"../../instance":46}],54:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -12190,9 +12184,10 @@ var AnswerListPresentation = (function () {
       var showGraphButton = graphButton(solutionGraph[0]);
 
       var $region = $(region);
-      $region.find('.answers-region__title__heading').append(tableButton).append(showGraphButton);
-      // var $region = $(region);
-      $region.find('.answers-region__title').append(list).append(table).append(solutionGraph);
+
+      $region.find('.answers-region__title').append(tableButton).append(showGraphButton);
+
+      $region.append(list).append(table).append(solutionGraph);
 
       // Add a list to the dom tree
       $('#' + domId).append($region);
@@ -12230,12 +12225,12 @@ var AnswerListPresentation = (function () {
 
 module.exports = new AnswerListPresentation();
 
-},{"./answerList":53,"./graph":56,"./graph-button":55,"./list-table-button":58,"./solutionTable":59}],58:[function(require,module,exports){
+},{"./answerList":50,"./graph":53,"./graph-button":52,"./list-table-button":55,"./solutionTable":56}],55:[function(require,module,exports){
 'use strict';
 
-var Hogan = require('Hogan.js');
+var Hogan = require('hogan.js');
 
-var regionHtml = '\n  <input type="button" value="Table" class="answers-region__title__button"></input>\n';
+var regionHtml = '\n  <input type="button" value="table" class="answers-region__title__button"></input>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
 module.exports = function (target, target2) {
@@ -12248,20 +12243,20 @@ module.exports = function (target, target2) {
       target2.classList.toggle('answers-region__answers-list--hide');
     }
 
-    if (e.target.value === 'Table') {
-      e.target.value = 'List';
+    if (e.target.value === 'table') {
+      e.target.value = 'list';
     } else {
-      e.target.value = 'Table';
+      e.target.value = 'table';
     }
   });
 
   return $region;
 };
 
-},{"Hogan.js":2}],59:[function(require,module,exports){
+},{"hogan.js":4}],56:[function(require,module,exports){
 'use strict';
 
-var Hogan = require('Hogan.js');
+var Hogan = require('hogan.js');
 var toSolutionRow = require('./toSolutionRow');
 
 var regionHtml = '<div class="answers-region__answers-table answers-region__answers-table--hide">\n      <table>\n          <tr>\n            {{#keys}}\n              <th>{{key}}</th>\n            {{/keys}}\n          </tr>\n      </table>\n  </div>';
@@ -12305,7 +12300,7 @@ module.exports = function (solutions) {
   return $region;
 };
 
-},{"./toSolutionRow":60,"Hogan.js":2}],60:[function(require,module,exports){
+},{"./toSolutionRow":57,"hogan.js":4}],57:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('hogan.js');
@@ -12333,12 +12328,12 @@ function toViewParameters(solution, key) {
   };
 }
 
-},{"../../../collection/toArray":23,"../../../toLastOfUrl":65,"hogan.js":7}],61:[function(require,module,exports){
+},{"../../../collection/toArray":20,"../../../toLastOfUrl":62,"hogan.js":4}],58:[function(require,module,exports){
 'use strict';
 
 var Hogan = require('hogan.js');
 
-var regionHtml = '<div class="sparql-region">\n  <div class="sparql-region__title">\n    <h2 class="sparql-region__title__heading">SPARQL {{count}} <input class="sparql-region__title__button" type="button" value="Show"></input></h2>\n  </div>\n  <div class="sparql-region__sparql sparql-region__sparql--hide">\n    <textarea>{{sparql}}</textarea>\n  </div>\n</div>\n';
+var regionHtml = '<div class="sparql-region">\n  <div class="sparql-region__title">\n    <h2 class="sparql-region__title__heading">Sparql {{count}}</h2>\n    <input class="sparql-region__title__button" type="button" value="Show sparql"></input>\n  </div>\n  <div class="sparql-region__sparql sparql-region__sparql--hide">\n    <textarea>{{sparql}}</textarea>\n  </div>\n</div>\n';
 var reigonTemplate = Hogan.compile(regionHtml);
 
 module.exports = function (sparql, count) {
@@ -12351,17 +12346,17 @@ module.exports = function (sparql, count) {
   $html.on('click', 'input', function (e) {
     $html.find('.sparql-region__sparql')[0].classList.toggle('sparql-region__sparql--hide');
 
-    if (e.target.value === 'Show') {
-      e.target.value = 'Hide';
+    if (e.target.value === 'Show sparql') {
+      e.target.value = 'Hide sparql';
     } else {
-      e.target.value = 'Show';
+      e.target.value = 'Show sparql';
     }
   });
 
   return $html;
 };
 
-},{"hogan.js":7}],62:[function(require,module,exports){
+},{"hogan.js":4}],59:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -12421,7 +12416,7 @@ var SparqlPresentation = (function () {
 
 module.exports = new SparqlPresentation();
 
-},{"./createTable":61}],63:[function(require,module,exports){
+},{"./createTable":58}],60:[function(require,module,exports){
 'use strict';
 
 module.exports = function (domId) {
@@ -12465,7 +12460,7 @@ function updateDisplay(el, msg) {
   el.innerHTML = msg;
 }
 
-},{}],64:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 var _ = require('lodash'),
@@ -12474,7 +12469,7 @@ var _ = require('lodash'),
 
 module.exports = _.compose(_.bind(Hogan.compile, Hogan), multiline);
 
-},{"hogan.js":7,"lodash":9,"multiline":10}],65:[function(require,module,exports){
+},{"hogan.js":4,"lodash":6,"multiline":7}],62:[function(require,module,exports){
 'use strict';
 
 module.exports = function (srcUrl) {
@@ -12484,4 +12479,4 @@ module.exports = function (srcUrl) {
   return parsedUrl.hash ? parsedUrl.hash : paths[paths.length - 1];
 };
 
-},{"url":22}]},{},[29])
+},{"url":19}]},{},[26])

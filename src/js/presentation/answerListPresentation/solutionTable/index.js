@@ -1,4 +1,4 @@
-const Hogan = require('Hogan.js')
+const Hogan = require('hogan.js')
 const toSolutionRow = require('./toSolutionRow')
 
 const regionHtml = `<div class="answers-region__answers-table answers-region__answers-table--hide">

@@ -1,4 +1,4 @@
-const Hogan = require('Hogan.js')
+const Hogan = require('hogan.js')
 
 const regionHtml = `
   <input type="button" value="table" class="answers-region__title__button"></input>
