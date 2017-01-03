@@ -16,7 +16,7 @@
     <select name="target" id="target">
       <% @targets.each do |t| %>
         <% if t == @target %>
-          <option value="<%= t %>" selected="selected">Change Target</option>
+          <option value="<%= t %>" selected="selected"><%= t %></option>
         <% else %>
           <option value="<%= t %>"><%= t %></option>
         <% end %>

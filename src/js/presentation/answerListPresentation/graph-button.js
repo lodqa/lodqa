@@ -1,7 +1,7 @@
 const Hogan = require('hogan.js')
 
 const regionHtml = `
-  <input type="button" value="show graph" class="answers-region__title__button"></input>
+  <input type="button" value="Show graph" class="answers-region__title__button"></input>
 `
 const reigonTemplate = Hogan.compile(regionHtml)
 
@@ -12,10 +12,10 @@ module.exports = function(target) {
     .on('click', (e) => {
       target.classList.toggle('answers-region__graph--hide')
 
-      if (e.target.value === 'show graph') {
-        e.target.value = 'hide graph'
+      if (e.target.value === 'Show graph') {
+        e.target.value = 'Hide graph'
       } else {
-        e.target.value = 'show graph'
+        e.target.value = 'Show graph'
       }
     })
 

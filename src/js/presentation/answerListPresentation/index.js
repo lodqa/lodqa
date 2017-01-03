@@ -23,7 +23,7 @@ class AnswerListPresentation {
 
     const region = `<div class="answers-region">
       <div class="answers-region__title">
-        <h3 class="answers-region__title__heading">Answers</h3>
+        <h3><span class="answers-region__title__heading">Answers</span></h3>
       </div>
     </div>
     `
@@ -41,7 +41,7 @@ class AnswerListPresentation {
     const $region = $(region)
 
     $region
-      .find('.answers-region__title')
+      .find('.answers-region__title__heading')
       .append(tableButton)
       .append(showGraphButton)
 

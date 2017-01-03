@@ -1,7 +1,7 @@
 const Hogan = require('hogan.js')
 
 const regionHtml = `
-  <input type="button" value="table" class="answers-region__title__button"></input>
+  <input type="button" value="Table" class="answers-region__title__button"></input>
 `
 const reigonTemplate = Hogan.compile(regionHtml)
 
@@ -16,10 +16,10 @@ module.exports = function(target, target2) {
         target2.classList.toggle('answers-region__answers-list--hide')
       }
 
-      if (e.target.value === 'table') {
-        e.target.value = 'list'
+      if (e.target.value === 'Table') {
+        e.target.value = 'List'
       } else {
-        e.target.value = 'table'
+        e.target.value = 'Table'
       }
     })
 
