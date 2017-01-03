@@ -23,6 +23,7 @@
 .node-editor input {
   box-sizing: border-box;
   height: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 /* graph */
 .jsPlumb-container {
@@ -168,6 +169,7 @@
 .table input {
   box-sizing: border-box;
   height: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 .table .placeholder {
   color: #aaa;
@@ -197,7 +199,7 @@
   color: #333;
 }
 .table table th.focus {
-  width: 21px;
+  width: 26px;
 }
 .table table th.text {
   width: 180px;
@@ -213,11 +215,11 @@
 }
 .table table td.focus {
   text-align: center;
-  width: 21px;
+  width: 26px;
 }
 .table table td.text {
   text-align: center;
-  vertical-align: top;
+  vertical-align: middle;
   width: 180px;
 }
 .table table td.text input {

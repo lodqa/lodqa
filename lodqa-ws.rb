@@ -39,18 +39,11 @@ class LodqaWS < Sinatra::Base
 
 	get '/' do
 		logger.info "access"
-		@config  = get_config(params)
-		@targets = get_targets
-
-		erb :index
-	end
-
-	get '/graphicator' do
 		@config = get_config(params)
 		@targets = get_targets
 
 		@query  = params['query'] unless params['query'].nil?
-		@target = params['target'] unless params['target'].nil?
+		@target = params['target'] || @targets.first
 
 		if @query
 			parser_url = @config["parser_url"]
@@ -150,7 +143,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	def get_targets
-		response = RestClient.get settings.target_db + '.json'
+		response = RestClient.get settings.target_db + '/names.json'
 		if response.code == 200
 			(JSON.parse response).delete_if{|t| t["publicity"] == false}
 		else

@@ -11122,9 +11122,10 @@ function all(loader, presentation) {
 module.exports = function (loader) {
   var beginSearch = document.querySelector('#beginSearch'),
       pgpElement = document.querySelector('.pgp'),
-      mappingsElement = document.querySelector('.mappings');
+      mappingsElement = document.querySelector('.mappings'),
+      runner = document.querySelector('#runner');
 
-  validateToSearch(beginSearch, pgpElement, mappingsElement);
+  validateToSearch(beginSearch, pgpElement, mappingsElement, runner);
   bindSearch(beginSearch, loader, pgpElement, mappingsElement);
 };
 
@@ -11156,9 +11157,9 @@ function search(event, loader, pgpElement, mappingsElement) {
   });
 }
 
-function validateToSearch(beginSearch, pgpElement, mappingsElement) {
+function validateToSearch(beginSearch, pgpElement, mappingsElement, runner) {
   var enableSearchButton = function enableSearchButton() {
-    return enableIfValid(beginSearch, pgpElement, mappingsElement);
+    return enableIfValid(beginSearch, pgpElement, mappingsElement, runner);
   },
       observer = new MutationObserver(enableSearchButton);
 
@@ -11174,11 +11175,13 @@ function validateToSearch(beginSearch, pgpElement, mappingsElement) {
   observer.observe(mappingsElement, config);
 }
 
-function enableIfValid(beginSearch, pgpElement, mappingsElement) {
+function enableIfValid(beginSearch, pgpElement, mappingsElement, runner) {
   if (hasFocus(pgpElement) && hasTerm(mappingsElement)) {
+    runner.classList.remove('hidden');
     beginSearch.removeAttribute('disabled');
   } else {
     beginSearch.setAttribute('disabled', 'disabled');
+    runner.classList.add('hidden');
   }
 }
 

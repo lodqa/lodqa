@@ -1,17 +1,15 @@
-<h1>Graph Editor
-<i title="2. Edit the graph generated from a natural language query, or compose a new graph from scratch." class="help-icon fa fa-info-circle"></i>
-</h1>
+<h1>Step 2. Check the <i>graph</i> and edit it if necessary.</h1>
 <div id="lodqa-pgp" class="hidden"><%= @pgp.to_json %></div>
 
 <div class="node-editor">
     <div class="input-node">
         <input class="label" placeholder="New Node"></input>
         <button class="button" disabled title="create"><i class="fa fa-plus"></i></button> to be connected as
-        <label>
+<!--         <label>
             <i>chain</i><input checked/ name="create-edge" type="radio" value="chain"></label> or
         <label>
             <i>star</i><input name="create-edge" type="radio" value="star"/></label>.
-    </div>
+ -->    </div>
     <div class="edit-edge hidden">
         <label>Delete Edge</label>
         <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>
@@ -23,9 +21,7 @@
 </div>
 <div class="pgp hidden"></div>
 
-<h1>Term Finder
-<i title="3. Find the terms corresponding to the parts of your graph. Do not forget to choose the focus node of your query." class="help-icon fa fa-info-circle"></i>
-</h1>
+<h1>Step 3. Find the <i>terms</i> for each part of the graph.</h1>
 
 <div class="table">
     <span class="placeholder">There is no graph yet.</span>

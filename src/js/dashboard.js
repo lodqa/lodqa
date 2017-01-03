@@ -1,25 +1,16 @@
-/* global graphEditor, getTargets*/
+/* global graphEditor */
 document.addEventListener('DOMContentLoaded', () => {
-  const targets = getTargets()
-  const targeth = targets.reduce(function(a, b) {
-    a[b.name] = b
-    return a
-  }, {})
-  const editor = graphEditor('/termfinder')
 
-  // init graph
-  editor.addPgp(JSON.parse(document.querySelector('#lodqa-pgp')
-    .innerHTML))
-
-  // add event listeners
-  const selector = document.querySelector('#target')
-  selector.addEventListener('change', (e) => applayTarget(e.target, targeth, editor))
-
-  document.querySelector('.dashboard__exapmle-button')
+  // sample queries
+  document.querySelector('#button-show-queries')
     .addEventListener('click', (e) => {
       e.stopPropagation()
-      document.querySelector('.examples')
-        .classList.remove('examples--hidden')
+      var element = document.querySelector('.examples')
+      if (element.classList.contains('examples--hidden')) {
+        element.classList.remove('examples--hidden')
+      } else {
+        element.classList.add('examples--hidden')        
+      }
     })
 
   document.querySelector('.sample-queries')
@@ -30,13 +21,22 @@ document.addEventListener('DOMContentLoaded', () => {
         .classList.add('examples--hidden')
     })
 
+  const editor = graphEditor('/termfinder')
+
+  // init graph
+  editor.addPgp(JSON.parse(document.querySelector('#lodqa-pgp')
+    .innerHTML))
+
+  // add event listeners
+  const selector = document.querySelector('#target')
+  selector.addEventListener('change', (e) => changeTarget(e.target.value))
+
   // initial target
-  applayTarget(selector, targeth, editor)
+  changeTarget(selector.value)
 
-  function applayTarget(selector, targeth, editor) {
-    const config = targeth[selector.value]
-
+  function applyConfig(config) {
     setTargetDisplay(config)
+
     setDictionaryUrl(editor, config)
     setNlqFormTarget(config)
     setEndpoint(config)
@@ -86,5 +86,25 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       dom.innerHTML = ''
     }
+  }
+
+  function changeTarget(target) {
+    const url = 'http://targets.lodqa.org/targets/' + target;
+
+    var req;
+    req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+      if (this.readyState === XMLHttpRequest.DONE) {
+        if (this.status == 200) {
+          const config = JSON.parse(this.response);
+          applyConfig(config);
+        } else {
+          console.log("Gateway error!")
+        }
+      }
+    };
+    req.open('GET', url);
+    req.setRequestHeader('Accept', 'application/json');
+    req.send();
   }
 })

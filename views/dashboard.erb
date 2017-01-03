@@ -6,17 +6,26 @@
 	<%= erb :'dashboard/nlq' %>
 </div>
 
-<div id="grapheditor">
-	<%= erb :'dashboard/grapheditor' %>
-</div>
 
-<div id="runner">
-	<%= erb :'dashboard/runner' %>
-</div>
+<% if @query.nil? %>
+	<div id="announce">
+		<%= erb :'dashboard/announce' %>
+	</div>
+	<div id="grapheditor" class="hidden">
+		<%= erb :'dashboard/grapheditor' %>
+	</div>
 
-<script type="text/javascript">
-	function getTargets() {
-		return <%= @targets.to_json %>
-	}
-</script>
+	<div id="runner" class="hidden">
+		<%= erb :'dashboard/runner' %>
+	</div>
+<% else %>
+	<div id="grapheditor">
+		<%= erb :'dashboard/grapheditor' %>
+	</div>
+
+	<div id="runner" class="hidden">
+		<%= erb :'dashboard/runner' %>
+	</div>
+<% end %>
+
 <script src="js/dashboard.js"></script>

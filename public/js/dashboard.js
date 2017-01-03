@@ -1,12 +1,24 @@
-/* global graphEditor, getTargets*/
+/* global graphEditor */
 'use strict';
 
 document.addEventListener('DOMContentLoaded', function () {
-  var targets = getTargets();
-  var targeth = targets.reduce(function (a, b) {
-    a[b.name] = b;
-    return a;
-  }, {});
+
+  // sample queries
+  document.querySelector('#button-show-queries').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var element = document.querySelector('.examples');
+    if (element.classList.contains('examples--hidden')) {
+      element.classList.remove('examples--hidden');
+    } else {
+      element.classList.add('examples--hidden');
+    }
+  });
+
+  document.querySelector('.sample-queries').addEventListener('click', function (e) {
+    document.querySelector('#query').value = e.target.text;
+    document.querySelector('.examples').classList.add('examples--hidden');
+  });
+
   var editor = graphEditor('/termfinder');
 
   // init graph
@@ -15,26 +27,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // add event listeners
   var selector = document.querySelector('#target');
   selector.addEventListener('change', function (e) {
-    return applayTarget(e.target, targeth, editor);
-  });
-
-  document.querySelector('.dashboard__exapmle-button').addEventListener('click', function (e) {
-    e.stopPropagation();
-    document.querySelector('.examples').classList.remove('examples--hidden');
-  });
-
-  document.querySelector('.sample-queries').addEventListener('click', function (e) {
-    document.querySelector('#query').value = e.target.text;
-    document.querySelector('.examples').classList.add('examples--hidden');
+    return changeTarget(e.target.value);
   });
 
   // initial target
-  applayTarget(selector, targeth, editor);
+  changeTarget(selector.value);
 
-  function applayTarget(selector, targeth, editor) {
-    var config = targeth[selector.value];
-
+  function applyConfig(config) {
     setTargetDisplay(config);
+
     setDictionaryUrl(editor, config);
     setNlqFormTarget(config);
     setEndpoint(config);
@@ -78,5 +79,25 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       dom.innerHTML = '';
     }
+  }
+
+  function changeTarget(target) {
+    var url = 'http://targets.lodqa.org/targets/' + target;
+
+    var req;
+    req = new XMLHttpRequest();
+    req.onreadystatechange = function () {
+      if (this.readyState === XMLHttpRequest.DONE) {
+        if (this.status == 200) {
+          var config = JSON.parse(this.response);
+          applyConfig(config);
+        } else {
+          console.log("Gateway error!");
+        }
+      }
+    };
+    req.open('GET', url);
+    req.setRequestHeader('Accept', 'application/json');
+    req.send();
   }
 });
