@@ -68,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setDictionaryUrl(editor, config) {
     const dicUrl = config.dictionary_url
-    editor.setDictionaryUrl(dicUrl)
+    const predDicUrl = config.pred_dictionary_url
+    editor.setDictionaryUrl(dicUrl, predDicUrl)
   }
 
   function updateExampleQeries(editor, config) {
