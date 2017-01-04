@@ -39,7 +39,7 @@ _global2['default'].graphEditor = function graphEditor(lookupUrl) {
 };
 
 function setDictionaryUrl(stream, dictionaryUrl, predDictionaryUrl) {
-  if (predDictionaryUrl == null) {
+  if (!predDictionaryUrl) {
     predDictionaryUrl = dictionaryUrl;
   }
   stream.push({
