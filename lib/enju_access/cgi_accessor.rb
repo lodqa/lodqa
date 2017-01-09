@@ -156,7 +156,7 @@ class EnjuAccess::CGIAccessor
                 wh
               end
             elsif base_noun_chunks.nil? || base_noun_chunks.empty?
-              nil
+              0
             else
               base_noun_chunks[0][:head]
             end
