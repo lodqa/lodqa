@@ -18,6 +18,13 @@ class Lodqa::Lodqa
     @options = options || {}
     @debug = @options[:debug] || false
     @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
+
+    simple_sparql = "select ?s where {?s ?p ?o} limit 1"
+    begin
+      @endpoint.query(simple_sparql)
+    rescue
+      raise SPARQL::Client::ServerError, "Endpoint does not respond."
+    end
   end
 
   def each_anchored_pgp_and_sparql_and_solution(proc_sparql_count = nil, proc_anchored_pgp = nil, proc_solution = nil)
