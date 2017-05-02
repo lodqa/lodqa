@@ -87,23 +87,24 @@ class LodqaWS < Sinatra::Base
 		config = get_config(params)
 		query = params['query']
 
-		request.websocket do |ws|
-			proc_sparql_count = Proc.new do |sparql_count|
-				ws_send(EM, ws, :sparql_count, sparql_count)
-			end
+		begin
+			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
 
-			proc_anchored_pgp = Proc.new do |anchored_pgp|
-				ws_send(EM, ws, :anchored_pgp, anchored_pgp)
-			end
+			request.websocket do |ws|
+				proc_sparql_count = Proc.new do |sparql_count|
+					ws_send(EM, ws, :sparql_count, sparql_count)
+				end
 
-			proc_solution = Proc.new do |solution|
-				ws_send(EM, ws, :solution, solution)
-			end
+				proc_anchored_pgp = Proc.new do |anchored_pgp|
+					ws_send(EM, ws, :anchored_pgp, anchored_pgp)
+				end
 
-			ws.onmessage do |data|
-				begin
+				proc_solution = Proc.new do |solution|
+					ws_send(EM, ws, :solution, solution)
+				end
+
+				ws.onmessage do |data|
 					json = JSON.parse(data)
-					lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
 
 					lodqa.pgp = json['pgp'].symbolize_keys
 					lodqa.mappings = json['mappings']
@@ -114,10 +115,14 @@ class LodqaWS < Sinatra::Base
 						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparql_count, proc_anchored_pgp, proc_solution)
 						ws.close_connection
 					end
-				rescue JSON::ParserError => e
-					p e.message
 				end
 			end
+		rescue SPARQL::Client::ServerError => e
+			[502, "SPARQL endpoint does not respond."]
+		rescue JSON::ParserError => e
+			[500, "Invalid JSON object from the client."]
+		rescue => e
+			[500, e.message]
 		end
 	end
 
