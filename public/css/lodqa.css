@@ -142,15 +142,15 @@ a:hover {
     display: none;
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1370px) {
     #results {
         right: 4px;
     }
 }
 
-@media (min-width: 1351px) {
+@media (min-width: 1371px) {
     #results {
-        left: 570px;
+        left: 600px;
     }
 }
 
