@@ -165,8 +165,8 @@ class LodqaWS < Sinatra::Base
 		# target name passed through params
 		unless params['target'].nil?
 			target_url = settings.target_db + '/' + params['target'] + '.json'
-			begin
-				config_add = RestClient.get target_url do |response, request, result|
+			config_add = begin
+				RestClient.get target_url do |response, request, result|
 		      case response.code
 		      	when 200 then JSON.parse response
 		      	else raise IOError, "invalid target"
@@ -176,10 +176,11 @@ class LodqaWS < Sinatra::Base
 	    	raise IOError, "invalid target"
 	    end
 
+	    config_add.delete_if{|k, v| v.nil?}
 	    config.merge! config_add unless config_add.nil?
 	  end
 
-	  config['dictionary_url']    = params['dictionary_url']    unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
+	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 
 	  config
 	end
