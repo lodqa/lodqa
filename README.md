@@ -44,6 +44,12 @@ Install gem packages:
 bundle install
 ```
 
+## Docker guide
+
+```
+docker-compose up
+```
+
 ## Development
 
 Build Javascript by the [gulp](http://gulpjs.com/).
