@@ -42,14 +42,14 @@ class Lodqa::TermFinder
 
   private
 
-  def _lookup (terms)
+  def _lookup   (terms)
     @dictionary.post terms.to_json do |response, request, result|
       case response.code
       when 200
         JSON.parse response
       else
         # request to dictionary is not success
-        raise GatewayError
+        raise GatewayError, "response:\n  status: #{response.code}\n  body: #{response}\nrequest:\n  method: #{request.method}\n  url: #{request.uri}\n  body: #{terms.to_json}"
       end
     end
   end
