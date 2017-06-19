@@ -1,37 +1,11 @@
 <h1>Step 2. Check the <i>graph</i> and edit it if necessary.</h1>
 <div id="lodqa-pgp" class="hidden"><%= @pgp.to_json %></div>
 
-<div class="node-editor">
-    <div class="input-node">
-        <input class="label" placeholder="New Node"></input>
-        <button class="button" disabled title="create"><i class="fa fa-plus"></i></button> to be connected as
-         <label>
-            <i>chain</i><input checked/ name="create-edge" type="radio" value="chain"></label> or
-        <label>
-            <i>star</i><input name="create-edge" type="radio" value="star"/></label>.
-    </div>
-    <div class="edit-edge hidden">
-        <label>Delete Edge</label>
-        <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>
-    </div>
-    <span class="message"></span>
-</div>
-<div class="jsPlumb-container">
-    <span class="placeholder">Compose a  graph.</span>
-</div>
-<div class="pgp hidden"></div>
+<div id="graph-editor-graph"></div>
 
 <h1>Step 3. Find the <i>terms</i> for each part of the graph.</h1>
 
-<div class="table">
-    <span class="placeholder">There is no graph yet.</span>
-    <span class="message"></span>
-    <div class="node-table"></div>
-    <div class="edge-table"></div>
-</div>
-<div class="mappings hidden"></div>
+<div id="graph-editor-table"></div>
 
 <script src="js/vender/jsplumb/dist/js/dom.jsPlumb-1.7.8.js"></script>
-<script src="js/vender/js-polyfills/keyboard.js"></script>
-<script src="js/vender/Element.closest/closest.js"></script>
 <script src="js/vender/grapheditor/index.js"></script>

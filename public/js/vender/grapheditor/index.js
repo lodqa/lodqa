@@ -9,6 +9,10 @@ var _global = require('global');
 
 var _global2 = _interopRequireDefault(_global);
 
+var _libCreateHtmlElement = require('./lib/createHtmlElement');
+
+var _libCreateHtmlElement2 = _interopRequireDefault(_libCreateHtmlElement);
+
 var _libStreamActionStream = require('./lib/stream/actionStream');
 
 var _libStreamActionStream2 = _interopRequireDefault(_libStreamActionStream);
@@ -24,6 +28,8 @@ var _libStreamRenderStream2 = _interopRequireDefault(_libStreamRenderStream);
 var _libStreamConst = require('./lib/stream/const');
 
 _global2['default'].graphEditor = function graphEditor(lookupUrl) {
+  (0, _libCreateHtmlElement2['default'])();
+
   var topStream = (0, _libStreamActionStream2['default'])();
 
   topStream.pipe((0, _libStreamModelStream2['default'])(lookupUrl)).pipe((0, _libStreamRenderStream2['default'])());
@@ -39,15 +45,12 @@ _global2['default'].graphEditor = function graphEditor(lookupUrl) {
 };
 
 function setDictionaryUrl(stream, dictionaryUrl, predDictionaryUrl) {
-  if (!predDictionaryUrl) {
-    predDictionaryUrl = dictionaryUrl;
-  }
   stream.push({
     source: ['graph-editor.js'],
     target: _libStreamConst.target.MODEL,
     type: _libStreamConst.actionType.SET_DICTIONARY_URL,
     dictionaryUrl: dictionaryUrl,
-    predDictionaryUrl: predDictionaryUrl
+    predDictionaryUrl: predDictionaryUrl || dictionaryUrl
   });
 }
 
@@ -130,7 +133,29 @@ function addPgp(stream, pgp) {
   }
 }
 
-},{"./lib/stream/actionStream":14,"./lib/stream/const":20,"./lib/stream/modelStream":32,"./lib/stream/renderStream":41,"babel/polyfill":84,"global":287}],2:[function(require,module,exports){
+},{"./lib/createHtmlElement":2,"./lib/stream/actionStream":15,"./lib/stream/const":21,"./lib/stream/modelStream":33,"./lib/stream/renderStream":42,"babel/polyfill":85,"global":286}],2:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports['default'] = createHtmlElement;
+
+function createHtmlElement() {
+  createGrpahHtml();
+  createTableHtml();
+}
+
+function createGrpahHtml() {
+  document.querySelector('#graph-editor-graph').innerHTML = '\n    <div class="node-editor">\n      <div class="input-node">\n        <input placeholder="New Node"></input>\n        <button title="create" disabled><i class="fa fa-plus"></i></button> to be connected as\n        <label>\n          <i>chain</i><input name="create-edge" type="radio" value="chain" checked></label> or\n        <label>\n          <i>star</i><input name="create-edge" type="radio" value="star"/></label>.\n      </div>\n      <span class="message"></span>\n    </div>\n    <div class="jsPlumb-container">\n      <span class="placeholder hidden">Compose a  graph.</span>\n    </div>\n    <div class="pgp hidden">\n    </div>\n  ';
+}
+
+function createTableHtml() {
+  document.querySelector('#graph-editor-table').innerHTML = '\n    <div class="table">\n      <span class="placeholder hidden">There is no graph yet.</span>\n      <span class="message"></span>\n      <div class="node-table"></div>\n      <div class="edge-table"></div>\n    </div>\n    <div class="mappings hidden">\n    </div>\n  ';
+}
+module.exports = exports['default'];
+
+},{}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -242,7 +267,7 @@ function toEdgeId(action) {
 }
 module.exports = exports['default'];
 
-},{"./Model":3}],3:[function(require,module,exports){
+},{"./Model":4}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -434,7 +459,7 @@ function _setMappings(map, mappings) {
 }
 module.exports = exports['default'];
 
-},{"./toArray":6}],4:[function(require,module,exports){
+},{"./toArray":7}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -537,7 +562,7 @@ function _verify(nodeMap, action) {
 }
 module.exports = exports['default'];
 
-},{"./Model":3,"./NodeSnapshot":5,"./toArray":6,"uuid":316}],5:[function(require,module,exports){
+},{"./Model":4,"./NodeSnapshot":6,"./toArray":7,"uuid":317}],6:[function(require,module,exports){
 // The data of nodes has a focus node id and a list of nodes.
 "use strict";
 
@@ -557,7 +582,7 @@ var _default = function _default(focus, list) {
 exports["default"] = _default;
 module.exports = exports["default"];
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -603,7 +628,7 @@ exports['default'] = function (map) {
 
 module.exports = exports['default'];
 
-},{"clone":91}],7:[function(require,module,exports){
+},{"clone":91}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -744,7 +769,7 @@ function toValue(connection) {
 }
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":54,"../const":20,"action-stream":76}],8:[function(require,module,exports){
+},{"../../view/graphComponent":55,"../const":21,"action-stream":77}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -805,7 +830,7 @@ var _default = (function (_ActionReadable) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":54,"../const":20,"action-stream":76}],9:[function(require,module,exports){
+},{"../../view/graphComponent":55,"../const":21,"action-stream":77}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -880,7 +905,7 @@ var _default = (function (_ActionReadable) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/nodeEditor/inputNodeComponent":62,"../../const":20,"./putValue":10,"action-stream":76,"dom-delegate":284}],10:[function(require,module,exports){
+},{"../../../view/nodeEditor/inputNodeComponent":63,"../../const":21,"./putValue":11,"action-stream":77,"dom-delegate":283}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -896,7 +921,7 @@ exports["default"] = function (component, target, type, push) {
 
 module.exports = exports["default"];
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -956,7 +981,7 @@ var _default = (function (_ActionReadable) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":76,"global":287}],12:[function(require,module,exports){
+},{"../const":21,"action-stream":77,"global":286}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1011,7 +1036,7 @@ var _default = (function (_ActionReadable) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../view/forceDirectedLayoutComponent":50,"../const":20,"action-stream":76}],13:[function(require,module,exports){
+},{"../../view/forceDirectedLayoutComponent":51,"../const":21,"action-stream":77}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1111,7 +1136,7 @@ function getIdWithSourcePoint(el) {
 }
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":54,"../const":20,"action-stream":76,"dom-delegate":284}],14:[function(require,module,exports){
+},{"../../view/graphComponent":55,"../const":21,"action-stream":77,"dom-delegate":283}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1173,7 +1198,7 @@ exports['default'] = function () {
 
 module.exports = exports['default'];
 
-},{"../const":20,"./EdgeActionStream":7,"./GraphActionStream":8,"./InputNodeActionStream":9,"./KeyboardActionStream":11,"./LayoutActionStream":12,"./NodeActionStream":13,"./table/EdgeTableActionStream":15,"./table/NodeTableActionStream":16,"action-stream":76}],15:[function(require,module,exports){
+},{"../const":21,"./EdgeActionStream":8,"./GraphActionStream":9,"./InputNodeActionStream":10,"./KeyboardActionStream":12,"./LayoutActionStream":13,"./NodeActionStream":14,"./table/EdgeTableActionStream":16,"./table/NodeTableActionStream":17,"action-stream":77}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1320,7 +1345,7 @@ function getAciton(component, event, target, type) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/table/edgeTableComponent":65,"../../const":20,"./Term":17,"action-stream":76,"debounce":282,"dom-delegate":284}],16:[function(require,module,exports){
+},{"../../../view/table/edgeTableComponent":66,"../../const":21,"./Term":18,"action-stream":77,"debounce":281,"dom-delegate":283}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1483,7 +1508,7 @@ function pushTextId(event, component, type, push) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/table/nodeTableComponent":69,"../../const":20,"./Term":17,"action-stream":76,"debounce":282,"dom-delegate":284}],17:[function(require,module,exports){
+},{"../../../view/table/nodeTableComponent":70,"../../const":21,"./Term":18,"action-stream":77,"debounce":281,"dom-delegate":283}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1586,7 +1611,7 @@ function pushTermId(event, component, target, type, push) {
 }
 module.exports = exports['default'];
 
-},{"../../const":20,"./getButton":18,"./pushUpdateTerm":19}],18:[function(require,module,exports){
+},{"../../const":21,"./getButton":19,"./pushUpdateTerm":20}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1603,7 +1628,7 @@ exports['default'] = function (element) {
 
 module.exports = exports['default'];
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1623,7 +1648,7 @@ exports['default'] = function (target, id, terms, push) {
 
 module.exports = exports['default'];
 
-},{"../../const":20}],20:[function(require,module,exports){
+},{"../../const":21}],21:[function(require,module,exports){
 module.exports={
   "actionType": {
     "AFTER_CREATE": "afterCreate",
@@ -1676,7 +1701,7 @@ module.exports={
   }
 }
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1747,7 +1772,7 @@ function deleteEdge(edges, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":76}],22:[function(require,module,exports){
+},{"../const":21,"action-stream":77}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1798,7 +1823,7 @@ function toNode(nodes, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":76}],23:[function(require,module,exports){
+},{"../const":21,"action-stream":77}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1905,7 +1930,7 @@ function deleteEdge(model, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":76}],24:[function(require,module,exports){
+},{"../const":21,"./pushSnapshot":34,"./text":35,"action-stream":77}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1941,7 +1966,7 @@ function done(push, informations) {
 
 module.exports = exports['default'];
 
-},{"../../../const":20,"./updateModels":25,"./updateState":26}],25:[function(require,module,exports){
+},{"../../../const":21,"./updateModels":26,"./updateState":27}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1994,7 +2019,7 @@ function updateModel(model, newValue, target) {
 }
 module.exports = exports['default'];
 
-},{"../../../const":20}],26:[function(require,module,exports){
+},{"../../../const":21}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2036,7 +2061,7 @@ function toAction(state) {
 }
 module.exports = exports['default'];
 
-},{"../../../const":20}],27:[function(require,module,exports){
+},{"../../../const":21}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2098,7 +2123,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../const":20,"./done":24,"./toInformation":29,"action-stream":76}],28:[function(require,module,exports){
+},{"../../const":21,"./done":25,"./toInformation":30,"action-stream":77}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2134,7 +2159,7 @@ exports['default'] = function (findTermUrl, dictionaryUrl, texts) {
 
 module.exports = exports['default'];
 
-},{"superagent":310}],29:[function(require,module,exports){
+},{"superagent":311}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2159,7 +2184,7 @@ exports['default'] = function (model, texts, target, findTermUrl, dictionaryUrl)
 
 module.exports = exports['default'];
 
-},{"./findTerm":28}],30:[function(require,module,exports){
+},{"./findTerm":29}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2300,7 +2325,7 @@ function getArms(nodeList, selectedNode, createEdge) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":76}],31:[function(require,module,exports){
+},{"../const":21,"./pushSnapshot":34,"./text":35,"action-stream":77}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2418,7 +2443,7 @@ function unselect(push, target) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":76}],32:[function(require,module,exports){
+},{"../const":21,"action-stream":77}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2474,7 +2499,7 @@ exports['default'] = function (lookupUrl) {
 
 module.exports = exports['default'];
 
-},{"../../model/Edge":2,"../../model/Node":4,"./DataModelAssociatedEdgeStream":21,"./DataModelAssociatedNodeStream":22,"./DataModelEdgeStream":23,"./DataModelFindTermStream":27,"./DataModelNodeStream":30,"./SelectionModelStream":31,"duplexer":285}],33:[function(require,module,exports){
+},{"../../model/Edge":3,"../../model/Node":5,"./DataModelAssociatedEdgeStream":22,"./DataModelAssociatedNodeStream":23,"./DataModelEdgeStream":24,"./DataModelFindTermStream":28,"./DataModelNodeStream":31,"./SelectionModelStream":32,"duplexer":284}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2493,7 +2518,7 @@ exports['default'] = function (push, model, target) {
 
 module.exports = exports['default'];
 
-},{"../const":20}],34:[function(require,module,exports){
+},{"../const":21}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2524,7 +2549,7 @@ function updateTerm(model, action, push, target) {
   }
 }
 
-},{"./pushSnapshot":33}],35:[function(require,module,exports){
+},{"./pushSnapshot":34}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2571,7 +2596,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../view/mappingsComponent":60,"../const":20,"action-stream":76}],36:[function(require,module,exports){
+},{"../../view/mappingsComponent":61,"../const":21,"action-stream":77}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2617,7 +2642,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../view/pgpComponent":64,"../const":20,"action-stream":76}],37:[function(require,module,exports){
+},{"../../view/pgpComponent":65,"../const":21,"action-stream":77}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2672,7 +2697,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/graphComponent":54,"../../const":20,"action-stream":76}],38:[function(require,module,exports){
+},{"../../../view/graphComponent":55,"../../const":21,"action-stream":77}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2725,7 +2750,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/forceDirectedLayoutComponent":50,"../../const":20,"action-stream":76}],39:[function(require,module,exports){
+},{"../../../view/forceDirectedLayoutComponent":51,"../../const":21,"action-stream":77}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2783,7 +2808,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/graphComponent":54,"../../const":20,"action-stream":76}],40:[function(require,module,exports){
+},{"../../../view/graphComponent":55,"../../const":21,"action-stream":77}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2811,7 +2836,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"./EdgeRenderStream":37,"./LayoutStream":38,"./NodeRenderStream":39}],41:[function(require,module,exports){
+},{"./EdgeRenderStream":38,"./LayoutStream":39,"./NodeRenderStream":40}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2851,7 +2876,7 @@ exports['default'] = function () {
 
 module.exports = exports['default'];
 
-},{"../const":20,"./MappingsRenderStream":35,"./PgpRenderStream":36,"./graph":40,"./nodeEditorStream":44,"./table":49,"action-stream":76}],42:[function(require,module,exports){
+},{"../const":21,"./MappingsRenderStream":36,"./PgpRenderStream":37,"./graph":41,"./nodeEditorStream":45,"./table":50,"action-stream":77}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2896,7 +2921,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/nodeEditor/inputNodeComponent":62,"../../const":20,"action-stream":76}],43:[function(require,module,exports){
+},{"../../../view/nodeEditor/inputNodeComponent":63,"../../const":21,"action-stream":77}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2950,7 +2975,7 @@ function showValidation(component, action) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/messageComponent":61,"../../const":20,"action-stream":76}],44:[function(require,module,exports){
+},{"../../../view/messageComponent":62,"../../const":21,"action-stream":77}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2982,7 +3007,7 @@ exports['default'] = function () {
 
 module.exports = exports['default'];
 
-},{"../../const":20,"./InputNodeRenderStream":42,"./MessageRenderStream":43,"duplexer":285}],45:[function(require,module,exports){
+},{"../../const":21,"./InputNodeRenderStream":43,"./MessageRenderStream":44,"duplexer":284}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3041,7 +3066,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/table/edgeTableComponent":65,"../../const":20,"action-stream":76}],46:[function(require,module,exports){
+},{"../../../view/table/edgeTableComponent":66,"../../const":21,"action-stream":77}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3103,7 +3128,7 @@ function show(component, action) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/messageComponent":61,"../../const":20,"action-stream":76}],47:[function(require,module,exports){
+},{"../../../view/messageComponent":62,"../../const":21,"action-stream":77}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3162,7 +3187,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/table/nodeTableComponent":69,"../../const":20,"action-stream":76}],48:[function(require,module,exports){
+},{"../../../view/table/nodeTableComponent":70,"../../const":21,"action-stream":77}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3205,7 +3230,7 @@ var _default = (function (_ActionTransform) {
 exports['default'] = _default;
 module.exports = exports['default'];
 
-},{"../../../view/table/placeholderComponent":72,"../../const":20,"action-stream":76}],49:[function(require,module,exports){
+},{"../../../view/table/placeholderComponent":73,"../../const":21,"action-stream":77}],50:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3238,7 +3263,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{"./EdgeTableRenderStream":45,"./MessageRenderStream":46,"./NodeTableRenderStream":47,"./PlaceholderRenderStream":48}],50:[function(require,module,exports){
+},{"./EdgeTableRenderStream":46,"./MessageRenderStream":47,"./NodeTableRenderStream":48,"./PlaceholderRenderStream":49}],51:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3334,7 +3359,7 @@ function drawNode(node, p) {
 }
 module.exports = exports['default'];
 
-},{"springy":307}],51:[function(require,module,exports){
+},{"springy":308}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3393,7 +3418,7 @@ function fromScreen(container, id, left, top) {
 }
 module.exports = exports['default'];
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3423,7 +3448,7 @@ exports['default'] = function (container, instance, id, name, callbacks) {
 
 module.exports = exports['default'];
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3553,7 +3578,7 @@ function toConnection(instance, sourceId, targetId) {
   return connection;
 }
 
-},{"./unhoverElement":58,"./unselectElement":59}],54:[function(require,module,exports){
+},{"./unhoverElement":59,"./unselectElement":60}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3651,7 +3676,7 @@ exports['default'] = function (selector) {
 
 module.exports = exports['default'];
 
-},{"./Callbacks":51,"./edgeApi":53,"./jsPlumbOption":55,"./nodeApi":56,"events":286}],55:[function(require,module,exports){
+},{"./Callbacks":52,"./edgeApi":54,"./jsPlumbOption":56,"./nodeApi":57,"events":285}],56:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3680,7 +3705,7 @@ exports['default'] = {
 };
 module.exports = exports['default'];
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3762,7 +3787,7 @@ function unhover(container) {
   (0, _unhoverElement2['default'])(container, '.node');
 }
 
-},{"./createNode":52,"./unhoverElement":58,"./unselectElement":59}],57:[function(require,module,exports){
+},{"./createNode":53,"./unhoverElement":59,"./unselectElement":60}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3777,7 +3802,7 @@ exports["default"] = function (container, selector, className) {
 
 module.exports = exports["default"];
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3796,7 +3821,7 @@ exports['default'] = function (container, selector) {
 
 module.exports = exports['default'];
 
-},{"./removeClass":57}],59:[function(require,module,exports){
+},{"./removeClass":58}],60:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3815,7 +3840,7 @@ exports['default'] = function (container, selector) {
 
 module.exports = exports['default'];
 
-},{"./removeClass":57}],60:[function(require,module,exports){
+},{"./removeClass":58}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3861,7 +3886,7 @@ function updateDisplay(component, texts) {
 }
 module.exports = exports["default"];
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3886,7 +3911,7 @@ function updateMessage(component, message) {
 }
 module.exports = exports['default'];
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3942,7 +3967,7 @@ exports['default'] = function (selector) {
 
 module.exports = exports['default'];
 
-},{"./reset":63}],63:[function(require,module,exports){
+},{"./reset":64}],64:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3961,7 +3986,7 @@ exports['default'] = function (inputText, button) {
 
 module.exports = exports['default'];
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4037,7 +4062,7 @@ function getPgpIdMap(nodes) {
 }
 module.exports = exports["default"];
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4235,7 +4260,7 @@ function updateDisplay(ractive, component, data) {
 }
 module.exports = exports['default'];
 
-},{"../getTr":67,"../hoverTerm":68,"../switchStateSearching":73,"../transform":74,"../unhoverTerm":75,"./template":66,"ractive":293}],66:[function(require,module,exports){
+},{"../getTr":68,"../hoverTerm":69,"../switchStateSearching":74,"../transform":75,"../unhoverTerm":76,"./template":67,"ractive":292}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4244,7 +4269,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = "\n{{#if texts}}\n<table>\n  <tbody>\n    {{#texts}}\n    <tr data-id=\"{{id}}\" data-source-id=\"{{sourceId}}\" data-target-id=\"{{targetId}}\" data-index={{@index}} class=\"{{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}\">\n      <td class=\"focus\">\n      </td>\n      <td class=\"text\">\n        <input value=\"{{text}}\">\n        <button class=\"find-term-button find-term\" title=\"find term\"><i class=\"fa fa-search\"></i></button>\n        <button class=\"delete-button\" title=\"delete\"><i class=\"fa fa-trash-o\"></i></button>\n      </td>\n      <td class=\"terms\">\n          {{#terms}}\n          <div data-index={{@index}} class=\"term {{#if id==hover_term.text && @index==hover_term.index}}hover{{/if}}\">\n            <input type=\"checkbox\" checked=\"{{enable}}\">\n            <input class=\"term\" value=\"{{value}}\">\n            <button class=\"delete-button\" title=\"delete\"><i class=\"fa fa-trash-o\"></i></button>\n          </div>\n          {{/terms}}\n          <div class=\"add\">\n            <input type=\"checkbox\">\n            <input class=\"term\">\n            <button class=\"add-button\" title=\"add\"><i class=\"fa fa-plus\"></i></button>\n          </div>\n      </td>\n    </tr>\n    {{/texts}}\n  </tbody>\n</table>\n{{/if}}";
 module.exports = exports["default"];
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4257,7 +4282,7 @@ exports['default'] = function (element) {
 
 module.exports = exports['default'];
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4273,7 +4298,7 @@ exports['default'] = function (ractive, id, index) {
 
 module.exports = exports['default'];
 
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4463,7 +4488,7 @@ function updateDisplay(ractive, component, data) {
 }
 module.exports = exports['default'];
 
-},{"../../../model/NodeSnapshot":5,"../getTr":67,"../hoverTerm":68,"../switchStateSearching":73,"../unhoverTerm":75,"./template":70,"./transformNode":71,"ractive":293}],70:[function(require,module,exports){
+},{"../../../model/NodeSnapshot":6,"../getTr":68,"../hoverTerm":69,"../switchStateSearching":74,"../unhoverTerm":76,"./template":71,"./transformNode":72,"ractive":292}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4472,7 +4497,7 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = "\n{{#if texts}}\n<table>\n  <thead>\n    <tr>\n      <th class=\"focus\">\n        <span title=\"Choose the focus node\">F</span>\n      </th>\n      <th class=\"text\">\n        <span class=\"title\">Text</span>\n        <button class=\"find-term-all-button find-term\" title=\"Find terms for all\"><i class=\"fa fa-search\"></i></button>\n        <button class=\"delete-all-button\" title=\"Delete all\"><i class=\"fa fa-trash-o\"></i></button>\n      </th>\n      <th class=\"terms\">Term</th>\n    </tr>\n  </thead>\n  <tbody>\n    {{#texts}}\n    <tr data-id=\"{{id}}\" data-index={{@index}} class=\"{{#if selected}}selected{{/if}} {{#if hover}}hover{{/if}}\">\n      <td class=\"focus\">\n        <input type=\"radio\" name=\"focus\" value=\"{{id}}\">\n      </td>\n      <td class=\"text\">\n        <input value=\"{{text}}\">\n        <button class=\"find-term-button find-term\" title=\"Find terms\"><i class=\"fa fa-search\"></i></button>\n        <button class=\"delete-button\" title=\"Delete\"><i class=\"fa fa-trash-o\"></i></button>\n      </td>\n      <td class=\"terms\">\n          {{#terms}}\n          <div data-index={{@index}} class=\"term {{#if id==hover_term.text && @index==hover_term.index}}hover{{/if}}\">\n            <input type=\"checkbox\" checked=\"{{enable}}\">\n            <input class=\"term\" value=\"{{value}}\">\n            <button class=\"delete-button\" title=\"Delete\"><i class=\"fa fa-trash-o\"></i></button>\n          </div>\n          {{/terms}}\n          <div class=\"add\">\n            <input type=\"checkbox\">\n            <input class=\"term\">\n            <button class=\"add-button\" title=\"Add\"><i class=\"fa fa-plus\"></i></button>\n          </div>\n      </td>\n    </tr>\n    {{/texts}}\n  </tbody>\n</table>\n{{/if}}";
 module.exports = exports["default"];
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4499,7 +4524,7 @@ exports['default'] = function (origin, predicate, params) {
 
 module.exports = exports['default'];
 
-},{"../../../model/NodeSnapshot":5,"../transform":74}],72:[function(require,module,exports){
+},{"../../../model/NodeSnapshot":6,"../transform":75}],73:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4530,7 +4555,7 @@ function showPlaceholder(component, data) {
 }
 module.exports = exports['default'];
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4622,7 +4647,7 @@ exports['default'] = function (component, isSearching) {
 
 module.exports = exports['default'];
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4641,7 +4666,7 @@ exports["default"] = function (list, predicate, params) {
 
 module.exports = exports["default"];
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4654,7 +4679,7 @@ exports['default'] = function (ractive) {
 
 module.exports = exports['default'];
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4683,7 +4708,7 @@ exports.ActionReadable = _libActionReadable2['default'];
 exports.ActionTransform = _libActionTransform2['default'];
 exports.FunnelStream = _libFunnelStream2['default'];
 exports.TailStream = _libTailStream2['default'];
-},{"./lib/ActionReadable":77,"./lib/ActionTransform":78,"./lib/FunnelStream":79,"./lib/TailStream":80}],77:[function(require,module,exports){
+},{"./lib/ActionReadable":78,"./lib/ActionTransform":79,"./lib/FunnelStream":80,"./lib/TailStream":81}],78:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4764,7 +4789,7 @@ var _default = (function (_Readable) {
 
 exports['default'] = _default;
 module.exports = exports['default'];
-},{"./defaultOption":81,"stream":308,"xtend":317}],78:[function(require,module,exports){
+},{"./defaultOption":82,"stream":309,"xtend":318}],79:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -4943,7 +4968,7 @@ function bindAction(distpatcher, target, actionType, handler) {
  * @property {!ActionHandler} Item[1] - handlers that has arguments of action and function.
  */
 module.exports = exports['default'];
-},{"./defaultOption":81,"bluebird":86,"stream":308,"xtend":317}],79:[function(require,module,exports){
+},{"./defaultOption":82,"bluebird":87,"stream":309,"xtend":318}],80:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5006,7 +5031,7 @@ var _default = (function (_Transform) {
 
 exports['default'] = _default;
 module.exports = exports['default'];
-},{"./defaultOption":81,"stream":308,"xtend":317}],80:[function(require,module,exports){
+},{"./defaultOption":82,"stream":309,"xtend":318}],81:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -5061,12 +5086,12 @@ var _default = (function (_Writable) {
 
 exports['default'] = _default;
 module.exports = exports['default'];
-},{"./defaultOption":81,"stream":308}],81:[function(require,module,exports){
+},{"./defaultOption":82,"stream":309}],82:[function(require,module,exports){
 module.exports={
   "objectMode": true
 }
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -5079,13 +5104,13 @@ if (global._babelPolyfill) {
 }
 global._babelPolyfill = true;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"core-js/shim":279,"regenerator/runtime":306}],83:[function(require,module,exports){
+},{"core-js/shim":279,"regenerator/runtime":306}],84:[function(require,module,exports){
 module.exports = require("./lib/polyfill");
 
-},{"./lib/polyfill":82}],84:[function(require,module,exports){
+},{"./lib/polyfill":83}],85:[function(require,module,exports){
 module.exports = require("babel-core/polyfill");
 
-},{"babel-core/polyfill":83}],85:[function(require,module,exports){
+},{"babel-core/polyfill":84}],86:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -5211,7 +5236,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -10106,9 +10131,9 @@ module.exports = ret;
 },{"./es5.js":14}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":88}],87:[function(require,module,exports){
+},{"_process":89}],88:[function(require,module,exports){
 
-},{}],88:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -10279,6 +10304,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -10290,119 +10319,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],89:[function(require,module,exports){
-(function (global){
-'use strict';
-
-var buffer = require('buffer');
-var Buffer = buffer.Buffer;
-var SlowBuffer = buffer.SlowBuffer;
-var MAX_LEN = buffer.kMaxLength || 2147483647;
-exports.alloc = function alloc(size, fill, encoding) {
-  if (typeof Buffer.alloc === 'function') {
-    return Buffer.alloc(size, fill, encoding);
-  }
-  if (typeof encoding === 'number') {
-    throw new TypeError('encoding must not be number');
-  }
-  if (typeof size !== 'number') {
-    throw new TypeError('size must be a number');
-  }
-  if (size > MAX_LEN) {
-    throw new RangeError('size is too large');
-  }
-  var enc = encoding;
-  var _fill = fill;
-  if (_fill === undefined) {
-    enc = undefined;
-    _fill = 0;
-  }
-  var buf = new Buffer(size);
-  if (typeof _fill === 'string') {
-    var fillBuf = new Buffer(_fill, enc);
-    var flen = fillBuf.length;
-    var i = -1;
-    while (++i < size) {
-      buf[i] = fillBuf[i % flen];
-    }
-  } else {
-    buf.fill(_fill);
-  }
-  return buf;
-}
-exports.allocUnsafe = function allocUnsafe(size) {
-  if (typeof Buffer.allocUnsafe === 'function') {
-    return Buffer.allocUnsafe(size);
-  }
-  if (typeof size !== 'number') {
-    throw new TypeError('size must be a number');
-  }
-  if (size > MAX_LEN) {
-    throw new RangeError('size is too large');
-  }
-  return new Buffer(size);
-}
-exports.from = function from(value, encodingOrOffset, length) {
-  if (typeof Buffer.from === 'function' && (!global.Uint8Array || Uint8Array.from !== Buffer.from)) {
-    return Buffer.from(value, encodingOrOffset, length);
-  }
-  if (typeof value === 'number') {
-    throw new TypeError('"value" argument must not be a number');
-  }
-  if (typeof value === 'string') {
-    return new Buffer(value, encodingOrOffset);
-  }
-  if (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) {
-    var offset = encodingOrOffset;
-    if (arguments.length === 1) {
-      return new Buffer(value);
-    }
-    if (typeof offset === 'undefined') {
-      offset = 0;
-    }
-    var len = length;
-    if (typeof len === 'undefined') {
-      len = value.byteLength - offset;
-    }
-    if (offset >= value.byteLength) {
-      throw new RangeError('\'offset\' is out of bounds');
-    }
-    if (len > value.byteLength - offset) {
-      throw new RangeError('\'length\' is out of bounds');
-    }
-    return new Buffer(value.slice(offset, offset + len));
-  }
-  if (Buffer.isBuffer(value)) {
-    var out = new Buffer(value.length);
-    value.copy(out, 0, 0, value.length);
-    return out;
-  }
-  if (value) {
-    if (Array.isArray(value) || (typeof ArrayBuffer !== 'undefined' && value.buffer instanceof ArrayBuffer) || 'length' in value) {
-      return new Buffer(value);
-    }
-    if (value.type === 'Buffer' && Array.isArray(value.data)) {
-      return new Buffer(value.data);
-    }
-  }
-
-  throw new TypeError('First argument must be a string, Buffer, ' + 'ArrayBuffer, Array, or array-like object.');
-}
-exports.allocUnsafeSlow = function allocUnsafeSlow(size) {
-  if (typeof Buffer.allocUnsafeSlow === 'function') {
-    return Buffer.allocUnsafeSlow(size);
-  }
-  if (typeof size !== 'number') {
-    throw new TypeError('size must be a number');
-  }
-  if (size >= MAX_LEN) {
-    throw new RangeError('size is too large');
-  }
-  return new SlowBuffer(size);
-}
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"buffer":90}],90:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -11954,7 +11871,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":85,"ieee754":288,"isarray":291}],91:[function(require,module,exports){
+},{"base64-js":86,"ieee754":287,"isarray":290}],91:[function(require,module,exports){
 (function (Buffer){
 var clone = (function() {
 'use strict';
@@ -16138,26 +16055,13 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":290}],281:[function(require,module,exports){
-module.exports = Date.now || now
-
-function now() {
-    return new Date().getTime()
-}
-
-},{}],282:[function(require,module,exports){
-
-/**
- * Module dependencies.
- */
-
-var now = require('date-now');
-
+},{"../../is-buffer/index.js":289}],281:[function(require,module,exports){
 /**
  * Returns a function, that, as long as it continues to be invoked, will not
  * be triggered. The function will be called after it stops being called for
  * N milliseconds. If `immediate` is passed, trigger the function on the
- * leading edge, instead of the trailing.
+ * leading edge, instead of the trailing. The function also has a property 'clear' 
+ * that is a function which will clear the timer to prevent previously scheduled executions. 
  *
  * @source underscore.js
  * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
@@ -16172,23 +16076,23 @@ module.exports = function debounce(func, wait, immediate){
   if (null == wait) wait = 100;
 
   function later() {
-    var last = now() - timestamp;
+    var last = Date.now() - timestamp;
 
-    if (last < wait && last > 0) {
+    if (last < wait && last >= 0) {
       timeout = setTimeout(later, wait - last);
     } else {
       timeout = null;
       if (!immediate) {
         result = func.apply(context, args);
-        if (!timeout) context = args = null;
+        context = args = null;
       }
     }
   };
 
-  return function debounced() {
+  var debounced = function(){
     context = this;
     args = arguments;
-    timestamp = now();
+    timestamp = Date.now();
     var callNow = immediate && !timeout;
     if (!timeout) timeout = setTimeout(later, wait);
     if (callNow) {
@@ -16198,9 +16102,18 @@ module.exports = function debounce(func, wait, immediate){
 
     return result;
   };
+
+  debounced.clear = function() {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  };
+
+  return debounced;
 };
 
-},{"date-now":281}],283:[function(require,module,exports){
+},{}],282:[function(require,module,exports){
 /*jshint browser:true, node:true*/
 
 'use strict';
@@ -16631,7 +16544,7 @@ Delegate.prototype.destroy = function() {
   this.root();
 };
 
-},{}],284:[function(require,module,exports){
+},{}],283:[function(require,module,exports){
 /*jshint browser:true, node:true*/
 
 'use strict';
@@ -16652,7 +16565,7 @@ module.exports = function(root) {
 
 module.exports.Delegate = Delegate;
 
-},{"./delegate":283}],285:[function(require,module,exports){
+},{"./delegate":282}],284:[function(require,module,exports){
 var Stream = require("stream")
 var writeMethods = ["write", "end", "destroy"]
 var readMethods = ["resume", "pause"]
@@ -16741,7 +16654,7 @@ function duplex(writer, reader) {
     }
 }
 
-},{"stream":308}],286:[function(require,module,exports){
+},{"stream":309}],285:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -17045,20 +16958,24 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],287:[function(require,module,exports){
+},{}],286:[function(require,module,exports){
 (function (global){
+var win;
+
 if (typeof window !== "undefined") {
-    module.exports = window;
+    win = window;
 } else if (typeof global !== "undefined") {
-    module.exports = global;
+    win = global;
 } else if (typeof self !== "undefined"){
-    module.exports = self;
+    win = self;
 } else {
-    module.exports = {};
+    win = {};
 }
 
+module.exports = win;
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],288:[function(require,module,exports){
+},{}],287:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -17144,7 +17061,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],289:[function(require,module,exports){
+},{}],288:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -17169,7 +17086,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],290:[function(require,module,exports){
+},{}],289:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -17192,14 +17109,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],291:[function(require,module,exports){
+},{}],290:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],292:[function(require,module,exports){
+},{}],291:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -17246,7 +17163,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":88}],293:[function(require,module,exports){
+},{"_process":89}],292:[function(require,module,exports){
 /*
 	Ractive.js v0.7.3
 	Sat Apr 25 2015 13:52:38 GMT-0400 (EDT) - commit da40f81c660ba2f09c45a09a9c20fdd34ee36d80
@@ -33867,10 +33784,10 @@ function nextTick(fn, arg1, arg2, arg3) {
 }));
 
 
-},{}],294:[function(require,module,exports){
-module.exports = require("./lib/_stream_duplex.js")
+},{}],293:[function(require,module,exports){
+module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":295}],295:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":294}],294:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -33946,7 +33863,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":297,"./_stream_writable":299,"core-util-is":280,"inherits":289,"process-nextick-args":292}],296:[function(require,module,exports){
+},{"./_stream_readable":296,"./_stream_writable":298,"core-util-is":280,"inherits":288,"process-nextick-args":291}],295:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -33973,7 +33890,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":298,"core-util-is":280,"inherits":289}],297:[function(require,module,exports){
+},{"./_stream_transform":297,"core-util-is":280,"inherits":288}],296:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -34002,19 +33919,11 @@ var EElistenerCount = function (emitter, type) {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream;
-(function () {
-  try {
-    Stream = require('st' + 'ream');
-  } catch (_) {} finally {
-    if (!Stream) Stream = require('events').EventEmitter;
-  }
-})();
+var Stream = require('./internal/streams/stream');
 /*</replacement>*/
 
-var Buffer = require('buffer').Buffer;
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var Buffer = require('safe-buffer').Buffer;
 /*</replacement>*/
 
 /*<replacement>*/
@@ -34036,6 +33945,8 @@ var BufferList = require('./internal/streams/BufferList');
 var StringDecoder;
 
 util.inherits(Readable, Stream);
+
+var kProxyEvents = ['error', 'close', 'destroy', 'pause', 'resume'];
 
 function prependListener(emitter, event, fn) {
   // Sadly this is not cacheable as some libraries bundle their own
@@ -34069,7 +33980,7 @@ function ReadableState(options, stream) {
   this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
 
   // cast to ints.
-  this.highWaterMark = ~ ~this.highWaterMark;
+  this.highWaterMark = ~~this.highWaterMark;
 
   // A linked list is used to store data chunks instead of an array because the
   // linked list can remove elements from the beginning faster than
@@ -34145,7 +34056,7 @@ Readable.prototype.push = function (chunk, encoding) {
   if (!state.objectMode && typeof chunk === 'string') {
     encoding = encoding || state.defaultEncoding;
     if (encoding !== state.encoding) {
-      chunk = bufferShim.from(chunk, encoding);
+      chunk = Buffer.from(chunk, encoding);
       encoding = '';
     }
   }
@@ -34465,7 +34376,7 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
 
   var doEnd = (!pipeOpts || pipeOpts.end !== false) && dest !== process.stdout && dest !== process.stderr;
 
-  var endFn = doEnd ? onend : cleanup;
+  var endFn = doEnd ? onend : unpipe;
   if (state.endEmitted) processNextTick(endFn);else src.once('end', endFn);
 
   dest.on('unpipe', onunpipe);
@@ -34498,7 +34409,7 @@ Readable.prototype.pipe = function (dest, pipeOpts) {
     dest.removeListener('error', onerror);
     dest.removeListener('unpipe', onunpipe);
     src.removeListener('end', onend);
-    src.removeListener('end', cleanup);
+    src.removeListener('end', unpipe);
     src.removeListener('data', ondata);
 
     cleanedUp = true;
@@ -34761,10 +34672,9 @@ Readable.prototype.wrap = function (stream) {
   }
 
   // proxy certain important events.
-  var events = ['error', 'close', 'destroy', 'pause', 'resume'];
-  forEach(events, function (ev) {
-    stream.on(ev, self.emit.bind(self, ev));
-  });
+  for (var n = 0; n < kProxyEvents.length; n++) {
+    stream.on(kProxyEvents[n], self.emit.bind(self, kProxyEvents[n]));
+  }
 
   // when we try to consume some more bytes, simply unpause the
   // underlying stream.
@@ -34856,7 +34766,7 @@ function copyFromBufferString(n, list) {
 // This function is designed to be inlinable, so please take care when making
 // changes to the function body.
 function copyFromBuffer(n, list) {
-  var ret = bufferShim.allocUnsafe(n);
+  var ret = Buffer.allocUnsafe(n);
   var p = list.head;
   var c = 1;
   p.data.copy(ret);
@@ -34917,7 +34827,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":295,"./internal/streams/BufferList":300,"_process":88,"buffer":90,"buffer-shims":89,"core-util-is":280,"events":286,"inherits":289,"isarray":291,"process-nextick-args":292,"string_decoder/":309,"util":87}],298:[function(require,module,exports){
+},{"./_stream_duplex":294,"./internal/streams/BufferList":299,"./internal/streams/stream":300,"_process":89,"core-util-is":280,"events":285,"inherits":288,"isarray":290,"process-nextick-args":291,"safe-buffer":307,"string_decoder/":310,"util":88}],297:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -35100,7 +35010,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":295,"core-util-is":280,"inherits":289}],299:[function(require,module,exports){
+},{"./_stream_duplex":294,"core-util-is":280,"inherits":288}],298:[function(require,module,exports){
 (function (process){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
@@ -35136,19 +35046,11 @@ var internalUtil = {
 /*</replacement>*/
 
 /*<replacement>*/
-var Stream;
-(function () {
-  try {
-    Stream = require('st' + 'ream');
-  } catch (_) {} finally {
-    if (!Stream) Stream = require('events').EventEmitter;
-  }
-})();
+var Stream = require('./internal/streams/stream');
 /*</replacement>*/
 
-var Buffer = require('buffer').Buffer;
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+var Buffer = require('safe-buffer').Buffer;
 /*</replacement>*/
 
 util.inherits(Writable, Stream);
@@ -35181,7 +35083,7 @@ function WritableState(options, stream) {
   this.highWaterMark = hwm || hwm === 0 ? hwm : defaultHwm;
 
   // cast to ints.
-  this.highWaterMark = ~ ~this.highWaterMark;
+  this.highWaterMark = ~~this.highWaterMark;
 
   // drain event flag.
   this.needDrain = false;
@@ -35336,20 +35238,16 @@ function writeAfterEnd(stream, cb) {
   processNextTick(cb, er);
 }
 
-// If we get something that is not a buffer, string, null, or undefined,
-// and we're not in objectMode, then that's an error.
-// Otherwise stream chunks are all considered to be of length=1, and the
-// watermarks determine how many objects to keep in the buffer, rather than
-// how many bytes or characters.
+// Checks that a user-supplied chunk is valid, especially for the particular
+// mode the stream is in. Currently this means that `null` is never accepted
+// and undefined/non-string values are only allowed in object mode.
 function validChunk(stream, state, chunk, cb) {
   var valid = true;
   var er = false;
-  // Always throw error if a null is written
-  // if we are not in object mode then throw
-  // if it is not a buffer, string, or undefined.
+
   if (chunk === null) {
     er = new TypeError('May not write null values to stream');
-  } else if (!Buffer.isBuffer(chunk) && typeof chunk !== 'string' && chunk !== undefined && !state.objectMode) {
+  } else if (typeof chunk !== 'string' && chunk !== undefined && !state.objectMode) {
     er = new TypeError('Invalid non-string/buffer chunk');
   }
   if (er) {
@@ -35363,19 +35261,20 @@ function validChunk(stream, state, chunk, cb) {
 Writable.prototype.write = function (chunk, encoding, cb) {
   var state = this._writableState;
   var ret = false;
+  var isBuf = Buffer.isBuffer(chunk);
 
   if (typeof encoding === 'function') {
     cb = encoding;
     encoding = null;
   }
 
-  if (Buffer.isBuffer(chunk)) encoding = 'buffer';else if (!encoding) encoding = state.defaultEncoding;
+  if (isBuf) encoding = 'buffer';else if (!encoding) encoding = state.defaultEncoding;
 
   if (typeof cb !== 'function') cb = nop;
 
-  if (state.ended) writeAfterEnd(this, cb);else if (validChunk(this, state, chunk, cb)) {
+  if (state.ended) writeAfterEnd(this, cb);else if (isBuf || validChunk(this, state, chunk, cb)) {
     state.pendingcb++;
-    ret = writeOrBuffer(this, state, chunk, encoding, cb);
+    ret = writeOrBuffer(this, state, isBuf, chunk, encoding, cb);
   }
 
   return ret;
@@ -35407,7 +35306,7 @@ Writable.prototype.setDefaultEncoding = function setDefaultEncoding(encoding) {
 
 function decodeChunk(state, chunk, encoding) {
   if (!state.objectMode && state.decodeStrings !== false && typeof chunk === 'string') {
-    chunk = bufferShim.from(chunk, encoding);
+    chunk = Buffer.from(chunk, encoding);
   }
   return chunk;
 }
@@ -35415,10 +35314,11 @@ function decodeChunk(state, chunk, encoding) {
 // if we're already writing something, then just put this
 // in the queue, and wait our turn.  Otherwise, call _write
 // If we return false, then we need a drain event, so set that flag.
-function writeOrBuffer(stream, state, chunk, encoding, cb) {
-  chunk = decodeChunk(state, chunk, encoding);
-
-  if (Buffer.isBuffer(chunk)) encoding = 'buffer';
+function writeOrBuffer(stream, state, isBuf, chunk, encoding, cb) {
+  if (!isBuf) {
+    chunk = decodeChunk(state, chunk, encoding);
+    if (Buffer.isBuffer(chunk)) encoding = 'buffer';
+  }
   var len = state.objectMode ? 1 : chunk.length;
 
   state.length += len;
@@ -35487,8 +35387,8 @@ function onwrite(stream, er) {
       asyncWrite(afterWrite, stream, state, finished, cb);
       /*</replacement>*/
     } else {
-        afterWrite(stream, state, finished, cb);
-      }
+      afterWrite(stream, state, finished, cb);
+    }
   }
 }
 
@@ -35639,7 +35539,6 @@ function CorkedRequest(state) {
 
   this.next = null;
   this.entry = null;
-
   this.finish = function (err) {
     var entry = _this.entry;
     _this.entry = null;
@@ -35657,12 +35556,12 @@ function CorkedRequest(state) {
   };
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":295,"_process":88,"buffer":90,"buffer-shims":89,"core-util-is":280,"events":286,"inherits":289,"process-nextick-args":292,"util-deprecate":314}],300:[function(require,module,exports){
+},{"./_stream_duplex":294,"./internal/streams/stream":300,"_process":89,"core-util-is":280,"inherits":288,"process-nextick-args":291,"safe-buffer":307,"util-deprecate":315}],299:[function(require,module,exports){
 'use strict';
 
-var Buffer = require('buffer').Buffer;
 /*<replacement>*/
-var bufferShim = require('buffer-shims');
+
+var Buffer = require('safe-buffer').Buffer;
 /*</replacement>*/
 
 module.exports = BufferList;
@@ -35710,9 +35609,9 @@ BufferList.prototype.join = function (s) {
 };
 
 BufferList.prototype.concat = function (n) {
-  if (this.length === 0) return bufferShim.alloc(0);
+  if (this.length === 0) return Buffer.alloc(0);
   if (this.length === 1) return this.head.data;
-  var ret = bufferShim.allocUnsafe(n >>> 0);
+  var ret = Buffer.allocUnsafe(n >>> 0);
   var p = this.head;
   var i = 0;
   while (p) {
@@ -35722,36 +35621,28 @@ BufferList.prototype.concat = function (n) {
   }
   return ret;
 };
-},{"buffer":90,"buffer-shims":89}],301:[function(require,module,exports){
-module.exports = require("./lib/_stream_passthrough.js")
+},{"safe-buffer":307}],300:[function(require,module,exports){
+module.exports = require('events').EventEmitter;
 
-},{"./lib/_stream_passthrough.js":296}],302:[function(require,module,exports){
-(function (process){
-var Stream = (function (){
-  try {
-    return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
-  } catch(_){}
-}());
+},{"events":285}],301:[function(require,module,exports){
+module.exports = require('./readable').PassThrough
+
+},{"./readable":302}],302:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
-exports.Stream = Stream || exports;
+exports.Stream = exports;
 exports.Readable = exports;
 exports.Writable = require('./lib/_stream_writable.js');
 exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-if (!process.browser && process.env.READABLE_STREAM === 'disable' && Stream) {
-  module.exports = Stream;
-}
+},{"./lib/_stream_duplex.js":294,"./lib/_stream_passthrough.js":295,"./lib/_stream_readable.js":296,"./lib/_stream_transform.js":297,"./lib/_stream_writable.js":298}],303:[function(require,module,exports){
+module.exports = require('./readable').Transform
 
-}).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":295,"./lib/_stream_passthrough.js":296,"./lib/_stream_readable.js":297,"./lib/_stream_transform.js":298,"./lib/_stream_writable.js":299,"_process":88}],303:[function(require,module,exports){
-module.exports = require("./lib/_stream_transform.js")
+},{"./readable":302}],304:[function(require,module,exports){
+module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_transform.js":298}],304:[function(require,module,exports){
-module.exports = require("./lib/_stream_writable.js")
-
-},{"./lib/_stream_writable.js":299}],305:[function(require,module,exports){
+},{"./lib/_stream_writable.js":298}],305:[function(require,module,exports){
 
 /**
  * Reduce `arr` with `fn`.
@@ -36436,7 +36327,10 @@ module.exports = function(arr, fn, initial){
 );
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":88}],307:[function(require,module,exports){
+},{"_process":89}],307:[function(require,module,exports){
+module.exports = require('buffer')
+
+},{"buffer":90}],308:[function(require,module,exports){
 /**
  * Springy v2.7.1
  *
@@ -37165,7 +37059,7 @@ module.exports = function(arr, fn, initial){
   return Springy;
 }));
 
-},{}],308:[function(require,module,exports){
+},{}],309:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -37294,230 +37188,280 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":286,"inherits":289,"readable-stream/duplex.js":294,"readable-stream/passthrough.js":301,"readable-stream/readable.js":302,"readable-stream/transform.js":303,"readable-stream/writable.js":304}],309:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
+},{"events":285,"inherits":288,"readable-stream/duplex.js":293,"readable-stream/passthrough.js":301,"readable-stream/readable.js":302,"readable-stream/transform.js":303,"readable-stream/writable.js":304}],310:[function(require,module,exports){
+'use strict';
 
-var Buffer = require('buffer').Buffer;
+var Buffer = require('safe-buffer').Buffer;
 
-var isBufferEncoding = Buffer.isEncoding
-  || function(encoding) {
-       switch (encoding && encoding.toLowerCase()) {
-         case 'hex': case 'utf8': case 'utf-8': case 'ascii': case 'binary': case 'base64': case 'ucs2': case 'ucs-2': case 'utf16le': case 'utf-16le': case 'raw': return true;
-         default: return false;
-       }
-     }
-
-
-function assertEncoding(encoding) {
-  if (encoding && !isBufferEncoding(encoding)) {
-    throw new Error('Unknown encoding: ' + encoding);
+var isEncoding = Buffer.isEncoding || function (encoding) {
+  encoding = '' + encoding;
+  switch (encoding && encoding.toLowerCase()) {
+    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
+      return true;
+    default:
+      return false;
   }
+};
+
+function _normalizeEncoding(enc) {
+  if (!enc) return 'utf8';
+  var retried;
+  while (true) {
+    switch (enc) {
+      case 'utf8':
+      case 'utf-8':
+        return 'utf8';
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return 'utf16le';
+      case 'latin1':
+      case 'binary':
+        return 'latin1';
+      case 'base64':
+      case 'ascii':
+      case 'hex':
+        return enc;
+      default:
+        if (retried) return; // undefined
+        enc = ('' + enc).toLowerCase();
+        retried = true;
+    }
+  }
+};
+
+// Do not cache `Buffer.isEncoding` when checking encoding names as some
+// modules monkey-patch it to support additional encodings
+function normalizeEncoding(enc) {
+  var nenc = _normalizeEncoding(enc);
+  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
+  return nenc || enc;
 }
 
 // StringDecoder provides an interface for efficiently splitting a series of
 // buffers into a series of JS strings without breaking apart multi-byte
-// characters. CESU-8 is handled as part of the UTF-8 encoding.
-//
-// @TODO Handling all encodings inside a single object makes it very difficult
-// to reason about this code, so it should be split up in the future.
-// @TODO There should be a utf8-strict encoding that rejects invalid UTF-8 code
-// points as used by CESU-8.
-var StringDecoder = exports.StringDecoder = function(encoding) {
-  this.encoding = (encoding || 'utf8').toLowerCase().replace(/[-_]/, '');
-  assertEncoding(encoding);
+// characters.
+exports.StringDecoder = StringDecoder;
+function StringDecoder(encoding) {
+  this.encoding = normalizeEncoding(encoding);
+  var nb;
   switch (this.encoding) {
-    case 'utf8':
-      // CESU-8 represents each of Surrogate Pair by 3-bytes
-      this.surrogateSize = 3;
-      break;
-    case 'ucs2':
     case 'utf16le':
-      // UTF-16 represents each of Surrogate Pair by 2-bytes
-      this.surrogateSize = 2;
-      this.detectIncompleteChar = utf16DetectIncompleteChar;
+      this.text = utf16Text;
+      this.end = utf16End;
+      nb = 4;
+      break;
+    case 'utf8':
+      this.fillLast = utf8FillLast;
+      nb = 4;
       break;
     case 'base64':
-      // Base-64 stores 3 bytes in 4 chars, and pads the remainder.
-      this.surrogateSize = 3;
-      this.detectIncompleteChar = base64DetectIncompleteChar;
+      this.text = base64Text;
+      this.end = base64End;
+      nb = 3;
       break;
     default:
-      this.write = passThroughWrite;
+      this.write = simpleWrite;
+      this.end = simpleEnd;
       return;
   }
-
-  // Enough space to store all bytes of a single character. UTF-8 needs 4
-  // bytes, but CESU-8 may require up to 6 (3 bytes per surrogate).
-  this.charBuffer = new Buffer(6);
-  // Number of bytes received for the current incomplete multi-byte character.
-  this.charReceived = 0;
-  // Number of bytes expected for the current incomplete multi-byte character.
-  this.charLength = 0;
-};
-
-
-// write decodes the given buffer and returns it as JS string that is
-// guaranteed to not contain any partial multi-byte characters. Any partial
-// character found at the end of the buffer is buffered up, and will be
-// returned when calling write again with the remaining bytes.
-//
-// Note: Converting a Buffer containing an orphan surrogate to a String
-// currently works, but converting a String to a Buffer (via `new Buffer`, or
-// Buffer#write) will replace incomplete surrogates with the unicode
-// replacement character. See https://codereview.chromium.org/121173009/ .
-StringDecoder.prototype.write = function(buffer) {
-  var charStr = '';
-  // if our last write ended with an incomplete multibyte character
-  while (this.charLength) {
-    // determine how many remaining bytes this buffer has to offer for this char
-    var available = (buffer.length >= this.charLength - this.charReceived) ?
-        this.charLength - this.charReceived :
-        buffer.length;
-
-    // add the new bytes to the char buffer
-    buffer.copy(this.charBuffer, this.charReceived, 0, available);
-    this.charReceived += available;
-
-    if (this.charReceived < this.charLength) {
-      // still not enough chars in this buffer? wait for more ...
-      return '';
-    }
-
-    // remove bytes belonging to the current character from the buffer
-    buffer = buffer.slice(available, buffer.length);
-
-    // get the character that was split
-    charStr = this.charBuffer.slice(0, this.charLength).toString(this.encoding);
-
-    // CESU-8: lead surrogate (D800-DBFF) is also the incomplete character
-    var charCode = charStr.charCodeAt(charStr.length - 1);
-    if (charCode >= 0xD800 && charCode <= 0xDBFF) {
-      this.charLength += this.surrogateSize;
-      charStr = '';
-      continue;
-    }
-    this.charReceived = this.charLength = 0;
-
-    // if there are no more bytes in this buffer, just emit our char
-    if (buffer.length === 0) {
-      return charStr;
-    }
-    break;
-  }
-
-  // determine and set charLength / charReceived
-  this.detectIncompleteChar(buffer);
-
-  var end = buffer.length;
-  if (this.charLength) {
-    // buffer the incomplete character bytes we got
-    buffer.copy(this.charBuffer, 0, buffer.length - this.charReceived, end);
-    end -= this.charReceived;
-  }
-
-  charStr += buffer.toString(this.encoding, 0, end);
-
-  var end = charStr.length - 1;
-  var charCode = charStr.charCodeAt(end);
-  // CESU-8: lead surrogate (D800-DBFF) is also the incomplete character
-  if (charCode >= 0xD800 && charCode <= 0xDBFF) {
-    var size = this.surrogateSize;
-    this.charLength += size;
-    this.charReceived += size;
-    this.charBuffer.copy(this.charBuffer, size, 0, size);
-    buffer.copy(this.charBuffer, 0, 0, size);
-    return charStr.substring(0, end);
-  }
-
-  // or just emit the charStr
-  return charStr;
-};
-
-// detectIncompleteChar determines if there is an incomplete UTF-8 character at
-// the end of the given buffer. If so, it sets this.charLength to the byte
-// length that character, and sets this.charReceived to the number of bytes
-// that are available for this character.
-StringDecoder.prototype.detectIncompleteChar = function(buffer) {
-  // determine how many bytes we have to check at the end of this buffer
-  var i = (buffer.length >= 3) ? 3 : buffer.length;
-
-  // Figure out if one of the last i bytes of our buffer announces an
-  // incomplete char.
-  for (; i > 0; i--) {
-    var c = buffer[buffer.length - i];
-
-    // See http://en.wikipedia.org/wiki/UTF-8#Description
-
-    // 110XXXXX
-    if (i == 1 && c >> 5 == 0x06) {
-      this.charLength = 2;
-      break;
-    }
-
-    // 1110XXXX
-    if (i <= 2 && c >> 4 == 0x0E) {
-      this.charLength = 3;
-      break;
-    }
-
-    // 11110XXX
-    if (i <= 3 && c >> 3 == 0x1E) {
-      this.charLength = 4;
-      break;
-    }
-  }
-  this.charReceived = i;
-};
-
-StringDecoder.prototype.end = function(buffer) {
-  var res = '';
-  if (buffer && buffer.length)
-    res = this.write(buffer);
-
-  if (this.charReceived) {
-    var cr = this.charReceived;
-    var buf = this.charBuffer;
-    var enc = this.encoding;
-    res += buf.slice(0, cr).toString(enc);
-  }
-
-  return res;
-};
-
-function passThroughWrite(buffer) {
-  return buffer.toString(this.encoding);
+  this.lastNeed = 0;
+  this.lastTotal = 0;
+  this.lastChar = Buffer.allocUnsafe(nb);
 }
 
-function utf16DetectIncompleteChar(buffer) {
-  this.charReceived = buffer.length % 2;
-  this.charLength = this.charReceived ? 2 : 0;
+StringDecoder.prototype.write = function (buf) {
+  if (buf.length === 0) return '';
+  var r;
+  var i;
+  if (this.lastNeed) {
+    r = this.fillLast(buf);
+    if (r === undefined) return '';
+    i = this.lastNeed;
+    this.lastNeed = 0;
+  } else {
+    i = 0;
+  }
+  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
+  return r || '';
+};
+
+StringDecoder.prototype.end = utf8End;
+
+// Returns only complete characters in a Buffer
+StringDecoder.prototype.text = utf8Text;
+
+// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
+StringDecoder.prototype.fillLast = function (buf) {
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
+  this.lastNeed -= buf.length;
+};
+
+// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
+// continuation byte.
+function utf8CheckByte(byte) {
+  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
+  return -1;
 }
 
-function base64DetectIncompleteChar(buffer) {
-  this.charReceived = buffer.length % 3;
-  this.charLength = this.charReceived ? 3 : 0;
+// Checks at most 3 bytes at the end of a Buffer in order to detect an
+// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
+// needed to complete the UTF-8 character (if applicable) are returned.
+function utf8CheckIncomplete(self, buf, i) {
+  var j = buf.length - 1;
+  if (j < i) return 0;
+  var nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 1;
+    return nb;
+  }
+  if (--j < i) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 2;
+    return nb;
+  }
+  if (--j < i) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) {
+      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
+    }
+    return nb;
+  }
+  return 0;
 }
 
-},{"buffer":90}],310:[function(require,module,exports){
+// Validates as many continuation bytes for a multi-byte UTF-8 character as
+// needed or are available. If we see a non-continuation byte where we expect
+// one, we "replace" the validated continuation bytes we've seen so far with
+// UTF-8 replacement characters ('\ufffd'), to match v8's UTF-8 decoding
+// behavior. The continuation byte check is included three times in the case
+// where all of the continuation bytes for a character exist in the same buffer.
+// It is also done this way as a slight performance increase instead of using a
+// loop.
+function utf8CheckExtraBytes(self, buf, p) {
+  if ((buf[0] & 0xC0) !== 0x80) {
+    self.lastNeed = 0;
+    return '\ufffd'.repeat(p);
+  }
+  if (self.lastNeed > 1 && buf.length > 1) {
+    if ((buf[1] & 0xC0) !== 0x80) {
+      self.lastNeed = 1;
+      return '\ufffd'.repeat(p + 1);
+    }
+    if (self.lastNeed > 2 && buf.length > 2) {
+      if ((buf[2] & 0xC0) !== 0x80) {
+        self.lastNeed = 2;
+        return '\ufffd'.repeat(p + 2);
+      }
+    }
+  }
+}
+
+// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
+function utf8FillLast(buf) {
+  var p = this.lastTotal - this.lastNeed;
+  var r = utf8CheckExtraBytes(this, buf, p);
+  if (r !== undefined) return r;
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, p, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, p, 0, buf.length);
+  this.lastNeed -= buf.length;
+}
+
+// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
+// partial character, the character's bytes are buffered until the required
+// number of bytes are available.
+function utf8Text(buf, i) {
+  var total = utf8CheckIncomplete(this, buf, i);
+  if (!this.lastNeed) return buf.toString('utf8', i);
+  this.lastTotal = total;
+  var end = buf.length - (total - this.lastNeed);
+  buf.copy(this.lastChar, 0, end);
+  return buf.toString('utf8', i, end);
+}
+
+// For UTF-8, a replacement character for each buffered byte of a (partial)
+// character needs to be added to the output.
+function utf8End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + '\ufffd'.repeat(this.lastTotal - this.lastNeed);
+  return r;
+}
+
+// UTF-16LE typically needs two bytes per character, but even if we have an even
+// number of bytes available, we need to check if we end on a leading/high
+// surrogate. In that case, we need to wait for the next two bytes in order to
+// decode the last character properly.
+function utf16Text(buf, i) {
+  if ((buf.length - i) % 2 === 0) {
+    var r = buf.toString('utf16le', i);
+    if (r) {
+      var c = r.charCodeAt(r.length - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) {
+        this.lastNeed = 2;
+        this.lastTotal = 4;
+        this.lastChar[0] = buf[buf.length - 2];
+        this.lastChar[1] = buf[buf.length - 1];
+        return r.slice(0, -1);
+      }
+    }
+    return r;
+  }
+  this.lastNeed = 1;
+  this.lastTotal = 2;
+  this.lastChar[0] = buf[buf.length - 1];
+  return buf.toString('utf16le', i, buf.length - 1);
+}
+
+// For UTF-16LE we do not explicitly append special replacement characters if we
+// end on a partial character, we simply let v8 handle that.
+function utf16End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) {
+    var end = this.lastTotal - this.lastNeed;
+    return r + this.lastChar.toString('utf16le', 0, end);
+  }
+  return r;
+}
+
+function base64Text(buf, i) {
+  var n = (buf.length - i) % 3;
+  if (n === 0) return buf.toString('base64', i);
+  this.lastNeed = 3 - n;
+  this.lastTotal = 3;
+  if (n === 1) {
+    this.lastChar[0] = buf[buf.length - 1];
+  } else {
+    this.lastChar[0] = buf[buf.length - 2];
+    this.lastChar[1] = buf[buf.length - 1];
+  }
+  return buf.toString('base64', i, buf.length - n);
+}
+
+function base64End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
+  return r;
+}
+
+// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
+function simpleWrite(buf) {
+  return buf.toString(this.encoding);
+}
+
+function simpleEnd(buf) {
+  return buf && buf.length ? this.write(buf) : '';
+}
+},{"safe-buffer":307}],311:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -38596,7 +38540,7 @@ request.put = function(url, data, fn){
   return req;
 };
 
-},{"./is-object":311,"./request":313,"./request-base":312,"emitter":92,"reduce":305}],311:[function(require,module,exports){
+},{"./is-object":312,"./request":314,"./request-base":313,"emitter":92,"reduce":305}],312:[function(require,module,exports){
 /**
  * Check if `obj` is an object.
  *
@@ -38611,7 +38555,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],312:[function(require,module,exports){
+},{}],313:[function(require,module,exports){
 /**
  * Module of mixed-in functions shared between node and client code
  */
@@ -38779,7 +38723,7 @@ exports.field = function(name, val) {
   return this;
 };
 
-},{"./is-object":311}],313:[function(require,module,exports){
+},{"./is-object":312}],314:[function(require,module,exports){
 // The node and browser modules expose versions of this with the
 // appropriate constructor function bound as first argument
 /**
@@ -38813,7 +38757,7 @@ function request(RequestConstructor, method, url) {
 
 module.exports = request;
 
-},{}],314:[function(require,module,exports){
+},{}],315:[function(require,module,exports){
 (function (global){
 
 /**
@@ -38884,7 +38828,7 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],315:[function(require,module,exports){
+},{}],316:[function(require,module,exports){
 (function (global){
 
 var rng;
@@ -38920,7 +38864,7 @@ module.exports = rng;
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],316:[function(require,module,exports){
+},{}],317:[function(require,module,exports){
 //     uuid.js
 //
 //     Copyright (c) 2010-2012 Robert Kieffer
@@ -39105,7 +39049,7 @@ uuid.unparse = unparse;
 
 module.exports = uuid;
 
-},{"./rng":315}],317:[function(require,module,exports){
+},{"./rng":316}],318:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;

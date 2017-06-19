@@ -1,4 +1,7 @@
 /* node editor */
+.node-editor {
+  min-width: 480px;
+}
 .node-editor label {
   font-size: 13px;
 }
@@ -32,7 +35,6 @@
   height: 150px;
   position: relative;
   width: 100%;
-  max-width: 600px;
   /* graph node */
   /* graph edge */
 }
@@ -153,7 +155,6 @@
 /* node-tabel */
 .table {
   border: solid 1px #cccccc;
-  max-width: 600px;
   min-height: 60px;
 }
 .table button {
@@ -179,8 +180,7 @@
   font-size: 0.9em;
   margin-right: 10px;
   width: 100%;
-  min-width: 300px;
-  max-width: 600px;
+  min-width: 520px;
 }
 .table table tr {
   height: 30px;
