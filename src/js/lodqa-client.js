@@ -9,7 +9,7 @@ const answerListPresentation = require('./presentation/answerListPresentation')
 const sparqlPresentation = require('./presentation/sparqlPresentation')
 const LabelFinder = require('./label-finder')
 
-document.addEventListener('DOMContentLoaded', init)
+document.addEventListener('DOMContentLoaded', setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()

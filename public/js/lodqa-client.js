@@ -11254,7 +11254,7 @@ var answerListPresentation = require('./presentation/answerListPresentation');
 var sparqlPresentation = require('./presentation/sparqlPresentation');
 var LabelFinder = require('./label-finder');
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', setTimeout(init, 150));
 
 function init() {
   var loader = new Loader();
