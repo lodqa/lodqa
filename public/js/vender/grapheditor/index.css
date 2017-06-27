@@ -1,32 +1,46 @@
 /* node editor */
 .node-editor {
+  display: flex;
+  justify-content: space-between;
+  line-height: 2em;
   min-width: 480px;
 }
 .node-editor label {
   font-size: 13px;
 }
-.node-editor button {
+.node-editor .node-text {
   box-shadow: 0 0 15px 4px #42ffb2;
   -webkit-transition: box-shadow 0.3s ease-in;
   -moz-transition: box-shadow 0.3s ease-in;
   -o-transition: box-shadow 0.3s ease-in;
   transition: box-shadow 0.3s ease-in;
+}
+.node-editor .node-text:disabled {
+  box-shadow: none;
+}
+.node-editor button {
   background-color: #f9f9f9;
   border: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 0.25em;
   height: 20px;
   margin: 0;
-  padding: 0;
-  width: 26px;
+  min-width: 26px;
+  padding: 0 6px;
   font-size: 11px;
-}
-.node-editor button:disabled {
-  box-shadow: none;
 }
 .node-editor input {
   box-sizing: border-box;
   height: 20px;
   border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.icon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -16px;
 }
 /* graph */
 .jsPlumb-container {
@@ -69,10 +83,51 @@
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
+.jsPlumb-container .node .name {
+  display: inline;
+}
+.jsPlumb-container .node .editInput {
+  display: none;
+}
+.jsPlumb-container .node .editIcon {
+  display: none;
+}
+.jsPlumb-container .node .deleteIcon {
+  display: none;
+}
 .jsPlumb-container .node.selected {
   background-color: #df2020;
   border-color: #f00;
   color: white;
+}
+.jsPlumb-container .node.selected .editIcon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -16px;
+  right: 15px;
+}
+.jsPlumb-container .node.selected .deleteIcon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -16px;
+  right: -4px;
+}
+.jsPlumb-container .node.selected.editing {
+  max-width: initial;
+}
+.jsPlumb-container .node.selected.editing .name {
+  display: none;
+}
+.jsPlumb-container .node.selected.editing .editInput {
+  display: block;
 }
 .jsPlumb-container .nodeDragHover {
   border: 2px solid orange;
@@ -98,22 +153,10 @@
   background-color: #fcc3cd;
   border-color: #ffc0cb;
 }
-.jsPlumb-container .edgeLabel._jsPlumb_hover {
-  background-color: #fcc3cd;
-  border-color: #ffc0cb;
-}
 .jsPlumb-container .edgeLabel.selected {
   background-color: #df2020;
   border-color: #f00;
   color: white;
-}
-.jsPlumb-container ._jsPlumb_source_hover {
-  background-color: #fcc3cd;
-  border-color: #ffc0cb;
-}
-.jsPlumb-container ._jsPlumb_target_hover {
-  background-color: #fcc3cd;
-  border-color: #ffc0cb;
 }
 .jsPlumb-container .edgeLabel {
   background-color: white;
@@ -125,31 +168,24 @@
   opacity: 0.8;
   padding: 0.3em;
 }
-.jsPlumb-container ._jsPlumb_connector path {
+.jsPlumb-container .jtk-connector path {
   cursor: pointer;
 }
-.jsPlumb-container ._jsPlumb_connector.selected path:nth-child(2) {
+.jsPlumb-container .jtk-connector.selected path:nth-child(2) {
   stroke: #f00;
 }
-.jsPlumb-container ._jsPlumb_connector.selected path:nth-child(3) {
+.jsPlumb-container .jtk-connector.selected path:nth-child(3) {
   stroke: #f00;
   fill: #f00;
 }
-.jsPlumb-container ._jsPlumb_connector.hover path:nth-child(2) {
+.jsPlumb-container .jtk-connector.hover path:nth-child(2) {
   stroke: #ffc0cb;
 }
-.jsPlumb-container ._jsPlumb_connector.hover path:nth-child(3) {
-  stroke: #ffc0cb;
-  fill: #ffc0cb;
-}
-.jsPlumb-container ._jsPlumb_hover path:nth-child(2) {
-  stroke: #ffc0cb;
-}
-.jsPlumb-container ._jsPlumb_hover path:nth-child(3) {
+.jsPlumb-container .jtk-connector.hover path:nth-child(3) {
   stroke: #ffc0cb;
   fill: #ffc0cb;
 }
-.jsPlumb-container ._jsPlumb_endpoint {
+.jsPlumb-container .jtk-endpoint {
   cursor: pointer;
 }
 /* node-tabel */
@@ -163,8 +199,8 @@
   border-radius: 0.25em;
   height: 20px;
   margin: 0;
-  padding: 0;
-  width: 26px;
+  min-width: 26px;
+  padding: 0 6px;
   font-size: 11px;
 }
 .table input {
@@ -235,7 +271,7 @@
   text-decoration: line-through;
 }
 .table table td.terms input.term {
-  width: 80%;
+  width: calc(100% - 56px);
   box-sizing: border-box;
 }
 .table table td.terms .add [type="checkbox"] {

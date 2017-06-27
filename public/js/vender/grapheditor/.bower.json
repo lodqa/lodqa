@@ -1,16 +1,13 @@
 {
   "name": "grapheditor",
   "description": "graph editor",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>",
     "Shigeru Nakajima <shigeru.nakajima@luxiar.com>"
   ],
   "dependencies": {
-    "Element.closest": "closest#~1.0.3",
-    "font-awesome": "~4.3.0",
-    "js-polyfills": "~0.1.6",
-    "jsplumb": "1.7.8"
+    "font-awesome": "~4.3.0"
   },
   "homepage": "https://github.com/lodqa/grapheditor",
   "ignore": [
@@ -44,13 +41,13 @@
     "type": "git",
     "url": "git://github.com/lodqa/grapheditor.git"
   },
-  "_release": "0.6.0",
+  "_release": "0.6.2",
   "_resolution": {
     "type": "version",
-    "tag": "v0.6.0",
-    "commit": "f92e184616acb70f71562d21f6a5d29951114481"
+    "tag": "v0.6.2",
+    "commit": "46c86ac728fae58b3fbbe08dccbee0134888e50c"
   },
   "_source": "https://github.com/lodqa/grapheditor.git",
-  "_target": "^0.6.0",
+  "_target": "^0.6.2",
   "_originalSource": "grapheditor"
 }
