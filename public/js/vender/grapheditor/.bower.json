@@ -1,7 +1,7 @@
 {
   "name": "grapheditor",
   "description": "graph editor",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>",
     "Shigeru Nakajima <shigeru.nakajima@luxiar.com>"
@@ -24,6 +24,7 @@
     "index.html",
     "demo.js",
     "package.json",
+    "package-lock.json",
     "README.md",
     "gulpfile.js",
     "gulpfile.es6"
@@ -41,13 +42,13 @@
     "type": "git",
     "url": "git://github.com/lodqa/grapheditor.git"
   },
-  "_release": "0.6.2",
+  "_release": "0.7.0",
   "_resolution": {
     "type": "version",
-    "tag": "v0.6.2",
-    "commit": "46c86ac728fae58b3fbbe08dccbee0134888e50c"
+    "tag": "v0.7.0",
+    "commit": "2c8c6d460ffa948d0c58773036896107c12663c7"
   },
   "_source": "https://github.com/lodqa/grapheditor.git",
-  "_target": "^0.6.2",
+  "_target": "^0.7.0",
   "_originalSource": "grapheditor"
 }

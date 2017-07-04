@@ -24,6 +24,7 @@
     "index.html",
     "demo.js",
     "package.json",
+    "package-lock.json",
     "README.md",
     "gulpfile.js",
     "gulpfile.es6"

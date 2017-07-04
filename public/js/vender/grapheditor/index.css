@@ -1,22 +1,8 @@
 /* node editor */
 .node-editor {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   line-height: 2em;
-  min-width: 480px;
-}
-.node-editor label {
-  font-size: 13px;
-}
-.node-editor .node-text {
-  box-shadow: 0 0 15px 4px #42ffb2;
-  -webkit-transition: box-shadow 0.3s ease-in;
-  -moz-transition: box-shadow 0.3s ease-in;
-  -o-transition: box-shadow 0.3s ease-in;
-  transition: box-shadow 0.3s ease-in;
-}
-.node-editor .node-text:disabled {
-  box-shadow: none;
 }
 .node-editor button {
   background-color: #f9f9f9;
@@ -27,11 +13,6 @@
   min-width: 26px;
   padding: 0 6px;
   font-size: 11px;
-}
-.node-editor input {
-  box-sizing: border-box;
-  height: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
 }
 .icon {
   color: black;
@@ -221,12 +202,12 @@
 .table table tr {
   height: 30px;
 }
+.table table tr.hover td {
+  background-color: #ffc0cb;
+}
 .table table tr.selected td {
   color: white;
   background-color: #df2020;
-}
-.table table tr.hover td {
-  background-color: #ffc0cb;
 }
 .table table th {
   border: 1px solid #b9b9b9;
