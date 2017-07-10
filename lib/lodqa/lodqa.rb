@@ -17,7 +17,14 @@ class Lodqa::Lodqa
     @graph_uri = graph_uri
     @options = options || {}
     @debug = @options[:debug] || false
-    @endpoint = SPARQL::Client.new(ep_url, @options[:endpoint_options] || {})
+
+    # Set default HTTP method to GET.
+    # Default HTTP method of SparqlClient is POST.
+    # But POST method in HTTP 1.1 may occurs conection broken error.
+    # If HTTP method is GET, when HTTP connection error occurs, a request is retried by HTTP stack of Ruby standard library.
+    endpoint_options = @options[:endpoint_options] || {}
+    endpoint_options[:method] ||= :get
+    @endpoint = SPARQL::Client.new(ep_url, endpoint_options)
 
     simple_sparql = "select ?s where {?s ?p ?o} limit 1"
     begin
