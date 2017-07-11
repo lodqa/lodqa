@@ -21,7 +21,11 @@
   padding: 0 5px;
   position: absolute;
   text-align: center;
-  top: -16px;
+  top: -18px;
+}
+.icon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
 }
 /* graph */
 .jsPlumb-container {
@@ -36,6 +40,15 @@
 .jsPlumb-container .placeholder {
   color: #aaa;
 }
+.jsPlumb-container .focusIcon {
+  display: none;
+}
+.jsPlumb-container .editIcon {
+  display: none;
+}
+.jsPlumb-container .deleteIcon {
+  display: none;
+}
 .jsPlumb-container .node {
   border: 1px solid #2e6f9a;
   border-radius: 8px;
@@ -46,6 +59,7 @@
   opacity: 0.8;
   padding: 16px;
   position: absolute;
+  min-width: 6em;
   max-width: 10em;
   -webkit-transition: background-color 0.25s ease-in;
   -moz-transition: background-color 0.25s ease-in;
@@ -70,16 +84,48 @@
 .jsPlumb-container .node .editInput {
   display: none;
 }
-.jsPlumb-container .node .editIcon {
-  display: none;
+.jsPlumb-container .node .focusIcon {
+  left: -3px;
 }
-.jsPlumb-container .node .deleteIcon {
-  display: none;
+.jsPlumb-container .node.focus .focusIcon {
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -18px;
+  color: black;
+  cursor: default;
+}
+.jsPlumb-container .node.focus .focusIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+.jsPlumb-container .node.focus .focusIcon:hover {
+  background-color: transparent;
+  border-radius: 0;
 }
 .jsPlumb-container .node.selected {
   background-color: #df2020;
   border-color: #f00;
   color: white;
+}
+.jsPlumb-container .node.selected .focusIcon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -18px;
+  color: gray;
+}
+.jsPlumb-container .node.selected .focusIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+.jsPlumb-container .node.selected.focus .focusIcon {
+  color: black;
 }
 .jsPlumb-container .node.selected .editIcon {
   color: black;
@@ -88,8 +134,12 @@
   padding: 0 5px;
   position: absolute;
   text-align: center;
-  top: -16px;
+  top: -18px;
   right: 15px;
+}
+.jsPlumb-container .node.selected .editIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
 }
 .jsPlumb-container .node.selected .deleteIcon {
   color: black;
@@ -98,8 +148,12 @@
   padding: 0 5px;
   position: absolute;
   text-align: center;
-  top: -16px;
+  top: -18px;
   right: -4px;
+}
+.jsPlumb-container .node.selected .deleteIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
 }
 .jsPlumb-container .node.selected.editing {
   max-width: initial;
@@ -109,6 +163,9 @@
 }
 .jsPlumb-container .node.selected.editing .editInput {
   display: block;
+}
+.jsPlumb-container .node.selected.editing .editIcon {
+  display: none;
 }
 .jsPlumb-container .nodeDragHover {
   border: 2px solid orange;
@@ -130,34 +187,75 @@
 .jsPlumb-container .sourcePoint:hover {
   box-shadow: 0 0 6px black;
 }
-.jsPlumb-container .edgeLabel.hover {
-  background-color: #fcc3cd;
-  border-color: #ffc0cb;
-}
-.jsPlumb-container .edgeLabel.selected {
-  background-color: #df2020;
-  border-color: #f00;
-  color: white;
-}
 .jsPlumb-container .edgeLabel {
+  font-size: 11px;
+}
+.jsPlumb-container .edgeLabel .name {
   background-color: white;
   border: 1px solid #346789;
   border-color: orange;
   border-radius: 0.5em;
   cursor: pointer;
-  font-size: 11px;
   opacity: 0.8;
   padding: 0.3em;
 }
+.jsPlumb-container .edgeLabel.no-text .name {
+  display: none;
+}
+.jsPlumb-container .edgeLabel.hover .name {
+  background-color: #fcc3cd;
+  border-color: #ffc0cb;
+}
+.jsPlumb-container .edgeLabel.selected .name {
+  background-color: #df2020;
+  border-color: #f00;
+  color: white;
+}
+.jsPlumb-container .edgeLabel.selected .editIcon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -18px;
+  right: 15px;
+}
+.jsPlumb-container .edgeLabel.selected .editIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+.jsPlumb-container .edgeLabel.selected .deleteIcon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -18px;
+  right: -4px;
+}
+.jsPlumb-container .edgeLabel.selected .deleteIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
+.jsPlumb-container .edgeEdit .deleteIcon {
+  color: black;
+  cursor: pointer;
+  display: block;
+  padding: 0 5px;
+  position: absolute;
+  text-align: center;
+  top: -18px;
+  font-size: 11px;
+  right: -4px;
+}
+.jsPlumb-container .edgeEdit .deleteIcon:hover {
+  background-color: lightgrey;
+  border-radius: 2px;
+}
 .jsPlumb-container .jtk-connector path {
   cursor: pointer;
-}
-.jsPlumb-container .jtk-connector.selected path:nth-child(2) {
-  stroke: #f00;
-}
-.jsPlumb-container .jtk-connector.selected path:nth-child(3) {
-  stroke: #f00;
-  fill: #f00;
 }
 .jsPlumb-container .jtk-connector.hover path:nth-child(2) {
   stroke: #ffc0cb;
@@ -165,6 +263,13 @@
 .jsPlumb-container .jtk-connector.hover path:nth-child(3) {
   stroke: #ffc0cb;
   fill: #ffc0cb;
+}
+.jsPlumb-container .jtk-connector.selected path:nth-child(2) {
+  stroke: #f00;
+}
+.jsPlumb-container .jtk-connector.selected path:nth-child(3) {
+  stroke: #f00;
+  fill: #f00;
 }
 .jsPlumb-container .jtk-endpoint {
   cursor: pointer;

@@ -81,7 +81,7 @@ function addPgp(stream, pgp) {
   }
 }
 
-},{"./lib/createHtmlElement":2,"./lib/stream/actionStream":15,"./lib/stream/const":21,"./lib/stream/modelStream":33,"./lib/stream/renderStream":42}],2:[function(require,module,exports){
+},{"./lib/createHtmlElement":2,"./lib/stream/actionStream":14,"./lib/stream/const":20,"./lib/stream/modelStream":32,"./lib/stream/renderStream":41}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -421,7 +421,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"clone":82}],8:[function(require,module,exports){
+},{"clone":81}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -449,7 +449,7 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 module.exports = exports['default'];
 
-},{"../const":21,"action-stream":72}],9:[function(require,module,exports){
+},{"../const":20,"action-stream":71}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -482,10 +482,16 @@ exports.default = class extends _actionStream.ActionReadable {
 
     component.instance.bind('connection', info => {
       try {
+        // Send an action with text of the connection.
+        // Because connections are created by the jsPlumb and then are added to the model.
+        // It is why?
+        // The jsPlumb provide a function to create a connection by drag and drop.
+        // But it does not provide fook point or event of drag and drop.
+        // We cannot distinguish an connection event by drag and drop and from another by api.
         push(Object.assign({
           target: _const.target.MODEL_EDGE,
           type: _const.actionType.CREATE
-        }, component.toEdgeValue(info.connection)));
+        }, component.toEdgeValue(info.connection, true)));
       } catch (e) {
         console.error(e, e.stack);
       }
@@ -526,6 +532,9 @@ exports.default = class extends _actionStream.ActionReadable {
       }
     });
 
+    // An connection event for the new edge is fired together with this event .
+    // The new edge is created responding to that event.
+    // Responsibility of this event is only deletion of the old edge.
     component.instance.bind('connectionMoved', info => {
       try {
         push({
@@ -539,12 +548,31 @@ exports.default = class extends _actionStream.ActionReadable {
       }
     });
 
+    container.on('click', '.edgeLabel .editIcon', () => {
+      push({
+        target: _const.target.MODEL,
+        type: _const.actionType.START_EDIT
+      });
+    });
+
+    // Delete the selected edge when the delete icon is clicked.
+    container.on('click', '.edgeLabel .deleteIcon', () => deleteEdge(push));
+    container.on('click', '.edgeEdit .deleteIcon', () => deleteEdge(push));
+
     // Text in the input element in order to edit was changed.
-    container.on('input', '.edgeLabel input', e => {
+    container.on('input', '.edgeEdit input', e => {
       push({
         target: _const.target.MODEL_EDGE,
         type: _const.actionType.UPDATE_TEXT,
         text: e.target.value
+      });
+    });
+
+    // the input element to edit lost focus
+    container.on('blur', '.edgeEdit input', () => {
+      push({
+        target: _const.target.MODEL,
+        type: _const.actionType.END_EDIT
       });
     });
 
@@ -559,43 +587,19 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 
 
+function deleteEdge(push) {
+  push({
+    target: _const.target.MODEL,
+    type: _const.actionType.DELETE
+  });
+}
+
 function toEdgeValueFromEndpoint(component, endpoint) {
   return component.toEdgeValue(endpoint.connections[0]);
 }
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":52,"../const":21,"action-stream":72,"dom-delegate":87}],10:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _actionStream = require('action-stream');
-
-var _const = require('../const');
-
-// Unselect nodes when elements outside the graph get focus.
-// Prevent deletion of node responding to key event on input elements outside the graph.
-exports.default = class extends _actionStream.ActionReadable {
-  constructor() {
-    super();
-    this.name = 'FocusActionStream';
-  }
-  _bindComponent(selector, push) {
-    document.body.addEventListener('focus', e => {
-      if (!e.target.closest('.jsPlumb-container')) {
-        push({
-          target: _const.target.MODEL,
-          type: _const.actionType.UNSELECT
-        });
-      }
-    }, true);
-  }
-};
-module.exports = exports['default'];
-
-},{"../const":21,"action-stream":72}],11:[function(require,module,exports){
+},{"../../view/graphComponent":51,"../const":20,"action-stream":71,"dom-delegate":86}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -635,7 +639,7 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":52,"../const":21,"action-stream":72}],12:[function(require,module,exports){
+},{"../../view/graphComponent":51,"../const":20,"action-stream":71}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -654,7 +658,15 @@ exports.default = class extends _actionStream.ActionReadable {
   }
   _bindComponent(selector, push) {
     document.addEventListener('keyup', e => {
+      // Ignore events on input elements, for example an input element in an editing node.
+      if (e.target.type === 'text') {
+        return;
+      }
+
       switch (e.key) {
+        case 'Backspace':
+          deleteSelected(push);
+          break;
         case 'Escape':
           push({
             target: _const.target.MODEL,
@@ -662,19 +674,25 @@ exports.default = class extends _actionStream.ActionReadable {
           });
           break;
         case 'Delete':
-          push({
-            target: _const.target.MODEL,
-            type: _const.actionType.DELETE
-          });
+          deleteSelected(push);
           break;
         default:
+          console.log(e.key);
       }
     });
   }
 };
+
+
+function deleteSelected(push) {
+  push({
+    target: _const.target.MODEL,
+    type: _const.actionType.DELETE
+  });
+}
 module.exports = exports['default'];
 
-},{"../const":21,"action-stream":72}],13:[function(require,module,exports){
+},{"../const":20,"action-stream":71}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -707,7 +725,7 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 module.exports = exports['default'];
 
-},{"../../view/forceDirectedLayoutComponent":48,"../const":21,"action-stream":72}],14:[function(require,module,exports){
+},{"../../view/forceDirectedLayoutComponent":47,"../const":20,"action-stream":71}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -746,25 +764,25 @@ exports.default = class extends _actionStream.ActionReadable {
         return;
       }
 
-      // click node
-      // Input elements is not blurred when node is clicked because jsPlumb stop mousedown events of nodes.
-      // Instead active element will be force blurred at click event.
-      document.activeElement.blur();
-
       selectNode(e.target, push);
     });
 
+    // push down focus icon
+    container.on('click', '.node .focusIcon', () => getFocus(push));
+
     // push down edit icon
-    container.on('click', '.editIcon', e => startEdit(e.target, push));
+    container.on('click', '.node .editIcon', () => startEdit(push));
 
     // push down delete icon
-    container.on('click', '.deleteIcon', e => deleteNode(e.target, push));
+    container.on('click', '.node .deleteIcon', () => deleteNode(push));
 
     container.on('mouseover', '.node', e => hoverNode(e.target, push));
 
     container.on('mouseout', '.node', e => unhoverNode(e.target, push));
 
-    container.on('input', '.editInput', e => updateText(e.target, push));
+    container.on('input', '.node .editInput', e => updateText(e.target, push));
+
+    container.on('blur', '.editInput', e => endEdit(e.target, push));
 
     component.emitter.on('dragging', e => push(Object.assign({
       target: _const.target.LAYOUT_NODE,
@@ -797,20 +815,34 @@ function selectNode(el, push) {
   });
 }
 
-function startEdit(el, push) {
+function getFocus(push) {
+  push({
+    target: _const.target.MODEL,
+    type: _const.actionType.FOCUS
+  });
+  // Stop event propergation to prevent to start editing node.
+  return false;
+}
+
+function startEdit(push) {
   // Push an action to the model to get current texte value.
   push({
-    target: _const.target.MODEL_NODE,
-    type: _const.actionType.START_EDIT,
-    id: getNodeEvenWhenClickChildren(el).id
+    target: _const.target.MODEL,
+    type: _const.actionType.START_EDIT
   });
 }
 
-function deleteNode(el, push) {
+function endEdit(el, push) {
   push({
-    target: _const.target.MODEL_NODE,
-    type: _const.actionType.DELETE,
-    id: getNodeEvenWhenClickChildren(el).id
+    target: _const.target.MODEL,
+    type: _const.actionType.END_EDIT
+  });
+}
+
+function deleteNode(push) {
+  push({
+    target: _const.target.MODEL,
+    type: _const.actionType.DELETE
   });
 }
 
@@ -848,7 +880,7 @@ function getNodeEvenWhenClickChildren(el) {
 }
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":52,"../const":21,"action-stream":72,"dom-delegate":87}],15:[function(require,module,exports){
+},{"../../view/graphComponent":51,"../const":20,"action-stream":71,"dom-delegate":86}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -866,7 +898,6 @@ exports.default = function () {
   new _NodeTableActionStream2.default(_const.selector.NODE_TABLE).pipe(funnel);
   new _EdgeTableActionStream2.default(_const.selector.EDGE_TABLE).pipe(funnel);
   new _KeyboardActionStream2.default().pipe(funnel);
-  new _FocusActionStream2.default().pipe(funnel);
 
   return funnel;
 };
@@ -907,15 +938,11 @@ var _KeyboardActionStream = require('./KeyboardActionStream');
 
 var _KeyboardActionStream2 = _interopRequireDefault(_KeyboardActionStream);
 
-var _FocusActionStream = require('./FocusActionStream');
-
-var _FocusActionStream2 = _interopRequireDefault(_FocusActionStream);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = exports['default'];
 
-},{"../const":21,"./AddEmptyNodeActionStream":8,"./EdgeActionStream":9,"./FocusActionStream":10,"./GraphActionStream":11,"./KeyboardActionStream":12,"./LayoutActionStream":13,"./NodeActionStream":14,"./table/EdgeTableActionStream":16,"./table/NodeTableActionStream":17,"action-stream":72}],16:[function(require,module,exports){
+},{"../const":20,"./AddEmptyNodeActionStream":8,"./EdgeActionStream":9,"./GraphActionStream":10,"./KeyboardActionStream":11,"./LayoutActionStream":12,"./NodeActionStream":13,"./table/EdgeTableActionStream":15,"./table/NodeTableActionStream":16,"action-stream":71}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1019,7 +1046,7 @@ function getAciton(component, event, target, type) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/table/edgeTableComponent":61,"../../const":21,"./Term":18,"action-stream":72,"debounce":85,"dom-delegate":87}],17:[function(require,module,exports){
+},{"../../../view/table/edgeTableComponent":60,"../../const":20,"./Term":17,"action-stream":71,"debounce":84,"dom-delegate":86}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1128,7 +1155,7 @@ function pushTextId(event, component, type, push) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/table/nodeTableComponent":65,"../../const":21,"./Term":18,"action-stream":72,"debounce":85,"dom-delegate":87}],18:[function(require,module,exports){
+},{"../../../view/table/nodeTableComponent":64,"../../const":20,"./Term":17,"action-stream":71,"debounce":84,"dom-delegate":86}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1219,7 +1246,7 @@ function pushTermId(event, component, target, type, push) {
 }
 module.exports = exports['default'];
 
-},{"../../const":21,"./getButton":19,"./pushUpdateTerm":20}],19:[function(require,module,exports){
+},{"../../const":20,"./getButton":18,"./pushUpdateTerm":19}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1236,7 +1263,7 @@ exports.default = function (element) {
 
 module.exports = exports['default'];
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1256,13 +1283,14 @@ var _const = require('../../const');
 
 module.exports = exports['default'];
 
-},{"../../const":21}],21:[function(require,module,exports){
+},{"../../const":20}],20:[function(require,module,exports){
 module.exports={
   "actionType": {
     "AFTER_CREATE": "afterCreate",
     "DELETE": "delete",
     "CREATE": "create",
     "DRAG": "drag",
+    "END_EDIT": "end-edit",
     "FIND_TERM": "find-term",
     "FOCUS": "focus",
     "HOVER": "hover",
@@ -1308,7 +1336,7 @@ module.exports={
   }
 }
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1358,7 +1386,7 @@ function deleteEdge(edges, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":21,"action-stream":72}],23:[function(require,module,exports){
+},{"../const":20,"action-stream":71}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1394,7 +1422,7 @@ function toNode(nodes, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":21,"action-stream":72}],24:[function(require,module,exports){
+},{"../const":20,"action-stream":71}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1436,12 +1464,6 @@ function createEdge(model, action, push) {
       target: _const.target.VIEW_EDGE,
       type: _const.actionType.DELETE
     });
-  } else if (action.sourceId === action.targetId) {
-    // Avoid loopback edges.
-    push({
-      target: _const.target.VIEW_EDGE,
-      type: _const.actionType.DELETE
-    });
   } else {
     model.add(action);
 
@@ -1476,7 +1498,7 @@ function deleteEdge(model, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":21,"./pushSnapshot":34,"./text":35,"action-stream":72}],25:[function(require,module,exports){
+},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":71}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1509,7 +1531,7 @@ function done(push, informations) {
 }
 module.exports = exports['default'];
 
-},{"../../../const":21,"./updateModels":26,"./updateState":27}],26:[function(require,module,exports){
+},{"../../../const":20,"./updateModels":25,"./updateState":26}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1538,7 +1560,7 @@ function updateModel(model, newValue, target) {
 }
 module.exports = exports['default'];
 
-},{"../../../const":21}],27:[function(require,module,exports){
+},{"../../../const":20}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1572,7 +1594,7 @@ function toAction(state) {
 }
 module.exports = exports['default'];
 
-},{"../../../const":21}],28:[function(require,module,exports){
+},{"../../../const":20}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1614,7 +1636,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../const":21,"./done":25,"./toInformation":30,"action-stream":72}],29:[function(require,module,exports){
+},{"../../const":20,"./done":24,"./toInformation":29,"action-stream":71}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1650,7 +1672,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"superagent":115}],30:[function(require,module,exports){
+},{"superagent":114}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1675,7 +1697,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"./findTerm":29}],31:[function(require,module,exports){
+},{"./findTerm":28}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1744,6 +1766,8 @@ function createNode(model, action, push) {
 
 function setFocus(model, action, push) {
   model.focus = action.id;
+
+  push(_const.target.VIEW_NODE);
   (0, _pushSnapshot2.default)(push, model, _const.target.VIEW_NODE);
 }
 
@@ -1786,7 +1810,7 @@ function getArms(nodeList, selectedNode, createEdge) {
 }
 module.exports = exports['default'];
 
-},{"../const":21,"./pushSnapshot":34,"./text":35,"action-stream":72}],32:[function(require,module,exports){
+},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":71}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1807,27 +1831,74 @@ exports.default = class extends _actionStream.ActionTransform {
 
     const clear = (action, push) => unselectAll(push);
 
-    this.bindActions(_const.target.MODEL_NODE, [
-    // Record an egde creation type.
-    [_const.actionType.CREATE, action => action.selectedNode = selectedNode], [_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectNode]]);
+    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectNode]]);
 
     this.bindActions(_const.target.MODEL_EDGE, [[_const.actionType.CREATE, clear], [_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectEdge], [_const.actionType.UPDATE_TEXT, appendSelectedEdge]]);
 
-    this.bindActions(_const.target.MODEL, [[_const.actionType.DELETE, deleteSelected], [_const.actionType.UNSELECT, clear]]);
+    this.bindActions(_const.target.MODEL, [[_const.actionType.DELETE, deleteSelected], [_const.actionType.FOCUS, focusSelectedNode], [_const.actionType.START_EDIT, startEditSelected], [_const.actionType.END_EDIT, endEditSelected], [_const.actionType.UNSELECT, clear]]);
   }
 };
 
 
-function deleteSelected(action, push) {
-  // Set id to the action if a node is selected
-  if (selectNode) {
-    action.target = _const.target.MODEL_NODE;
-    action.id = selectedNode;
+function focusSelectedNode(action, push) {
+  if (selectedNode) {
+    push({
+      target: _const.target.MODEL_NODE,
+      id: selectedNode
+    });
+  }
+}
+
+// Set id to the action if a node or an edge is selected
+function startEditSelected(action, push) {
+  if (selectedNode) {
+    push({
+      target: _const.target.MODEL_NODE,
+      id: selectedNode
+    });
   }
 
   if (selectedEdge) {
-    Object.assign(action, selectedEdge, {
-      target: _const.target.VIEW_EDGE
+    push({
+      target: _const.target.MODEL_EDGE,
+      sourceId: selectedEdge.sourceId,
+      targetId: selectedEdge.targetId
+    });
+  }
+}
+
+// Set id to the action if a node or an edge is selected
+function endEditSelected(action, push) {
+  if (selectedNode) {
+    push({
+      target: _const.target.VIEW_NODE,
+      id: selectedNode
+    });
+  }
+
+  if (selectedEdge) {
+    push({
+      target: _const.target.VIEW_EDGE,
+      sourceId: selectedEdge.sourceId,
+      targetId: selectedEdge.targetId
+    });
+  }
+}
+
+function deleteSelected(action, push) {
+  // Set id to the action if a node is selected
+  if (selectedNode) {
+    push({
+      target: _const.target.MODEL_NODE,
+      id: selectedNode
+    });
+  }
+
+  if (selectedEdge) {
+    push({
+      target: _const.target.VIEW_EDGE,
+      sourceId: selectedEdge.sourceId,
+      targetId: selectedEdge.targetId
     });
   }
 
@@ -1869,11 +1940,15 @@ function selectEdge(action, push) {
 
 // Append id of selected edge to the action.
 // Because the dom of edge on the graph dose not have id for model of that edge.
-function appendSelectedEdge(action) {
-  // Nothing is overwrite unless selected edge.
-  // No edge is selected when text of edge is changed on the edge table.
-  // Because any edge in the graph is unselected when input element outside the graph is selected.
-  Object.assign(action, selectedEdge);
+function appendSelectedEdge(action, push) {
+  // Nothing is overwrite unless action has id of edge.
+  // Because that aciton is pushed form edge table.
+  if (!action.sourceId && !action.targetId) {
+    push({
+      sourceId: selectedEdge.sourceId,
+      targetId: selectedEdge.targetId
+    });
+  }
 }
 
 function unselectAll(push) {
@@ -1900,7 +1975,7 @@ function unselect(push, target) {
 }
 module.exports = exports['default'];
 
-},{"../const":21,"action-stream":72}],33:[function(require,module,exports){
+},{"../const":20,"action-stream":71}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1956,7 +2031,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../../model/Edge":3,"../../model/Node":5,"./DataModelAssociatedEdgeStream":22,"./DataModelAssociatedNodeStream":23,"./DataModelEdgeStream":24,"./DataModelFindTermStream":28,"./DataModelNodeStream":31,"./SelectionModelStream":32,"duplexer":88}],34:[function(require,module,exports){
+},{"../../model/Edge":3,"../../model/Node":5,"./DataModelAssociatedEdgeStream":21,"./DataModelAssociatedNodeStream":22,"./DataModelEdgeStream":23,"./DataModelFindTermStream":27,"./DataModelNodeStream":30,"./SelectionModelStream":31,"duplexer":87}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1975,7 +2050,7 @@ var _const = require('../const');
 
 module.exports = exports['default'];
 
-},{"../const":21}],35:[function(require,module,exports){
+},{"../const":20}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2016,7 +2091,7 @@ function updateTerm(model, action, push, target) {
   }
 }
 
-},{"./pushSnapshot":34}],36:[function(require,module,exports){
+},{"./pushSnapshot":33}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2045,7 +2120,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../view/mappingsComponent":58,"../const":21,"action-stream":72}],37:[function(require,module,exports){
+},{"../../view/mappingsComponent":57,"../const":20,"action-stream":71}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2073,7 +2148,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../view/pgpComponent":60,"../const":21,"action-stream":72}],38:[function(require,module,exports){
+},{"../../view/pgpComponent":59,"../const":20,"action-stream":71}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2095,12 +2170,12 @@ exports.default = class extends _actionStream.ActionTransform {
     super();
     const component = (0, _graphComponent2.default)(selector);
 
-    this.bindActions(_const.target.VIEW_EDGE, [[_const.actionType.AFTER_CREATE, action => component.afterCreateEdge(action)], [_const.actionType.CREATE, action => component.createEdge(action)], [_const.actionType.SELECT, action => component.selectEdge(action)], [_const.actionType.DELETE, action => component.deleteEdge(action)], [_const.actionType.UNSELECT, () => component.unselectEdge()], [_const.actionType.HOVER, action => component.hoverEdge(action)], [_const.actionType.START_EDIT, action => component.startEditEdge(action)], [_const.actionType.UNHOVER, () => component.unhoverEdge()], [_const.actionType.UPDATE_TEXT, action => component.updateEdge(action)]]);
+    this.bindActions(_const.target.VIEW_EDGE, [[_const.actionType.AFTER_CREATE, action => component.afterCreateEdge(action)], [_const.actionType.CREATE, action => component.createEdge(action)], [_const.actionType.SELECT, action => component.selectEdge(action)], [_const.actionType.DELETE, action => component.deleteEdge(action)], [_const.actionType.UNSELECT, () => component.unselectEdge()], [_const.actionType.HOVER, action => component.hoverEdge(action)], [_const.actionType.START_EDIT, action => component.startEditEdge(action)], [_const.actionType.END_EDIT, action => component.endEditEdge(action)], [_const.actionType.UNHOVER, () => component.unhoverEdge()], [_const.actionType.UPDATE_TEXT, action => component.updateEdge(action)]]);
   }
 };
 module.exports = exports['default'];
 
-},{"../../../view/graphComponent":52,"../../const":21,"action-stream":72}],39:[function(require,module,exports){
+},{"../../../view/graphComponent":51,"../../const":20,"action-stream":71}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2131,7 +2206,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/forceDirectedLayoutComponent":48,"../../const":21,"action-stream":72}],40:[function(require,module,exports){
+},{"../../../view/forceDirectedLayoutComponent":47,"../../const":20,"action-stream":71}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2154,12 +2229,12 @@ exports.default = class extends _actionStream.ActionTransform {
 
     const component = (0, _graphComponent2.default)(selector);
 
-    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.CREATE, action => component.createNode(action.id, action.text)], [_const.actionType.UPDATE_TEXT, action => component.updateNode(action.id, action.text)], [_const.actionType.DELETE, action => component.deleteNode(action.id)], [_const.actionType.MOVE, action => component.moveNode(action.id, action.x, action.y)], [_const.actionType.SELECT, action => component.selectNode(action.id)], [_const.actionType.START_EDIT, action => component.startEditNode(action.id, action.text)], [_const.actionType.UNSELECT, () => component.unselectNode()], [_const.actionType.HOVER, action => component.hoverNode(action.id)], [_const.actionType.UNHOVER, () => component.unhoverNode()]]);
+    this.bindActions(_const.target.VIEW_NODE, [[_const.actionType.CREATE, action => component.createNode(action.id, action.text)], [_const.actionType.END_EDIT, action => component.endEditNode(action.id)], [_const.actionType.UPDATE_TEXT, action => component.updateNode(action.id, action.text)], [_const.actionType.DELETE, action => component.deleteNode(action.id)], [_const.actionType.FOCUS, action => component.focusNode(action.id)], [_const.actionType.MOVE, action => component.moveNode(action.id, action.x, action.y)], [_const.actionType.SELECT, action => component.selectNode(action.id)], [_const.actionType.START_EDIT, action => component.startEditNode(action.id, action.text)], [_const.actionType.UNSELECT, () => component.unselectNode()], [_const.actionType.HOVER, action => component.hoverNode(action.id)], [_const.actionType.UNHOVER, () => component.unhoverNode()]]);
   }
 };
 module.exports = exports['default'];
 
-},{"../../../view/graphComponent":52,"../../const":21,"action-stream":72}],41:[function(require,module,exports){
+},{"../../../view/graphComponent":51,"../../const":20,"action-stream":71}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2187,7 +2262,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{"./EdgeRenderStream":38,"./LayoutStream":39,"./NodeRenderStream":40}],42:[function(require,module,exports){
+},{"./EdgeRenderStream":37,"./LayoutStream":38,"./NodeRenderStream":39}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2223,7 +2298,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../const":21,"./MappingsRenderStream":36,"./PgpRenderStream":37,"./graph":41,"./table":47,"action-stream":72}],43:[function(require,module,exports){
+},{"../const":20,"./MappingsRenderStream":35,"./PgpRenderStream":36,"./graph":40,"./table":46,"action-stream":71}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2252,7 +2327,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/table/edgeTableComponent":61,"../../const":21,"action-stream":72}],44:[function(require,module,exports){
+},{"../../../view/table/edgeTableComponent":60,"../../const":20,"action-stream":71}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2299,7 +2374,7 @@ function show(component, action) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/messageComponent":59,"../../const":21,"action-stream":72}],45:[function(require,module,exports){
+},{"../../../view/messageComponent":58,"../../const":20,"action-stream":71}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2328,7 +2403,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/table/nodeTableComponent":65,"../../const":21,"action-stream":72}],46:[function(require,module,exports){
+},{"../../../view/table/nodeTableComponent":64,"../../const":20,"action-stream":71}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2355,7 +2430,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/table/placeholderComponent":68,"../../const":21,"action-stream":72}],47:[function(require,module,exports){
+},{"../../../view/table/placeholderComponent":67,"../../const":20,"action-stream":71}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2388,7 +2463,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{"./EdgeTableRenderStream":43,"./MessageRenderStream":44,"./NodeTableRenderStream":45,"./PlaceholderRenderStream":46}],48:[function(require,module,exports){
+},{"./EdgeTableRenderStream":42,"./MessageRenderStream":43,"./NodeTableRenderStream":44,"./PlaceholderRenderStream":45}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2469,7 +2544,7 @@ function drawNode(node, p) {
 }
 module.exports = exports['default'];
 
-},{"springy":111}],49:[function(require,module,exports){
+},{"springy":110}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2521,7 +2596,7 @@ function fromScreen(container, id, left, top) {
 }
 module.exports = exports['default'];
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2533,6 +2608,7 @@ exports.default = function (container, instance, id, name, callbacks) {
   <div id="${id}" class="node">
       <span class="name">${name}</span>
       <div class="sourcePoint"></div>
+      <div class="focusIcon"><i class="fa fa-bullseye" aria-hidden="true"></i></div>
       <div class="editIcon"><i class="fa fa-pencil"></i></div>
       <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
       <input class="editInput"></input>
@@ -2561,13 +2637,13 @@ exports.default = function (container, instance, id, name, callbacks) {
 
 module.exports = exports['default'];
 
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.toEdgeValue = exports.unhover = exports.hover = exports.unselect = exports.startEdit = exports.select = exports.remove = exports.update = exports.create = exports.afterCreate = undefined;
+exports.toEdgeValue = exports.unhover = exports.hover = exports.unselect = exports.endEdit = exports.startEdit = exports.select = exports.remove = exports.update = exports.create = exports.afterCreate = undefined;
 
 var _jsplumb = require('jsplumb');
 
@@ -2587,22 +2663,15 @@ exports.update = update;
 exports.remove = remove;
 exports.select = select;
 exports.startEdit = startEdit;
+exports.endEdit = endEdit;
 exports.unselect = unselect;
 exports.hover = hover;
 exports.unhover = unhover;
 exports.toEdgeValue = toEdgeValue;
 
-// Bind hover event handlers a new edge that created by jsPlumb
-// when user drag and drop end point on the graph.
+// Create a new edge by programrable API.
 
-function afterCreate(instance, sourceId, targetId, mouseover, mouseout) {
-  const connection = toConnection(instance, sourceId, targetId);
-
-  connection.bind('mouseover', mouseover);
-  connection.bind('mouseout', mouseout);
-}
-
-function create(instance, sourceId, targetId, label = '', mouseover, mouseout) {
+function create(instance, sourceId, targetId, label = '') {
   // Check presence of nodes before call a jsPlumb api, for logging detail information.
   // This check is done in jsPlumb, too.
   const source = instance.getElement(sourceId);
@@ -2617,8 +2686,27 @@ function create(instance, sourceId, targetId, label = '', mouseover, mouseout) {
     type: 'basic',
     overlays: [toLabelParam(label)]
   };
-  const connection = instance.connect(connParams);
 
+  instance.connect(connParams);
+}
+
+// This function are called after edges are created in the view and the model.
+// For example, when a edge created by programable API,
+// the edge is added to the view by the create function and added to the model and then this function is called.
+// Othewise, when user drag and drop to create a new edge,
+// the edge is added to the model by a jsPlumb's 'connection' event and then this function is called.
+function afterCreate(instance, sourceId, targetId, mouseover, mouseout) {
+  const connection = toConnection(instance, sourceId, targetId);
+
+  // Add the label overlay unless it
+  // Because a new edge that created by  user drag and drop end point in the graph has no label overlay.
+  const labelOverlay = connection.getOverlay('label');
+
+  if (!labelOverlay) {
+    connection.addOverlay(toLabelParam(''));
+  }
+
+  // Bind hover events handlers a new edge.
   connection.bind('mouseover', mouseover);
   connection.bind('mouseout', mouseout);
 }
@@ -2634,9 +2722,9 @@ function update(instance, sourceId, targetId, label) {
 
   if (label) {
     getNameSpan(labelOverlay).innerHTML = label;
-    getEdgeLabel(labelOverlay).classList.remove('hidden');
+    getEdgeLabel(labelOverlay).classList.remove('no-text');
   } else {
-    getEdgeLabel(labelOverlay).classList.add('hidden');
+    getEdgeLabel(labelOverlay).classList.add('no-text');
   }
 }
 
@@ -2652,32 +2740,33 @@ function select(container, instance, sourceId, targetId) {
   addClass(connection, 'selected');
 }
 
+function unselect(container, instance) {
+  instance.getAllConnections().filter(connection => connection.getOverlay('edit')).forEach(swithOverlayToLabel);
+
+  (0, _unselectElement2.default)(container, '.jtk-connector');
+  (0, _unselectElement2.default)(container, '.edgeLabel');
+}
+
 function startEdit(container, instance, sourceId, targetId, label = '') {
   const connection = toConnection(instance, sourceId, targetId);
 
   let editOverlay = connection.getOverlay('edit');
 
-  if (editOverlay) {
-    // Edit started already.
-    return;
+  // Create a overlay for  editing if it does not exists
+  if (!editOverlay) {
+    editOverlay = connection.addOverlay(toEditParam(label));
   }
 
-  editOverlay = connection.addOverlay(toEditParam(label));
+  // This method is called when the edge is clicked even if during editing.
+  // At that time the input element lose focus once.
   editOverlay.canvas.querySelector('input').focus();
   connection.removeOverlay('label');
 }
 
-function unselect(container, instance) {
-  instance.getAllConnections().filter(connection => connection.getOverlay('edit')).forEach(connection => {
-    const editOverlay = connection.getOverlay('edit');
-    const label = editOverlay.canvas.querySelector('input').value;
+function endEdit(instance, sourceId, targetId) {
+  const connection = toConnection(instance, sourceId, targetId);
 
-    connection.addOverlay(toLabelParam(label));
-    connection.removeOverlay('edit');
-  });
-
-  (0, _unselectElement2.default)(container, '.jtk-connector');
-  (0, _unselectElement2.default)(container, '.edgeLabel');
+  swithOverlayToLabel(connection);
 }
 
 function hover(instance, sourceId, targetId) {
@@ -2696,7 +2785,7 @@ function unhover(container) {
   (0, _unhoverElement2.default)(container, '.edgeLabel');
 }
 
-function toEdgeValue(connection) {
+function toEdgeValue(connection, withText = false) {
   let realConnection = connection;
 
   // When an event is occurs on the label.
@@ -2706,20 +2795,16 @@ function toEdgeValue(connection) {
 
   console.assert(realConnection instanceof _jsplumb.jsPlumb.Connection, 'This is not conneciton: ', realConnection);
 
-  const labelOverlay = realConnection.getOverlay('label');
-
-  if (labelOverlay) {
-    return {
-      sourceId: realConnection.sourceId,
-      targetId: realConnection.targetId,
-      text: getNameSpan(labelOverlay).innerHTML
-    };
-  }
-
-  return {
+  const value = {
     sourceId: realConnection.sourceId,
     targetId: realConnection.targetId
   };
+
+  if (withText) {
+    value.text = getTextFromConnection(realConnection);
+  }
+
+  return value;
 }
 
 // private
@@ -2752,15 +2837,18 @@ function addClassToLabel(connection, className) {
 
 function toLabelParam(label) {
   return toParam('label', `
-    <div class="edgeLabel ${label ? '' : 'hidden'}">
-      <span class="name">${label}</span>
+    <div class="edgeLabel ${label ? '' : 'no-text'}">
+      <div class="name">${label}</div>
+      <div class="editIcon"><i class="fa fa-pencil"></i></div>
+      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
     </div>`);
 }
 
 function toEditParam(label) {
   return toParam('edit', `
-    <div class="edgeLabel">
+    <div class="edgeEdit">
       <input value="${label}"></input>
+      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
     </div>`);
 }
 
@@ -2784,7 +2872,25 @@ function getNameSpan(labelOverlay) {
   return labelOverlay.canvas.querySelector('.name');
 }
 
-},{"./unhoverElement":56,"./unselectElement":57,"jsplumb":94}],52:[function(require,module,exports){
+function getTextFromConnection(connection) {
+  const labelOverlay = connection.getOverlay('label');
+
+  if (labelOverlay) {
+    return getNameSpan(labelOverlay).innerHTML;
+  }
+
+  return '';
+}
+
+function swithOverlayToLabel(connection) {
+  const editOverlay = connection.getOverlay('edit');
+  const label = editOverlay.canvas.querySelector('input').value;
+
+  connection.addOverlay(toLabelParam(label));
+  connection.removeOverlay('edit');
+}
+
+},{"./unhoverElement":55,"./unselectElement":56,"jsplumb":93}],51:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2808,18 +2914,21 @@ exports.default = function (selector) {
     createNode: (id, name) => nodeApi.create(container, instance, id, name, callbacks),
     updateNode: (id, name) => nodeApi.update(container, instance, id, name),
     deleteNode: id => nodeApi.remove(container, id),
+    focusNode: id => nodeApi.focus(container, id),
     moveNode: (id, x, y) => nodeApi.move(container, instance, id, x, y),
     selectNode: id => nodeApi.select(container, instance, id),
     startEditNode: (id, name) => nodeApi.startEdit(container, instance, id, name),
+    endEditNode: id => nodeApi.endEdit(container, instance, id),
     unselectNode: () => nodeApi.unselect(container, instance),
     hoverNode: id => nodeApi.hover(container, id),
     unhoverNode: () => nodeApi.unhover(container),
     afterCreateEdge: edge => edgeApi.afterCreate(instance, edge.sourceId, edge.targetId, callbacks.connectionMouseover, callbacks.connectionMouseout),
-    createEdge: edge => edgeApi.create(instance, edge.sourceId, edge.targetId, edge.text, callbacks.connectionMouseover, callbacks.connectionMouseout),
+    createEdge: edge => edgeApi.create(instance, edge.sourceId, edge.targetId, edge.text),
     updateEdge: edge => edgeApi.update(instance, edge.sourceId, edge.targetId, edge.text),
     deleteEdge: edge => edgeApi.remove(instance, edge.sourceId, edge.targetId),
     selectEdge: edge => edgeApi.select(container, instance, edge.sourceId, edge.targetId),
     startEditEdge: edge => edgeApi.startEdit(container, instance, edge.sourceId, edge.targetId, edge.text),
+    endEditEdge: edge => edgeApi.endEdit(instance, edge.sourceId, edge.targetId),
     unselectEdge: () => edgeApi.unselect(container, instance),
     hoverEdge: edge => edgeApi.hover(instance, edge.sourceId, edge.targetId),
     unhoverEdge: () => edgeApi.unhover(container),
@@ -2858,7 +2967,7 @@ let instance;
 
 module.exports = exports['default'];
 
-},{"./Callbacks":49,"./edgeApi":51,"./jsPlumbOption":53,"./nodeApi":54,"events":89,"jsplumb":94}],53:[function(require,module,exports){
+},{"./Callbacks":48,"./edgeApi":50,"./jsPlumbOption":52,"./nodeApi":53,"events":88,"jsplumb":93}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2887,13 +2996,13 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.unhover = exports.hover = exports.unselect = exports.startEdit = exports.select = exports.remove = exports.move = exports.update = exports.create = undefined;
+exports.unhover = exports.hover = exports.unselect = exports.startEdit = exports.select = exports.remove = exports.move = exports.update = exports.focus = exports.endEdit = exports.create = undefined;
 
 var _createNode = require('./createNode');
 
@@ -2907,9 +3016,19 @@ var _unhoverElement = require('./unhoverElement');
 
 var _unhoverElement2 = _interopRequireDefault(_unhoverElement);
 
+var _removeClass = require('./removeClass');
+
+var _removeClass2 = _interopRequireDefault(_removeClass);
+
+var _throttleit = require('throttleit');
+
+var _throttleit2 = _interopRequireDefault(_throttleit);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.create = _createNode2.default;
+exports.endEdit = endEdit;
+exports.focus = focus;
 exports.update = update;
 exports.move = move;
 exports.remove = remove;
@@ -2937,18 +3056,55 @@ function update(container, instance, id, name) {
   instance.repaintEverything();
 }
 
+const throttledRepaint = (0, _throttleit2.default)(instance => instance.repaintEverything(), 15);
+
+// Move node events is occured on every animation frame.
+// This function is important for CPU load.
 function move(container, instance, id, x, y) {
-  const node = container.querySelector(`#${id}`);
+  const node = document.getElementById(id);
 
   if (node) {
     const containerStyle = window.getComputedStyle(container);
     const containerWidth = parseInt(containerStyle.width);
     const containerHeight = parseInt(containerStyle.height);
     const nodeStyle = window.getComputedStyle(node);
+    const width = nodeStyle.width;
+    const height = nodeStyle.height;
 
-    node.style.left = `${(containerWidth - parseInt(nodeStyle.width)) * x}px`;
-    node.style.top = `${(containerHeight - parseInt(nodeStyle.height)) * y}px`;
-    instance.repaintEverything();
+    // Update node position on next animation frame to prevent reflow
+    setNewPositionNode(node, (containerWidth - parseInt(width)) * x, (containerHeight - parseInt(height)) * y);
+    requestAnimationFrame(updateAllNodePosition);
+
+    // The function of `repaintEverything` is heavy, so throttle it to improve performance
+    throttledRepaint(instance);
+  }
+}
+
+const newNodePosition = new Map();
+const nodePosition = new Map();
+
+function setNewPositionNode(node, left, top) {
+  newNodePosition.set(node, { left, top });
+}
+
+// Update all position node if position is changed.
+function updateAllNodePosition() {
+  for (const [node, position] of newNodePosition) {
+    if (!nodePosition.has(node)) {
+      nodePosition.set(node, { left: 0, top: 0 });
+    }
+
+    const old = nodePosition.get(node);
+
+    if (Math.abs(old.left - position.left) > 1) {
+      node.style.left = `${position.left}px`;
+      old.left = position.left;
+    }
+
+    if (Math.abs(old.top - position.top) > 1) {
+      node.style.top = `${position.top}px`;
+      old.top = position.top;
+    }
   }
 }
 
@@ -2962,6 +3118,14 @@ function remove(container, id) {
   if (container.querySelectorAll('.node').length === 0) {
     container.querySelector('.placeholder').classList.remove('hidden');
   }
+}
+
+function focus(container, id) {
+  (0, _removeClass2.default)(container, '.node', 'focus');
+
+  const node = container.querySelector(`#${id}`);
+
+  node.classList.add('focus');
 }
 
 function select(container, instance, id) {
@@ -2984,6 +3148,13 @@ function startEdit(container, instance, id, name) {
   instance.repaintEverything();
 }
 
+function endEdit(container, instance, id) {
+  container.querySelector(`#${id}`).classList.remove('editing');
+
+  // To move endpoints of edge
+  instance.repaintEverything();
+}
+
 function unselect(container, instance, id) {
   (0, _unselectElement2.default)(container, '.node', id);
 
@@ -3001,7 +3172,7 @@ function unhover(container) {
   (0, _unhoverElement2.default)(container, '.node');
 }
 
-},{"./createNode":50,"./unhoverElement":56,"./unselectElement":57}],55:[function(require,module,exports){
+},{"./createNode":49,"./removeClass":54,"./unhoverElement":55,"./unselectElement":56,"throttleit":121}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3014,7 +3185,7 @@ exports.default = function (container, selector, className, excludeId) {
 
 module.exports = exports["default"];
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3033,7 +3204,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"./removeClass":55}],57:[function(require,module,exports){
+},{"./removeClass":54}],56:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3053,7 +3224,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"./removeClass":55}],58:[function(require,module,exports){
+},{"./removeClass":54}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3097,7 +3268,7 @@ function updateDisplay(component, texts) {
 }
 module.exports = exports["default"];
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3122,7 +3293,7 @@ function updateMessage(component, message) {
 }
 module.exports = exports['default'];
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3192,7 +3363,7 @@ function getPgpIdMap(nodes) {
 }
 module.exports = exports["default"];
 
-},{}],61:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3370,7 +3541,7 @@ function updateDisplay(ractive, component, data) {
 }
 module.exports = exports['default'];
 
-},{"../getTr":63,"../hoverTerm":64,"../switchStateSearching":69,"../transform":70,"../unhoverTerm":71,"./template":62,"ractive":96}],62:[function(require,module,exports){
+},{"../getTr":62,"../hoverTerm":63,"../switchStateSearching":68,"../transform":69,"../unhoverTerm":70,"./template":61,"ractive":95}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3410,7 +3581,7 @@ exports.default = `
 {{/if}}`;
 module.exports = exports["default"];
 
-},{}],63:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3423,7 +3594,7 @@ exports.default = function (element) {
 
 module.exports = exports['default'];
 
-},{}],64:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3439,7 +3610,7 @@ exports.default = function (ractive, id, index) {
 
 module.exports = exports['default'];
 
-},{}],65:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3619,7 +3790,7 @@ function updateDisplay(ractive, component, data) {
 }
 module.exports = exports['default'];
 
-},{"../../../model/NodeSnapshot":6,"../getTr":63,"../hoverTerm":64,"../switchStateSearching":69,"../unhoverTerm":71,"./template":66,"./transformNode":67,"ractive":96}],66:[function(require,module,exports){
+},{"../../../model/NodeSnapshot":6,"../getTr":62,"../hoverTerm":63,"../switchStateSearching":68,"../unhoverTerm":70,"./template":65,"./transformNode":66,"ractive":95}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3673,7 +3844,7 @@ exports.default = `
 {{/if}}`;
 module.exports = exports["default"];
 
-},{}],67:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3700,7 +3871,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../../../model/NodeSnapshot":6,"../transform":70}],68:[function(require,module,exports){
+},{"../../../model/NodeSnapshot":6,"../transform":69}],67:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3731,7 +3902,7 @@ function showPlaceholder(component, data) {
 }
 module.exports = exports['default'];
 
-},{}],69:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3760,7 +3931,7 @@ exports.default = function (component, isSearching) {
 
 module.exports = exports['default'];
 
-},{}],70:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3779,7 +3950,7 @@ exports.default = function (list, predicate, params) {
 
 module.exports = exports["default"];
 
-},{}],71:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3792,7 +3963,7 @@ exports.default = function (ractive) {
 
 module.exports = exports['default'];
 
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3822,7 +3993,7 @@ exports.ActionReadable = _ActionReadable2.default;
 exports.ActionTransform = _ActionTransform2.default;
 exports.FunnelStream = _FunnelStream2.default;
 exports.TailStream = _TailStream2.default;
-},{"./lib/ActionReadable":73,"./lib/ActionTransform":74,"./lib/FunnelStream":75,"./lib/TailStream":76}],73:[function(require,module,exports){
+},{"./lib/ActionReadable":72,"./lib/ActionTransform":73,"./lib/FunnelStream":74,"./lib/TailStream":75}],72:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3877,7 +4048,7 @@ exports.default = class extends _stream.Readable {
   _read() {}
 };
 module.exports = exports['default'];
-},{"./defaultOption":77,"stream":112,"xtend":128}],74:[function(require,module,exports){
+},{"./defaultOption":76,"stream":111,"xtend":128}],73:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3995,7 +4166,7 @@ function bindAction(distpatcher, target, actionType, handler) {
  */
 
 module.exports = exports['default'];
-},{"./defaultOption":77,"stream":112,"xtend":128}],75:[function(require,module,exports){
+},{"./defaultOption":76,"stream":111,"xtend":128}],74:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4036,7 +4207,7 @@ exports.default = class extends _stream.Transform {
   }
 };
 module.exports = exports['default'];
-},{"./defaultOption":77,"stream":112,"xtend":128}],76:[function(require,module,exports){
+},{"./defaultOption":76,"stream":111,"xtend":128}],75:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4069,12 +4240,12 @@ exports.default = class extends _stream.Writable {
   }
 };
 module.exports = exports['default'];
-},{"./defaultOption":77,"stream":112}],77:[function(require,module,exports){
+},{"./defaultOption":76,"stream":111}],76:[function(require,module,exports){
 module.exports={
   "objectMode": true
 }
 
-},{}],78:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -4190,9 +4361,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],79:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 
-},{}],80:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -4378,7 +4549,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],81:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -6086,7 +6257,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":78,"ieee754":90}],82:[function(require,module,exports){
+},{"base64-js":77,"ieee754":89}],81:[function(require,module,exports){
 (function (Buffer){
 var clone = (function() {
 'use strict';
@@ -6341,7 +6512,7 @@ if (typeof module === 'object' && module.exports) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":81}],83:[function(require,module,exports){
+},{"buffer":80}],82:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -6506,7 +6677,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],84:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -6617,7 +6788,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":92}],85:[function(require,module,exports){
+},{"../../is-buffer/index.js":91}],84:[function(require,module,exports){
 /**
  * Returns a function, that, as long as it continues to be invoked, will not
  * be triggered. The function will be called after it stops being called for
@@ -6675,7 +6846,7 @@ module.exports = function debounce(func, wait, immediate){
   return debounced;
 };
 
-},{}],86:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 /*jshint browser:true, node:true*/
 
 'use strict';
@@ -7106,7 +7277,7 @@ Delegate.prototype.destroy = function() {
   this.root();
 };
 
-},{}],87:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 /*jshint browser:true, node:true*/
 
 'use strict';
@@ -7127,7 +7298,7 @@ module.exports = function(root) {
 
 module.exports.Delegate = Delegate;
 
-},{"./delegate":86}],88:[function(require,module,exports){
+},{"./delegate":85}],87:[function(require,module,exports){
 var Stream = require("stream")
 var writeMethods = ["write", "end", "destroy"]
 var readMethods = ["resume", "pause"]
@@ -7216,7 +7387,7 @@ function duplex(writer, reader) {
     }
 }
 
-},{"stream":112}],89:[function(require,module,exports){
+},{"stream":111}],88:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7520,7 +7691,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],90:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -7606,7 +7777,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],91:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -7631,7 +7802,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],92:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -7654,14 +7825,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],93:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],94:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 /**
  * jsBezier
  *
@@ -22184,7 +22355,7 @@ module.exports = Array.isArray || function (arr) {
 
 }).call(typeof window !== 'undefined' ? window : this);
 
-},{}],95:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22231,7 +22402,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":80}],96:[function(require,module,exports){
+},{"_process":79}],95:[function(require,module,exports){
 (function (global){
 /*
 	Ractive.js v0.9.1
@@ -38639,10 +38810,10 @@ return Ractive;
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],97:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":98}],98:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":97}],97:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38767,7 +38938,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":100,"./_stream_writable":102,"core-util-is":84,"inherits":91,"process-nextick-args":95}],99:[function(require,module,exports){
+},{"./_stream_readable":99,"./_stream_writable":101,"core-util-is":83,"inherits":90,"process-nextick-args":94}],98:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38815,7 +38986,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":101,"core-util-is":84,"inherits":91}],100:[function(require,module,exports){
+},{"./_stream_transform":100,"core-util-is":83,"inherits":90}],99:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -39824,7 +39995,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":98,"./internal/streams/BufferList":103,"./internal/streams/destroy":104,"./internal/streams/stream":105,"_process":80,"core-util-is":84,"events":89,"inherits":91,"isarray":93,"process-nextick-args":95,"safe-buffer":110,"string_decoder/":113,"util":79}],101:[function(require,module,exports){
+},{"./_stream_duplex":97,"./internal/streams/BufferList":102,"./internal/streams/destroy":103,"./internal/streams/stream":104,"_process":79,"core-util-is":83,"events":88,"inherits":90,"isarray":92,"process-nextick-args":94,"safe-buffer":109,"string_decoder/":112,"util":78}],100:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -40039,7 +40210,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":98,"core-util-is":84,"inherits":91}],102:[function(require,module,exports){
+},{"./_stream_duplex":97,"core-util-is":83,"inherits":90}],101:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -40694,7 +40865,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'))
-},{"./_stream_duplex":98,"./internal/streams/destroy":104,"./internal/streams/stream":105,"_process":80,"core-util-is":84,"inherits":91,"process-nextick-args":95,"safe-buffer":110,"util-deprecate":122}],103:[function(require,module,exports){
+},{"./_stream_duplex":97,"./internal/streams/destroy":103,"./internal/streams/stream":104,"_process":79,"core-util-is":83,"inherits":90,"process-nextick-args":94,"safe-buffer":109,"util-deprecate":122}],102:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -40779,7 +40950,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":110}],104:[function(require,module,exports){
+},{"safe-buffer":109}],103:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -40852,13 +41023,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":95}],105:[function(require,module,exports){
+},{"process-nextick-args":94}],104:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":89}],106:[function(require,module,exports){
+},{"events":88}],105:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":107}],107:[function(require,module,exports){
+},{"./readable":106}],106:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -40867,13 +41038,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":98,"./lib/_stream_passthrough.js":99,"./lib/_stream_readable.js":100,"./lib/_stream_transform.js":101,"./lib/_stream_writable.js":102}],108:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":97,"./lib/_stream_passthrough.js":98,"./lib/_stream_readable.js":99,"./lib/_stream_transform.js":100,"./lib/_stream_writable.js":101}],107:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":107}],109:[function(require,module,exports){
+},{"./readable":106}],108:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":102}],110:[function(require,module,exports){
+},{"./lib/_stream_writable.js":101}],109:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -40937,7 +41108,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":81}],111:[function(require,module,exports){
+},{"buffer":80}],110:[function(require,module,exports){
 /**
  * Springy v2.7.1
  *
@@ -41666,7 +41837,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return Springy;
 }));
 
-},{}],112:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -41795,7 +41966,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":89,"inherits":91,"readable-stream/duplex.js":97,"readable-stream/passthrough.js":106,"readable-stream/readable.js":107,"readable-stream/transform.js":108,"readable-stream/writable.js":109}],113:[function(require,module,exports){
+},{"events":88,"inherits":90,"readable-stream/duplex.js":96,"readable-stream/passthrough.js":105,"readable-stream/readable.js":106,"readable-stream/transform.js":107,"readable-stream/writable.js":108}],112:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -42068,10 +42239,10 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":114}],114:[function(require,module,exports){
+},{"safe-buffer":113}],113:[function(require,module,exports){
 module.exports = require('buffer')
 
-},{"buffer":81}],115:[function(require,module,exports){
+},{"buffer":80}],114:[function(require,module,exports){
 /**
  * Root reference for iframes.
  */
@@ -43006,7 +43177,7 @@ request.put = function(url, data, fn){
   return req;
 };
 
-},{"./is-function":116,"./is-object":117,"./request-base":118,"./response-base":119,"./should-retry":120,"component-emitter":83}],116:[function(require,module,exports){
+},{"./is-function":115,"./is-object":116,"./request-base":117,"./response-base":118,"./should-retry":119,"component-emitter":82}],115:[function(require,module,exports){
 /**
  * Check if `fn` is a function.
  *
@@ -43023,7 +43194,7 @@ function isFunction(fn) {
 
 module.exports = isFunction;
 
-},{"./is-object":117}],117:[function(require,module,exports){
+},{"./is-object":116}],116:[function(require,module,exports){
 /**
  * Check if `obj` is an object.
  *
@@ -43038,7 +43209,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],118:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 /**
  * Module of mixed-in functions shared between node and client code
  */
@@ -43631,7 +43802,7 @@ RequestBase.prototype._setTimeouts = function() {
   }
 }
 
-},{"./is-object":117}],119:[function(require,module,exports){
+},{"./is-object":116}],118:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -43766,7 +43937,7 @@ ResponseBase.prototype._setStatusProperties = function(status){
     this.notFound = 404 == status;
 };
 
-},{"./utils":121}],120:[function(require,module,exports){
+},{"./utils":120}],119:[function(require,module,exports){
 var ERROR_CODES = [
   'ECONNRESET',
   'ETIMEDOUT',
@@ -43791,7 +43962,7 @@ module.exports = function shouldRetry(err, res) {
   return false;
 };
 
-},{}],121:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 
 /**
  * Return the mime type for the given `str`.
@@ -43860,6 +44031,40 @@ exports.cleanHeader = function(header, shouldStripCookie){
   }
   return header;
 };
+},{}],121:[function(require,module,exports){
+module.exports = throttle;
+
+/**
+ * Returns a new function that, when invoked, invokes `func` at most once per `wait` milliseconds.
+ *
+ * @param {Function} func Function to wrap.
+ * @param {Number} wait Number of milliseconds that must elapse between `func` invocations.
+ * @return {Function} A new function that wraps the `func` function passed in.
+ */
+
+function throttle (func, wait) {
+  var ctx, args, rtn, timeoutID; // caching
+  var last = 0;
+
+  return function throttled () {
+    ctx = this;
+    args = arguments;
+    var delta = new Date() - last;
+    if (!timeoutID)
+      if (delta >= wait) call();
+      else timeoutID = setTimeout(call, wait - delta);
+    return rtn;
+  };
+
+  function call () {
+    timeoutID = 0;
+    last = +new Date();
+    rtn = func.apply(ctx, args);
+    ctx = null;
+    args = null;
+  }
+}
+
 },{}],122:[function(require,module,exports){
 (function (global){
 
