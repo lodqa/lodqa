@@ -11186,11 +11186,11 @@ function enableIfValid(beginSearch, pgpElement, mappingsElement, runner) {
 }
 
 function hasFocus(pgpElement) {
-  if (!pgpElement.innerHTML) {
+  if (!pgpElement.innerHTML.trim()) {
     return false;
   }
 
-  var pgp = JSON.parse(pgpElement.innerHTML);
+  var pgp = JSON.parse(pgpElement.innerHTML.trim());
 
   return Boolean(pgp.focus);
 }
