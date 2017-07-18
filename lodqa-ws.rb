@@ -111,9 +111,15 @@ class LodqaWS < Sinatra::Base
 					# lodqa.parse(query, config['parser_url'])
 
 					EM.defer do
-						ws.send("start")
-						lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparql_count, proc_anchored_pgp, proc_solution)
-						ws.close_connection
+						begin
+							ws.send("start")
+							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparql_count, proc_anchored_pgp, proc_solution)
+						rescue => e
+							p "error: #{e.inspect}, backtrace: #{e.backtrace}, data: #{data}"
+							ws.send({error: e}.to_json)
+						ensure
+							ws.close_connection(true)
+						end
 					end
 				end
 			end

@@ -90,17 +90,9 @@ class GraphFinder
       if @debug
         puts "#{query[:sparql]}\n++++++++++"
       end
-      begin
-        result = @endpoint.query(query[:sparql])
-      rescue => detail
-        if @debug
-          p detail
-          puts "==========\n"
-        end
-        sleep(2)
-        next
-        # print detail.backtrace.join("\n")
-      end
+
+      # 1 / 0
+      result = @endpoint.query(query[:sparql])
 
       if proc_solution
         proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
