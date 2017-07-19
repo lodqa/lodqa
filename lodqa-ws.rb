@@ -29,7 +29,7 @@ class LodqaWS < Sinatra::Base
 			begin
 				json_params = JSON.parse body unless body.empty?
 				json_params = {'keywords' => json_params} if json_params.is_a? Array
-			rescue => e
+			rescue
 				@error_message = 'ill-formed JSON string'
 			end
 
@@ -70,9 +70,8 @@ class LodqaWS < Sinatra::Base
 				"Access-Control-Allow-Origin" => "*"
 			content_type :json
 			mappings.to_json
-		rescue GatewayError => e
+		rescue GatewayError
 			status 502
-			body = e.message
 		end
 	end
 
@@ -85,7 +84,6 @@ class LodqaWS < Sinatra::Base
 	# Websocket only!
 	get '/solutions' do
 		config = get_config(params)
-		query = params['query']
 
 		begin
 			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
@@ -108,7 +106,6 @@ class LodqaWS < Sinatra::Base
 
 					lodqa.pgp = json['pgp'].symbolize_keys
 					lodqa.mappings = json['mappings']
-					# lodqa.parse(query, config['parser_url'])
 
 					EM.defer do
 						begin
@@ -141,9 +138,8 @@ class LodqaWS < Sinatra::Base
 				content_type :json
 			  f.string
 			}
-		rescue OpenURI::HTTPError => e
+		rescue OpenURI::HTTPError
 			status 502
-			body = e.message
 		end
 	end
 
@@ -173,18 +169,18 @@ class LodqaWS < Sinatra::Base
 			target_url = settings.target_db + '/' + params['target'] + '.json'
 			config_add = begin
 				RestClient.get target_url do |response, request, result|
-		      case response.code
-		      	when 200 then JSON.parse response
-		      	else raise IOError, "invalid target"
-		      end
-	    	end
-	    rescue
-	    	raise IOError, "invalid target"
-	    end
+					case response.code
+						when 200 then JSON.parse response
+						else raise IOError, "invalid target"
+					end
+				end
+			rescue
+				raise IOError, "invalid target"
+			end
 
-	    config_add.delete_if{|k, v| v.nil?}
-	    config.merge! config_add unless config_add.nil?
-	  end
+			config_add.delete_if{|k, v| v.nil?}
+			config.merge! config_add unless config_add.nil?
+		end
 
 	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 
