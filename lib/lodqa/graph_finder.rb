@@ -91,7 +91,6 @@ class GraphFinder
         puts "#{query[:sparql]}\n++++++++++"
       end
 
-      # 1 / 0
       result = @endpoint.query(query[:sparql])
 
       if proc_solution
