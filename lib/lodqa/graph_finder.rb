@@ -5,6 +5,7 @@
 require 'json'
 require 'sparql/client'
 require 'pp'
+require 'lodqa/logger'
 
 class GraphFinder
   # This constructor takes the URL of an end point to be searched
@@ -85,21 +86,23 @@ class GraphFinder
     @bgps.map {|bgp| {bgp:bgp, sparql:compose_sparql(bgp, @pgp)} }
   end
 
-  def each_sparql_and_solution(proc_solution = nil)
+  def each_sparql_and_solution(proc_solution = nil, proc_cancel_flag)
     queries.each do |query|
-      if @debug
-        puts "#{query[:sparql]}\n++++++++++"
-      end
+      Lodqa::Logger.debug "#{query[:sparql]}\n++++++++++"
 
       result = @endpoint.query(query[:sparql])
+
+      if proc_cancel_flag.call
+        Lodqa::Logger.debug "Stop procedure after a sparql query ends"
+        return
+      end
 
       if proc_solution
         proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
       end
 
-      if @debug
-        puts "==========\n"
-      end
+      Lodqa::Logger.debug "==========\n"
+
       sleep(2)
     end
   end

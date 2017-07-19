@@ -7,7 +7,9 @@ require 'lodqa'
 require 'json'
 require 'open-uri'
 require 'cgi/util'
+require 'securerandom'
 require "lodqa/gateway_error.rb"
+require 'lodqa/logger'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -83,12 +85,20 @@ class LodqaWS < Sinatra::Base
 
 	# Websocket only!
 	get '/solutions' do
+		debug = false
+		Lodqa::Logger.level = debug ? :debug : :info
+
 		config = get_config(params)
 
 		begin
-			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates']})
+			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates'], debug: debug})
 
 			request.websocket do |ws|
+				request_id = SecureRandom.uuid
+
+				# Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
+				Lodqa::Logger.debug('Request start', request_id)
+
 				proc_sparql_count = Proc.new do |sparql_count|
 					ws_send(EM, ws, :sparql_count, sparql_count)
 				end
@@ -108,17 +118,26 @@ class LodqaWS < Sinatra::Base
 					lodqa.mappings = json['mappings']
 
 					EM.defer do
+						Thread.current.thread_variable_set(:request_id, request_id)
+
 						begin
 							ws.send("start")
 							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparql_count, proc_anchored_pgp, proc_solution)
 						rescue => e
-							p "error: #{e.inspect}, backtrace: #{e.backtrace}, data: #{data}"
+							Lodqa::Logger.error "error: #{e.inspect}, backtrace: #{e.backtrace}, data: #{data}"
 							ws.send({error: e}.to_json)
 						ensure
 							ws.close_connection(true)
 						end
 					end
 				end
+
+				ws.onclose do
+					# Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
+					Lodqa::Logger.debug 'The WebSocket connection for is closed.', request_id
+					lodqa.dispose request_id
+				end
+
 			end
 		rescue SPARQL::Client::ServerError => e
 			[502, "SPARQL endpoint does not respond."]

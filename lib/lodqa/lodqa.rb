@@ -5,6 +5,7 @@ require 'json'
 require 'enju_access/enju_access'
 require 'lodqa/graph_finder'
 require 'lodqa/termfinder'
+require 'lodqa/logger'
 
 module Lodqa; end unless defined? Lodqa
 
@@ -73,10 +74,22 @@ class Lodqa::Lodqa
 
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution)
+
+      Lodqa::Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
+
+      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
+
+      if @cancel_flag
+        Lodqa::Logger.debug "Stop during or after anchored_pgp: #{anchored_pgp}"
+        return
+      end
     end
   end
 
+  def dispose(request_id)
+    Lodqa::Logger.debug "Cancel query for pgp: #{@pgp}", request_id
+    @cancel_flag = true
+  end
 end
 
 if __FILE__ == $0
