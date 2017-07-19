@@ -9,7 +9,7 @@ require 'pp'
 class GraphFinder
   # This constructor takes the URL of an end point to be searched
   # optionally options can be passed to the server of the end point.
-  def initialize (pgp, endpoint, graph_uri, options = {})
+  def initialize(pgp, endpoint, graph_uri, options = {})
     options ||= {}
     @debug = options[:debug] || false
 
@@ -25,7 +25,7 @@ class GraphFinder
 
   # It generates bgps by applying variation operations to the pgp.
   # The option _max_hop_ specifies the maximum number of hops to be searched.
-  def gen_bgps (pgp, max_hop = 1)
+  def gen_bgps(pgp, max_hop = 1)
     if @debug
       puts "=== [Pseudo Graph Pattern] ====="
       p pgp
@@ -139,7 +139,7 @@ class GraphFinder
   end
 
   # make variations by inversing each triple pattern
-  def generate_inverse_variations (bgps)
+  def generate_inverse_variations(bgps)
     rbgps = []
 
     bgps.each do |bgp|
@@ -256,7 +256,7 @@ class GraphFinder
     query += "} LIMIT 10"
   end
 
-  def stringify_term (t)
+  def stringify_term(t)
     if (t.class == RDF::URI)
       %|<#{t.to_s}>|
     elsif (t.class == RDF::Literal)
