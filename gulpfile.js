@@ -2,12 +2,15 @@ var gulp = require('gulp'),
   babel = require('gulp-babel'),
   browserify = require('gulp-browserify'),
   src = 'src/js/',
-  js = 'lodqa-client.js',
   dist = 'public/js/'
+
+
+const debug = require('gulp-debug');
 
 gulp
   .task('browserify', function() {
-    gulp.src(src + js)
+    gulp.src(['aa', `${src}lodqa-client.js`, `${src}execute.js`])
+      .pipe(debug({title: 'unicorn:'}))
       .pipe(browserify({
         transform: ['babelify']
       }))
