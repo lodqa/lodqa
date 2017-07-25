@@ -330,10 +330,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _uuid = require('uuid');
-
-var _uuid2 = _interopRequireDefault(_uuid);
-
 var _Model = require('./Model');
 
 var _Model2 = _interopRequireDefault(_Model);
@@ -354,16 +350,11 @@ exports.default = class extends _Model2.default {
     super();
     this._focus = null;
   }
-  // Generate id unless.
   add(action) {
-    const id = action.id || `node-${_uuid2.default.v1()}`;
-
     super.add({
-      id,
+      id: action.id,
       text: action.text
     });
-
-    return id;
   }
   get snapshot() {
     return new _NodeSnapshot2.default(focusMustBeInMap(this._map, this._focus), (0, _toArray2.default)(this._map));
@@ -382,7 +373,7 @@ function focusMustBeInMap(nodeMap, focus) {
 }
 module.exports = exports['default'];
 
-},{"./Model":4,"./NodeSnapshot":6,"./toArray":7,"uuid":123}],6:[function(require,module,exports){
+},{"./Model":4,"./NodeSnapshot":6,"./toArray":7}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -421,16 +412,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"clone":81}],8:[function(require,module,exports){
+},{"clone":92}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _uuid = require('uuid');
+
+var _uuid2 = _interopRequireDefault(_uuid);
+
 var _actionStream = require('action-stream');
 
 var _const = require('../const');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = class extends _actionStream.ActionReadable {
   constructor(selector) {
@@ -442,6 +439,7 @@ exports.default = class extends _actionStream.ActionReadable {
       push({
         target: _const.target.MODEL_NODE,
         type: _const.actionType.CREATE,
+        id: `node-${_uuid2.default.v1()}`,
         text: ''
       });
     });
@@ -449,7 +447,7 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":71}],9:[function(require,module,exports){
+},{"../const":20,"action-stream":82,"uuid":134}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -599,7 +597,7 @@ function toEdgeValueFromEndpoint(component, endpoint) {
 }
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":51,"../const":20,"action-stream":71,"dom-delegate":86}],10:[function(require,module,exports){
+},{"../../view/graphComponent":61,"../const":20,"action-stream":82,"dom-delegate":97}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -639,7 +637,7 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":51,"../const":20,"action-stream":71}],11:[function(require,module,exports){
+},{"../../view/graphComponent":61,"../const":20,"action-stream":82}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -692,7 +690,7 @@ function deleteSelected(push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":71}],12:[function(require,module,exports){
+},{"../const":20,"action-stream":82}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -725,7 +723,7 @@ exports.default = class extends _actionStream.ActionReadable {
 };
 module.exports = exports['default'];
 
-},{"../../view/forceDirectedLayoutComponent":47,"../const":20,"action-stream":71}],13:[function(require,module,exports){
+},{"../../view/forceDirectedLayoutComponent":47,"../const":20,"action-stream":82}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -880,7 +878,7 @@ function getNodeEvenWhenClickChildren(el) {
 }
 module.exports = exports['default'];
 
-},{"../../view/graphComponent":51,"../const":20,"action-stream":71,"dom-delegate":86}],14:[function(require,module,exports){
+},{"../../view/graphComponent":61,"../const":20,"action-stream":82,"dom-delegate":97}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -942,7 +940,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../const":20,"./AddEmptyNodeActionStream":8,"./EdgeActionStream":9,"./GraphActionStream":10,"./KeyboardActionStream":11,"./LayoutActionStream":12,"./NodeActionStream":13,"./table/EdgeTableActionStream":15,"./table/NodeTableActionStream":16,"action-stream":71}],15:[function(require,module,exports){
+},{"../const":20,"./AddEmptyNodeActionStream":8,"./EdgeActionStream":9,"./GraphActionStream":10,"./KeyboardActionStream":11,"./LayoutActionStream":12,"./NodeActionStream":13,"./table/EdgeTableActionStream":15,"./table/NodeTableActionStream":16,"action-stream":82}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1046,7 +1044,7 @@ function getAciton(component, event, target, type) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/table/edgeTableComponent":60,"../../const":20,"./Term":17,"action-stream":71,"debounce":84,"dom-delegate":86}],16:[function(require,module,exports){
+},{"../../../view/table/edgeTableComponent":71,"../../const":20,"./Term":17,"action-stream":82,"debounce":95,"dom-delegate":97}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1155,7 +1153,7 @@ function pushTextId(event, component, type, push) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/table/nodeTableComponent":64,"../../const":20,"./Term":17,"action-stream":71,"debounce":84,"dom-delegate":86}],17:[function(require,module,exports){
+},{"../../../view/table/nodeTableComponent":75,"../../const":20,"./Term":17,"action-stream":82,"debounce":95,"dom-delegate":97}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1309,7 +1307,6 @@ module.exports={
     "UPDATE_STATE": "update-state"
   },
   "target": {
-    "EDITOR": "editor",
     "LAYOUT_EDGE": "layout-edge",
     "LAYOUT_NODE": "layout-node",
     "MODEL": "model",
@@ -1386,7 +1383,7 @@ function deleteEdge(edges, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":71}],22:[function(require,module,exports){
+},{"../const":20,"action-stream":82}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1422,7 +1419,7 @@ function toNode(nodes, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":71}],23:[function(require,module,exports){
+},{"../const":20,"action-stream":82}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1498,7 +1495,7 @@ function deleteEdge(model, action, push) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":71}],24:[function(require,module,exports){
+},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":82}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1636,7 +1633,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../const":20,"./done":24,"./toInformation":29,"action-stream":71}],28:[function(require,module,exports){
+},{"../../const":20,"./done":24,"./toInformation":29,"action-stream":82}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1672,7 +1669,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"superagent":114}],29:[function(require,module,exports){
+},{"superagent":125}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1733,31 +1730,20 @@ exports.default = class extends _actionStream.ActionTransform {
 function createNode(model, action, push) {
   console.assert('text' in action, 'A node MUST have the text.', action);
 
-  const id = model.add(action);
+  model.add(action);
 
-  push({
-    target: _const.target.LAYOUT_NODE,
-    id
-  });
-
-  push(_const.target.EDITOR);
-
-  push({
-    target: _const.target.VIEW_NODE,
-    id
-  });
+  push(_const.target.LAYOUT_NODE);
+  push(_const.target.VIEW_NODE);
 
   if (action.text === '') {
     push({
       target: _const.target.VIEW_NODE,
-      type: _const.actionType.SELECT,
-      id
+      type: _const.actionType.SELECT
     });
 
     push({
       target: _const.target.VIEW_NODE,
-      type: _const.actionType.START_EDIT,
-      id
+      type: _const.actionType.START_EDIT
     });
   }
 
@@ -1810,7 +1796,7 @@ function getArms(nodeList, selectedNode, createEdge) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":71}],31:[function(require,module,exports){
+},{"../const":20,"./pushSnapshot":33,"./text":34,"action-stream":82}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1831,7 +1817,7 @@ exports.default = class extends _actionStream.ActionTransform {
 
     const clear = (action, push) => unselectAll(push);
 
-    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectNode]]);
+    this.bindActions(_const.target.MODEL_NODE, [[_const.actionType.CREATE, selectNode], [_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectNode]]);
 
     this.bindActions(_const.target.MODEL_EDGE, [[_const.actionType.CREATE, clear], [_const.actionType.DELETE, clear], [_const.actionType.SELECT, selectEdge], [_const.actionType.UPDATE_TEXT, appendSelectedEdge]]);
 
@@ -1916,7 +1902,10 @@ function selectNode(action, push) {
   } else {
     selectedNode = action.id;
     unselectEdge(push);
-    push(_const.target.VIEW_NODE);
+    push({
+      target: _const.target.VIEW_NODE,
+      type: _const.actionType.SELECT
+    });
   }
 }
 
@@ -1933,7 +1922,6 @@ function selectEdge(action, push) {
       targetId: action.targetId
     };
     unselectNode(push);
-    push(_const.target.EDITOR);
     push(_const.target.VIEW_EDGE);
   }
 }
@@ -1964,7 +1952,6 @@ function unselectNode(push) {
 function unselectEdge(push) {
   selectedEdge = null;
   unselect(push, _const.target.VIEW_EDGE);
-  unselect(push, _const.target.EDITOR);
 }
 
 function unselect(push, target) {
@@ -1975,7 +1962,7 @@ function unselect(push, target) {
 }
 module.exports = exports['default'];
 
-},{"../const":20,"action-stream":71}],32:[function(require,module,exports){
+},{"../const":20,"action-stream":82}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2031,7 +2018,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../../model/Edge":3,"../../model/Node":5,"./DataModelAssociatedEdgeStream":21,"./DataModelAssociatedNodeStream":22,"./DataModelEdgeStream":23,"./DataModelFindTermStream":27,"./DataModelNodeStream":30,"./SelectionModelStream":31,"duplexer":87}],33:[function(require,module,exports){
+},{"../../model/Edge":3,"../../model/Node":5,"./DataModelAssociatedEdgeStream":21,"./DataModelAssociatedNodeStream":22,"./DataModelEdgeStream":23,"./DataModelFindTermStream":27,"./DataModelNodeStream":30,"./SelectionModelStream":31,"duplexer":98}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2120,7 +2107,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../view/mappingsComponent":57,"../const":20,"action-stream":71}],36:[function(require,module,exports){
+},{"../../view/mappingsComponent":67,"../const":20,"action-stream":82}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2148,7 +2135,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../view/pgpComponent":59,"../const":20,"action-stream":71}],37:[function(require,module,exports){
+},{"../../view/pgpComponent":69,"../const":20,"action-stream":82}],37:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2175,7 +2162,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/graphComponent":51,"../../const":20,"action-stream":71}],38:[function(require,module,exports){
+},{"../../../view/graphComponent":61,"../../const":20,"action-stream":82}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2206,7 +2193,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/forceDirectedLayoutComponent":47,"../../const":20,"action-stream":71}],39:[function(require,module,exports){
+},{"../../../view/forceDirectedLayoutComponent":47,"../../const":20,"action-stream":82}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2234,7 +2221,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/graphComponent":51,"../../const":20,"action-stream":71}],40:[function(require,module,exports){
+},{"../../../view/graphComponent":61,"../../const":20,"action-stream":82}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2298,7 +2285,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../const":20,"./MappingsRenderStream":35,"./PgpRenderStream":36,"./graph":40,"./table":46,"action-stream":71}],42:[function(require,module,exports){
+},{"../const":20,"./MappingsRenderStream":35,"./PgpRenderStream":36,"./graph":40,"./table":46,"action-stream":82}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2327,7 +2314,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/table/edgeTableComponent":60,"../../const":20,"action-stream":71}],43:[function(require,module,exports){
+},{"../../../view/table/edgeTableComponent":71,"../../const":20,"action-stream":82}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2374,7 +2361,7 @@ function show(component, action) {
 }
 module.exports = exports['default'];
 
-},{"../../../view/messageComponent":58,"../../const":20,"action-stream":71}],44:[function(require,module,exports){
+},{"../../../view/messageComponent":68,"../../const":20,"action-stream":82}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2403,7 +2390,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/table/nodeTableComponent":64,"../../const":20,"action-stream":71}],45:[function(require,module,exports){
+},{"../../../view/table/nodeTableComponent":75,"../../const":20,"action-stream":82}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2430,7 +2417,7 @@ exports.default = class extends _actionStream.ActionTransform {
 };
 module.exports = exports['default'];
 
-},{"../../../view/table/placeholderComponent":67,"../../const":20,"action-stream":71}],46:[function(require,module,exports){
+},{"../../../view/table/placeholderComponent":78,"../../const":20,"action-stream":82}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2544,7 +2531,7 @@ function drawNode(node, p) {
 }
 module.exports = exports['default'];
 
-},{"springy":110}],48:[function(require,module,exports){
+},{"springy":121}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2643,17 +2630,327 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+exports.default = function (connection, className) {
+  connection.canvas.classList.add(className);
+
+  addClassToLabel(connection, className);
+};
+
+var _getEdgeLabel = require('./getEdgeLabel');
+
+var _getEdgeLabel2 = _interopRequireDefault(_getEdgeLabel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function addClassToLabel(connection, className) {
+  const labelOverlay = connection.getOverlay('label');
+
+  if (labelOverlay) {
+    (0, _getEdgeLabel2.default)(labelOverlay).classList.add(className);
+  }
+}
+module.exports = exports['default'];
+
+},{"./getEdgeLabel":51}],51:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (labelOverlay) {
+  return labelOverlay.canvas.children[0];
+};
+
+module.exports = exports["default"];
+
+},{}],52:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _toLabelParam = require('../toLabelParam');
+
+var _toLabelParam2 = _interopRequireDefault(_toLabelParam);
+
+var _getNameSpan = require('../getNameSpan');
+
+var _getNameSpan2 = _interopRequireDefault(_getNameSpan);
+
+var _toConnection = require('./toConnection');
+
+var _toConnection2 = _interopRequireDefault(_toConnection);
+
+var _getEdgeLabel = require('./getEdgeLabel');
+
+var _getEdgeLabel2 = _interopRequireDefault(_getEdgeLabel);
+
+var _addClass = require('./addClass');
+
+var _addClass2 = _interopRequireDefault(_addClass);
+
+var _switchOverlayToLabel = require('./switchOverlayToLabel');
+
+var _switchOverlayToLabel2 = _interopRequireDefault(_switchOverlayToLabel);
+
+var _toEditParam = require('./toEditParam');
+
+var _toEditParam2 = _interopRequireDefault(_toEditParam);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// A wrapper class to utilize 'jsPlumb connection' API
+exports.default = class {
+  constructor(instance, sourceId, targetId) {
+    this.instance = instance;
+
+    if (targetId) {
+      this.connection = (0, _toConnection2.default)(instance, sourceId, targetId);
+    } else {
+      // The second parameter is connection when number of parameters are two.
+      const connection = sourceId;
+
+      this.connection = connection;
+    }
+  }
+
+  addLabelOverlay() {
+    // Add the label overlay unless it
+    // Because a new edge that created by  user drag and drop end point in the graph has no label overlay.
+    const labelOverlay = this.connection.getOverlay('label');
+
+    if (!labelOverlay) {
+      this.connection.addOverlay((0, _toLabelParam2.default)(''));
+    }
+  }
+
+  bindHoverEventhandlers(mouseover, mouseout) {
+    // Bind hover events handlers a new edge.
+    this.connection.bind('mouseover', mouseover);
+    this.connection.bind('mouseout', mouseout);
+  }
+
+  updateText(label) {
+    const labelOverlay = this.connection.getOverlay('label');
+
+    // The labelOverlay does not exists during edit
+    if (!labelOverlay) {
+      return;
+    }
+
+    if (label) {
+      (0, _getNameSpan2.default)(labelOverlay).innerHTML = label;
+      (0, _getEdgeLabel2.default)(labelOverlay).classList.remove('no-text');
+    } else {
+      (0, _getEdgeLabel2.default)(labelOverlay).classList.add('no-text');
+    }
+  }
+
+  remove() {
+    this.instance.deleteConnection(this.connection);
+  }
+
+  select() {
+    (0, _addClass2.default)(this.connection, 'selected');
+  }
+
+  unselect() {
+    const overlay = this.connection.getOverlay('edit');
+
+    if (overlay) {
+      (0, _switchOverlayToLabel2.default)(this.connection, false);
+    }
+  }
+
+  startEdit(label = '') {
+    let editOverlay = this.connection.getOverlay('edit');
+
+    // Create a overlay for  editing if it does not exists
+    if (!editOverlay) {
+      editOverlay = this.connection.addOverlay((0, _toEditParam2.default)(label));
+    }
+
+    // This method is called when the edge is clicked even if during editing.
+    // At that time the input element lose focus once.
+    editOverlay.canvas.querySelector('input').focus();
+    this.connection.removeOverlay('label');
+  }
+
+  endEdit() {
+    (0, _switchOverlayToLabel2.default)(this.connection, true);
+  }
+
+  hover() {
+    // Connections cannot be get when they are being dragging.
+    if (!this.connection) {
+      return;
+    }
+
+    (0, _addClass2.default)(this.connection, 'hover');
+  }
+};
+module.exports = exports['default'];
+
+},{"../getNameSpan":57,"../toLabelParam":59,"./addClass":50,"./getEdgeLabel":51,"./switchOverlayToLabel":53,"./toConnection":54,"./toEditParam":55}],53:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (connection, selected) {
+  const editOverlay = connection.getOverlay('edit');
+  const label = editOverlay.canvas.querySelector('input').value;
+
+  connection.addOverlay((0, _toLabelParam2.default)(label, selected));
+  connection.removeOverlay('edit');
+};
+
+var _toLabelParam = require('../toLabelParam');
+
+var _toLabelParam2 = _interopRequireDefault(_toLabelParam);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = exports['default'];
+
+},{"../toLabelParam":59}],54:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (instance, sourceId, targetId) {
+  console.assert(sourceId, 'sourceId is required.');
+  console.assert(targetId, 'targetId is required.');
+
+  const connections = instance.getConnections({
+    source: sourceId,
+    target: targetId
+  });
+  const connection = connections[0];
+
+  return connection;
+};
+
+module.exports = exports['default'];
+
+},{}],55:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = toEditParam;
+
+var _toOverlayPalameter = require('../toOverlayPalameter');
+
+var _toOverlayPalameter2 = _interopRequireDefault(_toOverlayPalameter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function toEditParam(label) {
+  return (0, _toOverlayPalameter2.default)('edit', `
+    <div class="edgeEdit">
+      <input value="${label}"></input>
+      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
+    </div>`);
+}
+module.exports = exports['default'];
+
+},{"../toOverlayPalameter":60}],56:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.unselectAll = exports.register = undefined;
+
+var _toLabelParam = require('./toLabelParam');
+
+var _toLabelParam2 = _interopRequireDefault(_toLabelParam);
+
+var _Connection = require('./Connection');
+
+var _Connection2 = _interopRequireDefault(_Connection);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.register = register;
+exports.unselectAll = unselectAll;
+
+
+function register(instance, sourceId, targetId, label = '') {
+  // Check presence of nodes before call a jsPlumb api, for logging detail information.
+  // This check is done in jsPlumb, too.
+  const source = instance.getElement(sourceId);
+  const target = instance.getElement(targetId);
+
+  console.assert(source, 'the source is not exists :', sourceId);
+  console.assert(target, 'the target is not exists :', targetId);
+
+  const connParams = {
+    source,
+    target,
+    type: 'basic',
+    overlays: [(0, _toLabelParam2.default)(label)]
+  };
+
+  instance.connect(connParams);
+}
+
+function unselectAll(instance) {
+  instance.getAllConnections().forEach(c => new _Connection2.default(instance, c).unselect);
+}
+
+},{"./Connection":52,"./toLabelParam":59}],57:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (labelOverlay) {
+  return labelOverlay.canvas.querySelector('.name');
+};
+
+module.exports = exports['default'];
+
+},{}],58:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.toEdgeValue = exports.unhover = exports.hover = exports.unselect = exports.endEdit = exports.startEdit = exports.select = exports.remove = exports.update = exports.create = exports.afterCreate = undefined;
 
 var _jsplumb = require('jsplumb');
 
-var _unselectElement = require('./unselectElement');
+var _unselectElement = require('../unselectElement');
 
 var _unselectElement2 = _interopRequireDefault(_unselectElement);
 
-var _unhoverElement = require('./unhoverElement');
+var _unhoverElement = require('../unhoverElement');
 
 var _unhoverElement2 = _interopRequireDefault(_unhoverElement);
+
+var _Connection = require('./Connection');
+
+var _Connection2 = _interopRequireDefault(_Connection);
+
+var _getNameSpan = require('./getNameSpan');
+
+var _getNameSpan2 = _interopRequireDefault(_getNameSpan);
+
+var _connectionUtil = require('./connectionUtil');
+
+var connectionUtil = _interopRequireWildcard(_connectionUtil);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2671,23 +2968,8 @@ exports.toEdgeValue = toEdgeValue;
 
 // Create a new edge by programrable API.
 
-function create(instance, sourceId, targetId, label = '') {
-  // Check presence of nodes before call a jsPlumb api, for logging detail information.
-  // This check is done in jsPlumb, too.
-  const source = instance.getElement(sourceId);
-  const target = instance.getElement(targetId);
-
-  console.assert(source, 'the source is not exists :', sourceId);
-  console.assert(target, 'the target is not exists :', targetId);
-
-  const connParams = {
-    source,
-    target,
-    type: 'basic',
-    overlays: [toLabelParam(label)]
-  };
-
-  instance.connect(connParams);
+function create(instance, sourceId, targetId, label) {
+  connectionUtil.register(instance, sourceId, targetId, label);
 }
 
 // This function are called after edges are created in the view and the model.
@@ -2696,88 +2978,51 @@ function create(instance, sourceId, targetId, label = '') {
 // Othewise, when user drag and drop to create a new edge,
 // the edge is added to the model by a jsPlumb's 'connection' event and then this function is called.
 function afterCreate(instance, sourceId, targetId, mouseover, mouseout) {
-  const connection = toConnection(instance, sourceId, targetId);
+  const connection = new _Connection2.default(instance, sourceId, targetId);
 
-  // Add the label overlay unless it
-  // Because a new edge that created by  user drag and drop end point in the graph has no label overlay.
-  const labelOverlay = connection.getOverlay('label');
-
-  if (!labelOverlay) {
-    connection.addOverlay(toLabelParam(''));
-  }
-
-  // Bind hover events handlers a new edge.
-  connection.bind('mouseover', mouseover);
-  connection.bind('mouseout', mouseout);
+  connection.addLabelOverlay();
+  connection.bindHoverEventhandlers(mouseover, mouseout);
 }
 
 function update(instance, sourceId, targetId, label) {
-  const connection = toConnection(instance, sourceId, targetId);
-  const labelOverlay = connection.getOverlay('label');
+  const connection = new _Connection2.default(instance, sourceId, targetId);
 
-  // The labelOverlay does not exists during edit
-  if (!labelOverlay) {
-    return;
-  }
-
-  if (label) {
-    getNameSpan(labelOverlay).innerHTML = label;
-    getEdgeLabel(labelOverlay).classList.remove('no-text');
-  } else {
-    getEdgeLabel(labelOverlay).classList.add('no-text');
-  }
+  connection.updateText(label);
 }
 
 function remove(instance, sourceId, targetId) {
-  instance.deleteConnection(toConnection(instance, sourceId, targetId));
+  new _Connection2.default(instance, sourceId, targetId).remove();
 }
 
 function select(container, instance, sourceId, targetId) {
   unselect(container, instance);
 
-  const connection = toConnection(instance, sourceId, targetId);
-
-  addClass(connection, 'selected');
+  new _Connection2.default(instance, sourceId, targetId).select();
 }
 
 function unselect(container, instance) {
-  instance.getAllConnections().filter(connection => connection.getOverlay('edit')).forEach(swithOverlayToLabel);
+  connectionUtil.unselectAll(instance);
 
   (0, _unselectElement2.default)(container, '.jtk-connector');
   (0, _unselectElement2.default)(container, '.edgeLabel');
 }
 
 function startEdit(container, instance, sourceId, targetId, label = '') {
-  const connection = toConnection(instance, sourceId, targetId);
+  const connection = new _Connection2.default(instance, sourceId, targetId);
 
-  let editOverlay = connection.getOverlay('edit');
-
-  // Create a overlay for  editing if it does not exists
-  if (!editOverlay) {
-    editOverlay = connection.addOverlay(toEditParam(label));
-  }
-
-  // This method is called when the edge is clicked even if during editing.
-  // At that time the input element lose focus once.
-  editOverlay.canvas.querySelector('input').focus();
-  connection.removeOverlay('label');
+  connection.startEdit(label);
 }
 
 function endEdit(instance, sourceId, targetId) {
-  const connection = toConnection(instance, sourceId, targetId);
+  const connection = new _Connection2.default(instance, sourceId, targetId);
 
-  swithOverlayToLabel(connection);
+  connection.endEdit();
 }
 
 function hover(instance, sourceId, targetId) {
-  const connection = toConnection(instance, sourceId, targetId);
+  const connection = new _Connection2.default(instance, sourceId, targetId);
 
-  // Connections cannot be get when they are being dragging.
-  if (!connection) {
-    return;
-  }
-
-  addClass(connection, 'hover');
+  connection.hover();
 }
 
 function unhover(container) {
@@ -2808,51 +3053,48 @@ function toEdgeValue(connection, withText = false) {
 }
 
 // private
-function toConnection(instance, sourceId, targetId) {
-  console.assert(sourceId, 'sourceId is required.');
-  console.assert(targetId, 'targetId is required.');
-
-  const connections = instance.getConnections({
-    source: sourceId,
-    target: targetId
-  });
-  const connection = connections[0];
-
-  return connection;
-}
-
-function addClass(connection, className) {
-  connection.canvas.classList.add(className);
-
-  addClassToLabel(connection, className);
-}
-
-function addClassToLabel(connection, className) {
+function getTextFromConnection(connection) {
   const labelOverlay = connection.getOverlay('label');
 
   if (labelOverlay) {
-    getEdgeLabel(labelOverlay).classList.add(className);
+    return (0, _getNameSpan2.default)(labelOverlay).innerHTML;
   }
+
+  return '';
 }
 
-function toLabelParam(label) {
-  return toParam('label', `
-    <div class="edgeLabel ${label ? '' : 'no-text'}">
+},{"../unhoverElement":65,"../unselectElement":66,"./Connection":52,"./connectionUtil":56,"./getNameSpan":57,"jsplumb":104}],59:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (label, selected = false) {
+  return (0, _toOverlayPalameter2.default)('label', `
+    <div class="edgeLabel ${label ? '' : 'no-text'} ${selected ? 'selected' : ''}">
       <div class="name">${label}</div>
       <div class="editIcon"><i class="fa fa-pencil"></i></div>
       <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
     </div>`);
-}
+};
 
-function toEditParam(label) {
-  return toParam('edit', `
-    <div class="edgeEdit">
-      <input value="${label}"></input>
-      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
-    </div>`);
-}
+var _toOverlayPalameter = require('./toOverlayPalameter');
 
-function toParam(id, innerHTML) {
+var _toOverlayPalameter2 = _interopRequireDefault(_toOverlayPalameter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = exports['default'];
+
+},{"./toOverlayPalameter":60}],60:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (id, innerHTML) {
   return ['Custom', {
     create() {
       const el = document.createElement('div');
@@ -2862,35 +3104,11 @@ function toParam(id, innerHTML) {
     },
     id
   }];
-}
+};
 
-function getEdgeLabel(labelOverlay) {
-  return labelOverlay.canvas.children[0];
-}
+module.exports = exports['default'];
 
-function getNameSpan(labelOverlay) {
-  return labelOverlay.canvas.querySelector('.name');
-}
-
-function getTextFromConnection(connection) {
-  const labelOverlay = connection.getOverlay('label');
-
-  if (labelOverlay) {
-    return getNameSpan(labelOverlay).innerHTML;
-  }
-
-  return '';
-}
-
-function swithOverlayToLabel(connection) {
-  const editOverlay = connection.getOverlay('edit');
-  const label = editOverlay.canvas.querySelector('input').value;
-
-  connection.addOverlay(toLabelParam(label));
-  connection.removeOverlay('edit');
-}
-
-},{"./unhoverElement":55,"./unselectElement":56,"jsplumb":93}],51:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2967,7 +3185,7 @@ let instance;
 
 module.exports = exports['default'];
 
-},{"./Callbacks":48,"./edgeApi":50,"./jsPlumbOption":52,"./nodeApi":53,"events":88,"jsplumb":93}],52:[function(require,module,exports){
+},{"./Callbacks":48,"./edgeApi":58,"./jsPlumbOption":62,"./nodeApi":63,"events":99,"jsplumb":104}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2996,7 +3214,7 @@ exports.default = {
 };
 module.exports = exports['default'];
 
-},{}],53:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3172,7 +3390,7 @@ function unhover(container) {
   (0, _unhoverElement2.default)(container, '.node');
 }
 
-},{"./createNode":49,"./removeClass":54,"./unhoverElement":55,"./unselectElement":56,"throttleit":121}],54:[function(require,module,exports){
+},{"./createNode":49,"./removeClass":64,"./unhoverElement":65,"./unselectElement":66,"throttleit":132}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3185,7 +3403,7 @@ exports.default = function (container, selector, className, excludeId) {
 
 module.exports = exports["default"];
 
-},{}],55:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3204,7 +3422,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"./removeClass":54}],56:[function(require,module,exports){
+},{"./removeClass":64}],66:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3224,7 +3442,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"./removeClass":54}],57:[function(require,module,exports){
+},{"./removeClass":64}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3268,7 +3486,7 @@ function updateDisplay(component, texts) {
 }
 module.exports = exports["default"];
 
-},{}],58:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3293,14 +3511,15 @@ function updateMessage(component, message) {
 }
 module.exports = exports['default'];
 
-},{}],59:[function(require,module,exports){
-"use strict";
+},{}],69:[function(require,module,exports){
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
 exports.default = function (selector) {
+  const pgp = new _pgp2.default();
   const component = document.querySelector(selector);
 
   if (!component) {
@@ -3308,25 +3527,73 @@ exports.default = function (selector) {
   }
 
   return {
-    setNode: data => setNode(component, data.list, data.focus),
-    setEdge: edges => setEdge(component, edges)
+    setNode: data => setNode(component, pgp, data.list, data.focus),
+    setEdge: edges => setEdge(component, pgp, edges)
   };
 };
 
-const pgp = {}; // The output data.
-let pgpIdMap; // The map of original node id and id on the pgg.
+var _pgp = require('./pgp');
 
-function setNode(component, nodes, focus) {
-  pgpIdMap = getPgpIdMap(nodes);
+var _pgp2 = _interopRequireDefault(_pgp);
 
-  pgp.nodes = getNodesForPgp(nodes);
-  pgp.focus = pgpIdMap.get(focus);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  update(component, pgp);
+function setNode(component, pgp, nodes, focus) {
+  pgp.nodes = nodes;
+  pgp.focus = focus;
+  updateDisplay(component, pgp.json);
 }
 
-function setEdge(component, edges) {
-  pgp.edges = edges.map(e => {
+function setEdge(component, pgp, edges) {
+  pgp.edges = edges;
+  updateDisplay(component, pgp.json);
+}
+
+function updateDisplay(component, pgp) {
+  component.innerHTML = JSON.stringify(pgp, null, 2);
+}
+module.exports = exports['default'];
+
+},{"./pgp":70}],70:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = class {
+  get json() {
+    const data = {};
+    const pgpIdMap = toPgpIdMap(this.nodes);
+
+    data.nodes = convertToNodesForPgp(pgpIdMap, this.nodes);
+    data.edges = convertToEdgesForPgp(pgpIdMap, this.edges || []);
+    // The focus is id. format it.
+    data.focus = pgpIdMap.get(this.focus);
+
+    return data;
+  }
+};
+
+// Create a map for converting id of nodes to format that starts with 't' and is followed number.
+
+function toPgpIdMap(nodes) {
+  return new Map(nodes.reduce((ret, node, index) => ret.concat([[node.id, `t${index + 1}`]]), []));
+}
+
+// Convert nodes array to hash, and format its id.
+function convertToNodesForPgp(pgpIdMap, nodes) {
+  return nodes.reduce((ret, node) => {
+    ret[pgpIdMap.get(node.id)] = {
+      text: node.text
+    };
+
+    return ret;
+  }, {});
+}
+
+// Format edges
+function convertToEdgesForPgp(pgpIdMap, edges) {
+  return edges.map(e => {
     if (e.text) {
       return {
         object: pgpIdMap.get(e.targetId),
@@ -3340,30 +3607,10 @@ function setEdge(component, edges) {
       subject: pgpIdMap.get(e.sourceId)
     };
   });
-
-  update(component, pgp);
-}
-
-function update(component, pgp) {
-  component.innerHTML = JSON.stringify(pgp, null, 2);
-}
-
-function getNodesForPgp(nodes) {
-  return nodes.reduce((ret, node) => {
-    ret[pgpIdMap.get(node.id)] = {
-      text: node.text
-    };
-
-    return ret;
-  }, {});
-}
-
-function getPgpIdMap(nodes) {
-  return new Map(nodes.reduce((ret, node, index) => ret.concat([[node.id, `t${index + 1}`]]), []));
 }
 module.exports = exports["default"];
 
-},{}],60:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3541,7 +3788,7 @@ function updateDisplay(ractive, component, data) {
 }
 module.exports = exports['default'];
 
-},{"../getTr":62,"../hoverTerm":63,"../switchStateSearching":68,"../transform":69,"../unhoverTerm":70,"./template":61,"ractive":95}],61:[function(require,module,exports){
+},{"../getTr":73,"../hoverTerm":74,"../switchStateSearching":79,"../transform":80,"../unhoverTerm":81,"./template":72,"ractive":106}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3581,7 +3828,7 @@ exports.default = `
 {{/if}}`;
 module.exports = exports["default"];
 
-},{}],62:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3594,7 +3841,7 @@ exports.default = function (element) {
 
 module.exports = exports['default'];
 
-},{}],63:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3610,7 +3857,7 @@ exports.default = function (ractive, id, index) {
 
 module.exports = exports['default'];
 
-},{}],64:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3790,7 +4037,7 @@ function updateDisplay(ractive, component, data) {
 }
 module.exports = exports['default'];
 
-},{"../../../model/NodeSnapshot":6,"../getTr":62,"../hoverTerm":63,"../switchStateSearching":68,"../unhoverTerm":70,"./template":65,"./transformNode":66,"ractive":95}],65:[function(require,module,exports){
+},{"../../../model/NodeSnapshot":6,"../getTr":73,"../hoverTerm":74,"../switchStateSearching":79,"../unhoverTerm":81,"./template":76,"./transformNode":77,"ractive":106}],76:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3844,7 +4091,7 @@ exports.default = `
 {{/if}}`;
 module.exports = exports["default"];
 
-},{}],66:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3871,7 +4118,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 module.exports = exports['default'];
 
-},{"../../../model/NodeSnapshot":6,"../transform":69}],67:[function(require,module,exports){
+},{"../../../model/NodeSnapshot":6,"../transform":80}],78:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3902,7 +4149,7 @@ function showPlaceholder(component, data) {
 }
 module.exports = exports['default'];
 
-},{}],68:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3931,7 +4178,7 @@ exports.default = function (component, isSearching) {
 
 module.exports = exports['default'];
 
-},{}],69:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3950,7 +4197,7 @@ exports.default = function (list, predicate, params) {
 
 module.exports = exports["default"];
 
-},{}],70:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3963,7 +4210,7 @@ exports.default = function (ractive) {
 
 module.exports = exports['default'];
 
-},{}],71:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3993,7 +4240,7 @@ exports.ActionReadable = _ActionReadable2.default;
 exports.ActionTransform = _ActionTransform2.default;
 exports.FunnelStream = _FunnelStream2.default;
 exports.TailStream = _TailStream2.default;
-},{"./lib/ActionReadable":72,"./lib/ActionTransform":73,"./lib/FunnelStream":74,"./lib/TailStream":75}],72:[function(require,module,exports){
+},{"./lib/ActionReadable":83,"./lib/ActionTransform":84,"./lib/FunnelStream":85,"./lib/TailStream":86}],83:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4048,7 +4295,7 @@ exports.default = class extends _stream.Readable {
   _read() {}
 };
 module.exports = exports['default'];
-},{"./defaultOption":76,"stream":111,"xtend":128}],73:[function(require,module,exports){
+},{"./defaultOption":87,"stream":122,"xtend":139}],84:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4166,7 +4413,7 @@ function bindAction(distpatcher, target, actionType, handler) {
  */
 
 module.exports = exports['default'];
-},{"./defaultOption":76,"stream":111,"xtend":128}],74:[function(require,module,exports){
+},{"./defaultOption":87,"stream":122,"xtend":139}],85:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4207,7 +4454,7 @@ exports.default = class extends _stream.Transform {
   }
 };
 module.exports = exports['default'];
-},{"./defaultOption":76,"stream":111,"xtend":128}],75:[function(require,module,exports){
+},{"./defaultOption":87,"stream":122,"xtend":139}],86:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4240,12 +4487,12 @@ exports.default = class extends _stream.Writable {
   }
 };
 module.exports = exports['default'];
-},{"./defaultOption":76,"stream":111}],76:[function(require,module,exports){
+},{"./defaultOption":87,"stream":122}],87:[function(require,module,exports){
 module.exports={
   "objectMode": true
 }
 
-},{}],77:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -4361,9 +4608,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],78:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 
-},{}],79:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -4549,7 +4796,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],80:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -6257,7 +6504,7 @@ function numberIsNaN (obj) {
   return obj !== obj // eslint-disable-line no-self-compare
 }
 
-},{"base64-js":77,"ieee754":89}],81:[function(require,module,exports){
+},{"base64-js":88,"ieee754":100}],92:[function(require,module,exports){
 (function (Buffer){
 var clone = (function() {
 'use strict';
@@ -6512,7 +6759,7 @@ if (typeof module === 'object' && module.exports) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":80}],82:[function(require,module,exports){
+},{"buffer":91}],93:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -6677,7 +6924,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],83:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -6788,7 +7035,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":91}],84:[function(require,module,exports){
+},{"../../is-buffer/index.js":102}],95:[function(require,module,exports){
 /**
  * Returns a function, that, as long as it continues to be invoked, will not
  * be triggered. The function will be called after it stops being called for
@@ -6846,7 +7093,7 @@ module.exports = function debounce(func, wait, immediate){
   return debounced;
 };
 
-},{}],85:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 /*jshint browser:true, node:true*/
 
 'use strict';
@@ -7277,7 +7524,7 @@ Delegate.prototype.destroy = function() {
   this.root();
 };
 
-},{}],86:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 /*jshint browser:true, node:true*/
 
 'use strict';
@@ -7298,7 +7545,7 @@ module.exports = function(root) {
 
 module.exports.Delegate = Delegate;
 
-},{"./delegate":85}],87:[function(require,module,exports){
+},{"./delegate":96}],98:[function(require,module,exports){
 var Stream = require("stream")
 var writeMethods = ["write", "end", "destroy"]
 var readMethods = ["resume", "pause"]
@@ -7387,7 +7634,7 @@ function duplex(writer, reader) {
     }
 }
 
-},{"stream":111}],88:[function(require,module,exports){
+},{"stream":122}],99:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7691,7 +7938,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],89:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -7777,7 +8024,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],90:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -7802,7 +8049,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],91:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -7825,14 +8072,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],92:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],93:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 /**
  * jsBezier
  *
@@ -22355,7 +22602,7 @@ module.exports = Array.isArray || function (arr) {
 
 }).call(typeof window !== 'undefined' ? window : this);
 
-},{}],94:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -22402,7 +22649,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 }).call(this,require('_process'))
-},{"_process":79}],95:[function(require,module,exports){
+},{"_process":90}],106:[function(require,module,exports){
 (function (global){
 /*
 	Ractive.js v0.9.1
@@ -38810,10 +39057,10 @@ return Ractive;
 
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],96:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":97}],97:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":108}],108:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38938,7 +39185,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":99,"./_stream_writable":101,"core-util-is":83,"inherits":90,"process-nextick-args":94}],98:[function(require,module,exports){
+},{"./_stream_readable":110,"./_stream_writable":112,"core-util-is":94,"inherits":101,"process-nextick-args":105}],109:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -38986,7 +39233,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":100,"core-util-is":83,"inherits":90}],99:[function(require,module,exports){
+},{"./_stream_transform":111,"core-util-is":94,"inherits":101}],110:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -39995,7 +40242,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":97,"./internal/streams/BufferList":102,"./internal/streams/destroy":103,"./internal/streams/stream":104,"_process":79,"core-util-is":83,"events":88,"inherits":90,"isarray":92,"process-nextick-args":94,"safe-buffer":109,"string_decoder/":112,"util":78}],100:[function(require,module,exports){
+},{"./_stream_duplex":108,"./internal/streams/BufferList":113,"./internal/streams/destroy":114,"./internal/streams/stream":115,"_process":90,"core-util-is":94,"events":99,"inherits":101,"isarray":103,"process-nextick-args":105,"safe-buffer":120,"string_decoder/":123,"util":89}],111:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -40210,7 +40457,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":97,"core-util-is":83,"inherits":90}],101:[function(require,module,exports){
+},{"./_stream_duplex":108,"core-util-is":94,"inherits":101}],112:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -40865,7 +41112,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'))
-},{"./_stream_duplex":97,"./internal/streams/destroy":103,"./internal/streams/stream":104,"_process":79,"core-util-is":83,"inherits":90,"process-nextick-args":94,"safe-buffer":109,"util-deprecate":122}],102:[function(require,module,exports){
+},{"./_stream_duplex":108,"./internal/streams/destroy":114,"./internal/streams/stream":115,"_process":90,"core-util-is":94,"inherits":101,"process-nextick-args":105,"safe-buffer":120,"util-deprecate":133}],113:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -40950,7 +41197,7 @@ module.exports = function () {
 
   return BufferList;
 }();
-},{"safe-buffer":109}],103:[function(require,module,exports){
+},{"safe-buffer":120}],114:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -41023,13 +41270,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":94}],104:[function(require,module,exports){
+},{"process-nextick-args":105}],115:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":88}],105:[function(require,module,exports){
+},{"events":99}],116:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":106}],106:[function(require,module,exports){
+},{"./readable":117}],117:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -41038,13 +41285,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":97,"./lib/_stream_passthrough.js":98,"./lib/_stream_readable.js":99,"./lib/_stream_transform.js":100,"./lib/_stream_writable.js":101}],107:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":108,"./lib/_stream_passthrough.js":109,"./lib/_stream_readable.js":110,"./lib/_stream_transform.js":111,"./lib/_stream_writable.js":112}],118:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":106}],108:[function(require,module,exports){
+},{"./readable":117}],119:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":101}],109:[function(require,module,exports){
+},{"./lib/_stream_writable.js":112}],120:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -41108,7 +41355,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":80}],110:[function(require,module,exports){
+},{"buffer":91}],121:[function(require,module,exports){
 /**
  * Springy v2.7.1
  *
@@ -41837,7 +42084,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return Springy;
 }));
 
-},{}],111:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -41966,7 +42213,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":88,"inherits":90,"readable-stream/duplex.js":96,"readable-stream/passthrough.js":105,"readable-stream/readable.js":106,"readable-stream/transform.js":107,"readable-stream/writable.js":108}],112:[function(require,module,exports){
+},{"events":99,"inherits":101,"readable-stream/duplex.js":107,"readable-stream/passthrough.js":116,"readable-stream/readable.js":117,"readable-stream/transform.js":118,"readable-stream/writable.js":119}],123:[function(require,module,exports){
 'use strict';
 
 var Buffer = require('safe-buffer').Buffer;
@@ -42239,10 +42486,10 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":113}],113:[function(require,module,exports){
+},{"safe-buffer":124}],124:[function(require,module,exports){
 module.exports = require('buffer')
 
-},{"buffer":80}],114:[function(require,module,exports){
+},{"buffer":91}],125:[function(require,module,exports){
 /**
  * Root reference for iframes.
  */
@@ -43177,7 +43424,7 @@ request.put = function(url, data, fn){
   return req;
 };
 
-},{"./is-function":115,"./is-object":116,"./request-base":117,"./response-base":118,"./should-retry":119,"component-emitter":82}],115:[function(require,module,exports){
+},{"./is-function":126,"./is-object":127,"./request-base":128,"./response-base":129,"./should-retry":130,"component-emitter":93}],126:[function(require,module,exports){
 /**
  * Check if `fn` is a function.
  *
@@ -43194,7 +43441,7 @@ function isFunction(fn) {
 
 module.exports = isFunction;
 
-},{"./is-object":116}],116:[function(require,module,exports){
+},{"./is-object":127}],127:[function(require,module,exports){
 /**
  * Check if `obj` is an object.
  *
@@ -43209,7 +43456,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],117:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 /**
  * Module of mixed-in functions shared between node and client code
  */
@@ -43802,7 +44049,7 @@ RequestBase.prototype._setTimeouts = function() {
   }
 }
 
-},{"./is-object":116}],118:[function(require,module,exports){
+},{"./is-object":127}],129:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -43937,7 +44184,7 @@ ResponseBase.prototype._setStatusProperties = function(status){
     this.notFound = 404 == status;
 };
 
-},{"./utils":120}],119:[function(require,module,exports){
+},{"./utils":131}],130:[function(require,module,exports){
 var ERROR_CODES = [
   'ECONNRESET',
   'ETIMEDOUT',
@@ -43962,7 +44209,7 @@ module.exports = function shouldRetry(err, res) {
   return false;
 };
 
-},{}],120:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 
 /**
  * Return the mime type for the given `str`.
@@ -44031,7 +44278,7 @@ exports.cleanHeader = function(header, shouldStripCookie){
   }
   return header;
 };
-},{}],121:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 module.exports = throttle;
 
 /**
@@ -44065,7 +44312,7 @@ function throttle (func, wait) {
   }
 }
 
-},{}],122:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 (function (global){
 
 /**
@@ -44136,7 +44383,7 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],123:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 var v1 = require('./v1');
 var v4 = require('./v4');
 
@@ -44146,7 +44393,7 @@ uuid.v4 = v4;
 
 module.exports = uuid;
 
-},{"./v1":126,"./v4":127}],124:[function(require,module,exports){
+},{"./v1":137,"./v4":138}],135:[function(require,module,exports){
 /**
  * Convert array of 16 byte values to UUID string format of the form:
  * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
@@ -44171,7 +44418,7 @@ function bytesToUuid(buf, offset) {
 
 module.exports = bytesToUuid;
 
-},{}],125:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 (function (global){
 // Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
@@ -44208,7 +44455,7 @@ if (!rng) {
 module.exports = rng;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],126:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
@@ -44310,7 +44557,7 @@ function v1(options, buf, offset) {
 
 module.exports = v1;
 
-},{"./lib/bytesToUuid":124,"./lib/rng":125}],127:[function(require,module,exports){
+},{"./lib/bytesToUuid":135,"./lib/rng":136}],138:[function(require,module,exports){
 var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
@@ -44341,7 +44588,7 @@ function v4(options, buf, offset) {
 
 module.exports = v4;
 
-},{"./lib/bytesToUuid":124,"./lib/rng":125}],128:[function(require,module,exports){
+},{"./lib/bytesToUuid":135,"./lib/rng":136}],139:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;

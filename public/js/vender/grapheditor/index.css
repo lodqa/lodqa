@@ -27,6 +27,14 @@
   background-color: lightgrey;
   border-radius: 2px;
 }
+.icon--cannot_selectable {
+  color: black;
+  cursor: default;
+}
+.icon--cannot_selectable:hover {
+  background-color: transparent;
+  border-radius: 0;
+}
 /* graph */
 .jsPlumb-container {
   margin: 3px 0;
@@ -126,6 +134,11 @@
 }
 .jsPlumb-container .node.selected.focus .focusIcon {
   color: black;
+  cursor: default;
+}
+.jsPlumb-container .node.selected.focus .focusIcon:hover {
+  background-color: transparent;
+  border-radius: 0;
 }
 .jsPlumb-container .node.selected .editIcon {
   color: black;
