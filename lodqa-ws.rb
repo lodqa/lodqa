@@ -58,6 +58,25 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
+	get '/execute' do
+		config = get_config(params)
+
+		g = Lodqa::Graphicator.new(config["parser_url"])
+		g.parse(params['query'])
+		@pgp = g.get_pgp
+
+		tf = Lodqa::TermFinder.new(config['dictionary_url'])
+
+		# TODO: Find term of edges, too.
+		keywords = @pgp[:nodes].values.map{|n| n[:text]}
+		@mappings = tf.find(keywords)
+
+		targets = get_targets
+		@target = params['target'] || targets.first
+
+		erb :execute
+	end
+
 	# Command for test: curl -H "content-type:application/json" -d '{"keywords":["drug", "genes"]} http://localhost:9292/termfinder'
 	post '/termfinder' do
 		config = get_config(params)
