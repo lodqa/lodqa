@@ -15,15 +15,22 @@ const regionHtml = `<div class="sparql-region">
 const reigonTemplate = Hogan.compile(regionHtml)
 
 module.exports = function(sparql, count) {
-  const $html = $(reigonTemplate.render({
+  const element = document.createElement('div')
+
+  element.innerHTML = reigonTemplate.render({
     sparql,
     count
-  }))
+  })
 
   // Activate the show button
-  $html
-    .on('click', 'input', (e) => {
-      $html.find('.sparql-region__sparql')[0].classList.toggle('sparql-region__sparql--hide')
+  element
+    .querySelector('input')
+    .addEventListener('click', (e) => {
+      e.target
+        .closest('.sparql-region')
+        .querySelector('.sparql-region__sparql')
+        .classList
+        .toggle('sparql-region__sparql--hide')
 
       if (e.target.value === 'Show') {
         e.target.value = 'Hide'
@@ -32,5 +39,5 @@ module.exports = function(sparql, count) {
       }
     })
 
-  return $html
+  return element.children[0]
 }

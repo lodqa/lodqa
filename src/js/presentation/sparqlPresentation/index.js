@@ -21,8 +21,8 @@ class SparqlPresentation {
     }
 
     // Add a table to the dom tree
-    $(`#${domId}`)
-      .append(createTable(sparql, privateData.sparqlCount))
+    document.querySelector(`#${domId}`)
+      .appendChild(createTable(sparql, privateData.sparqlCount))
 
     // Enable syntax highlight of sparql
     /*global CodeMirror:true*/
