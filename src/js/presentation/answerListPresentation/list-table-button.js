@@ -6,10 +6,12 @@ const regionHtml = `
 const reigonTemplate = Hogan.compile(regionHtml)
 
 module.exports = function(target, target2) {
-  const $region = $(reigonTemplate.render())
+  const element = document.createElement('div')
+  element.innerHTML = reigonTemplate.render()
 
-  $region
-    .on('click', (e) => {
+  element
+    .querySelector('input')
+    .addEventListener('click', (e) => {
       target.classList.toggle('answers-region__answers-table--hide')
 
       if(target2){
@@ -23,5 +25,5 @@ module.exports = function(target, target2) {
       }
     })
 
-  return $region
+  return element.children[0]
 }

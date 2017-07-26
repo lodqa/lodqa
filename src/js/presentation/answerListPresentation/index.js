@@ -27,55 +27,49 @@ class AnswerListPresentation {
       </div>
     </div>
     `
-    privateData.list = $(answerList(solutions, privateData.anchoredPgp.focus))
+    privateData.list = answerList(solutions, privateData.anchoredPgp.focus)
     const list = privateData.list
 
     privateData.table = solutionTable(solutions)
     const table = privateData.table
-    const tableButton = listTableButton(table[0], list[0])
+    const tableButton = listTableButton(table, list)
 
     privateData.graph = graph(privateData.anchoredPgp, bgp, solutions)
     const solutionGraph = privateData.graph.dom
-    const showGraphButton = graphButton(solutionGraph[0])
+    const showGraphButton = graphButton(solutionGraph)
 
-    const $region = $(region)
+    const element = document.createElement('div')
+    element.innerHTML = region
 
-    $region
-      .find('.answers-region__title__heading')
-      .append(tableButton)
-      .append(showGraphButton)
+    element.querySelector('.answers-region__title__heading').appendChild(tableButton)
+    element.querySelector('.answers-region__title__heading').appendChild(showGraphButton)
 
-    $region
-      .append(list)
-      .append(table)
-      .append(solutionGraph)
+    element.children[0].appendChild(list)
+    element.children[0].appendChild(table)
+    element.children[0].appendChild(solutionGraph)
 
     // Add a list to the dom tree
-    $(`#${domId}`)
-      .append($region)
+    document.querySelector(`#${domId}`)
+      .appendChild(element.children[0])
   }
 
   updateLabel(url, label) {
     // Update labels in the list
     if (privateData.list) {
-      privateData.list
-        .find('a')
-        .each((index, element) => {
-          if(element.href === url && element.innerText !==label){
-            element.innerText = label
-          }
-        })
+      for (const element of privateData.list.querySelectorAll('a')) {
+        if(element.href === url && element.innerText !==label){
+          element.innerText = label
+        }
+      }
     }
 
     // Update labels in the table
     if (privateData.table) {
-      privateData.table
-        .find('a')
-        .each((index, element) => {
-          if(element.href === url && element.innerText !==label){
-            element.innerText = label
-          }
-        })
+      for (const element of privateData.table.querySelectorAll('a')) {
+        if(element.href === url && element.innerText !==label){
+          element.innerText = label
+        }
+      }
     }
 
     // Update labels in the graph

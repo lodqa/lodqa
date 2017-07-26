@@ -1,29 +1,30 @@
 /*global Springy:true*/
 module.exports = function(options, className) {
-  const graph = new Springy.Graph()
-  const link = $('<a target="_blank">')
-  const canvas = $('<canvas>')
-    .attr(options)
+  const element = document.createElement('div')
 
-  const springy = canvas.springy({
+  element.innerHTML = `
+    <div class="${className.join(' ') || 'graph'}">
+      <a target="_blank"></a>
+      <canvas ${Object.entries(options).map((e) => `${e[0]}="${e[1]}"`).join(' ')}></canvas>
+    </div>
+    `
+
+  const link = element.querySelector('a')
+  const canvas = element.querySelector('canvas')
+  const graph = new Springy.Graph()
+  const springy = $(canvas).springy({
     graph
   })
 
   updateLinkOnSelect(link, springy)
 
-  const dom = $(`<div class="${className.join(' ') || 'graph'}">`)
-    .append(link)
-    .append(canvas)
-
-  return [graph, dom]
+  return [graph, element.children[0]]
 }
-
 
 function updateLinkOnSelect(link, springy) {
   springy.event
     .on('selected', (selected) => {
-      link
-        .text(selected.node.data.url)
-        .attr('href', selected.node.data.url)
+      link.textContent = selected.node.data.url
+      link.setAttribute('href', selected.node.data.url)
     })
 }

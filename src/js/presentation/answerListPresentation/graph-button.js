@@ -6,10 +6,12 @@ const regionHtml = `
 const reigonTemplate = Hogan.compile(regionHtml)
 
 module.exports = function(target) {
-  const $region = $(reigonTemplate.render())
+  const element = document.createElement('div')
+  element.innerHTML = reigonTemplate.render()
 
-  $region
-    .on('click', (e) => {
+  element
+    .querySelector('input')
+    .addEventListener('click', (e) => {
       target.classList.toggle('answers-region__graph--hide')
 
       if (e.target.value === 'Show graph') {
@@ -19,5 +21,5 @@ module.exports = function(target) {
       }
     })
 
-  return $region
+  return element.children[0]
 }

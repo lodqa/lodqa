@@ -10,9 +10,11 @@ const regionHtml = `<ul class="answers-region__answers-list">
 const instanceTemplate = Hogan.compile(regionHtml)
 
 module.exports = function(solutions, focus) {
+  const element = document.createElement('div')
   const answers = toAnswers(solutions, focus)
 
-  return instanceTemplate.render({
+  element.innerHTML = instanceTemplate.render({
     answers
   })
+  return element.children[0]
 }

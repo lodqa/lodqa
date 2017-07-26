@@ -8,6 +8,15 @@ const regionHtml = `<div class="answers-region__answers-table answers-region__an
               <th>{{key}}</th>
             {{/keys}}
           </tr>
+          {{#solutions}}
+          <tr>
+            {{#nodes}}
+              <td class="solution">
+                <a target="_blank" href="{{url}}" title="{{url}}">{{label}}</a>
+              </td>
+            {{/nodes}}
+          </tr>
+          {{/solutions}}
       </table>
   </div>`
 const reigonTemplate = Hogan.compile(regionHtml)
@@ -17,13 +26,12 @@ module.exports = function(solutions) {
     keys: Object.keys(solutions[0])
       .map((key) => ({
         key
-      }))
+      })),
+    solutions: solutions.map(toSolutionRow)
   }
-  const $region = $(reigonTemplate.render(data))
+  const element = document.createElement('div')
 
-  for (const solution of solutions) {
-    $region.find('table').append(toSolutionRow(solution))
-  }
+  element.innerHTML = reigonTemplate.render(data)
 
-  return $region
+  return element.children[0]
 }
