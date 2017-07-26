@@ -6,8 +6,7 @@
   "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {
     "hogan.js": "^3.0.2",
-    "lodash": "^2.4.1",
-    "multiline": "^1.0.1"
+    "lodash": "^2.4.1"
   },
   "devDependencies": {
     "babelify": "^6.3.0",
