@@ -1,5 +1,5 @@
 const Loader = require('./loader/loadSolution')
-const bindResult = require('./controller/bindResult')
+const BindResult = require('./controller/bindResult')
 const bindWebsocketPresentation = require('./controller/bindWebsocketPresentation')
 const bindParseRenderingPresentation = require('./controller/bindParseRenderingPresentation')
 const bindSearchButton = require('./controller/bindSearchButton')
@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
+  const bindResult = new BindResult('lodqa-results')
 
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
   bindResult.sparqlCount(loader, sparqlPresentation)
