@@ -61,6 +61,8 @@ class LodqaWS < Sinatra::Base
 	get '/execute' do
 		config = get_config(params)
 
+		@query = params['query']
+
 		g = Lodqa::Graphicator.new(config["parser_url"])
 		g.parse(params['query'])
 		@pgp = g.get_pgp

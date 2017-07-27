@@ -11,9 +11,9 @@ const config = document.querySelector('#target').innerHTML
 const loader = new Loader()
 const bindResult = new BindResult('lodqa-results')
 
-bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
-bindResult.sparqlCount(loader, sparqlPresentation)
-bindResult.solution(loader, sparqlPresentation)
+// bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
+// bindResult.sparqlCount(loader, sparqlPresentation)
+// bindResult.solution(loader, sparqlPresentation)
 bindResult.all(loader, answerListPresentation)
 bindResult.all(loader, new LabelFinder(answerListPresentation))
 

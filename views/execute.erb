@@ -15,11 +15,14 @@
         <script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
     </head>
     <body style="background-color: white;">
-        <div id="pgp"><%= @pgp.to_json %></div>
-        <div id="mappings"><%= @mappings.to_json %></div>
-        <div id="target"><%= @target %></div>
-        <input id="endpoint-url" type="text" value="<%= @endpoint_url %>"/>
-        <input id="need-proxy" type="text" value="<%= @need_proxy %>"/>
+        <div style="display: none;">
+          <div id="pgp"><%= @pgp.to_json %></div>
+          <div id="mappings"><%= @mappings.to_json %></div>
+          <div id="target"><%= @target %></div>
+          <input id="endpoint-url" type="text" value="<%= @endpoint_url %>"/>
+          <input id="need-proxy" type="text" value="<%= @need_proxy %>"/>
+        </div>
+        Show below results of '<%= @query %>':
         <div id="lodqa-results"></div>
     </body>
     <script type="text/javascript" src="js/execute.js">
