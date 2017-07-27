@@ -9,8 +9,12 @@
         <script src="js/vender/codemirror/lib/codemirror.js"></script>
         <script src="js/vender/codemirror/mode/sparql/sparql.js"></script>
         <script src="js/vender/codemirror/addon/wrap/hardwrap.js"></script>
+        <script src="js/vender/Springy/springy.js"></script>
+        <script src="js/vender/jQuery/dist/jquery.min.js"></script>
+        <script src="js/vender/Springy/springyui.js"></script>
+        <script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
     </head>
-    <body>
+    <body style="background-color: white;">
         <div id="pgp"><%= @pgp.to_json %></div>
         <div id="mappings"><%= @mappings.to_json %></div>
         <div id="target"><%= @target %></div>
