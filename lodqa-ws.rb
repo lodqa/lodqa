@@ -74,6 +74,12 @@ class LodqaWS < Sinatra::Base
 		targets = get_targets
 		@target = params['target'] || targets.first
 
+		# For the label finder
+		p config['endpoint_url']
+		p config
+		@endpoint_url = config['endpoint_url']
+		@need_proxy = config['name'] == 'biogateway'
+
 		erb :execute
 	end
 

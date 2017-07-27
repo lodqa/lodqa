@@ -18,6 +18,8 @@
         <div id="pgp"><%= @pgp.to_json %></div>
         <div id="mappings"><%= @mappings.to_json %></div>
         <div id="target"><%= @target %></div>
+        <input id="endpoint-url" type="text" value="<%= @endpoint_url %>"/>
+        <input id="need-proxy" type="text" value="<%= @need_proxy %>"/>
         <div id="lodqa-results"></div>
     </body>
     <script type="text/javascript" src="js/execute.js">
