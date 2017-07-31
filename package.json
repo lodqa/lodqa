@@ -5,8 +5,7 @@
   "author": "jdkim",
   "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {
-    "hogan.js": "^3.0.2",
-    "lodash": "^2.4.1"
+    "hogan.js": "^3.0.2"
   },
   "devDependencies": {
     "eslint": "^4.3.0",
