@@ -24,7 +24,9 @@
         "jquery": true
     },
     "extends": "eslint:recommended",
-    "ecmaFeatures": {
-        "modules": true
+    "parserOptions" : {
+        "ecmaFeatures": {
+            "modules": true
+        }
     }
 }
