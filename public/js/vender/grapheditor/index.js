@@ -1461,6 +1461,12 @@ function createEdge(model, action, push) {
       target: _const.target.VIEW_EDGE,
       type: _const.actionType.DELETE
     });
+  } else if (action.sourceId === action.targetId) {
+    // Avoid loopback edges.
+    push({
+      target: _const.target.VIEW_EDGE,
+      type: _const.actionType.DELETE
+    });
   } else {
     model.add(action);
 
