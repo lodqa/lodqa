@@ -34,11 +34,11 @@ function openConnection(emitter, pathname, config) {
     const jsondata = JSON.parse(m.data);
 
     ['sparql_count', 'anchored_pgp', 'solution', 'parse_rendering']
-    .forEach(function(event) {
-      if (jsondata.hasOwnProperty(event)) {
-        emitter.emit(event, jsondata[event])
-      }
-    })
+      .forEach(function(event) {
+        if (jsondata.hasOwnProperty(event)) {
+          emitter.emit(event, jsondata[event])
+        }
+      })
   }
 
   return ws

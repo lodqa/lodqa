@@ -7,5 +7,5 @@ module.exports = function switchDirection(bgp, first, second) {
     return [second[1], first[1]]
   }
 
-  throw new Error(`what's wrong?`)
+  throw new Error('what\'s wrong?')
 }

@@ -90,22 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function changeTarget(target) {
-    const url = 'http://targets.lodqa.org/targets/' + target;
+    const url = 'http://targets.lodqa.org/targets/' + target
 
-    var req;
-    req = new XMLHttpRequest();
+    var req
+    req = new XMLHttpRequest()
     req.onreadystatechange = function() {
       if (this.readyState === XMLHttpRequest.DONE) {
         if (this.status == 200) {
-          const config = JSON.parse(this.response);
-          applyConfig(config);
+          const config = JSON.parse(this.response)
+          applyConfig(config)
         } else {
-          console.log("Gateway error!")
+          console.log('Gateway error!')
         }
       }
-    };
-    req.open('GET', url);
-    req.setRequestHeader('Accept', 'application/json');
-    req.send();
+    }
+    req.open('GET', url)
+    req.setRequestHeader('Accept', 'application/json')
+    req.send()
   }
 })
