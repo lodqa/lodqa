@@ -9,6 +9,6 @@
     "commit": "f71eeda0fac4ec1442e631e90ff0703a0fb4ac96"
   },
   "_source": "https://github.com/jquery/jquery.git",
-  "_target": "~3.2.1",
+  "_target": "^3.2.1",
   "_originalSource": "jQuery"
 }

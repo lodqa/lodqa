@@ -26,6 +26,6 @@
     "commit": "4778ae9e1172c2a7fc77fb5fde22e6438bc4c5c2"
   },
   "_source": "https://github.com/components/codemirror.git",
-  "_target": "^5.27.4",
+  "_target": "~5.27.4",
   "_originalSource": "codemirror"
 }
