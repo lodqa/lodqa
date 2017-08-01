@@ -14,7 +14,7 @@ module.exports = function(graph, bgp, edges, transitNodes, instanceNodes, pathIn
 }
 
 function fromSubject(edge, pathInfo) {
-  var anchoredPgpNodeId = edge.subject
+  const anchoredPgpNodeId = edge.subject
 
   return {
     transitNodeId: 'x' + pathInfo.no + (pathInfo.childNo - 1),
@@ -24,7 +24,7 @@ function fromSubject(edge, pathInfo) {
 }
 
 function fromObject(edge, pathInfo) {
-  var anchoredPgpNodeId = edge.object
+  const anchoredPgpNodeId = edge.object
 
   return {
     transitNodeId: 'x' + pathInfo.no + pathInfo.childNo,

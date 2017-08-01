@@ -5,11 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('#button-show-queries')
     .addEventListener('click', (e) => {
       e.stopPropagation()
-      var element = document.querySelector('.examples')
+      const element = document.querySelector('.examples')
       if (element.classList.contains('examples--hidden')) {
         element.classList.remove('examples--hidden')
       } else {
-        element.classList.add('examples--hidden')        
+        element.classList.add('examples--hidden')
       }
     })
 
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function changeTarget(target) {
     const url = 'http://targets.lodqa.org/targets/' + target
 
-    var req
+    let req
     req = new XMLHttpRequest()
     req.onreadystatechange = function() {
       if (this.readyState === XMLHttpRequest.DONE) {
