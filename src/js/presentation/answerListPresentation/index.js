@@ -1,7 +1,7 @@
 const answerList = require('./answerList')
 const solutionTable = require('./solutionTable')
 const listTableButton = require('./list-table-button')
-const graph = require('./graph')
+const answerGraph = require('./graph')
 const graphButton = require('./graph-button')
 
 const privateData = {}
@@ -27,30 +27,32 @@ class AnswerListPresentation {
       </div>
     </div>
     `
-    privateData.list = answerList(solutions, privateData.anchoredPgp.focus)
-    const {list} = privateData
-
-    privateData.table = solutionTable(solutions)
-    const {table} = privateData
-    const tableButton = listTableButton(table, list)
-
-    privateData.graph = graph(privateData.anchoredPgp, bgp, solutions)
-    const solutionGraph = privateData.graph.dom
-    const showGraphButton = graphButton(solutionGraph)
-
     const element = document.createElement('div')
     element.innerHTML = region
 
-    element.querySelector('.answers-region__title__heading').appendChild(tableButton)
-    element.querySelector('.answers-region__title__heading').appendChild(showGraphButton)
-
+    const list = answerList(solutions, privateData.anchoredPgp.focus)
     element.children[0].appendChild(list)
+
+    const table = solutionTable(solutions)
     element.children[0].appendChild(table)
-    element.children[0].appendChild(solutionGraph)
+
+    const graph = answerGraph(privateData.anchoredPgp, bgp, solutions)
+    element.children[0].appendChild(graph)
+
+    const tableButton = listTableButton(table, list)
+    element.querySelector('.answers-region__title__heading').appendChild(tableButton)
+
+    const showGraphButton = graphButton(graph)
+    element.querySelector('.answers-region__title__heading').appendChild(showGraphButton)
 
     // Add a list to the dom tree
     document.querySelector(`#${domId}`)
       .appendChild(element.children[0])
+
+    // Set privateData for the updateLabel function
+    privateData.list = list
+    privateData.table = table
+    privateData.graph = graph
   }
 
   updateLabel(url, label) {
