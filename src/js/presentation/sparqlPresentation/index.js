@@ -3,8 +3,8 @@ const createTable = require('./createTable')
 const privateData = {}
 
 class SparqlPresentation {
-  onSparqlCount() {
-    privateData.sparqlCount = 0
+  setSparqlCount(count) {
+    privateData.sparqlCount = count
   }
 
   onSolution(data, domId) {

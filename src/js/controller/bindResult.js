@@ -15,7 +15,7 @@ module.exports = function(loader, domId) {
 }
 
 function sparqlCount(domId, loader, onSparqlCount) {
-  loader.on('sparql_count', (total) => onSparqlCount(total))
+  loader.on('sparql_count', () => onSparqlCount(0))
 }
 
 function anchoredPgp(domId, loader, onAnchoredPgp) {

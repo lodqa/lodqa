@@ -9,12 +9,12 @@ const bindResult = new BindResult(loader, 'lodqa-results')
 const labelFinder = new LabelFinder(answerListPresentation)
 
 bindResult({
+  sparqlCount: [
+    sparqlPresentation.setSparqlCount
+  ],
   anchoredPgp: [
     answerListPresentation.onAnchoredPgp,
     labelFinder.onAnchoredPgp
-  ],
-  sparqlCount: [
-    sparqlPresentation.onSparqlCount
   ],
   solution: [
     answerListPresentation.onSolution,

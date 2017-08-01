@@ -18,7 +18,7 @@ function init() {
 
   bindResult({
     sparqlCount: [
-      sparqlPresentation.onSparqlCount
+      sparqlPresentation.setSparqlCount
     ],
     anchoredPgp: [
       anchoredPgpTablePresentation.onAnchoredPgp,
