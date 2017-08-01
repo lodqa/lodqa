@@ -23,5 +23,5 @@ function anchoredPgp(domId, loader, onAnchoredPgp) {
 }
 
 function solution(domId, loader, onSolution) {
-  loader.on('solution', (data) => onSolution(data, domId))
+  loader.on('solution', (data) => onSolution(domId, data))
 }

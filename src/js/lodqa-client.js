@@ -28,7 +28,7 @@ function init() {
     solution: [
       sparqlPresentation.onSolution,
       answerListPresentation.onSolution,
-      (data, domId) => labelFinder.onSolution(data, domId)
+      (domId, data) => labelFinder.onSolution(data)
     ]
   })
 

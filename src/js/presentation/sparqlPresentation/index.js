@@ -7,7 +7,7 @@ class SparqlPresentation {
     privateData.sparqlCount = count
   }
 
-  onSolution(data, domId) {
+  onSolution(domId, data) {
     const {
       sparql,
       solutions

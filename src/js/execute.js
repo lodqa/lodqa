@@ -18,7 +18,7 @@ bindResult({
   ],
   solution: [
     answerListPresentation.onSolution,
-    (data, domId) => labelFinder.onSolution(data, domId),
+    (domId, data) => labelFinder.onSolution(data),
     sparqlPresentation.onSolution
   ]
 })

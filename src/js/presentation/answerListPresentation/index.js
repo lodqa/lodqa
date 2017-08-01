@@ -11,7 +11,7 @@ class AnswerListPresentation {
     privateData.anchoredPgp = anchored_pgp
   }
 
-  onSolution(data, domId) {
+  onSolution(domId, data) {
     const {
       bgp,
       solutions
