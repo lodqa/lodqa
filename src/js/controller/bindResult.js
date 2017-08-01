@@ -1,12 +1,20 @@
-module.exports = function(domId){
-  return {
-    sparqlCount,
-    anchoredPgp: (loader, presentation) => anchoredPgp(domId, loader, presentation),
-    solution: (loader, presentation) => solution(domId, loader, presentation)
+module.exports = function(loader, domId) {
+  const events = {
+    sparqlCount: (callback) => sparqlCount(domId, loader, callback),
+    anchoredPgp: (callback) => anchoredPgp(domId, loader, callback),
+    solution: (callback) => solution(domId, loader, callback),
+  }
+
+  return (map) => {
+    for (const [event, callbacks] of Object.entries(map)) {
+      for (const callback of callbacks) {
+        events[event](callback)
+      }
+    }
   }
 }
 
-function sparqlCount(loader, onSparqlCount) {
+function sparqlCount(domId, loader, onSparqlCount) {
   loader.on('sparql_count', (total) => onSparqlCount(total))
 }
 

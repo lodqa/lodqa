@@ -4,20 +4,30 @@ const sparqlPresentation = require('./presentation/sparqlPresentation')
 const answerListPresentation = require('./presentation/answerListPresentation')
 const LabelFinder = require('./label-finder')
 
-const pgp = JSON.parse(document.querySelector('#pgp').innerHTML)
-const mappings = JSON.parse(document.querySelector('#mappings').innerHTML)
-const config = document.querySelector('#target').innerHTML
 const loader = new Loader()
-const bindResult = new BindResult('lodqa-results')
-
-bindResult.anchoredPgp(loader, answerListPresentation.onAnchoredPgp)
-bindResult.solution(loader, answerListPresentation.onSolution)
-
+const bindResult = new BindResult(loader, 'lodqa-results')
 const labelFinder = new LabelFinder(answerListPresentation)
-bindResult.anchoredPgp(loader, labelFinder.onAnchoredPgp)
-bindResult.solution(loader, (data, domId) => labelFinder.onSolution(data, domId))
 
-bindResult.sparqlCount(loader, sparqlPresentation.onSparqlCount)
-bindResult.solution(loader, sparqlPresentation.onSolution)
+bindResult({
+  anchoredPgp: [
+    answerListPresentation.onAnchoredPgp,
+    labelFinder.onAnchoredPgp
+  ],
+  sparqlCount: [
+    sparqlPresentation.onSparqlCount
+  ],
+  solution: [
+    answerListPresentation.onSolution,
+    (data, domId) => labelFinder.onSolution(data, domId),
+    sparqlPresentation.onSolution
+  ]
+})
+
+const pgp = JSON.parse(document.querySelector('#pgp')
+  .innerHTML)
+const mappings = JSON.parse(document.querySelector('#mappings')
+  .innerHTML)
+const config = document.querySelector('#target')
+  .innerHTML
 
 loader.beginSearch(pgp, mappings, '/solutions', config)

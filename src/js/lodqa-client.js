@@ -13,17 +13,24 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
-  const bindResult = new BindResult('lodqa-results')
-
-  bindResult.anchoredPgp(loader, anchoredPgpTablePresentation.onAnchoredPgp)
-  bindResult.sparqlCount(loader, sparqlPresentation.onSparqlCount)
-  bindResult.solution(loader, sparqlPresentation.onSolution)
-  bindResult.anchoredPgp(loader, answerListPresentation.onAnchoredPgp)
-  bindResult.solution(loader, answerListPresentation.onSolution)
-
+  const bindResult = new BindResult(loader, 'lodqa-results')
   const labelFinder = new LabelFinder(answerListPresentation)
-  bindResult.anchoredPgp(loader, labelFinder.onAnchoredPgp)
-  bindResult.solution(loader, (data, domId) => labelFinder.onSolution(data, domId))
+
+  bindResult({
+    sparqlCount: [
+      sparqlPresentation.onSparqlCount
+    ],
+    anchoredPgp: [
+      anchoredPgpTablePresentation.onAnchoredPgp,
+      answerListPresentation.onAnchoredPgp,
+      labelFinder.onAnchoredPgp
+    ],
+    solution: [
+      sparqlPresentation.onSolution,
+      answerListPresentation.onSolution,
+      (data, domId) => labelFinder.onSolution(data, domId)
+    ]
+  })
 
   bindWebsocketPresentation(loader)
   bindParseRenderingPresentation(loader)
