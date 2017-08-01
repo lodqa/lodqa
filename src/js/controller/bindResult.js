@@ -6,14 +6,14 @@ module.exports = function(domId){
   }
 }
 
-function sparqlCount(loader, presentation) {
-  loader.on('sparql_count', (total) => presentation.onSparqlCount(total))
+function sparqlCount(loader, onSparqlCount) {
+  loader.on('sparql_count', (total) => onSparqlCount(total))
 }
 
-function anchoredPgp(domId, loader, presentation) {
-  loader.on('anchored_pgp', (anchoredPgp) => presentation.onAnchoredPgp(domId, anchoredPgp))
+function anchoredPgp(domId, loader, onAnchoredPgp) {
+  loader.on('anchored_pgp', (anchoredPgp) => onAnchoredPgp(domId, anchoredPgp))
 }
 
-function solution(domId, loader, presentation) {
-  loader.on('solution', (data) => presentation.onSolution(data, domId))
+function solution(domId, loader, onSolution) {
+  loader.on('solution', (data) => onSolution(data, domId))
 }

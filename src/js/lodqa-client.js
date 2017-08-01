@@ -15,15 +15,15 @@ function init() {
   const loader = new Loader()
   const bindResult = new BindResult('lodqa-results')
 
-  bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
-  bindResult.sparqlCount(loader, sparqlPresentation)
-  bindResult.solution(loader, sparqlPresentation)
-  bindResult.anchoredPgp(loader, answerListPresentation)
-  bindResult.solution(loader, answerListPresentation)
+  bindResult.anchoredPgp(loader, anchoredPgpTablePresentation.onAnchoredPgp)
+  bindResult.sparqlCount(loader, sparqlPresentation.onSparqlCount)
+  bindResult.solution(loader, sparqlPresentation.onSolution)
+  bindResult.anchoredPgp(loader, answerListPresentation.onAnchoredPgp)
+  bindResult.solution(loader, answerListPresentation.onSolution)
 
   const labelFinder = new LabelFinder(answerListPresentation)
-  bindResult.anchoredPgp(loader, labelFinder)
-  bindResult.solution(loader, labelFinder)
+  bindResult.anchoredPgp(loader, labelFinder.onAnchoredPgp)
+  bindResult.solution(loader, (data, domId) => labelFinder.onSolution(data, domId))
 
   bindWebsocketPresentation(loader)
   bindParseRenderingPresentation(loader)

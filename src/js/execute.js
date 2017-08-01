@@ -10,14 +10,14 @@ const config = document.querySelector('#target').innerHTML
 const loader = new Loader()
 const bindResult = new BindResult('lodqa-results')
 
-bindResult.anchoredPgp(loader, answerListPresentation)
-bindResult.solution(loader, answerListPresentation)
+bindResult.anchoredPgp(loader, answerListPresentation.onAnchoredPgp)
+bindResult.solution(loader, answerListPresentation.onSolution)
 
 const labelFinder = new LabelFinder(answerListPresentation)
-bindResult.anchoredPgp(loader, labelFinder)
-bindResult.solution(loader, labelFinder)
+bindResult.anchoredPgp(loader, labelFinder.onAnchoredPgp)
+bindResult.solution(loader, (data, domId) => labelFinder.onSolution(data, domId))
 
-bindResult.sparqlCount(loader, sparqlPresentation)
-bindResult.solution(loader, sparqlPresentation)
+bindResult.sparqlCount(loader, sparqlPresentation.onSparqlCount)
+bindResult.solution(loader, sparqlPresentation.onSolution)
 
 loader.beginSearch(pgp, mappings, '/solutions', config)
