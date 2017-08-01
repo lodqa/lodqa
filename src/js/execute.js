@@ -1,23 +1,23 @@
 const Loader = require('./loader/loadSolution')
 const BindResult = require('./controller/bindResult')
 const sparqlPresentation = require('./presentation/sparqlPresentation')
-const answerListPresentation = require('./presentation/answerListPresentation')
+const answersPresentation = require('./presentation/answers-presentation')
 const LabelFinder = require('./label-finder')
 
 const loader = new Loader()
 const bindResult = new BindResult(loader, 'lodqa-results')
-const labelFinder = new LabelFinder(answerListPresentation)
+const labelFinder = new LabelFinder(answersPresentation)
 
 bindResult({
   sparqlCount: [
     sparqlPresentation.setSparqlCount
   ],
   anchoredPgp: [
-    answerListPresentation.onAnchoredPgp,
+    answersPresentation.onAnchoredPgp,
     labelFinder.onAnchoredPgp
   ],
   solution: [
-    answerListPresentation.onSolution,
+    answersPresentation.onSolution,
     (domId, data) => labelFinder.onSolution(data),
     sparqlPresentation.onSolution
   ]

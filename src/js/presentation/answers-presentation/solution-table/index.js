@@ -1,5 +1,6 @@
 const handlebars = require('handlebars')
-const toSolutionRow = require('./toSolutionRow')
+const createDom = require('../create-dom')
+const toSolutionRow = require('./to-solution-row')
 
 const regionHtml = `<div class="answers-region__answers-table answers-region__answers-table--hide">
       <table>
@@ -29,9 +30,16 @@ module.exports = function(solutions) {
       })),
     solutions: solutions.map(toSolutionRow)
   }
-  const element = document.createElement('div')
+  const dom = createDom(reigonTemplate(data))
 
-  element.innerHTML = reigonTemplate(data)
-
-  return element.children[0]
+  return {
+    dom,
+    updateLabel(url, label) {
+      for (const element of dom.querySelectorAll('a')) {
+        if(element.href === url && element.innerText !==label){
+          element.innerText = label
+        }
+      }
+    }
+  }
 }
