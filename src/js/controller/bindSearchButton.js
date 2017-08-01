@@ -1,8 +1,8 @@
 module.exports = function(loader) {
-  const beginSearch = document.querySelector('#beginSearch'),
-    pgpElement = document.querySelector('.pgp'),
-    mappingsElement = document.querySelector('.mappings'),
-    runner = document.querySelector('#runner')
+  const beginSearch = document.querySelector('#beginSearch')
+  const pgpElement = document.querySelector('.pgp')
+  const mappingsElement = document.querySelector('.mappings')
+  const runner = document.querySelector('#runner')
 
   validateToSearch(beginSearch, pgpElement, mappingsElement, runner)
   bindSearch(beginSearch, loader, pgpElement, mappingsElement)
@@ -27,17 +27,17 @@ function search(event, loader, pgpElement, mappingsElement) {
   document.getElementById('results').innerHTML = '<h1>Results</h1><div id="lodqa-results"></div>'
   event.target.setAttribute('disabled', 'disabled')
 
-  const pgp = JSON.parse(pgpElement.innerHTML),
-    mappings = JSON.parse(mappingsElement.innerHTML),
-    config = document.querySelector('#target').value
+  const pgp = JSON.parse(pgpElement.innerHTML)
+  const mappings = JSON.parse(mappingsElement.innerHTML)
+  const config = document.querySelector('#target').value
 
   loader.beginSearch(pgp, mappings, '/solutions', config)
   loader.once('ws_close', () => event.target.removeAttribute('disabled'))
 }
 
 function validateToSearch(beginSearch, pgpElement, mappingsElement, runner) {
-  const enableSearchButton = () => enableIfValid(beginSearch, pgpElement, mappingsElement, runner),
-    observer = new MutationObserver(enableSearchButton)
+  const enableSearchButton = () => enableIfValid(beginSearch, pgpElement, mappingsElement, runner)
+  const observer = new MutationObserver(enableSearchButton)
 
   enableSearchButton()
 
