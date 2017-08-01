@@ -1,6 +1,5 @@
 const Loader = require('./loader/loadSolution')
 const BindResult = require('./controller/bindResult')
-const anchoredPgpTablePresentation = require('./presentation/anchoredPgpTablePresentation')
 const sparqlPresentation = require('./presentation/sparqlPresentation')
 const answerListPresentation = require('./presentation/answerListPresentation')
 const LabelFinder = require('./label-finder')
@@ -11,9 +10,12 @@ const config = document.querySelector('#target').innerHTML
 const loader = new Loader()
 const bindResult = new BindResult('lodqa-results')
 
-// bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
-bindResult.all(loader, answerListPresentation)
-bindResult.all(loader, new LabelFinder(answerListPresentation))
+bindResult.anchoredPgp(loader, answerListPresentation)
+bindResult.solution(loader, answerListPresentation)
+
+const labelFinder = new LabelFinder(answerListPresentation)
+bindResult.anchoredPgp(loader, labelFinder)
+bindResult.solution(loader, labelFinder)
 
 bindResult.sparqlCount(loader, sparqlPresentation)
 bindResult.solution(loader, sparqlPresentation)

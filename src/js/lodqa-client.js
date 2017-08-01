@@ -18,8 +18,12 @@ function init() {
   bindResult.anchoredPgp(loader, anchoredPgpTablePresentation)
   bindResult.sparqlCount(loader, sparqlPresentation)
   bindResult.solution(loader, sparqlPresentation)
-  bindResult.all(loader, answerListPresentation)
-  bindResult.all(loader, new LabelFinder(answerListPresentation))
+  bindResult.anchoredPgp(loader, answerListPresentation)
+  bindResult.solution(loader, answerListPresentation)
+
+  const labelFinder = new LabelFinder(answerListPresentation)
+  bindResult.anchoredPgp(loader, labelFinder)
+  bindResult.solution(loader, labelFinder)
 
   bindWebsocketPresentation(loader)
   bindParseRenderingPresentation(loader)
