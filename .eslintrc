@@ -1,20 +1,44 @@
 {
     "rules": {
         "indent": [
-            2,
+            1,
             2
         ],
         "quotes": [
-            2,
+            1,
             "single"
         ],
         "linebreak-style": [
-            2,
+            1,
             "unix"
         ],
         "semi": [
-            2,
+            1,
             "never"
+        ],
+        "no-console": [
+            0
+        ],
+        "no-var": [
+            1
+        ],
+        "prefer-const": [
+            1
+        ],
+        "one-var": [
+            1,
+            "never"
+        ],
+        "prefer-arrow-callback": [
+            1
+        ],
+        "func-style": [
+            1,
+            "declaration",
+            {"allowArrowFunctions": true}
+        ],
+        "prefer-destructuring": [
+            1
         ]
     },
     "env": {
