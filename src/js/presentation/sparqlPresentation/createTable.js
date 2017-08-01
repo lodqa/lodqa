@@ -1,4 +1,4 @@
-const Hogan = require('hogan.js')
+const handlebars = require('handlebars')
 
 const regionHtml = `<div class="sparql-region">
   <div class="sparql-region__title">
@@ -12,12 +12,12 @@ const regionHtml = `<div class="sparql-region">
   </div>
 </div>
 `
-const reigonTemplate = Hogan.compile(regionHtml)
+const reigonTemplate = handlebars.compile(regionHtml)
 
 module.exports = function(sparql, count) {
   const element = document.createElement('div')
 
-  element.innerHTML = reigonTemplate.render({
+  element.innerHTML = reigonTemplate({
     sparql,
     count
   })

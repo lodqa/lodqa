@@ -1,7 +1,7 @@
-const Hogan = require('hogan.js')
+const handlebars = require('handlebars')
 const toArray = require('../collection/toArray')
 
-const template = Hogan.compile(`
+const template = handlebars.compile(`
   <div class="result-region anchored_pgp-region">
       <table class="anchored_pgp-table">
           <tr>
@@ -27,7 +27,7 @@ module.exports = {
     const nodes = Object.keys(anchored_pgp.nodes)
       .map((node_id) => toViewParameters(anchored_pgp, node_id))
       .reduce(toArray, [])
-    const table = template.render({nodes})
+    const table = template({nodes})
     const element = document.createElement('div')
 
     element.innerHTML = table

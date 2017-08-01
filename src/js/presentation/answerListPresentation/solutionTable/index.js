@@ -1,4 +1,4 @@
-const Hogan = require('hogan.js')
+const handlebars = require('handlebars')
 const toSolutionRow = require('./toSolutionRow')
 
 const regionHtml = `<div class="answers-region__answers-table answers-region__answers-table--hide">
@@ -19,7 +19,7 @@ const regionHtml = `<div class="answers-region__answers-table answers-region__an
           {{/solutions}}
       </table>
   </div>`
-const reigonTemplate = Hogan.compile(regionHtml)
+const reigonTemplate = handlebars.compile(regionHtml)
 
 module.exports = function(solutions) {
   const data = {
@@ -31,7 +31,7 @@ module.exports = function(solutions) {
   }
   const element = document.createElement('div')
 
-  element.innerHTML = reigonTemplate.render(data)
+  element.innerHTML = reigonTemplate(data)
 
   return element.children[0]
 }

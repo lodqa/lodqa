@@ -1,14 +1,10 @@
-const Hogan = require('hogan.js')
-
 const regionHtml = `
   <input type="button" value="Show graph" class="answers-region__title__button"></input>
 `
-const reigonTemplate = Hogan.compile(regionHtml)
-
 module.exports = function(target) {
   const element = document.createElement('div')
-  element.innerHTML = reigonTemplate.render()
 
+  element.innerHTML = regionHtml
   element
     .querySelector('input')
     .addEventListener('click', (e) => {
