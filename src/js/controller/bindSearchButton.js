@@ -13,7 +13,6 @@ function bindSearch(beginSearch, loader, pgpElement, mappingsElement) {
     .addEventListener('click', (e) => {
       e.target.classList.toggle('hidden')
       document.querySelector('#stopSearch').classList.toggle('hidden')
-
       document.querySelector('.dashboard').classList.add('dashboard--back')
       document.querySelector('.results').classList.remove('results--hidden', 'results--back')
       document.querySelector('.results').classList.remove('results--back')
@@ -77,7 +76,6 @@ function hasTerm(mappingsElement) {
   }
 
   const mappings = JSON.parse(mappingsElement.innerHTML)
-
   const hasTerm = Object.keys(mappings)
     .filter((key) => mappings[key].filter((term) => term).length > 0)
 
