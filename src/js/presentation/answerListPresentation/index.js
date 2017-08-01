@@ -28,10 +28,10 @@ class AnswerListPresentation {
     </div>
     `
     privateData.list = answerList(solutions, privateData.anchoredPgp.focus)
-    const list = privateData.list
+    const {list} = privateData
 
     privateData.table = solutionTable(solutions)
-    const table = privateData.table
+    const {table} = privateData
     const tableButton = listTableButton(table, list)
 
     privateData.graph = graph(privateData.anchoredPgp, bgp, solutions)
