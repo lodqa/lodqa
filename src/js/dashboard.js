@@ -91,9 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function changeTarget(target) {
     const url = 'http://targets.lodqa.org/targets/' + target
+    const req = new XMLHttpRequest()
 
-    let req
-    req = new XMLHttpRequest()
     req.onreadystatechange = function() {
       if (this.readyState === XMLHttpRequest.DONE) {
         if (this.status == 200) {
