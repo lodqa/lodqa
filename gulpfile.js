@@ -9,7 +9,7 @@ gulp
   .task('browserify', () => gulp
     .src([`${src}lodqa-client.js`, `${src}execute.js`])
     .pipe(debug({title: 'unicorn:'}))
-    .pipe(browserify())
+    .pipe(browserify({debug: true}))
     .pipe(gulp.dest(dist))
   )
   .task('auto_compile', () => {
