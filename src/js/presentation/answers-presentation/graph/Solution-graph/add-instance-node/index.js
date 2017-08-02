@@ -1,4 +1,4 @@
-const instance = require('../../../instance')
+const instance = require('../../../../../instance')
 const toRed = require('../../to-red')
 const toTerm = require('../to-term')
 const toEdge = require('../to-edge')
