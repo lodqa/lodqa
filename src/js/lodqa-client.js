@@ -1,6 +1,6 @@
 const Loader = require('./loader/load-solution')
 const BindResult = require('./controller/bind-result')
-const bindWebsocketPresentation = require('./controller/bind-websocket-presentation')
+const bindProgressPresentation = require('./controller/bind-progress-presentation')
 const bindParseRenderingPresentation = require('./controller/bind-parse-rendering-presentation')
 const bindSearchButton = require('./controller/bind-search-button')
 const bindStopSearchButton = require('./controller/bind-stop-search-button')
@@ -32,7 +32,7 @@ function init() {
     ]
   })
 
-  bindWebsocketPresentation(loader)
+  bindProgressPresentation(loader)
   bindParseRenderingPresentation(loader)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
