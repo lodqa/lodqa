@@ -1,5 +1,5 @@
 const handlebars = require('handlebars')
-const createDom = require('../create-dom')
+const createDom = require('../../create-dom')
 const toSolutionRow = require('./to-solution-row')
 
 const regionHtml = `<div class="answers-region__answers-table answers-region__answers-table--hide">

@@ -1,4 +1,5 @@
 const handlebars = require('handlebars')
+const createDom = require('../create-dom')
 
 const regionHtml = `<div class="sparql-region">
   <div class="sparql-region__title">
@@ -15,12 +16,10 @@ const regionHtml = `<div class="sparql-region">
 const reigonTemplate = handlebars.compile(regionHtml)
 
 module.exports = function(sparql, count) {
-  const element = document.createElement('div')
-
-  element.innerHTML = reigonTemplate({
+  const element = createDom(reigonTemplate({
     sparql,
     count
-  })
+  }))
 
   // Activate the show button
   element
@@ -39,5 +38,5 @@ module.exports = function(sparql, count) {
       }
     })
 
-  return element.children[0]
+  return element
 }

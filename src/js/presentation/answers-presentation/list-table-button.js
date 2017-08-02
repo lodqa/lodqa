@@ -1,13 +1,13 @@
+const createDom = require('../create-dom')
+
 const regionHtml = `
   <input type="button" value="Table" class="answers-region__title__button"></input>
 `
 
 module.exports = function(target, target2) {
-  const element = document.createElement('div')
+  const element = createDom(regionHtml)
 
-  element.innerHTML = regionHtml
   element
-    .querySelector('input')
     .addEventListener('click', (e) => {
       target.classList.toggle('answers-region__answers-table--hide')
 
@@ -22,5 +22,5 @@ module.exports = function(target, target2) {
       }
     })
 
-  return element.children[0]
+  return element
 }

@@ -1,5 +1,6 @@
 const handlebars = require('handlebars')
 const toArray = require('../collection/to-array')
+const createDom = require('./create-dom')
 
 const template = handlebars.compile(`
   <div class="result-region anchored_pgp-region">
@@ -28,10 +29,9 @@ module.exports = {
       .map((node_id) => toViewParameters(anchored_pgp, node_id))
       .reduce(toArray, [])
     const table = template({nodes})
-    const element = document.createElement('div')
+    const element = createDom(table)
 
-    element.innerHTML = table
-    document.querySelector(`#${domId}`).appendChild(element.children[0])
+    document.querySelector(`#${domId}`).appendChild(element)
   }
 }
 

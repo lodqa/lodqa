@@ -1,13 +1,13 @@
 /*global Springy:true*/
-module.exports = function(options, className) {
-  const element = document.createElement('div')
+const createDom = require('../../../create-dom')
 
-  element.innerHTML = `
+module.exports = function(options, className) {
+  const element = createDom(`
     <div class="${className.join(' ') || 'graph'}">
       <a target="_blank"></a>
       <canvas ${Object.entries(options).map((e) => `${e[0]}="${e[1]}"`).join(' ')}></canvas>
     </div>
-    `
+    `)
 
   const link = element.querySelector('a')
   const canvas = element.querySelector('canvas')
@@ -18,7 +18,7 @@ module.exports = function(options, className) {
 
   updateLinkOnSelect(link, springy)
 
-  return [graph, element.children[0]]
+  return [graph, element]
 }
 
 function updateLinkOnSelect(link, springy) {
