@@ -1,9 +1,9 @@
 const instance = require('../../../instance')
-const toRed = require('../../toRed')
-const toTerm = require('../toTerm')
-const toEdge = require('../toEdge')
-const toLabelAndSetFontNormal = require('../toLabelAndSetFontNormal')
-const switchDirection = require('../switchDirection')
+const toRed = require('../../to-red')
+const toTerm = require('../to-term')
+const toEdge = require('../to-edge')
+const toLabelAndSetFontNormal = require('../to-label-and-set-font-normal')
+const switchDirection = require('../switch-direction')
 
 module.exports = function(graph, addEdge, isFocus, bgp, solution) {
   return Object.keys(solution)

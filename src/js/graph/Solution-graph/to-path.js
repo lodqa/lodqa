@@ -1,4 +1,4 @@
-const switchDirection = require('./switchDirection')
+const switchDirection = require('./switch-direction')
 
 module.exports = function(graph, bgp, edges, transitNodes, instanceNodes, pathInfo) {
   const edge = edges[pathInfo.no]

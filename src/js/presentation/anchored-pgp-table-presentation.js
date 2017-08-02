@@ -1,5 +1,5 @@
 const handlebars = require('handlebars')
-const toArray = require('../collection/toArray')
+const toArray = require('../collection/to-array')
 
 const template = handlebars.compile(`
   <div class="result-region anchored_pgp-region">

@@ -1,4 +1,4 @@
-const websocketPresentation = require('../presentation/websocketPresentation')
+const websocketPresentation = require('../presentation/websocket-presentation')
 
 module.exports = function bindWebsocketPresentation(loader) {
   const presentation = websocketPresentation('lodqa-messages')

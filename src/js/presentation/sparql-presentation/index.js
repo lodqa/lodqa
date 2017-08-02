@@ -1,4 +1,4 @@
-const createTable = require('./createTable')
+const createTable = require('./create-table')
 
 const privateData = {}
 

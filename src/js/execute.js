@@ -1,6 +1,6 @@
-const Loader = require('./loader/loadSolution')
-const BindResult = require('./controller/bindResult')
-const sparqlPresentation = require('./presentation/sparqlPresentation')
+const Loader = require('./loader/load-solution')
+const BindResult = require('./controller/bind-result')
+const sparqlPresentation = require('./presentation/sparql-presentation')
 const answersPresentation = require('./presentation/answers-presentation')
 const LabelFinder = require('./label-finder')
 

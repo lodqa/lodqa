@@ -1,5 +1,5 @@
 const instance = require('../../instance')
-const SolutionGraph = require('../../graph/SolutionGraph')
+const SolutionGraph = require('../../graph/Solution-graph')
 
 module.exports = function(anchoredPgp, bgp, solutions) {
   const graph = new SolutionGraph({

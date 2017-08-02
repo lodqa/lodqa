@@ -1,5 +1,5 @@
-const fixNodePosition = require('../fixNodePosition')
-const toLabelAndSetFontNormal = require('./toLabelAndSetFontNormal')
+const fixNodePosition = require('../fix-node-position')
+const toLabelAndSetFontNormal = require('./to-label-and-set-font-normal')
 
 module.exports = function(graph, addNodes, anchoredPgp) {
   const nodeIds = Object.keys(anchoredPgp.nodes)

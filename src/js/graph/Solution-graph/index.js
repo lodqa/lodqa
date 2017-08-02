@@ -1,8 +1,8 @@
-const lodqaGraph = require('../lodqaGraph')
-const addAnchoredPgpNodes = require('./addAnchoredPgpNodes')
-const addInstanceNode = require('./addInstanceNode')
-const addTransitNode = require('./addTransitNode')
-const addPath = require('./addPath')
+const lodqaGraph = require('../lodqa-graph')
+const addAnchoredPgpNodes = require('./add-anchored-pgp-nodes')
+const addInstanceNode = require('./add-instance-node')
+const addTransitNode = require('./add-transit-node')
+const addPath = require('./add-path')
 
 module.exports = function(options, className) {
   const graph = lodqaGraph(options, className)

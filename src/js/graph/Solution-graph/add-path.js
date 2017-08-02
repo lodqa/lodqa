@@ -1,5 +1,5 @@
-const toEdge = require('./toEdge')
-const toPath = require('./toPath')
+const toEdge = require('./to-edge')
+const toPath = require('./to-path')
 
 module.exports = function(graph, bgp, solution, edges, transitNodes, instanceNodes) {
   return Object.keys(solution)

@@ -1,5 +1,5 @@
-const addNodes = require('./addNodes')
-const addEdge = require('./addEdge')
+const addNodes = require('./add-nodes')
+const addEdge = require('./add-edge')
 const Graph = require('./Graph')
 
 module.exports = function(options, className) {

@@ -1,5 +1,5 @@
-const toTerm = require('./toTerm')
-const toLabel = require('./toLabel')
+const toTerm = require('./to-term')
+const toLabel = require('./to-label')
 
 module.exports = function(solution, edgeId) {
   const [edge] = Object.keys(solution)

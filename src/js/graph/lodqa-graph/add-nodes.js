@@ -1,6 +1,6 @@
 /*global Springy:true*/
-const toRed = require('../toRed')
-const setFont = require('../setFont')
+const toRed = require('../to-red')
+const setFont = require('../set-font')
 
 module.exports = function(graph, nodes, focus) {
   nodes

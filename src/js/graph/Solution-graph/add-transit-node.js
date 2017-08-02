@@ -1,5 +1,5 @@
-const toTerm = require('./toTerm')
-const toLabelAndSetFontNormal = require('./toLabelAndSetFontNormal')
+const toTerm = require('./to-term')
+const toLabelAndSetFontNormal = require('./to-label-and-set-font-normal')
 
 module.exports = function addTransitNode(graph, solution) {
   return Object.keys(solution)
