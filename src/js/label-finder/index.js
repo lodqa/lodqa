@@ -5,8 +5,8 @@ const fetch = sparqlFetchLabel()
 const cache = new LabelCache()
 
 module.exports = class LabefFinder {
-  constructor(graph) {
-    this.graph = graph
+  constructor(callback) {
+    this.callback = callback
   }
 
   onSolution(data) {
@@ -20,13 +20,13 @@ module.exports = class LabefFinder {
         const cachedLabel = cache.get(endpointUrl, url)
 
         if(cachedLabel) {
-          this.graph.updateLabel(url, cachedLabel)
+          this.callback(url, cachedLabel)
         } else {
           fetch(endpointUrl, url, needProxy && '/proxy')
             .then((label) => {
               if (label) {
                 cache.set(endpointUrl, url, label)
-                this.graph.updateLabel(url, label)
+                this.callback(url, label)
               }
             })
         }

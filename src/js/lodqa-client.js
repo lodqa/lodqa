@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 function init() {
   const loader = new Loader()
   const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
-  const labelFinder = new LabelFinder(answersPresentation)
+  const labelFinder = new LabelFinder(answersPresentation.updateLabel)
 
   bindResult({
     sparqlCount: [
