@@ -9,18 +9,6 @@ module.exports = class LabefFinder {
     this.graph = graph
   }
 
-  onAnchoredPgp(domId, anchoredPgp) {
-    const {
-      endpointUrl,
-      needProxy
-    } = getEndPoint()
-
-    for (const node of Object.values(anchoredPgp.nodes)) {
-      fetch(endpointUrl, node.term, needProxy && '/proxy')
-        .then((label) => node.label = label)
-    }
-  }
-
   onSolution(data) {
     const {
       endpointUrl,

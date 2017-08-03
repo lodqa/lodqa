@@ -13,8 +13,7 @@ bindResult({
     sparqlPresentation.setSparqlCount
   ],
   anchoredPgp: [
-    answersPresentation.onAnchoredPgp,
-    labelFinder.onAnchoredPgp
+    answersPresentation.onAnchoredPgp
   ],
   solution: [
     answersPresentation.onSolution,

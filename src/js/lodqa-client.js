@@ -21,8 +21,7 @@ function init() {
     ],
     anchoredPgp: [
       anchoredPgpTablePresentation.onAnchoredPgp,
-      answersPresentation.onAnchoredPgp,
-      labelFinder.onAnchoredPgp
+      answersPresentation.onAnchoredPgp
     ],
     solution: [
       sparqlPresentation.onSolution,
