@@ -12,13 +12,9 @@ gulp
     .pipe(browserify())
     .pipe(gulp.dest(dist))
   )
-  .task('copy', () => gulp
-    .src([`${src}index.js`, `${src}dashboard.js`])
-    .pipe(gulp.dest(dist))
-  )
   .task('auto_compile', () => {
     gulp.watch(src + '**', ['browserify'])
     gulp.watch(src + 'index.js', ['copy'])
     gulp.watch(src + 'dashboard.js', ['copy'])
   })
-  .task('default', ['browserify', 'copy', 'auto_compile'])
+  .task('default', ['browserify', 'auto_compile'])
