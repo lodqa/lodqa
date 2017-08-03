@@ -1,8 +1,8 @@
-module.exports = function(loader, domId) {
+module.exports = function(eventEmitter, domId) {
   const events = {
-    sparqlCount: (callback) => sparqlCount(domId, loader, callback),
-    anchoredPgp: (callback) => anchoredPgp(domId, loader, callback),
-    solution: (callback) => solution(domId, loader, callback),
+    sparqlCount: (callback) => sparqlCount(domId, eventEmitter, callback),
+    anchoredPgp: (callback) => anchoredPgp(domId, eventEmitter, callback),
+    solution: (callback) => solution(domId, eventEmitter, callback),
   }
 
   return (map) => {
@@ -14,14 +14,14 @@ module.exports = function(loader, domId) {
   }
 }
 
-function sparqlCount(domId, loader, onSparqlCount) {
-  loader.on('sparql_count', () => onSparqlCount(0))
+function sparqlCount(domId, eventEmitter, onSparqlCount) {
+  eventEmitter.on('sparql_count', () => onSparqlCount(0))
 }
 
-function anchoredPgp(domId, loader, onAnchoredPgp) {
-  loader.on('anchored_pgp', (anchoredPgp) => onAnchoredPgp(domId, anchoredPgp))
+function anchoredPgp(domId, eventEmitter, onAnchoredPgp) {
+  eventEmitter.on('anchored_pgp', (anchoredPgp) => onAnchoredPgp(domId, anchoredPgp))
 }
 
-function solution(domId, loader, onSolution) {
-  loader.on('solution', (data) => onSolution(domId, data))
+function solution(domId, eventEmitter, onSolution) {
+  eventEmitter.on('solution', (data) => onSolution(domId, data))
 }

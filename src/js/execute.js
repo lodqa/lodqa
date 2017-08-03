@@ -5,7 +5,7 @@ const answersPresentation = require('./presentation/answers-presentation')
 const LabelFinder = require('./label-finder')
 
 const loader = new Loader()
-const bindResult = new BindResult(loader, 'lodqa-results')
+const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
 const labelFinder = new LabelFinder(answersPresentation)
 
 bindResult({

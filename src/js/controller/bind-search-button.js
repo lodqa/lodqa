@@ -31,7 +31,7 @@ function search(event, loader, pgpElement, mappingsElement) {
   const config = document.querySelector('#target').value
 
   loader.beginSearch(pgp, mappings, '/solutions', config)
-  loader.once('ws_close', () => event.target.removeAttribute('disabled'))
+  loader.eventEmitter.once('ws_close', () => event.target.removeAttribute('disabled'))
 }
 
 function validateToSearch(beginSearch, pgpElement, mappingsElement, runner) {

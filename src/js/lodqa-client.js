@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
-  const bindResult = new BindResult(loader, 'lodqa-results')
+  const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
   const labelFinder = new LabelFinder(answersPresentation)
 
   bindResult({
@@ -32,7 +32,7 @@ function init() {
     ]
   })
 
-  bindProgressPresentation(loader)
+  bindProgressPresentation(loader.eventEmitter)
   bindParseRenderingPresentation(loader)
   bindSearchButton(loader)
   bindStopSearchButton(loader)

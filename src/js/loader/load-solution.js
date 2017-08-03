@@ -1,10 +1,14 @@
 const {EventEmitter} = require('events')
 
-module.exports = class extends EventEmitter {
-  beginSearch(pgp, mappings, pathname, config) {
-    this.ws = openConnection(this, pathname, config)
+module.exports = class {
+  constructor() {
+    this.eventEmitter = new EventEmitter()
+  }
 
-    this.once('ws_open', function() {
+  beginSearch(pgp, mappings, pathname, config) {
+    this.ws = openConnection(this.eventEmitter, pathname, config)
+
+    this.eventEmitter.once('ws_open', () => {
       this.ws.send(JSON.stringify({
         pgp,
         mappings
