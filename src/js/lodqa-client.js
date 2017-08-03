@@ -1,7 +1,6 @@
 const Loader = require('./loader/load-solution')
 const BindResult = require('./controller/bind-result')
 const bindProgressPresentation = require('./controller/bind-progress-presentation')
-const bindParseRenderingPresentation = require('./controller/bind-parse-rendering-presentation')
 const bindSearchButton = require('./controller/bind-search-button')
 const bindStopSearchButton = require('./controller/bind-stop-search-button')
 const anchoredPgpTablePresentation = require('./presentation/anchored-pgp-table-Presentation')
@@ -33,7 +32,6 @@ function init() {
   })
 
   bindProgressPresentation(loader.eventEmitter)
-  bindParseRenderingPresentation(loader)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 
