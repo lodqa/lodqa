@@ -1,34 +1,34 @@
 module.exports = function(domId) {
-  const dom = document.getElementById(domId)
+  const element = document.getElementById(domId)
 
-  let hoge = 0
-  let fuga = 0
+  let total = 0
+  let recieved = 0
 
   return {
-    onOpen: () => show(dom),
-    onSparqlCount: (total) => {
-      hoge = total
-      showProgress(dom, 0, total)
+    onOpen: () => show(element),
+    onSparqlCount: (newTotal) => {
+      total = newTotal
+      showProgress(element, 0, newTotal)
     },
-    onSolution: () => showProgress(dom, ++fuga, hoge),
+    onSolution: () => showProgress(element, ++recieved, total),
     onClose: () => {
-      hoge = 0
-      fuga = 0
-      hide(dom)
+      total = 0
+      recieved = 0
+      hide(element)
     }
   }
 }
 
-function show(dom) {
-  updateDisplay(dom, '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>')
+function show(element) {
+  updateDisplay(element, '<div class="lodqa-message">lodqa running ...<img src="images/working.gif"/></div>')
 }
 
-function showProgress(dom, count, total) {
-  updateDisplay(dom, `<div class="lodqa-message">loading ${count} of ${total} <img src="images/working.gif"/></div>`)
+function showProgress(element, count, total) {
+  updateDisplay(element, `<div class="lodqa-message">loading ${count} of ${total} <img src="images/working.gif"/></div>`)
 }
 
-function hide(dom) {
-  updateDisplay(dom, '')
+function hide(element) {
+  updateDisplay(element, '')
 }
 
 function updateDisplay(el, msg) {
