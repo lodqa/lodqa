@@ -6,14 +6,13 @@ const bindStopSearchButton = require('./controller/bind-stop-search-button')
 const anchoredPgpTablePresentation = require('./presentation/anchored-pgp-table-Presentation')
 const answersPresentation = require('./presentation/answers-presentation')
 const sparqlPresentation = require('./presentation/sparql-presentation')
-const LabelFinder = require('./label-finder')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
   const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
-  const labelFinder = new LabelFinder(answersPresentation.updateLabel)
+
 
   bindResult({
     sparqlCount: [
@@ -25,8 +24,7 @@ function init() {
     ],
     solution: [
       sparqlPresentation.onSolution,
-      answersPresentation.onSolution,
-      (domId, data) => labelFinder.onSolution(data)
+      (domId, data) => answersPresentation.onSolution(domId, data)
     ]
   })
 

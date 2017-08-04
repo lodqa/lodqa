@@ -2,6 +2,7 @@ const answerList = require('./answer-list')
 const solutionTable = require('./solution-table')
 const solutionGraph = require('./graph')
 const render = require('./render')
+const LabelFinder = require('./label-finder')
 
 const privateData = {}
 
@@ -26,21 +27,12 @@ class AnswersPresentation {
 
     render(domId, list, table, graph)
 
-    // Set privateData for the updateLabel function
-    privateData.updateLabel = {
-      list: list.updateLabel,
-      table: table.updateLabel,
-      graph: graph.updateLabel
-    }
-  }
-
-  updateLabel(url, label) {
-    // Update labels in the list, the table and the graph
-    for (const func of Object.values(privateData.updateLabel)) {
-      if (func) {
-        func(url, label)
-      }
-    }
+    new LabelFinder().find(data.solutions, (url, label) => {
+      // Update labels in the list, the table and the graph
+      [list.updateLabel, table.updateLabel, graph.updateLabel]
+        .filter((func) => func)
+        .forEach((func) => func(url, label))
+    })
   }
 }
 
