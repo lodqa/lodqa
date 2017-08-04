@@ -6,11 +6,10 @@
   "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {},
   "devDependencies": {
+    "browserify": "^14.4.0",
     "eslint": "^4.3.0",
-    "gulp": "^3.9.1",
-    "gulp-browserify": "^0.5.0",
-    "gulp-debug": "^3.1.0",
     "handlebars": "^4.0.10",
+    "npm-run-all": "^4.0.2",
     "sparql-fetch-label": "^0.0.1"
   },
   "homepage": "https://github.com/lodqa/lodqa.git",
@@ -26,7 +25,10 @@
     "url": "https://github.com/lodqa/lodqa.git"
   },
   "scripts": {
-    "start": "gulp",
-    "lint": "eslint src"
+    "start": "npm run browserify",
+    "lint": "eslint src",
+    "browserify": "npm-run-all --parallel browserify:*",
+    "browserify:lodqa-client": "browserify -d -o public/js/lodqa-client.js src/js/lodqa-client.js",
+    "browserify:execute": "browserify -d -o public/js/execute.js src/js/execute.js"
   }
 }
