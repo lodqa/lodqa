@@ -15,21 +15,33 @@ module.exports = class LabefFinder {
       needProxy
     } = getEndPoint()
 
-    for (const solution of data.solutions) {
-      for (const url of Object.values(solution)) {
-        const cachedLabel = cache.get(endpointUrl, url)
+    // Create an array of non-duplicate URLs
+    const uniqUrls = Array.from(
+      new Set(data.solutions.reduce(
+        (array, solution) => {
+          for (const url of Object.values(solution)){
+            array.push(url)
+          }
+          return array
+        }, [])
+      )
+    )
 
-        if(cachedLabel) {
-          this.callback(url, cachedLabel)
-        } else {
-          fetch(endpointUrl, url, needProxy && '/proxy')
-            .then((label) => {
-              if (label) {
-                cache.set(endpointUrl, url, label)
-                this.callback(url, label)
-              }
-            })
-        }
+
+    // Get labels of urls
+    for (const url of uniqUrls) {
+      const cachedLabel = cache.get(endpointUrl, url)
+
+      if(cachedLabel) {
+        this.callback(url, cachedLabel)
+      } else {
+        fetch(endpointUrl, url, needProxy && '/proxy')
+          .then((label) => {
+            if (label) {
+              cache.set(endpointUrl, url, label)
+              this.callback(url, label)
+            }
+          })
       }
     }
   }
