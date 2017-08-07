@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function changeTarget(target) {
-    const url = 'http://targets.lodqa.org/targets/' + target
+    const url = `http://targets.lodqa.org/targets/${target}`
     const req = new XMLHttpRequest()
 
     req.onreadystatechange = function() {

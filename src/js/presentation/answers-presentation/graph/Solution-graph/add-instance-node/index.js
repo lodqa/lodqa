@@ -26,7 +26,7 @@ function transformIf(predicate, transform, object) {
 function addEdgeToInstance(graph, addEdge, bgp, solution, term) {
   const instanceNode = graph.newNode(term)
   const anchoredPgpNodeId = instanceNode.data.id.substr(1)
-  const edgeId = 's' + anchoredPgpNodeId
+  const edgeId = `s${anchoredPgpNodeId}`
   const anchoredPgpNode = graph.nodeSet[anchoredPgpNodeId]
   const edge = toEdge(solution, edgeId)
   const [source, target] = switchDirection(bgp, [anchoredPgpNodeId, anchoredPgpNode], [term.id, instanceNode])

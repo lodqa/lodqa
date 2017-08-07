@@ -17,8 +17,8 @@ function fromSubject(edge, pathInfo) {
   const anchoredPgpNodeId = edge.subject
 
   return {
-    transitNodeId: 'x' + pathInfo.no + (pathInfo.childNo - 1),
-    instanceNodeId: 'i' + anchoredPgpNodeId,
+    transitNodeId: `x${pathInfo.no}${pathInfo.childNo - 1}`,
+    instanceNodeId: `i${anchoredPgpNodeId}`,
     anchoredPgpNodeId: anchoredPgpNodeId
   }
 }
@@ -27,8 +27,8 @@ function fromObject(edge, pathInfo) {
   const anchoredPgpNodeId = edge.object
 
   return {
-    transitNodeId: 'x' + pathInfo.no + pathInfo.childNo,
-    instanceNodeId: 'i' + anchoredPgpNodeId,
+    transitNodeId: `x${pathInfo.no}${pathInfo.childNo}`,
+    instanceNodeId: `i${anchoredPgpNodeId}`,
     anchoredPgpNodeId: anchoredPgpNodeId
   }
 }

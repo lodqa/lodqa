@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "npm run browserify",
-    "lint": "eslint src",
+    "lint": "eslint src public/js/index.js public/js/dashboard.js",
     "browserify": "npm-run-all --parallel browserify:*",
     "browserify:lodqa-client": "browserify -d -o public/js/lodqa-client.js src/js/lodqa-client.js",
     "browserify:execute": "browserify -d -o public/js/execute.js src/js/execute.js"

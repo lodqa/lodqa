@@ -39,6 +39,13 @@
         ],
         "prefer-destructuring": [
             1
+        ],
+        "prefer-template": [
+            1
+        ],
+        "template-curly-spacing": [
+            1,
+            "never"
         ]
     },
     "env": {

@@ -24,7 +24,7 @@ module.exports = class {
 }
 
 function openConnection(emitter, pathname, config) {
-  const ws = new WebSocket('ws://' + location.host + pathname + '?target=' + config)
+  const ws = new WebSocket(`ws://${location.host}${pathname}?target=${config}`)
 
   ws.onopen = function() {
     emitter.emit('ws_open')
