@@ -7,11 +7,11 @@ const LabelFinder = require('./label-finder')
 const privateData = {}
 
 class AnswersPresentation {
-  onAnchoredPgp(domId, anchored_pgp) {
+  setAnchoredPgp(domId, anchored_pgp) {
     privateData.anchoredPgp = anchored_pgp
   }
 
-  onSolution(domId, data) {
+  showSolution(domId, data) {
     const {
       bgp,
       solutions

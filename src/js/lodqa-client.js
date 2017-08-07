@@ -16,15 +16,15 @@ function init() {
 
   bindResult({
     sparqlCount: [
-      sparqlPresentation.setSparqlCount
+      sparqlPresentation.resetSparqlCount
     ],
     anchoredPgp: [
-      anchoredPgpTablePresentation.onAnchoredPgp,
-      answersPresentation.onAnchoredPgp
+      anchoredPgpTablePresentation.showAnchoredPgp,
+      answersPresentation.setAnchoredPgp
     ],
     solution: [
-      sparqlPresentation.onSolution,
-      (domId, data) => answersPresentation.onSolution(domId, data)
+      sparqlPresentation.showSparql,
+      (domId, data) => answersPresentation.showSolution(domId, data)
     ]
   })
 

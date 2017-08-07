@@ -24,7 +24,7 @@ const template = handlebars.compile(`
 `)
 
 module.exports = {
-  onAnchoredPgp(domId, anchored_pgp) {
+  showAnchoredPgp(domId, anchored_pgp) {
     const nodes = Object.keys(anchored_pgp.nodes)
       .map((node_id) => toViewParameters(anchored_pgp, node_id))
       .reduce(toArray, [])

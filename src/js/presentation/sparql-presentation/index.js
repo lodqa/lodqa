@@ -3,11 +3,11 @@ const createTable = require('./create-table')
 const privateData = {}
 
 class SparqlPresentation {
-  setSparqlCount(count) {
-    privateData.sparqlCount = count
+  resetSparqlCount() {
+    privateData.sparqlCount = 0
   }
 
-  onSolution(domId, data) {
+  showSparql(domId, data) {
     const {
       sparql,
       solutions
