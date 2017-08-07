@@ -12,18 +12,19 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 function init() {
   const loader = new Loader()
   const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
-
+  let sparqlCount = 0
 
   bindResult({
     sparqlCount: [
-      sparqlPresentation.resetSparqlCount
+      () => sparqlCount = 0
     ],
     anchoredPgp: [
       anchoredPgpTablePresentation.showAnchoredPgp,
       answersPresentation.setAnchoredPgp
     ],
     solution: [
-      sparqlPresentation.showSparql,
+      () => sparqlCount++,
+      (domId, data) => sparqlPresentation.show(domId, data, sparqlCount),
       (domId, data) => answersPresentation.showSolution(domId, data)
     ]
   })

@@ -7,15 +7,12 @@ const loader = new Loader()
 const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
 
 bindResult({
-  sparqlCount: [
-    sparqlPresentation.resetSparqlCount
-  ],
   anchoredPgp: [
     answersPresentation.setAnchoredPgp
   ],
   solution: [
     (domId, data) => answersPresentation.showSolution(domId, data),
-    sparqlPresentation.showSparql
+    sparqlPresentation.show
   ]
 })
 
