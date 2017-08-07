@@ -1,34 +1,55 @@
 // Cache of url's label.
 // Labels are stored for each endpoint.
 module.exports = function LabelCache() {
-  const map = new Map()
+  const storedUrl = new Map()
+  const nonResolvableUrl = new Map()
 
   return {
-    get: (endpointUrl, url) => get(map, endpointUrl, url),
-    set: (endpointUrl, url, label) => set(map, endpointUrl, url, label)
+    get: (endpointUrl, url) => get(storedUrl, endpointUrl, url),
+    set: (endpointUrl, url, label) => set(storedUrl, endpointUrl, url, label),
+    setNonResolvableUrl: (endpointUrl, url) => setNonResolvableUrl(nonResolvableUrl, endpointUrl, url),
+    isNonResolvableUrl: (endpointUrl, url) => isNonResolvableUrl(nonResolvableUrl, endpointUrl, url)
   }
 }
 
-function get(map, endpointUrl, url) {
-  if (map.has(endpointUrl)) {
-    return map.get(endpointUrl)
+function get(storedUrl, endpointUrl, url) {
+  if (storedUrl.has(endpointUrl)) {
+    return storedUrl.get(endpointUrl)
       .get(url)
   }
 }
 
-function set(map, endpointUrl, url, label) {
-  const labelMap = getOrCreateLabelMap(map, endpointUrl)
+function set(storedUrl, endpointUrl, url, label) {
+  const labelMap = getOrCreateLabelMap(storedUrl, endpointUrl)
 
   labelMap.set(url, label)
 }
 
-function getOrCreateLabelMap(map, endpointUrl) {
-  if (map.has(endpointUrl)) {
-    return map.get(endpointUrl)
-  } else {
-    const newMap = new Map()
+function setNonResolvableUrl(nonResolvableUrl, endpointUrl, url) {
+  const set = getOrCreateUrlSet(nonResolvableUrl, endpointUrl)
 
-    map.set(endpointUrl, newMap)
-    return newMap
+  set.add(url)
+}
+
+function isNonResolvableUrl(nonResolvableUrl, endpointUrl, url) {
+  if (nonResolvableUrl.get(endpointUrl)) {
+    return nonResolvableUrl.get(endpointUrl)
+      .has(url)
   }
+}
+
+function getOrCreateLabelMap(storedUrl, endpointUrl) {
+  return getOrCreateStoreForEndpoint(storedUrl, endpointUrl, () => new Map())
+}
+
+function getOrCreateUrlSet(storedUrl, endpointUrl) {
+  return getOrCreateStoreForEndpoint(storedUrl, endpointUrl, () => new Set())
+}
+
+function getOrCreateStoreForEndpoint(parentStroe, endpointUrl, constructor) {
+  if (!parentStroe.has(endpointUrl)) {
+    parentStroe.set(endpointUrl, constructor())
+  }
+
+  return parentStroe.get(endpointUrl)
 }

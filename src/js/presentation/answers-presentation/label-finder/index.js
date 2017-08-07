@@ -64,24 +64,27 @@ function getEndPointInformationFromDom() {
 }
 
 // Create an array of non-duplicate URLs
-function getUniqUrls(solutions){
+function getUniqUrls(solutions) {
   return Array.from(
     new Set(solutions.reduce(
       (array, solution) => {
-        for (const url of Object.values(solution)){
+        for (const url of Object.values(solution)) {
           array.push(url)
         }
         return array
-      }, [])
-    )
+      }, []))
   )
 }
 
 // Get labels of urls
-function getLabelOfEachUrl(cache, endpointUrl, url, needProxy, callback){
+function getLabelOfEachUrl(cache, endpointUrl, url, needProxy, callback) {
+  if (cache.isNonResolvableUrl(endpointUrl, url)) {
+    return
+  }
+
   const cachedLabel = cache.get(endpointUrl, url)
 
-  if(cachedLabel) {
+  if (cachedLabel) {
     callback(url, cachedLabel)
   } else {
     fetchLabel(cache, endpointUrl, url, needProxy, callback)
@@ -89,12 +92,14 @@ function getLabelOfEachUrl(cache, endpointUrl, url, needProxy, callback){
 }
 
 // Fetch label of url
-function fetchLabel(cache, endpointUrl, url, needProxy, callback){
+function fetchLabel(cache, endpointUrl, url, needProxy, callback) {
   fetch(endpointUrl, url, needProxy && '/proxy')
     .then((label) => {
       if (label) {
         cache.set(endpointUrl, url, label)
         callback(url, label)
+      } else {
+        cache.setNonResolvableUrl(endpointUrl, url)
       }
     })
 }
