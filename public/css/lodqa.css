@@ -136,6 +136,7 @@ a:hover {
     position: fixed;
     top: 135px;
     width: 533px;
+    z-index: 1;
 }
 
 .examples--hidden {
@@ -468,4 +469,3 @@ input [type="button"]{
     position:relative;
     top:1px;
 }
-
