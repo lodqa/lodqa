@@ -14,13 +14,6 @@
 	<div id="announce">
 		<%= erb :'dashboard/announce' %>
 	</div>
-	<div id="grapheditor" class="hidden">
-		<%= erb :'dashboard/grapheditor' %>
-	</div>
-
-	<div id="runner" class="hidden">
-		<%= erb :'dashboard/runner' %>
-	</div>
 <% else %>
 	<div id="grapheditor">
 		<%= erb :'dashboard/grapheditor' %>
@@ -29,6 +22,8 @@
 	<div id="runner" class="hidden">
 		<%= erb :'dashboard/runner' %>
 	</div>
+
+	<script src="js/lodqa-client.js"></script>
 <% end %>
 
 <script src="js/dashboard.js"></script>

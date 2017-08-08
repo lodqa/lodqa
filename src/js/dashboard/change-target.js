@@ -1,7 +1,7 @@
 const applyConfig = require('./apply-config')
 const setDictionaryUrl = require('./set-dictionary-url')
 
-module.exports = function(target, editor) {
+module.exports = function(target, editor = null) {
   const url = `http://targets.lodqa.org/targets/${target}`
   const req = new XMLHttpRequest()
 
@@ -10,7 +10,9 @@ module.exports = function(target, editor) {
       if (this.status == 200) {
         const config = JSON.parse(this.response)
         applyConfig(config)
-        setDictionaryUrl(editor, config)
+        if (editor) {
+          setDictionaryUrl(editor, config)
+        }
       } else {
         console.log('Gateway error!')
       }
