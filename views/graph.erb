@@ -1,0 +1,15 @@
+<% if @query.nil? %>
+	<div id="announce">
+		<%= erb :'graph/announce' %>
+	</div>
+<% else %>
+	<div id="grapheditor">
+		<%= erb :'graph/grapheditor' %>
+	</div>
+
+	<div id="runner" class="hidden">
+		<%= erb :'graph/runner' %>
+	</div>
+
+  <script src="js/lodqa-client.js"></script>
+<% end %>

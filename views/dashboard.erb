@@ -10,20 +10,4 @@
 	<%= erb :examples %>
 </div>
 
-<% if @query.nil? %>
-	<div id="announce">
-		<%= erb :'dashboard/announce' %>
-	</div>
-<% else %>
-	<div id="grapheditor">
-		<%= erb :'dashboard/grapheditor' %>
-	</div>
-
-	<div id="runner" class="hidden">
-		<%= erb :'dashboard/runner' %>
-	</div>
-
-	<script src="js/lodqa-client.js"></script>
-<% end %>
-
 <script src="js/dashboard.js"></script>
