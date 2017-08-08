@@ -1,18 +1,22 @@
 const Loader = require('./loader/load-solution')
 const BindResult = require('./controller/bind-result')
-const sparqlPresentation = require('./presentation/sparql-presentation')
-const answersPresentation = require('./presentation/answers-presentation')
+const answerIndexPresentation = require('./presentation/answer-index-presentation')
+const SparqlCount = require('./sparql-count')
 
 const loader = new Loader()
-const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
+const bindResult = new BindResult(loader.eventEmitter, 'answer-index')
+const sparqlCount = new SparqlCount()
 
 bindResult({
+  sparqlCount: [
+    () => sparqlCount.reset()
+  ],
   anchoredPgp: [
-    answersPresentation.setAnchoredPgp
+    answerIndexPresentation.setAnchoredPgp
   ],
   solution: [
-    (domId, data) => answersPresentation.showSolution(domId, data),
-    sparqlPresentation.show
+    () => sparqlCount.increment(),
+    (domId, data) => answerIndexPresentation.show(domId, data, sparqlCount.count)
   ]
 })
 

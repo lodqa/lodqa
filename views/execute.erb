@@ -19,6 +19,22 @@
             .answer-index {
                 margin: 40px 10px;
             }
+            .answer-index .solution {
+                display: flex;
+            }
+            .answer-index .answer {
+                width: 300px;
+            }
+            .answer-index .sparqls {
+                display: flex;
+                list-style-type: none;
+                margin: 0 1em;
+                padding: 0;
+            }
+            .answer-index .sparql {
+                margin: 0 0.1em;
+                min-width: 2em;
+            }
 
         </style>
     </head>
@@ -32,7 +48,7 @@
                     <div id="mappings"><%= @mappings.to_json %></div>
                 </div>
                 Show below results of '<%= @query %>':
-                <div id="lodqa-results"></div>
+                <div id="answer-index"></div>
             </div>
             <% end %>
         </div>
