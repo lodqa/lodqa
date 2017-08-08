@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setDictionaryUrl(editor, config)
     setNlqFormTarget(config)
     setEndpoint(config)
-    updateExampleQeries(editor, config)
+    updateExampleQeries(config)
   }
 
   function setTargetDisplay(config) {
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     editor.setDictionaryUrl(dicUrl, predDicUrl)
   }
 
-  function updateExampleQeries(editor, config) {
+  function updateExampleQeries(config) {
     const {
       sample_queries
     } = config
