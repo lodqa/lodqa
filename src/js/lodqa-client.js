@@ -6,25 +6,26 @@ const bindStopSearchButton = require('./controller/bind-stop-search-button')
 const anchoredPgpTablePresentation = require('./presentation/anchored-pgp-table-Presentation')
 const answersPresentation = require('./presentation/answers-presentation')
 const sparqlPresentation = require('./presentation/sparql-presentation')
+const SparqlCount = require('./sparql-count')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
   const bindResult = new BindResult(loader.eventEmitter, 'lodqa-results')
-  let sparqlCount = 0
+  const sparqlCount = new SparqlCount()
 
   bindResult({
     sparqlCount: [
-      () => sparqlCount = 0
+      () => sparqlCount.reset()
     ],
     anchoredPgp: [
       anchoredPgpTablePresentation.showAnchoredPgp,
       answersPresentation.setAnchoredPgp
     ],
     solution: [
-      () => sparqlCount++,
-      (domId, data) => sparqlPresentation.show(domId, data, sparqlCount),
+      () => sparqlCount.increment(),
+      (domId, data) => sparqlPresentation.show(domId, data, sparqlCount.count),
       (domId, data) => answersPresentation.showSolution(domId, data)
     ]
   })
