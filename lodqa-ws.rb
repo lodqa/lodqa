@@ -73,8 +73,8 @@ class LodqaWS < Sinatra::Base
 		keywords = @pgp[:nodes].values.map{|n| n[:text]}
 		@mappings = tf.find(keywords)
 
-		targets = get_targets
-		@target = params['target'] || targets.first
+		@targets = get_targets
+		@target = params['target'] || @targets.first
 
 		# For the label finder
 		@endpoint_url = config['endpoint_url']

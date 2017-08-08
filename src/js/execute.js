@@ -21,6 +21,6 @@ const pgp = JSON.parse(document.querySelector('#pgp')
 const mappings = JSON.parse(document.querySelector('#mappings')
   .innerHTML)
 const config = document.querySelector('#target')
-  .innerHTML
+  .value
 
 loader.beginSearch(pgp, mappings, '/solutions', config)
