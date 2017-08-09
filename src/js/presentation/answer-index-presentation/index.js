@@ -1,4 +1,5 @@
 const Handlebars = require('handlebars')
+const findLabel = require('../find-label')
 const updateAnswers = require('./update-answers')
 const getUniqAnswers = require('./get-uniq-answers')
 
@@ -38,6 +39,11 @@ class AnswerIndexPresentation {
     )
 
     updateDisplay(domId, answers)
+
+    findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
+      answers.get(url).label = label
+      updateDisplay(domId, answers)
+    })
   }
 }
 
