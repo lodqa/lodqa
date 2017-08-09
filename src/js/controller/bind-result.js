@@ -1,27 +1,21 @@
-module.exports = function(eventEmitter, domId) {
-  const events = {
-    sparqlCount: (callback) => sparqlCount(domId, eventEmitter, callback),
-    anchoredPgp: (callback) => anchoredPgp(domId, eventEmitter, callback),
-    solution: (callback) => solution(domId, eventEmitter, callback),
-  }
+const camelCase = require('camel-case')
 
+const events = [
+  'sparql_count',
+  'anchored_pgp',
+  'solution'
+]
+
+module.exports = function(eventEmitter) {
   return (map) => {
-    for (const [event, callbacks] of Object.entries(map)) {
-      for (const callback of callbacks) {
-        events[event](callback)
+    for (const event of events) {
+      const callbacks = map[camelCase(event)]
+
+      if (callbacks) {
+        for (const callback of callbacks) {
+          eventEmitter.on(event, callback)
+        }
       }
     }
   }
-}
-
-function sparqlCount(domId, eventEmitter, onSparqlCount) {
-  eventEmitter.on('sparql_count', () => onSparqlCount(0))
-}
-
-function anchoredPgp(domId, eventEmitter, onAnchoredPgp) {
-  eventEmitter.on('anchored_pgp', (anchoredPgp) => onAnchoredPgp(domId, anchoredPgp))
-}
-
-function solution(domId, eventEmitter, onSolution) {
-  eventEmitter.on('solution', (data) => onSolution(domId, data))
 }

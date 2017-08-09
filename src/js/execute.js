@@ -4,19 +4,20 @@ const answerIndexPresentation = require('./presentation/answer-index-presentatio
 const SparqlCount = require('./sparql-count')
 
 const loader = new Loader()
-const bindResult = new BindResult(loader.eventEmitter, 'answer-index')
+const bindResult = new BindResult(loader.eventEmitter)
 const sparqlCount = new SparqlCount()
+const domId = 'answer-index'
 
 bindResult({
   sparqlCount: [
     () => sparqlCount.reset()
   ],
   anchoredPgp: [
-    answerIndexPresentation.setAnchoredPgp
+    (data) => answerIndexPresentation.setAnchoredPgp(domId, data)
   ],
   solution: [
     () => sparqlCount.increment(),
-    (domId, data) => answerIndexPresentation.show(domId, data, sparqlCount.count)
+    (data) => answerIndexPresentation.show(domId, data, sparqlCount.count)
   ]
 })
 

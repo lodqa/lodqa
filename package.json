@@ -7,6 +7,7 @@
   "dependencies": {},
   "devDependencies": {
     "browserify": "^14.4.0",
+    "camel-case": "^3.0.0",
     "eslint": "^4.3.0",
     "handlebars": "^4.0.10",
     "npm-run-all": "^4.0.2",
