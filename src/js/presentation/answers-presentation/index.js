@@ -1,8 +1,9 @@
+const findLabel = require('../find-label')
 const answerList = require('./answer-list')
 const solutionTable = require('./solution-table')
 const solutionGraph = require('./graph')
 const render = require('./render')
-const LabelFinder = require('./label-finder')
+const getUniqUrls = require('./get-uniq-urls')
 
 const privateData = {}
 
@@ -27,7 +28,7 @@ class AnswersPresentation {
 
     render(domId, list, table, graph)
 
-    new LabelFinder().find(data.solutions, (url, label) => {
+    findLabel(getUniqUrls(solutions), (url, label) => {
       // Update labels in the list, the table and the graph
       [list.updateLabel, table.updateLabel, graph.updateLabel]
         .filter((func) => func)
