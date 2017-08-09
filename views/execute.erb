@@ -19,19 +19,46 @@
             .answer-index {
                 margin: 40px 10px;
             }
-            .answer-index .solution {
+            #progress-bar .sparqls {
+                background-color: #222288;
+                border-radius: 3px;
+                display: flex;
+                flex-wrap: wrap;
+                list-style-type: none;
+                margin: 0 -9px;
+                padding: 0;
+            }
+            #progress-bar .sparql {
+                background-color: white;
+                margin: 2px;
+                padding: 1px 2px;
+            }
+            #progress-bar .sparql-number {
+                display: inline-block;
+                min-width: 2.1em;
+            }
+            #progress-bar .number-of-answers {
+                display: inline-block;
+                min-width: 1.3em;
+                text-align: right;
+            }
+            #progress-bar .number-of-answers .fa-spinner {
+                color: mediumvioletred;
+            }
+            #answer-index .solution {
                 display: flex;
             }
-            .answer-index .answer {
+            #answer-index .answer {
                 width: 300px;
             }
-            .answer-index .sparqls {
+            #answer-index .sparqls {
                 display: flex;
+                flex-wrap: wrap;
                 list-style-type: none;
                 margin: 0 1em;
                 padding: 0;
             }
-            .answer-index .sparql {
+            #answer-index .sparql {
                 margin: 0 0.1em;
                 min-width: 2em;
             }
@@ -48,6 +75,7 @@
                     <div id="mappings"><%= @mappings.to_json %></div>
                 </div>
                 Show below results of '<%= @query %>':
+                <div id="progress-bar"></div>
                 <div id="answer-index"></div>
             </div>
             <% end %>

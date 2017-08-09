@@ -5,7 +5,8 @@ const events = [
   'ws_close',
   'sparql_count',
   'anchored_pgp',
-  'solution'
+  'solution',
+  'error'
 ]
 
 module.exports = function(eventEmitter) {
