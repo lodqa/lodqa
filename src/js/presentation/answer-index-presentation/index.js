@@ -38,19 +38,20 @@ class AnswerIndexPresentation {
       data.sparql
     )
 
-    updateDisplay(domId, answers)
+    updateDisplay(domId, Array.from(answers.values()))
 
     findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
-      answers.get(url).label = label
-      updateDisplay(domId, answers)
+      answers.get(url)
+        .label = label
+      updateDisplay(domId, Array.from(answers.values()))
     })
   }
 }
 
-function updateDisplay(domId, answers){
+function updateDisplay(domId, answers) {
   document.querySelector(`#${domId}`)
     .innerHTML = template({
-      answers: Array.from(answers.values())
+      answers
     })
 }
 
