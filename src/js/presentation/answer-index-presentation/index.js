@@ -1,7 +1,7 @@
 const Handlebars = require('handlebars')
 const findLabel = require('../find-label')
 const updateAnswers = require('./update-answers')
-const getUniqAnswers = require('./get-uniq-answers')
+const getUniqAnswers = require('../get-uniq-answers')
 
 const template = Handlebars.compile(`
   {{#each answers}}
