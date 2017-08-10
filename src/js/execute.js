@@ -7,17 +7,18 @@ const loader = new Loader()
 const bindResult = new BindResult(loader.eventEmitter)
 const sparqlCount = new SparqlCount()
 const domId = 'answer-index'
+const anchoredPgp = {}
 
 bindResult({
   sparqlCount: [
     () => sparqlCount.reset()
   ],
   anchoredPgp: [
-    (data) => answerIndexPresentation.setAnchoredPgp(domId, data)
+    (data) => anchoredPgp.focus = data.focus
   ],
   solution: [
     () => sparqlCount.increment(),
-    (data) => answerIndexPresentation.show(domId, data, sparqlCount.count)
+    (data) => answerIndexPresentation(domId, data, sparqlCount.count, anchoredPgp.focus)
   ]
 })
 

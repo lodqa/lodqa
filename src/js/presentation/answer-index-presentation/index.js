@@ -3,7 +3,6 @@ const findLabel = require('../find-label')
 const updateAnswers = require('./update-answers')
 const getUniqAnswers = require('./get-uniq-answers')
 
-const privateData = {}
 const template = Handlebars.compile(`
   {{#each answers}}
     <div class="solution">
@@ -23,31 +22,6 @@ const template = Handlebars.compile(`
 // The answer is an object that has a url, a label and an array of sparql.
 const answers = new Map()
 
-class AnswerIndexPresentation {
-  setAnchoredPgp(domId, anchored_pgp) {
-    privateData.anchoredPgp = anchored_pgp
-  }
-
-  show(domId, data, sparqlCount) {
-    const uniqAnswers = getUniqAnswers(data.solutions, privateData.anchoredPgp.focus)
-
-    updateAnswers(
-      answers,
-      uniqAnswers,
-      sparqlCount,
-      data.sparql
-    )
-
-    updateDisplay(domId, Array.from(answers.values()))
-
-    findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
-      answers.get(url)
-        .label = label
-      updateDisplay(domId, Array.from(answers.values()))
-    })
-  }
-}
-
 function updateDisplay(domId, answers) {
   document.querySelector(`#${domId}`)
     .innerHTML = template({
@@ -55,4 +29,21 @@ function updateDisplay(domId, answers) {
     })
 }
 
-module.exports = new AnswerIndexPresentation
+module.exports = function (domId, data, sparqlCount, focusNode) {
+  const uniqAnswers = getUniqAnswers(data.solutions, focusNode)
+
+  updateAnswers(
+    answers,
+    uniqAnswers,
+    sparqlCount,
+    data.sparql
+  )
+
+  updateDisplay(domId, Array.from(answers.values()))
+
+  findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
+    answers.get(url)
+      .label = label
+    updateDisplay(domId, Array.from(answers.values()))
+  })
+}
