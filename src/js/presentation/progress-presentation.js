@@ -5,13 +5,13 @@ module.exports = function(domId) {
   let recieved = 0
 
   return {
-    onOpen: () => show(element),
-    onSparqlCount: (newTotal) => {
+    show: () => show(element),
+    setTotal: (newTotal) => {
       total = newTotal
       showProgress(element, 0, newTotal)
     },
-    onSolution: () => showProgress(element, ++recieved, total),
-    onClose: () => {
+    updateProgress: () => showProgress(element, ++recieved, total),
+    hide: () => {
       total = 0
       recieved = 0
       hide(element)

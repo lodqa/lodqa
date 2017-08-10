@@ -1,6 +1,8 @@
 const camelCase = require('camel-case')
 
 const events = [
+  'ws_open',
+  'ws_close',
   'sparql_count',
   'anchored_pgp',
   'solution'
