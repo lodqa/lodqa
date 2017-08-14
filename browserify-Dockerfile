@@ -1,0 +1,11 @@
+FROM node:alpine
+
+RUN mkdir -p /app
+
+COPY ./package.json /app/
+WORKDIR /app
+RUN npm install
+
+COPY src /app/src
+RUN mkdir -p ./public/js
+RUN npm start
