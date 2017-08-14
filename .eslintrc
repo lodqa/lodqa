@@ -46,6 +46,10 @@
         "template-curly-spacing": [
             1,
             "never"
+        ],
+        "import/no-unresolved": [
+            2,
+            { commonjs: true }
         ]
     },
     "env": {
@@ -59,5 +63,6 @@
         "ecmaFeatures": {
             "modules": true
         }
-    }
+    },
+    "plugins": ["import"]
 }

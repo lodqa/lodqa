@@ -9,6 +9,7 @@
     "browserify": "^14.4.0",
     "camel-case": "^3.0.0",
     "eslint": "^4.3.0",
+    "eslint-plugin-import": "^2.7.0",
     "handlebars": "^4.0.10",
     "npm-run-all": "^4.0.2",
     "sparql-fetch-label": "^0.0.1"
