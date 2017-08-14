@@ -18,17 +18,17 @@ function init() {
   const progressPresentation = ProgressPresentation('lodqa-messages')
 
   bindResult({
-    wsOpen: [
+    ws_open: [
       progressPresentation.show
     ],
-    wsClose: [
+    ws_close: [
       progressPresentation.hide
     ],
-    sparqlCount: [
+    sparql_count: [
       () => sparqlCount.reset(),
       progressPresentation.setTotal
     ],
-    anchoredPgp: [
+    anchored_pgp: [
       (data) => anchoredPgpTablePresentation.showAnchoredPgp(domId, data),
       (data) => answersPresentation.setAnchoredPgp(domId, data)
     ],

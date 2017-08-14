@@ -12,11 +12,11 @@ const progressBarDomId = 'progress-bar'
 const anchoredPgp = {}
 
 bindResult({
-  sparqlCount: [
+  sparql_count: [
     () => sparqlCount.reset(),
     (total) => progressBarPresentation.setTotalSparqlCount(progressBarDomId, total)
   ],
-  anchoredPgp: [
+  anchored_pgp: [
     (data) => anchoredPgp.focus = data.focus
   ],
   solution: [
@@ -28,7 +28,7 @@ bindResult({
     () => progressBarPresentation.stop(progressBarDomId, sparqlCount.count),
     (data) => console.error(data)
   ],
-  wsClose: [
+  ws_close: [
     () => progressBarPresentation.stop(progressBarDomId, sparqlCount.count)
   ]
 })

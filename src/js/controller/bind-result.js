@@ -1,5 +1,3 @@
-const camelCase = require('camel-case')
-
 const events = [
   'ws_open',
   'ws_close',
@@ -12,7 +10,7 @@ const events = [
 module.exports = function(eventEmitter) {
   return (map) => {
     for (const event of events) {
-      const callbacks = map[camelCase(event)]
+      const callbacks = map[event]
 
       if (callbacks) {
         for (const callback of callbacks) {
