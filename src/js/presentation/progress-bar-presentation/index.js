@@ -2,7 +2,7 @@ const render = require('./render')
 const getUniqAnswers = require('../get-uniq-answers')
 
 module.exports = {
-  setTotalSparqlCount(domId, total) {
+  show(domId, total) {
     // Render all of the progress bar
     const viewModel = Array.from(Array(total)).map((val, index) => ({sparqlNumber: index + 1}))
     render(domId, viewModel)

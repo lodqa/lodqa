@@ -14,7 +14,7 @@ const anchoredPgp = {}
 bindResult({
   sparql_count: [
     () => sparqlCount.reset(),
-    (total) => progressBarPresentation.setTotalSparqlCount(progressBarDomId, total)
+    (total) => progressBarPresentation.show(progressBarDomId, total)
   ],
   anchored_pgp: [
     (data) => anchoredPgp.focus = data.focus
