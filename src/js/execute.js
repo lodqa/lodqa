@@ -27,6 +27,9 @@ bindResult({
   error: [
     () => progressBarPresentation.stop(progressBarDomId, sparqlCount.count),
     (data) => console.error(data)
+  ],
+  wsClose: [
+    () => progressBarPresentation.stop(progressBarDomId, sparqlCount.count)
   ]
 })
 
@@ -38,3 +41,9 @@ const config = document.querySelector('#target')
   .value
 
 loader.beginSearch(pgp, mappings, '/solutions', config)
+
+document.body.addEventListener('keyup', (e) => {
+  if(e.key === 'Escape') {
+    loader.stopSearch()
+  }
+})
