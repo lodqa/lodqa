@@ -3,24 +3,27 @@ const BindResult = require('./controller/bind-result')
 const answerIndexPresentation = require('./presentation/answer-index-presentation')
 const SparqlCount = require('./sparql-count')
 const progressBarPresentation = require('./presentation/progress-bar-presentation')
+const sparqlPresentation = require('./presentation/sparql-presentation')
 
 const loader = new Loader()
 const bindResult = new BindResult(loader.eventEmitter)
 const sparqlCount = new SparqlCount()
 const answerIndexnDomId = 'answer-index'
 const progressBarDomId = 'progress-bar'
-const anchoredPgp = {}
+let anchoredPgp = null
+const solution = new Map()
 
 bindResult({
   sparql_count: [
     () => sparqlCount.reset(),
-    (total) => progressBarPresentation.show(progressBarDomId, total)
+    (total) => progressBarPresentation.show(progressBarDomId, total, (sparqlCount) => sparqlPresentation(sparqlCount, anchoredPgp, solution.get(sparqlCount)))
   ],
   anchored_pgp: [
-    (data) => anchoredPgp.focus = data.focus
+    (data) => anchoredPgp = data
   ],
   solution: [
     () => sparqlCount.increment(),
+    (data) => solution.set(`${sparqlCount.count}`, data),
     (data) => answerIndexPresentation(answerIndexnDomId, data, sparqlCount.count, anchoredPgp.focus),
     (data) => progressBarPresentation.progress(progressBarDomId, data.solutions, sparqlCount.count, anchoredPgp.focus)
   ],
@@ -46,4 +49,11 @@ document.body.addEventListener('keyup', (e) => {
   if(e.key === 'Escape') {
     loader.stopSearch()
   }
+})
+
+document.querySelector('#lightbox').addEventListener('click', (e) => {
+  if(e.target.closest('#sparql')) {
+    return
+  }
+  e.target.closest('#lightbox').classList.add('hidden')
 })

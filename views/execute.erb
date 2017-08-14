@@ -29,9 +29,16 @@
                 padding: 0;
             }
             #progress-bar .sparql {
-                background-color: white;
+                background-color: darkgray;
                 margin: 2px;
                 padding: 1px 2px;
+            }
+            #progress-bar .sparql.no-answer {
+                background-color: darkgray;
+            }
+            #progress-bar .sparql.has-answer {
+                background-color: white;
+                cursor: pointer;
             }
             #progress-bar .sparql-number {
                 display: inline-block;
@@ -62,6 +69,33 @@
                 margin: 0 0.1em;
                 min-width: 2em;
             }
+            #lightbox {
+                background: rgba(0,0,0,.7);
+                height: 100%;
+                left: 0;
+                overflow-x: scroll;
+                position: fixed;
+                top: 0;
+                width: 100%;
+            }
+            #lightbox.hidden {
+                display: none;
+            }
+            #lightbox p {
+                color: #fff;
+                font-family: 'helvetica';
+                font-size: 14px;
+                margin-right: 20px;
+                position: fixed;
+                right: 0;
+            }
+            #lightbox #content {
+                background: white;
+                border-radius: 3px;
+                margin: 100px auto;
+                padding: 0.1em 1.5em 2em 1em;
+                width: calc(100% - 100px);
+            }
 
         </style>
     </head>
@@ -77,6 +111,12 @@
                 Show below results of '<%= @query %>':
                 <div id="progress-bar"></div>
                 <div id="answer-index"></div>
+                <div id="lightbox" class="hidden">
+                    <p>Click to close</p>
+                    <div id="content">
+                        <div id="sparql"></div>
+                    </div>
+                </div>
             </div>
             <% end %>
         </div>

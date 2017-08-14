@@ -15,9 +15,19 @@ const template = handlebars.compile(`
   </ul>
 `)
 
-module.exports = function(domId, viewModel) {
-  document.querySelector(`#${domId}`)
+module.exports = function(domId, viewModel, onClick) {
+  const element = document.querySelector(`#${domId}`)
+
+  element
     .innerHTML = template({
       sparqls: viewModel
     })
+
+  element.addEventListener('click', (e) => {
+    const sparql = e.target.closest('.sparql')
+
+    if(sparql){
+      onClick(sparql.getAttribute('data-sparql-number'))
+    }
+  })
 }

@@ -2,17 +2,28 @@ const render = require('./render')
 const getUniqAnswers = require('../get-uniq-answers')
 
 module.exports = {
-  show(domId, total) {
+  show(domId, total, onSparqlClick) {
     // Render all of the progress bar
-    const viewModel = Array.from(Array(total)).map((val, index) => ({sparqlNumber: index + 1}))
-    render(domId, viewModel)
+    const viewModel = Array.from(Array(total))
+      .map((val, index) => ({
+        sparqlNumber: index + 1
+      }))
+    render(domId, viewModel, onSparqlClick)
   },
   progress(domId, solutions, sparqlCount, focusNode) {
     const current = getCurrentSparql(domId, sparqlCount)
+    const uniqAnswersLength = getUniqAnswers(solutions, focusNode)
+      .length
+
     // Show number of answers of the solution that was just arrived.
     current.querySelector('.number-of-answers')
-      .innerHTML = getUniqAnswers(solutions, focusNode)
-        .length
+      .innerHTML = uniqAnswersLength
+
+    if(uniqAnswersLength) {
+      current.classList.add('has-answer')
+    } else {
+      current.classList.add('no-answer')
+    }
 
     // Show the spinner icon for the next sparql
     const next = current.nextElementSibling
