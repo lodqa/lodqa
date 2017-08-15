@@ -28,7 +28,7 @@ bindResult({
     (data) => progressBarPresentation.progress(progressBarDomId, data.solutions, sparqlCount.count, anchoredPgp.focus)
   ],
   error: [
-    () => progressBarPresentation.stop(progressBarDomId, sparqlCount.count),
+    (data) => progressBarPresentation.stop(progressBarDomId, sparqlCount.count, data),
     (data) => console.error(data)
   ],
   ws_close: [
