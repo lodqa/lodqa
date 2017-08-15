@@ -8,5 +8,6 @@ node_modules
 bower.json
 browsorify.sh
 gulpfile.js
+package.json
 Dockerfile
 *.md
