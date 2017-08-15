@@ -57,3 +57,7 @@ document.querySelector('#lightbox').addEventListener('click', (e) => {
   }
   e.target.closest('#lightbox').classList.add('hidden')
 })
+
+document.querySelector('#show-only-has-answers').addEventListener('click', () => {
+  document.querySelector('#progress-bar').classList.toggle('show-only-has-answers')
+})

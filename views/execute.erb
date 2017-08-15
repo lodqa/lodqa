@@ -36,6 +36,9 @@
             #progress-bar .sparql.no-answer {
                 background-color: darkgray;
             }
+            #progress-bar.show-only-has-answers .sparql.no-answer {
+                display: none;
+            }
             #progress-bar .sparql.has-answer {
                 background-color: white;
                 cursor: pointer;
@@ -108,7 +111,13 @@
                     <div id="pgp"><%= @pgp.to_json %></div>
                     <div id="mappings"><%= @mappings.to_json %></div>
                 </div>
-                Show below results of '<%= @query %>':
+                <div>
+                  Show below results of '<%= @query %>':
+                </div>
+                <div>
+                  <input type="checkbox" id="show-only-has-answers">
+                  <label for="show-only-has-answers">Show only sparqls with answers</label>
+                </div>
                 <div id="progress-bar"></div>
                 <div id="answer-index"></div>
                 <div id="lightbox" class="hidden">
