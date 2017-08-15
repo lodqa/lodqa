@@ -3,7 +3,7 @@ const BindResult = require('./controller/bind-result')
 const SparqlCount = require('./sparql-count')
 const ProgressBarPresentation = require('./presentation/progress-bar-presentation')
 const SparqlAndAnswersPresentation = require('./presentation/sparql-and-answers-presentation')
-const answerIndexPresentation = require('./presentation/answer-index-presentation')
+const AnswerIndexPresentation = require('./presentation/answer-index-presentation')
 const beginSearch = require('./execute/begin-search')
 const bindEscKeyToStopSearch = require('./execute/bind-esc-key-to-stop-search')
 const bindCheckboxToToggleShowOnlyHasAnswers = require('./execute/bind-checkbox-to-toggle-show-only-has-answers')
@@ -15,6 +15,7 @@ let anchoredPgp = null
 const solution = new Map()
 const progressBarPresentation = new ProgressBarPresentation('progress-bar')
 const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation('lightbox')
+const answerIndexPresentation = new AnswerIndexPresentation('answer-index')
 
 bindResult({
   sparql_count: [
@@ -27,7 +28,7 @@ bindResult({
   solution: [
     () => sparqlCount.increment(),
     (data) => solution.set(`${sparqlCount.count}`, data),
-    (data) => answerIndexPresentation('answer-index', data, sparqlCount.count, anchoredPgp.focus),
+    (data) => answerIndexPresentation.show(data, sparqlCount.count, anchoredPgp.focus),
     (data) => progressBarPresentation.progress(data.solutions, sparqlCount.count, anchoredPgp.focus)
   ],
   error: [

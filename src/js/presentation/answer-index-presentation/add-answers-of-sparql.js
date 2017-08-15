@@ -1,10 +1,10 @@
-module.exports = function(answers, uniqAnswers, sparqlCount, sparql) {
+module.exports = function(answers, uniqAnswers, sparqlNumber, sparql) {
   uniqAnswers
     .map(
       (answer) => (
         Object.assign({
           sparqls: [{
-            name: `S${sparqlCount}`,
+            name: `S${sparqlNumber}`,
             sparql: sparql
           }]
         }, answer)))
