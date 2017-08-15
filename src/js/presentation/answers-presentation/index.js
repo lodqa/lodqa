@@ -8,11 +8,11 @@ const getUniqUrls = require('./get-uniq-urls')
 const privateData = {}
 
 class AnswersPresentation {
-  setAnchoredPgp(domId, anchored_pgp) {
+  setAnchoredPgp(anchored_pgp) {
     privateData.anchoredPgp = anchored_pgp
   }
 
-  showSolution(domId, data) {
+  showSolution(dom, data) {
     const {
       bgp,
       solutions
@@ -26,7 +26,7 @@ class AnswersPresentation {
     const table = solutionTable(solutions)
     const graph = solutionGraph(privateData.anchoredPgp, bgp, solutions)
 
-    render(domId, list, table, graph)
+    render(dom, list, table, graph)
 
     findLabel(getUniqUrls(solutions), (url, label) => {
       // Update labels in the list, the table and the graph

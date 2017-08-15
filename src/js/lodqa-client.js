@@ -30,12 +30,12 @@ function init() {
     ],
     anchored_pgp: [
       (data) => anchoredPgpTablePresentation.showAnchoredPgp(domId, data),
-      (data) => answersPresentation.setAnchoredPgp(domId, data)
+      (data) => answersPresentation.setAnchoredPgp(data)
     ],
     solution: [
       () => sparqlCount.increment(),
-      (data) => sparqlPresentation.show(domId, data, sparqlCount.count),
-      (data) => answersPresentation.showSolution(domId, data),
+      (data) => sparqlPresentation.show(document.querySelector(`#${domId}`), data, sparqlCount.count),
+      (data) => answersPresentation.showSolution(document.querySelector(`#${domId}`), data),
       progressPresentation.updateProgress
     ]
   })

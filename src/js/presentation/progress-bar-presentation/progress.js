@@ -1,7 +1,7 @@
 const getUniqAnswers = require('../get-uniq-answers')
 const getCurrentSparql = require('./get-current-sparql')
 
-module.exports = function progress(domId, solutions, sparqlCount, focusNode) {
+module.exports = function(domId, solutions, sparqlCount, focusNode) {
   const current = getCurrentSparql(domId, sparqlCount)
   const uniqAnswersLength = getUniqAnswers(solutions, focusNode)
     .length

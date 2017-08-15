@@ -3,7 +3,7 @@ const createTable = require('./create-table')
 const privateData = {}
 
 class SparqlPresentation {
-  show(domId, data, sparqlCount) {
+  show(dom, data, sparqlCount) {
     const {
       sparql,
       solutions
@@ -14,12 +14,12 @@ class SparqlPresentation {
     }
 
     // Add a table to the dom tree
-    document.querySelector(`#${domId}`)
+    dom
       .appendChild(createTable(sparql, sparqlCount))
 
     // Enable syntax highlight of sparql
     /*global CodeMirror:true*/
-    const sparqls = document.querySelectorAll(`#${domId} textarea`)
+    const sparqls = dom.querySelectorAll('textarea')
     CodeMirror
       .fromTextArea(sparqls[sparqls.length - 1], {
         mode: 'application/sparql-query',

@@ -9,7 +9,7 @@ const region = `<div class="answers-region">
 </div>
 `
 
-module.exports = function(domId, list, table, graph) {
+module.exports = function(dom, list, table, graph) {
   const element = createDom(region)
 
   element.appendChild(list.dom)
@@ -25,6 +25,5 @@ module.exports = function(domId, list, table, graph) {
     .appendChild(showGraphButton)
 
   // Add an element to the dom tree
-  document.querySelector(`#${domId}`)
-    .appendChild(element)
+  dom.appendChild(element)
 }
