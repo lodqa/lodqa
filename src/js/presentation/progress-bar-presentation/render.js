@@ -10,12 +10,15 @@ const template = handlebars.compile(`
             <i class="fa fa-spinner fa-spin fa-fw"></i>
           {{/if}}
         </span>
+        <span class="except-from-answers">
+          <input type="checkbox" id="except-{{sparqlNumber}}"><label for="except-{{sparqlNumber}}">except</label>
+        </span>
       </li>
     {{/each}}
   </ul>
 `)
 
-module.exports = function(domId, viewModel, onClick) {
+module.exports = function(domId, viewModel, onClick, onChange) {
   const element = document.querySelector(`#${domId}`)
 
   element
@@ -24,10 +27,23 @@ module.exports = function(domId, viewModel, onClick) {
     })
 
   element.addEventListener('click', (e) => {
+    const hideAnswer = e.target.closest('.except-from-answers')
+    if (hideAnswer) {
+      return
+    }
+
     const sparql = e.target.closest('.sparql')
 
-    if(sparql){
+    if (sparql) {
       onClick(sparql.getAttribute('data-sparql-number'))
+    }
+  })
+
+  element.addEventListener('change', (e) => {
+    const sparql = e.target.closest('.sparql')
+
+    if (sparql) {
+      onChange(sparql.getAttribute('data-sparql-number'), e.target.checked)
     }
   })
 }

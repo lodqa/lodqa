@@ -15,11 +15,14 @@ const template = Handlebars.compile(`
   {{/each}}
 `)
 
-module.exports = function(domId, answersMap) {
+module.exports = function(domId, answersMap, hideSparqls) {
   const answers = Array.from(answersMap.values())
+  const hoge = answers.map((a) => Object.assign({}, a, {
+    sparqls: a.sparqls.filter((sparql) => !hideSparqls.has(sparql.name.substr(1)))
+  }))
 
   document.querySelector(`#${domId}`)
     .innerHTML = template({
-      answers
+      answers: hoge
     })
 }

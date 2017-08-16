@@ -7,8 +7,8 @@ module.exports = class {
     this.progressBarDomId = progressBarDomId
   }
 
-  show(total, onSparqlClick) {
-    show(this.progressBarDomId, total, onSparqlClick)
+  show(total, onSparqlClick, onChcekChange) {
+    show(this.progressBarDomId, total, onSparqlClick, onChcekChange)
   }
 
   progress(solutions, sparqlCount, focusNode) {

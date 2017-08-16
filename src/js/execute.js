@@ -20,7 +20,11 @@ const answerIndexPresentation = new AnswerIndexPresentation('answer-index')
 bindResult({
   sparql_count: [
     () => sparqlCount.reset(),
-    (total) => progressBarPresentation.show(total, (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, anchoredPgp, solution.get(sparqlCount)))
+    (total) => progressBarPresentation.show(
+      total,
+      (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, anchoredPgp, solution.get(sparqlCount)),
+      (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
+    )
   ],
   anchored_pgp: [
     (data) => anchoredPgp = data
