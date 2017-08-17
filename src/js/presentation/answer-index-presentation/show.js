@@ -4,6 +4,11 @@ const addAnswersOfSparql = require('./add-answers-of-sparql')
 const updateDisplay = require('./update-display')
 
 module.exports = function(domId, answersMap, data, sparqlNumber, focusNode, hideSparqls) {
+  // The data.solutions is empty when the sparql query timed out.
+  if (data.sparql_timeout) {
+    return
+  }
+
   const uniqAnswers = getUniqAnswers(data.solutions, focusNode)
 
   addAnswersOfSparql(

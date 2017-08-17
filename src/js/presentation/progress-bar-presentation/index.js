@@ -11,8 +11,8 @@ module.exports = class {
     show(this.progressBarDomId, total, onSparqlClick, onChcekChange)
   }
 
-  progress(solutions, sparqlCount, focusNode) {
-    progress(this.progressBarDomId, solutions, sparqlCount, focusNode)
+  progress(solutions, sparqlCount, focusNode, sparqlTimeout) {
+    progress(this.progressBarDomId, solutions, sparqlCount, focusNode, sparqlTimeout)
   }
 
   stop(sparqlCount, errorMessage) {

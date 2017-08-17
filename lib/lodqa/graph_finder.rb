@@ -90,18 +90,28 @@ class GraphFinder
     queries.each do |query|
       Lodqa::Logger.debug "#{query[:sparql]}\n++++++++++"
 
-      result = @endpoint.query(query[:sparql])
+      begin
+        result = @endpoint.query(query[:sparql])
 
-      if proc_cancel_flag.call
-        Lodqa::Logger.debug "Stop procedure after a sparql query ends"
-        return
-      end
+        if proc_solution
+          proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
+        end
+      rescue Net::HTTP::Persistent::Error => e
+        Lodqa::Logger.error "Sparql Timeout: #{e}"
 
-      if proc_solution
-        proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
+        # Send back error
+        if proc_solution
+          proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
+        end
+      ensure
+        if proc_cancel_flag.call
+          Lodqa::Logger.debug "Stop procedure after a sparql query ends"
+          return
+        end
       end
 
       Lodqa::Logger.debug "==========\n"
+
 
       sleep(2)
     end

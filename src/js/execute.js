@@ -33,7 +33,7 @@ bindResult({
     () => sparqlCount.increment(),
     (data) => solution.set(`${sparqlCount.count}`, {solutions: data, anchoredPgp}),
     (data) => answerIndexPresentation.show(data, sparqlCount.count, anchoredPgp.focus),
-    (data) => progressBarPresentation.progress(data.solutions, sparqlCount.count, anchoredPgp.focus)
+    (data) => progressBarPresentation.progress(data.solutions, sparqlCount.count, anchoredPgp.focus, data.sparql_timeout)
   ],
   error: [
     (data) => progressBarPresentation.stop(sparqlCount.count, data),

@@ -364,6 +364,10 @@ div.atext {
     height: auto;
 }
 
+.error-region {
+    color: red;
+}
+
 /* anchored_pgp-table */
 
 .anchored_pgp-region {
