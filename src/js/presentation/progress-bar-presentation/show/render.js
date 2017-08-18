@@ -26,9 +26,10 @@ module.exports = function(domId, viewModel, onClick, onChange) {
       sparqls: viewModel
     })
 
+  // Bind an event handler on click events of sparqls
   element.addEventListener('click', (e) => {
-    const hideAnswer = e.target.closest('.except-from-answers')
-    if (hideAnswer) {
+    const exceptFromAnswers = e.target.closest('.except-from-answers')
+    if (exceptFromAnswers) {
       return
     }
 
@@ -39,6 +40,7 @@ module.exports = function(domId, viewModel, onClick, onChange) {
     }
   })
 
+  // Bind an event handler on change events of checkboxes.
   element.addEventListener('change', (e) => {
     const sparql = e.target.closest('.sparql')
 
