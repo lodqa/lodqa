@@ -124,8 +124,8 @@ class LodqaWS < Sinatra::Base
 				# Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
 				Lodqa::Logger.debug('Request start', request_id)
 
-				proc_sparql_count = Proc.new do |sparql_count|
-					ws_send(EM, ws, :sparql_count, sparql_count)
+				proc_sparqls = Proc.new do |sparqls|
+					ws_send(EM, ws, :sparqls, sparqls)
 				end
 
 				proc_anchored_pgp = Proc.new do |anchored_pgp|
@@ -147,7 +147,7 @@ class LodqaWS < Sinatra::Base
 
 						begin
 							ws.send("start")
-							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparql_count, proc_anchored_pgp, proc_solution)
+							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparqls, proc_anchored_pgp, proc_solution)
 						rescue => e
 							Lodqa::Logger.error "error: #{e.inspect}, backtrace: #{e.backtrace}, data: #{data}"
 							ws.send({error: e}.to_json)

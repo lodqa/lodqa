@@ -1,7 +1,7 @@
 const events = [
   'ws_open',
   'ws_close',
-  'sparql_count',
+  'sparqls',
   'anchored_pgp',
   'solution',
   'error'

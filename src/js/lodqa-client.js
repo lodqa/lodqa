@@ -25,9 +25,9 @@ function init() {
     ws_close: [
       progressPresentation.hide
     ],
-    sparql_count: [
+    sparqls: [
       () => sparqlCount.reset(),
-      progressPresentation.setTotal
+      (sparqls) => progressPresentation.setTotal(sparqls.length)
     ],
     anchored_pgp: [
       (data) => anchoredPgpTablePresentation.showAnchoredPgp(domId, data),
