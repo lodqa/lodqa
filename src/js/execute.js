@@ -22,7 +22,7 @@ bindResult({
     () => sparqlCount.reset(),
     (total) => progressBarPresentation.show(
       total,
-      (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, anchoredPgp, solution.get(sparqlCount)),
+      (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, solution.get(sparqlCount).anchoredPgp, solution.get(sparqlCount).solutions),
       (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
     )
   ],
@@ -31,7 +31,7 @@ bindResult({
   ],
   solution: [
     () => sparqlCount.increment(),
-    (data) => solution.set(`${sparqlCount.count}`, data),
+    (data) => solution.set(`${sparqlCount.count}`, {solutions: data, anchoredPgp}),
     (data) => answerIndexPresentation.show(data, sparqlCount.count, anchoredPgp.focus),
     (data) => progressBarPresentation.progress(data.solutions, sparqlCount.count, anchoredPgp.focus)
   ],
