@@ -8,23 +8,24 @@ module.exports = class {
     bindClickOnLightBoxToCloseIt(lightboxDomId)
   }
 
-  show(sparqlCount, solution) {
-    if(!solution) {
-      return
-    }
-
-    const {
-      anchoredPgp,
-      solutions
-    } = solution
-
+  show(sparqlCount, sparql, data) {
     const lightbox = document.querySelector(`#${this.lightboxDomId}`)
     lightbox.classList.remove('hidden')
 
     const content = lightbox.querySelector('.content')
     content.innerHTML = ''
-    sparqlPresentation.show(content, solution, sparqlCount, true)
-    answersPresentation.setAnchoredPgp(anchoredPgp)
-    answersPresentation.showSolution(content, solutions)
+
+    if (data) {
+      const {
+        anchoredPgp,
+        solution
+      } = data
+
+      sparqlPresentation.show(content, sparqlCount, sparql, solution.solutions, solution.sparql_timeout, true)
+      answersPresentation.setAnchoredPgp(anchoredPgp)
+      answersPresentation.showSolution(content, solution)
+    } else {
+      sparqlPresentation.show(content, sparqlCount, sparql, [], false, true)
+    }
   }
 }

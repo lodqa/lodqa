@@ -35,7 +35,7 @@ function init() {
     ],
     solution: [
       () => sparqlCount.increment(),
-      (data) => sparqlPresentation.show(document.querySelector(`#${domId}`), data, sparqlCount.count, isVerbose),
+      (data) => sparqlPresentation.show(document.querySelector(`#${domId}`), sparqlCount.count, data.sparql, data.solutions, data.sparql_timeout, isVerbose),
       (data) => answersPresentation.showSolution(document.querySelector(`#${domId}`), data),
       progressPresentation.updateProgress
     ]

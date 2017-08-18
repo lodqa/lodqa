@@ -10,19 +10,20 @@ const bindCheckboxToToggleShowOnlyHasAnswers = require('./execute/bind-checkbox-
 
 const loader = new Loader()
 const bindResult = new BindResult(loader.eventEmitter)
-const sparqlCount = new SparqlCount()
-let anchoredPgp = null
-const solution = new Map()
 const progressBarPresentation = new ProgressBarPresentation('progress-bar')
 const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation('lightbox')
 const answerIndexPresentation = new AnswerIndexPresentation('answer-index')
+
+const sparqlCount = new SparqlCount()
+let anchoredPgp = null
+const solution = new Map()
 
 bindResult({
   sparqls: [
     () => sparqlCount.reset(),
     (sparqls) => progressBarPresentation.show(
-      sparqls.length,
-      (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, solution.get(sparqlCount)),
+      sparqls,
+      (sparqlCount, sparql) => sparqlAndAnswersPresentation.show(sparqlCount, sparql, solution.get(sparqlCount)),
       (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
     )
   ],
@@ -31,7 +32,7 @@ bindResult({
   ],
   solution: [
     () => sparqlCount.increment(),
-    (data) => solution.set(`${sparqlCount.count}`, {solutions: data, anchoredPgp}),
+    (data) => solution.set(`${sparqlCount.count}`, {solution: data, anchoredPgp}),
     (data) => answerIndexPresentation.show(data, sparqlCount.count, anchoredPgp.focus),
     (data) => progressBarPresentation.progress(data.solutions, sparqlCount.count, anchoredPgp.focus, data.sparql_timeout)
   ],

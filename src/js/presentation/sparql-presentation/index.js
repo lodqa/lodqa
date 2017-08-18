@@ -2,13 +2,7 @@ const createTable = require('./create-table')
 const createDom = require('../create-dom')
 
 class SparqlPresentation {
-  show(dom, data, sparqlCount, isVerbose) {
-    const {
-      sparql,
-      solutions,
-      sparql_timeout
-    } = data
-
+  show(dom, sparqlCount, sparql, solutions, sparql_timeout, isVerbose) {
     if (solutions.length === 0 && !isVerbose) {
       return
     }
