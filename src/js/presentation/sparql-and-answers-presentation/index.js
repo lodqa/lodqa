@@ -1,16 +1,26 @@
 const sparqlPresentation = require('../sparql-presentation')
 const answersPresentation = require('../answers-presentation')
 const bindClickOnLightBoxToCloseIt = require('./bind-click-on-lightbox-to-close-it')
+const bindOneKeyupHandler = require('../../execute/bind-one-keyup-handler')
+const doIfEsc = require('../../execute/do-if-esc')
 
 module.exports = class {
-  constructor(lightboxDomId) {
+  constructor(lightboxDomId, onClose) {
     this.lightboxDomId = lightboxDomId
-    bindClickOnLightBoxToCloseIt(lightboxDomId)
+
+    this.close = () => {
+      closeDialog(this.lightboxDomId)
+      onClose()
+    }
+
+    bindClickOnLightBoxToCloseIt(lightboxDomId, this.close)
   }
 
   show(sparqlCount, sparql, data) {
     const lightbox = document.querySelector(`#${this.lightboxDomId}`)
     lightbox.classList.remove('hidden')
+
+    bindOneKeyupHandler(doIfEsc(this.close))
 
     const content = lightbox.querySelector('.content')
     content.innerHTML = ''
@@ -28,4 +38,9 @@ module.exports = class {
       sparqlPresentation.show(content, sparqlCount, sparql)
     }
   }
+}
+
+function closeDialog(lightboxDomId) {
+  document.querySelector(`#${lightboxDomId}`)
+    .classList.add('hidden')
 }

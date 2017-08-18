@@ -5,25 +5,30 @@ const ProgressBarPresentation = require('./presentation/progress-bar-presentatio
 const SparqlAndAnswersPresentation = require('./presentation/sparql-and-answers-presentation')
 const AnswerIndexPresentation = require('./presentation/answer-index-presentation')
 const beginSearch = require('./execute/begin-search')
-const bindEscKeyToStopSearch = require('./execute/bind-esc-key-to-stop-search')
+const bindOneKeyupHandler = require('./execute/bind-one-keyup-handler')
 const bindCheckboxToToggleShowOnlyHasAnswers = require('./execute/bind-checkbox-to-toggle-show-only-has-answers')
+const doIfEsc = require('./execute/do-if-esc')
 
 const loader = new Loader()
 const bindResult = new BindResult(loader.eventEmitter)
 const progressBarPresentation = new ProgressBarPresentation('progress-bar')
-const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation('lightbox')
 const answerIndexPresentation = new AnswerIndexPresentation('answer-index')
 
 const sparqlCount = new SparqlCount()
 let anchoredPgp = null
 const solution = new Map()
 
+const stopSearchIfEsc = doIfEsc(() => loader.stopSearch())
+const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation('lightbox', () => bindOneKeyupHandler(stopSearchIfEsc))
+
 bindResult({
   sparqls: [
     () => sparqlCount.reset(),
     (sparqls) => progressBarPresentation.show(
       sparqls,
-      (sparqlCount, sparql) => sparqlAndAnswersPresentation.show(sparqlCount, sparql, solution.get(sparqlCount)),
+      (sparqlCount, sparql) => {
+        sparqlAndAnswersPresentation.show(sparqlCount, sparql, solution.get(sparqlCount))
+      },
       (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
     )
   ],
@@ -46,5 +51,5 @@ bindResult({
 })
 
 beginSearch(loader, 'pgp', 'mappings', 'target')
-bindEscKeyToStopSearch(loader)
+bindOneKeyupHandler(stopSearchIfEsc)
 bindCheckboxToToggleShowOnlyHasAnswers('show-only-has-answers', progressBarPresentation)
