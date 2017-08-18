@@ -16,6 +16,7 @@ function init() {
   const sparqlCount = new SparqlCount()
   const domId = 'lodqa-results'
   const progressPresentation = ProgressPresentation('lodqa-messages')
+  let isVerbose = false
 
   bindResult({
     ws_open: [
@@ -34,7 +35,7 @@ function init() {
     ],
     solution: [
       () => sparqlCount.increment(),
-      (data) => sparqlPresentation.show(document.querySelector(`#${domId}`), data, sparqlCount.count),
+      (data) => sparqlPresentation.show(document.querySelector(`#${domId}`), data, sparqlCount.count, isVerbose),
       (data) => answersPresentation.showSolution(document.querySelector(`#${domId}`), data),
       progressPresentation.updateProgress
     ]
@@ -44,5 +45,5 @@ function init() {
   bindStopSearchButton(loader)
 
   const checkbox = document.querySelector('#verbose')
-  checkbox.addEventListener('change', (event) => sparqlPresentation.setVerbose(event.target.checked))
+  checkbox.addEventListener('change', (event) => isVerbose = event.target.checked)
 }

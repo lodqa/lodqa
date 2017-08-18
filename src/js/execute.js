@@ -22,7 +22,7 @@ bindResult({
     () => sparqlCount.reset(),
     (total) => progressBarPresentation.show(
       total,
-      (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, solution.get(sparqlCount).anchoredPgp, solution.get(sparqlCount).solutions),
+      (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, solution.get(sparqlCount)),
       (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
     )
   ],

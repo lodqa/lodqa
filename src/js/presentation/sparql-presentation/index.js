@@ -1,17 +1,15 @@
 const createTable = require('./create-table')
 const createDom = require('../create-dom')
 
-const privateData = {}
-
 class SparqlPresentation {
-  show(dom, data, sparqlCount) {
+  show(dom, data, sparqlCount, isVerbose) {
     const {
       sparql,
       solutions,
       sparql_timeout
     } = data
 
-    if (solutions.length === 0 && !privateData.verbose) {
+    if (solutions.length === 0 && !isVerbose) {
       return
     }
 
@@ -39,10 +37,6 @@ class SparqlPresentation {
         </div>
       `))
     }
-  }
-
-  setVerbose(value) {
-    privateData.verbose = value
   }
 }
 
