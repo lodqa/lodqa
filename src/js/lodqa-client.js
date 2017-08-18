@@ -35,7 +35,11 @@ function init() {
     ],
     solution: [
       () => sparqlCount.increment(),
-      (data) => sparqlPresentation.show(document.querySelector(`#${domId}`), sparqlCount.count, data.sparql, data.solutions, data.sparql_timeout, isVerbose),
+      (data) => {
+        if(data.solutions.length !== 0 || isVerbose){
+          sparqlPresentation.show(document.querySelector(`#${domId}`), sparqlCount.count, data.sparql, data.sparql_timeout)
+        }
+      },
       (data) => answersPresentation.showSolution(document.querySelector(`#${domId}`), data),
       progressPresentation.updateProgress
     ]

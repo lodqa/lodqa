@@ -21,11 +21,11 @@ module.exports = class {
         solution
       } = data
 
-      sparqlPresentation.show(content, sparqlCount, sparql, solution.solutions, solution.sparql_timeout, true)
+      sparqlPresentation.show(content, sparqlCount, sparql, solution.sparql_timeout)
       answersPresentation.setAnchoredPgp(anchoredPgp)
       answersPresentation.showSolution(content, solution)
     } else {
-      sparqlPresentation.show(content, sparqlCount, sparql, [], false, true)
+      sparqlPresentation.show(content, sparqlCount, sparql)
     }
   }
 }
