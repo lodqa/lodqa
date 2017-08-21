@@ -13,7 +13,7 @@ module.exports = class {
     this.hideSparqls = new Set()
   }
 
-  show(data, sparqlNumber, focusNode) {
+  progress(data, sparqlNumber, focusNode) {
     show(this.domId, this.answers, data, sparqlNumber, focusNode, this.hideSparqls)
   }
 
