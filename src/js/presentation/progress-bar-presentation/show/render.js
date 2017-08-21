@@ -4,7 +4,7 @@ const template = handlebars.compile(`
   <ul class="sparqls">
     {{#each sparqls}}
       <li class="sparql" data-sparql-number="{{sparqlNumber}}">
-        <span class="sparql-number">S{{sparqlNumber}}</span>
+        <span class="sparql-number"><a href="#" class="sparql-link">S{{sparqlNumber}}</a></span>
         <span class="number-of-answers">
           {{#if @first}}
             <i class="fa fa-spinner fa-spin fa-fw"></i>
@@ -28,15 +28,17 @@ module.exports = function(domId, viewModel, onClick, onChange) {
 
   // Bind an event handler on click events of sparqls
   element.addEventListener('click', (e) => {
-    const exceptFromAnswers = e.target.closest('.except-from-answers')
-    if (exceptFromAnswers) {
-      return
-    }
+    if(e.target.classList.contains('sparql-link')) {
+      const exceptFromAnswers = e.target.closest('.except-from-answers')
+      if (exceptFromAnswers) {
+        return
+      }
 
-    const sparql = e.target.closest('.sparql')
+      const sparql = e.target.closest('.sparql')
 
-    if (sparql) {
-      onClick(sparql.getAttribute('data-sparql-number'))
+      if (sparql) {
+        onClick(sparql.getAttribute('data-sparql-number'))
+      }
     }
   })
 
