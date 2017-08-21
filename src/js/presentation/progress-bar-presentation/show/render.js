@@ -14,7 +14,7 @@ const template = handlebars.compile(`
           {{/if}}
         </span>
         <span class="except-from-answers">
-          <input type="checkbox" id="except-{{sparqlNumber}}"><label for="except-{{sparqlNumber}}">except</label>
+          <input type="checkbox">
         </span>
       </li>
     {{/each}}
