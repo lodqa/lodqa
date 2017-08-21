@@ -1,4 +1,7 @@
 const Handlebars = require('handlebars')
+const registerPartial = require('../../execute/register-partial')
+
+registerPartial()
 
 const template = Handlebars.compile(`
   {{#each answers}}
@@ -8,7 +11,7 @@ const template = Handlebars.compile(`
       </div>
       <ul class="sparqls">
         {{#each sparqls}}
-        <li class="sparql"><span title="{{sparql}}">{{name}}</span></li>
+        <li class="sparql">{{> sparql-link}}</li>
         {{/each}}
       </ul>
     </div>
@@ -16,13 +19,15 @@ const template = Handlebars.compile(`
 `)
 
 module.exports = function(domId, answersMap, hideSparqls) {
-  const answers = Array.from(answersMap.values())
-  const hoge = answers.map((a) => Object.assign({}, a, {
-    sparqls: a.sparqls.filter((sparql) => !hideSparqls.has(sparql.name.substr(1)))
+  const originalAnswers = Array.from(answersMap.values())
+
+  // Hide answers accoding to the hidelSparqls
+  const answers = originalAnswers.map((a) => Object.assign({}, a, {
+    sparqls: a.sparqls.filter((sparql) => !hideSparqls.has(sparql.sparqlNumber.toString()))
   }))
 
   document.querySelector(`#${domId}`)
     .innerHTML = template({
-      answers: hoge
+      answers
     })
 }

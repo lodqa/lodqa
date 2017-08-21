@@ -14,8 +14,7 @@ module.exports = function(domId, answersMap, data, sparqlNumber, focusNode, hide
   addAnswersOfSparql(
     answersMap,
     uniqAnswers,
-    sparqlNumber,
-    data.sparql
+    sparqlNumber
   )
 
   updateDisplay(domId, answersMap, hideSparqls)

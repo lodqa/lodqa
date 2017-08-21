@@ -8,6 +8,7 @@ const beginSearch = require('./execute/begin-search')
 const bindOneKeyupHandler = require('./execute/bind-one-keyup-handler')
 const bindCheckboxToToggleShowOnlyHasAnswers = require('./execute/bind-checkbox-to-toggle-show-only-has-answers')
 const doIfEsc = require('./execute/do-if-esc')
+const bindSparqlLinkClick = require('./execute/bind-sparql-link-click')
 
 const loader = new Loader()
 const bindResult = new BindResult(loader.eventEmitter)
@@ -20,15 +21,16 @@ const solution = new Map()
 
 const stopSearchIfEsc = doIfEsc(() => loader.stopSearch())
 const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation('lightbox', () => bindOneKeyupHandler(stopSearchIfEsc))
+let sparqls = null
+
+bindSparqlLinkClick(['progress-bar', 'answer-index'], (sparqlCount) => sparqlAndAnswersPresentation.show(sparqlCount, sparqls[sparqlCount - 1], solution.get(sparqlCount)))
 
 bindResult({
   sparqls: [
     () => sparqlCount.reset(),
+    (newSparqls) => sparqls = newSparqls,
     (sparqls) => progressBarPresentation.show(
       sparqls,
-      (sparqlCount, sparql) => {
-        sparqlAndAnswersPresentation.show(sparqlCount, sparql, solution.get(sparqlCount))
-      },
       (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
     )
   ],

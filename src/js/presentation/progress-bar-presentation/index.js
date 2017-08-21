@@ -7,8 +7,8 @@ module.exports = class {
     this.progressBarDomId = progressBarDomId
   }
 
-  show(sparqls, onSparqlClick, onChcekChange) {
-    show(this.progressBarDomId, sparqls.length, (sparqlCount) => onSparqlClick(sparqlCount, sparqls[sparqlCount - 1]), onChcekChange)
+  show(sparqls, onChcekChange) {
+    show(this.progressBarDomId, sparqls.length, onChcekChange)
   }
 
   progress(solutions, sparqlCount, focusNode, sparqlTimeout) {

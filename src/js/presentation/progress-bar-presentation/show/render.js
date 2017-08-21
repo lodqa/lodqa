@@ -1,10 +1,13 @@
 const handlebars = require('handlebars')
+const registerPartial = require('../../../execute/register-partial')
+
+registerPartial()
 
 const template = handlebars.compile(`
   <ul class="sparqls">
     {{#each sparqls}}
       <li class="sparql" data-sparql-number="{{sparqlNumber}}">
-        <span class="sparql-number"><a href="#" class="sparql-link">S{{sparqlNumber}}</a></span>
+        <span class="sparql-number">{{> sparql-link}}</span>
         <span class="number-of-answers">
           {{#if @first}}
             <i class="fa fa-spinner fa-spin fa-fw"></i>
@@ -18,29 +21,13 @@ const template = handlebars.compile(`
   </ul>
 `)
 
-module.exports = function(domId, viewModel, onClick, onChange) {
+module.exports = function(domId, viewModel, onChange) {
   const element = document.querySelector(`#${domId}`)
 
   element
     .innerHTML = template({
       sparqls: viewModel
     })
-
-  // Bind an event handler on click events of sparqls
-  element.addEventListener('click', (e) => {
-    if(e.target.classList.contains('sparql-link')) {
-      const exceptFromAnswers = e.target.closest('.except-from-answers')
-      if (exceptFromAnswers) {
-        return
-      }
-
-      const sparql = e.target.closest('.sparql')
-
-      if (sparql) {
-        onClick(sparql.getAttribute('data-sparql-number'))
-      }
-    }
-  })
 
   // Bind an event handler on change events of checkboxes.
   element.addEventListener('change', (e) => {
