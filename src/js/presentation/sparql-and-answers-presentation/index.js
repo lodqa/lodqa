@@ -1,6 +1,6 @@
 const sparqlPresentation = require('../sparql-presentation')
 const answersPresentation = require('../answers-presentation')
-const bindClickOnLightBoxToCloseIt = require('./bind-click-on-lightbox-to-close-it')
+const bindClickOnSideOfLightBoxToCloseIt = require('./bind-click-on-side-of-lightbox-to-close-it')
 const bindOneKeyupHandler = require('../../execute/bind-one-keyup-handler')
 const doIfEsc = require('../../execute/do-if-esc')
 
@@ -13,7 +13,7 @@ module.exports = class {
       onClose()
     }
 
-    bindClickOnLightBoxToCloseIt(lightboxDomId, this.close)
+    bindClickOnSideOfLightBoxToCloseIt(lightboxDomId, this.close)
   }
 
   show(sparqlCount, sparql, data) {
