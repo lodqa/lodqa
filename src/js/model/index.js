@@ -1,4 +1,4 @@
-const SparqlCount = require('../sparql-count')
+const SparqlCount = require('./sparql-count')
 
 module.exports = class Model {
   constructor() {
