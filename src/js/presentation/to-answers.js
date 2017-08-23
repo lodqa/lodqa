@@ -1,4 +1,4 @@
-const instance = require('../instance')
+const instance = require('./instance')
 const toLastOfUrl = require('../to-last-of-url')
 
 module.exports = function toAnswers(solutions, focus) {
