@@ -67,12 +67,6 @@ class LodqaWS < Sinatra::Base
 		g.parse(params['query'])
 		@pgp = g.get_pgp
 
-		tf = Lodqa::TermFinder.new(config['dictionary_url'])
-
-		# TODO: Find term of edges, too.
-		keywords = @pgp[:nodes].values.map{|n| n[:text]}
-		@mappings = tf.find(keywords)
-
 		@targets = get_targets
 		@target = params['target'] || @targets.first
 
@@ -80,7 +74,17 @@ class LodqaWS < Sinatra::Base
 		@endpoint_url = config['endpoint_url']
 		@need_proxy = config['name'] == 'biogateway'
 
-		erb :execute
+		begin
+			tf = Lodqa::TermFinder.new(config['dictionary_url'])
+
+			# TODO: Find term of edges, too.
+			keywords = @pgp[:nodes].values.map{|n| n[:text]}
+
+			@mappings = tf.find(keywords)
+			erb :execute
+		rescue GatewayError
+			erb :dictionary_lookup_error
+		end
 	end
 
 	# Command for test: curl -H "content-type:application/json" -d '{"keywords":["drug", "genes"]} http://localhost:9292/termfinder'

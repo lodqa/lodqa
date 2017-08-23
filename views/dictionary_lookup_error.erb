@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>LODQA : Question-Answering over Linked Open Data</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+        <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+        <style media="screen">
+            .answer-index {
+                margin: 40px 10px;
+            }
+            .error_message {
+                color: red;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="dashboard" class="dashboard frame">
+            <%= erb :dashboard %>
+            <div class="answer-index">
+                <div class="error_message">
+                    Dictionary lookup error!
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
