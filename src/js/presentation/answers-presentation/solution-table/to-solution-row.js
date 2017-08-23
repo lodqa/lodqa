@@ -1,5 +1,5 @@
 const toArray = require('../../../collection/to-array')
-const toLastOfUrl = require('../../../to-last-of-url')
+const toLastOfUrl = require('../../to-last-of-url')
 
 module.exports = function(solution) {
   const nodes = Object.keys(solution)

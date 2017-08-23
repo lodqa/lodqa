@@ -1,4 +1,4 @@
-const toLastOfUrl = require('../../../../to-last-of-url')
+const toLastOfUrl = require('../../../to-last-of-url')
 
 module.exports = function(term) {
   return {
