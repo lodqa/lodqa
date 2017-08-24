@@ -75,10 +75,9 @@ class LodqaWS < Sinatra::Base
 		@need_proxy = config['name'] == 'biogateway'
 
 		begin
+			# Find terms of nodes and edges.
 			tf = Lodqa::TermFinder.new(config['dictionary_url'])
-
-			# TODO: Find term of edges, too.
-			keywords = @pgp[:nodes].values.map{|n| n[:text]}
+			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
 			@mappings = tf.find(keywords)
 			erb :execute
