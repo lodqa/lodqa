@@ -61,6 +61,10 @@
             #progress-bar .number-of-answers .fa-spinner {
                 color: mediumvioletred;
             }
+            #progress-bar .no-sparql {
+                color: white;
+                margin-left: 0.3em;
+            }
             #answer-index .solution {
                 display: flex;
             }
@@ -118,11 +122,11 @@
                     <div id="mappings"><%= @mappings.to_json %></div>
                 </div>
                 <div>
-                  Show below results of '<%= @query %>':
+                    Show below results of '<%= @query %>':
                 </div>
                 <div>
-                  <input type="checkbox" id="show-only-has-answers">
-                  <label for="show-only-has-answers">Show only sparqls with answers</label>
+                    <input type="checkbox" id="show-only-has-answers">
+                    <label for="show-only-has-answers">Show only sparqls with answers</label>
                 </div>
                 <div id="progress-bar"></div>
                 <div id="answer-index"></div>

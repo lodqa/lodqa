@@ -17,6 +17,8 @@ const template = handlebars.compile(`
           <input type="checkbox">
         </span>
       </li>
+    {{else}}
+    <span class="no-sparql">No Sparql</span>
     {{/each}}
   </ul>
 `)
