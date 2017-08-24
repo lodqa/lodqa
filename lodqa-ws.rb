@@ -193,7 +193,7 @@ class LodqaWS < Sinatra::Base
 	private
 
 	def ws_send(eventMachine, websocket, key, value)
-		eventMachine.add_timer(1){websocket.send({key => value}.to_json)}
+		websocket.send({key => value}.to_json)
 	end
 
 	def get_targets
