@@ -162,7 +162,7 @@ class LodqaWS < Sinatra::Base
 
 				ws.onclose do
 					# Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
-					Lodqa::Logger.debug 'The WebSocket connection for is closed.', request_id
+					Lodqa::Logger.debug 'The WebSocket connection is closed.', request_id
 					lodqa.dispose request_id
 				end
 
