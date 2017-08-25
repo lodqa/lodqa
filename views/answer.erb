@@ -19,6 +19,9 @@
             .answer-index {
                 margin: 40px 10px;
             }
+            .hidden {
+                display: none;
+            }
             #progress-bar .sparqls {
                 background-color: #222288;
                 border-radius: 3px;
@@ -91,9 +94,6 @@
                 top: 0;
                 width: 100%;
             }
-            #lightbox.hidden {
-                display: none;
-            }
             #lightbox p {
                 color: #fff;
                 font-family: 'helvetica';
@@ -117,7 +117,7 @@
             <%= erb :dashboard %>
             <% if !@query.nil? %>
             <div class="answer-index">
-                <div style="display: none;">
+                <div class="hidden">
                     <div id="pgp"><%= @pgp.to_json %></div>
                     <div id="mappings"><%= @mappings.to_json %></div>
                 </div>
