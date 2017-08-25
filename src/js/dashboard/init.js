@@ -32,14 +32,14 @@ function initSampleQueries() {
 }
 
 function bindSearchButtonEventhandler() {
-  document.querySelector('#execute-button')
+  document.querySelector('#search-button')
     .addEventListener('click', (e) => {
       // Do not submit form.
       e.preventDefault()
 
       const form = document.querySelector('#nlqform')
 
-      location.href = `/execute?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}`
+      location.href = `/answer?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}`
     })
 }
 

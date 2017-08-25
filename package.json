@@ -31,6 +31,6 @@
     "browserify": "npm-run-all --parallel browserify:*",
     "browserify:lodqa-client": "browserify -d -o public/js/lodqa-client.js src/js/lodqa-client.js",
     "browserify:dashboard": "browserify -d -o public/js/dashboard.js src/js/dashboard.js",
-    "browserify:execute": "browserify -d -o public/js/execute.js src/js/execute.js"
+    "browserify:execute": "browserify -d -o public/js/answer.js src/js/answer.js"
   }
 }

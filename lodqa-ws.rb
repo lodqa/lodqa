@@ -58,7 +58,7 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
-	get '/execute' do
+	get '/answer' do
 		config = get_config(params)
 
 		@query = params['query']
@@ -80,7 +80,7 @@ class LodqaWS < Sinatra::Base
 			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
 			@mappings = tf.find(keywords)
-			erb :execute
+			erb :answer
 		rescue GatewayError
 			erb :dictionary_lookup_error
 		end
