@@ -1,4 +1,4 @@
-const getUniqAnswers = require('../../get-uniq-answers')
+const getUniqAnswers = require('../../../answer/get-uniq-answers')
 const getCurrentSparql = require('../get-current-sparql')
 const showError = require('../show-error')
 const getNumberOfAnswers = require('../get-number-of-answers')

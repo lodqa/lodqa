@@ -1,4 +1,4 @@
-const findLabel = require('../find-label')
+const findLabel = require('../../find-label')
 const answerList = require('./answer-list')
 const solutionTable = require('./solution-table')
 const solutionGraph = require('./graph')

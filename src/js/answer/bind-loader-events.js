@@ -11,7 +11,7 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
       () => model.resetSpraqlCount(),
       (sparqls) => progressBarPresentation.show(
         sparqls,
-        (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, isHide)
+        (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, model, isHide)
       )
     ],
     anchored_pgp: [
@@ -20,7 +20,7 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
     solution: [
       () => model.incrementSparqlCount(),
       (data) => model.setSolution(data),
-      (data) => answerIndexPresentation.progress(data, model.sparqlCount, model.focus),
+      () => answerIndexPresentation.progress(model),
       (data) => progressBarPresentation.progress(data.solutions, model.sparqlCount, model.focus, data.sparql_timeout)
     ],
     error: [

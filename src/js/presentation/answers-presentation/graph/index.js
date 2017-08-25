@@ -1,4 +1,4 @@
-const instance = require('../../instance')
+const instance = require('../../../instance')
 const SolutionGraph = require('./Solution-graph')
 
 module.exports = function(anchoredPgp, bgp, solutions) {
