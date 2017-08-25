@@ -5,6 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
         <link href="js/vender/codemirror/lib/codemirror.css" rel="stylesheet">
         <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="css/answer.css" media="screen" rel="stylesheet" type="text/css">
         <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
 
         <script src="js/vender/codemirror/lib/codemirror.js"></script>
@@ -14,103 +15,6 @@
         <script src="js/vender/jQuery/dist/jquery.min.js"></script>
         <script src="js/vender/Springy/springyui.js"></script>
         <script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
-
-        <style media="screen">
-            .answer-index {
-                margin: 40px 10px;
-            }
-            .hidden {
-                display: none;
-            }
-            #progress-bar .sparqls {
-                background-color: #222288;
-                border-radius: 3px;
-                display: flex;
-                flex-wrap: wrap;
-                list-style-type: none;
-                margin: 0 21px;
-                padding: 0;
-            }
-            #progress-bar .sparql {
-                background-color: darkgray;
-                margin: 2px;
-                padding: 1px 2px;
-                width: 5.1em;
-            }
-            #progress-bar .sparql.no-answer {
-                background-color: darkgray;
-            }
-            #progress-bar.show-only-has-answers .sparql.no-answer {
-                display: none;
-            }
-            #progress-bar .sparql .except-from-answers {
-                display: none;
-            }
-            #progress-bar .sparql.has-answer {
-                background-color: white;
-            }
-            #progress-bar .sparql.has-answer .except-from-answers {
-                display: inline-block;
-            }
-            #progress-bar .sparql-number {
-                display: inline-block;
-                min-width: 2.1em;
-            }
-            #progress-bar .number-of-answers {
-                display: inline-block;
-                min-width: 1.3em;
-                text-align: right;
-            }
-            #progress-bar .number-of-answers .fa-spinner {
-                color: mediumvioletred;
-            }
-            #progress-bar .no-sparql {
-                color: white;
-                margin-left: 0.3em;
-            }
-            #answer-index .solution {
-                display: flex;
-            }
-            #answer-index .answer {
-                width: 300px;
-            }
-            #answer-index .sparqls {
-                display: flex;
-                flex-wrap: wrap;
-                list-style-type: none;
-                margin: 0 1em;
-                padding: 0;
-            }
-            #answer-index .sparql {
-                margin: 0 0.1em;
-                min-width: 2em;
-            }
-            #lightbox {
-                background: rgba(0,0,0,.7);
-                height: 100%;
-                left: 0;
-                overflow-x: scroll;
-                position: fixed;
-                top: 0;
-                width: 100%;
-            }
-            #lightbox p {
-                color: #fff;
-                font-family: 'helvetica';
-                font-size: 14px;
-                margin-right: 20px;
-                position: fixed;
-                right: 0;
-            }
-            #lightbox .content {
-                background: white;
-                border-radius: 3px;
-                margin: 100px auto;
-                padding: 0.1em 1.5em 2em 1em;
-                width: calc(100% - 100px);
-            }
-
-        </style>
     </head>
     <body>
         <div id="dashboard" class="dashboard frame">
