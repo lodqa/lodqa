@@ -84,6 +84,10 @@
     min-width: 2em;
 }
 
+#download {
+    margin-top: 1em;
+}
+
 #lightbox {
     background: rgba(0, 0, 0, .7);
     height: 100%;
