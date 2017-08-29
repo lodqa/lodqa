@@ -1,6 +1,7 @@
-const bindCheckboxToToggleShowOnlyHasAnswers = require('../../answer/bind-checkbox-to-toggle-show-only-has-answers')
+const bindHandlerToCheckbox = require('./bind-handler-to-checkbox')
 const show = require('./show')
-const progress = require('./progress')
+const progressDetail = require('./progress-detail')
+const progressSimple = require('./progress-simple')
 const stop = require('./stop')
 
 module.exports = class {
@@ -11,12 +12,15 @@ module.exports = class {
   show(sparqls, onChcekChange) {
     show(this.progressBarDomId, sparqls.length, onChcekChange)
 
-    // Bind a handler to switch appearance of sparqls
-    bindCheckboxToToggleShowOnlyHasAnswers('show-only-has-answers', this)
+    // To switch showing detail of progress
+    bindHandlerToCheckbox('show-detail-progress-bar', () => this.toggleDetail())
+    // To switch appearance of sparqls
+    bindHandlerToCheckbox('show-only-has-answers', () => this.toggleShowOnlyHasAnswers())
   }
 
   progress(solutions, sparqlCount, focusNode, sparqlTimeout) {
-    progress(this.progressBarDomId, solutions, sparqlCount, focusNode, sparqlTimeout)
+    progressSimple(this.progressBarDomId, sparqlCount)
+    progressDetail(this.progressBarDomId, solutions, sparqlCount, focusNode, sparqlTimeout)
   }
 
   stop(sparqlCount, errorMessage) {
@@ -26,5 +30,13 @@ module.exports = class {
   toggleShowOnlyHasAnswers() {
     document.querySelector(`#${this.progressBarDomId}`)
       .classList.toggle('show-only-has-answers')
+  }
+
+  toggleDetail() {
+    document.querySelector(`#${this.progressBarDomId} .detail-progress-bar`)
+      .classList.toggle('hidden')
+
+    document.querySelector(`#${this.progressBarDomId} .simple-progress-bar`)
+      .classList.toggle('hidden')
   }
 }

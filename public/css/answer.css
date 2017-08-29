@@ -6,7 +6,15 @@
     display: none;
 }
 
-#progress-bar .sparqls {
+#progress-bar .simple-progress-bar .sparqls {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#progress-bar .detail-progress-bar .sparqls {
     background-color: #222288;
     border-radius: 3px;
     display: flex;

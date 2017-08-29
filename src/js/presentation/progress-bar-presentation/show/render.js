@@ -4,27 +4,46 @@ const registerPartial = require('../../../answer/register-partial')
 registerPartial()
 
 const template = handlebars.compile(`
-  <div>
-      <input type="checkbox" id="show-only-has-answers">
-      <label for="show-only-has-answers">Show only sparqls with answers</label>
+  <div class="simple-progress-bar">
+    <ul class="sparqls">
+      {{#each sparqls}}
+        <li data-sparql-number="{{sparqlNumber}}">
+        {{#if @first}}
+        i
+        {{else}}
+        .
+        {{/if}}
+        </li>
+      {{/each}}
+    </ul>
   </div>
-  <ul class="sparqls">
-    {{#each sparqls}}
-      <li class="sparql" data-sparql-number="{{sparqlNumber}}">
-        <span class="sparql-number">{{> sparql-link}}</span>
-        <span class="number-of-answers">
-          {{#if @first}}
-            <i class="fa fa-spinner fa-spin fa-fw"></i>
-          {{/if}}
-        </span>
-        <span class="except-from-answers">
-          <input type="checkbox">
-        </span>
-      </li>
-    {{else}}
-    <span class="no-sparql">No Sparql</span>
-    {{/each}}
-  </ul>
+  <span>
+    <input type="checkbox" id="show-detail-progress-bar">
+    <label for="show-detail-progress-bar">Show detail status of progress</label>
+  </span>
+  <div class="detail-progress-bar hidden">
+    <div>
+        <input type="checkbox" id="show-only-has-answers">
+        <label for="show-only-has-answers">Show only sparqls with answers</label>
+    </div>
+    <ul class="sparqls">
+      {{#each sparqls}}
+        <li class="sparql" data-sparql-number="{{sparqlNumber}}">
+          <span class="sparql-number">{{> sparql-link}}</span>
+          <span class="number-of-answers">
+            {{#if @first}}
+              <i class="fa fa-spinner fa-spin fa-fw"></i>
+            {{/if}}
+          </span>
+          <span class="except-from-answers">
+            <input type="checkbox">
+          </span>
+        </li>
+      {{else}}
+      <span class="no-sparql">No Sparql</span>
+      {{/each}}
+    </ul>
+  </div>
 `)
 
 module.exports = function(domId, viewModel, onChange) {
