@@ -4,6 +4,10 @@ const registerPartial = require('../../../answer/register-partial')
 registerPartial()
 
 const template = handlebars.compile(`
+  <div>
+      <input type="checkbox" id="show-only-has-answers">
+      <label for="show-only-has-answers">Show only sparqls with answers</label>
+  </div>
   <ul class="sparqls">
     {{#each sparqls}}
       <li class="sparql" data-sparql-number="{{sparqlNumber}}">
