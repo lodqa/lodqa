@@ -8,6 +8,7 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
   const downloadJsonButton = new DownloadJsonButton('download-json-button', (button) => button.updateContent(model.answers))
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
+  model.onAnswerChange = () => downloadJsonButton.updateLength(model.answers.length)
 
   bindResult({
     sparqls: [

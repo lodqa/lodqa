@@ -15,6 +15,10 @@ module.exports = class {
       })), null, 2))
     )
   }
+
+  updateLength(length) {
+    this._dom.querySelector('.answers-length').innerText = `(${length})`
+  }
 }
 
 function setContent(button, data) {
