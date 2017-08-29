@@ -1,26 +1,25 @@
 module.exports = class {
-  constructor(domId, onClick) {
+  constructor(domId, onClick, formatter) {
     this._domId = domId
     this._dom = document.querySelector(`#${this._domId}`)
+    this._formatter = formatter
 
     this._dom.addEventListener('click', () => onClick(this))
   }
 
-  updateContent(answers) {
+  updateContent(labelAndUrls) {
     setContent(
       this._dom,
-      encodeURIComponent(JSON.stringify(answers.map((s) => ({
-        label: s.label,
-        url: s.url
-      })), null, 2))
+      this._formatter(labelAndUrls)
     )
   }
 
   updateLength(length) {
-    this._dom.querySelector('.answers-length').innerText = `(${length})`
+    this._dom.querySelector('.answers-length')
+      .innerText = `(${length})`
   }
 }
 
 function setContent(button, data) {
-  button.href = `data:,${data}`
+  button.href = `data:,${encodeURIComponent(data)}`
 }

@@ -49,6 +49,13 @@ module.exports = class Model {
     return filterVisibleAnswers(this._answersMap, this._hideSparqls)
   }
 
+  get labelAndUrls() {
+    return this.answers.map((s) => ({
+      label: s.label,
+      url: s.url
+    }))
+  }
+
   get currentSoluton() {
     return this.getSolution(this.sparqlCount)
       .solution

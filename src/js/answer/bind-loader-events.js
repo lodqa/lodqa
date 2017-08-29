@@ -5,7 +5,7 @@ const DownloadJsonButton = require('../presentation/download-json-button')
 module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, answerIndexDomId) {
   const bindResult = new BindResult(loader.eventEmitter)
   const answerIndexPresentation = new AnswerIndexPresentation(answerIndexDomId)
-  const downloadJsonButton = new DownloadJsonButton('download-json-button', (button) => button.updateContent(model.answers))
+  const downloadJsonButton = new DownloadJsonButton('download-json-button', (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
   model.onAnswerChange = () => downloadJsonButton.updateLength(model.answers.length)
