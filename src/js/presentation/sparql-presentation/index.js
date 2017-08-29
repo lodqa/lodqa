@@ -3,22 +3,33 @@ const createDom = require('../create-dom')
 
 class SparqlPresentation {
   show(dom, sparqlCount, sparql, sparql_timeout = null) {
+    // Add line break to the sparql
+    const formatedSparql = sparql
+      .replace(/([{])/g, '$1\r\n')
+      .replace(/([}])/g, '\r\n$1')
+      .replace(/(\. )/g, '$1\r\n')
+      .replace(/(, )/g, '$1\r\n')
+      .replace(/( filter)/ig, '\r\n$1')
+      .replace(/( limit)/ig, '\r\n$1')
+
     // Add a table to the dom tree
     dom
-      .appendChild(createTable(sparql, sparqlCount))
+      .appendChild(createTable(formatedSparql, sparqlCount))
 
     // Enable syntax highlight of sparql
     /*global CodeMirror:true*/
-    const sparqls = dom.querySelectorAll('textarea')
-    CodeMirror
-      .fromTextArea(sparqls[sparqls.length - 1], {
-        mode: 'application/sparql-query',
-        readOnly: true,
-        hardwrap: true
-      })
-      .wrapParagraph(undefined, {
-        column: 125
-      })
+    const textarea = dom.querySelectorAll('textarea')
+    const editor = CodeMirror.fromTextArea(textarea[textarea.length - 1], {
+      mode: 'application/sparql-query',
+      readOnly: true,
+      lineWrapping: true // wrap line if overflow
+    })
+
+    // Indent all lines
+    const count = editor.lineCount()
+    for (let i = 0; i < count; i++) {
+      editor.indentLine(i)
+    }
 
     if (sparql_timeout) {
       dom.appendChild(createDom(`
