@@ -1,12 +1,22 @@
 module.exports = class {
   constructor(domId, onClick) {
     this._domId = domId
-    document.querySelector(`#${this._domId}`)
-      .addEventListener('click', () => onClick(this))
+    this._dom = document.querySelector(`#${this._domId}`)
+
+    this._dom.addEventListener('click', () => onClick(this))
   }
 
-  set content(data){
-    document.querySelector(`#${this._domId}`)
-      .href = `data:,${data}`
+  updateContent(answers) {
+    setContent(
+      this._dom,
+      encodeURIComponent(JSON.stringify(answers.map((s) => ({
+        label: s.label,
+        url: s.url
+      })), null, 2))
+    )
   }
+}
+
+function setContent(button, data) {
+  button.href = `data:,${data}`
 }
