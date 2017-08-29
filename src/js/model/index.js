@@ -39,14 +39,7 @@ module.exports = class Model {
   }
 
   get answers() {
-    const originalAnswers = Array.from(this._answersMap.values())
-
-    // Hide answers accoding to the hidelSparqls
-    const answers = originalAnswers.map((a) => Object.assign({}, a, {
-      sparqls: a.sparqls.filter((sparql) => !this._hideSparqls.has(sparql.sparqlNumber.toString()))
-    }))
-
-    return answers
+    return filterVisibleAnswers(this._answersMap, this._hideSparqls)
   }
 
   get currentSoluton() {
@@ -103,4 +96,20 @@ module.exports = class Model {
       this._hideSparqls.delete(sparqlCount)
     }
   }
+}
+
+function filterVisibleAnswers(answersMap, hideSparqls) {
+  const originalAnswers = Array.from(answersMap.values())
+
+  // Hide answers accoding to the hidelSparqls
+  const answers = originalAnswers.map((a) => Object.assign({}, a, {
+    sparqls: excludeHideSparqls(a.sparqls, hideSparqls)
+  }))
+    .filter((a) => a.sparqls.length)
+
+  return answers
+}
+
+function excludeHideSparqls(sparqls, hideSparqls) {
+  return sparqls.filter((sparql) => !hideSparqls.has(sparql.sparqlNumber.toString()))
 }
