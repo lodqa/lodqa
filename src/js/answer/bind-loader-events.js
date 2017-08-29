@@ -1,14 +1,17 @@
 const BindResult = require('../controller/bind-result')
 const AnswerIndexPresentation = require('../presentation/answer-index-presentation')
-const DownloadJsonButton = require('../presentation/download-json-button')
+const DownloadButton = require('../presentation/download-button')
+const DownloadTsvButton = require('../presentation/download-tsv-button')
 
 module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, answerIndexDomId) {
   const bindResult = new BindResult(loader.eventEmitter)
   const answerIndexPresentation = new AnswerIndexPresentation(answerIndexDomId)
-  const downloadJsonButton = new DownloadJsonButton('download-json-button', (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
+  const downloadJsonButton = new DownloadButton('download-json-button', (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
+  const downloadTsvButton = new DownloadTsvButton('download-tsv-button', (button) => button.updateContent(model.labelAndUrls))
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
   model.onAnswerChange = () => downloadJsonButton.updateLength(model.answers.length)
+  model.onAnswerChange = () => downloadTsvButton.updateLength(model.answers.length)
 
   bindResult({
     sparqls: [
