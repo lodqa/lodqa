@@ -50,7 +50,8 @@
         "import/no-unresolved": [
             2,
             { commonjs: true }
-        ]
+        ],
+        "import/no-dynamic-require": [2]
     },
     "env": {
         "es6": true,
