@@ -1,7 +1,7 @@
 const BindResult = require('../controller/bind-result')
 const AnswerIndexPresentation = require('../presentation/answer-index-presentation')
 
-module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, answerIndexDomId){
+module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, answerIndexDomId) {
   const bindResult = new BindResult(loader.eventEmitter)
   const answerIndexPresentation = new AnswerIndexPresentation(answerIndexDomId)
 
@@ -11,7 +11,10 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
       () => model.resetSpraqlCount(),
       (sparqls) => progressBarPresentation.show(
         sparqls,
-        (sparqlCount, isHide) => answerIndexPresentation.updateSparqlHideStatus(sparqlCount, model, isHide)
+        (sparqlCount, isHide) => {
+          model.updateSparqlHideStatus(sparqlCount, isHide)
+          answerIndexPresentation.updateDisplay(model)
+        }
       )
     ],
     anchored_pgp: [

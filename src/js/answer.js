@@ -24,6 +24,5 @@ beginSearch(loader, 'pgp', 'mappings', 'target')
 
 document.querySelector('#download-json-button')
   .addEventListener('click', (e) => {
-    // console.log(model.answersMap.values(), model.answersMap);
-    e.target.href = `data:,${encodeURIComponent(JSON.stringify(Array.from(model.answersMap.values()).map((s) => ({label: s.label, url: s.url})), null, 2))}`
+    e.target.href = `data:,${encodeURIComponent(JSON.stringify(model.answers.map((s) => ({label: s.label, url: s.url})), null, 2))}`
   })

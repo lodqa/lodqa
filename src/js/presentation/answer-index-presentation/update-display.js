@@ -18,13 +18,10 @@ const template = Handlebars.compile(`
   {{/each}}
 `)
 
-module.exports = function(domId, answersMap, hideSparqls) {
-  const originalAnswers = Array.from(answersMap.values())
-
-  // Hide answers accoding to the hidelSparqls
-  const answers = originalAnswers.map((a) => Object.assign({}, a, {
-    sparqls: a.sparqls.filter((sparql) => !hideSparqls.has(sparql.sparqlNumber.toString()))
-  }))
+module.exports = function(domId, model) {
+  const {
+    answers
+  } = model
 
   document.querySelector(`#${domId}`)
     .innerHTML = template({

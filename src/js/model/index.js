@@ -13,6 +13,9 @@ module.exports = class Model {
     // The answers is a map that has url as key and answer as value.
     // The answer is an object that has a url, a label and an array of sparql.
     this._answersMap = new Map()
+
+    // The set of hide sparqls. This has only spraqlCount
+    this._hideSparqls = new Set()
   }
 
   set sparqls(sparqls) {
@@ -35,8 +38,15 @@ module.exports = class Model {
     return this._sparqlCount.count
   }
 
-  get answersMap() {
-    return this._answersMap
+  get answers() {
+    const originalAnswers = Array.from(this._answersMap.values())
+
+    // Hide answers accoding to the hidelSparqls
+    const answers = originalAnswers.map((a) => Object.assign({}, a, {
+      sparqls: a.sparqls.filter((sparql) => !this._hideSparqls.has(sparql.sparqlNumber.toString()))
+    }))
+
+    return answers
   }
 
   get currentSoluton() {
@@ -69,7 +79,7 @@ module.exports = class Model {
     const uniqAnswers = getUniqAnswers(this.currentSoluton.solutions, this.focus)
 
     addAnswersOfSparql(
-      this.answersMap,
+      this._answersMap,
       uniqAnswers,
       this.sparqlCount
     )
@@ -79,10 +89,18 @@ module.exports = class Model {
     const uniqAnswers = getUniqAnswers(this.currentSoluton.solutions, this.focus)
 
     findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
-      this.answersMap.get(url)
+      this._answersMap.get(url)
         .label = label
 
-      callback(this.answersMap)
+      callback()
     })
+  }
+
+  updateSparqlHideStatus(sparqlCount, isHide) {
+    if (isHide) {
+      this._hideSparqls.add(sparqlCount)
+    } else {
+      this._hideSparqls.delete(sparqlCount)
+    }
   }
 }

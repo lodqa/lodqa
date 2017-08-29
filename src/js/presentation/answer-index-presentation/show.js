@@ -1,6 +1,6 @@
 const updateDisplay = require('./update-display')
 
-module.exports = function(domId, model, hideSparqls) {
+module.exports = function(domId, model) {
   const data = model.currentSoluton
 
   // The data.solutions is empty when the sparql query timed out.
@@ -8,10 +8,6 @@ module.exports = function(domId, model, hideSparqls) {
     return
   }
 
-  updateDisplay(domId, model.answersMap, hideSparqls)
-  model.findLabel((answersMap) => updateLabelAndDisplay(domId, answersMap, hideSparqls))
-}
-
-function updateLabelAndDisplay(domId, answersMap, hideSparqls) {
-  updateDisplay(domId, answersMap, hideSparqls)
+  updateDisplay(domId, model)
+  model.findLabel(() => updateDisplay(domId, model))
 }
