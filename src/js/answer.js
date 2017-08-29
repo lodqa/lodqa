@@ -6,7 +6,6 @@ const bindCheckboxToToggleShowOnlyHasAnswers = require('./answer/bind-checkbox-t
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
 const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const bindLoaderEvents = require('./answer/bind-loader-events')
-const DownloadJsonButton = require('./presentation/download-json-button')
 
 const model = new Model()
 const loader = new Loader()
@@ -22,10 +21,3 @@ bindCheckboxToToggleShowOnlyHasAnswers('show-only-has-answers', progressBarPrese
 bindLoaderEvents(loader, model, progressBarPresentation, 'answer-index')
 
 beginSearch(loader, 'pgp', 'mappings', 'target')
-
-new DownloadJsonButton('download-json-button', (button) => {
-  button.content = encodeURIComponent(JSON.stringify(model.answers.map((s) => ({
-    label: s.label,
-    url: s.url
-  })), null, 2))
-})

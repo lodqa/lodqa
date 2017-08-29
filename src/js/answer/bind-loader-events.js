@@ -1,9 +1,17 @@
 const BindResult = require('../controller/bind-result')
 const AnswerIndexPresentation = require('../presentation/answer-index-presentation')
+const DownloadJsonButton = require('../presentation/download-json-button')
 
 module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, answerIndexDomId) {
   const bindResult = new BindResult(loader.eventEmitter)
   const answerIndexPresentation = new AnswerIndexPresentation(answerIndexDomId)
+
+  new DownloadJsonButton('download-json-button', (button) => {
+    button.content = encodeURIComponent(JSON.stringify(model.answers.map((s) => ({
+      label: s.label,
+      url: s.url
+    })), null, 2))
+  })
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
 
