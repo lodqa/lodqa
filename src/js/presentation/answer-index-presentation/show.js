@@ -9,5 +9,5 @@ module.exports = function(domId, model) {
   }
 
   updateDisplay(domId, model)
-  model.findLabel(() => updateDisplay(domId, model))
+  model.findLabel()
 }

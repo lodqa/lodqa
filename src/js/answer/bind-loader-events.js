@@ -5,16 +5,15 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
   const bindResult = new BindResult(loader.eventEmitter)
   const answerIndexPresentation = new AnswerIndexPresentation(answerIndexDomId)
 
+  model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
+
   bindResult({
     sparqls: [
       (newSparqls) => model.sparqls = newSparqls,
       () => model.resetSpraqlCount(),
       (sparqls) => progressBarPresentation.show(
         sparqls,
-        (sparqlCount, isHide) => {
-          model.updateSparqlHideStatus(sparqlCount, isHide)
-          answerIndexPresentation.updateDisplay(model)
-        }
+        (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
       )
     ],
     anchored_pgp: [

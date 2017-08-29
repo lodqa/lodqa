@@ -17,6 +17,8 @@ module.exports = class Model {
 
     // The set of hide sparqls. This has only spraqlCount
     this._hideSparqls = new Set()
+
+    this._onAnswerChanges =[]
   }
 
   set sparqls(sparqls) {
@@ -25,6 +27,10 @@ module.exports = class Model {
 
   set anchoredPgp(anchoredPgp) {
     this._anchoredPgp = anchoredPgp
+  }
+
+  set onAnswerChange(callback) {
+    this._onAnswerChanges.push(callback)
   }
 
   get anchoredPgp() {
@@ -77,16 +83,18 @@ module.exports = class Model {
       uniqAnswers,
       this.sparqlCount
     )
+
+    emit(this)
   }
 
-  findLabel(callback) {
+  findLabel() {
     const uniqAnswers = getUniqAnswers(this.currentSoluton.solutions, this.focus)
 
     findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
       this._answersMap.get(url)
         .label = label
 
-      callback()
+      emit(this)
     })
   }
 
@@ -96,5 +104,11 @@ module.exports = class Model {
     } else {
       this._hideSparqls.delete(sparqlCount)
     }
+
+    emit(this)
   }
+}
+
+function emit(model) {
+  model._onAnswerChanges.forEach((c) => c())
 }
