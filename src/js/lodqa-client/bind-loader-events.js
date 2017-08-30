@@ -1,6 +1,6 @@
 const Model = require('../model')
 const BindResult = require('../controller/bind-result')
-const ProgressPresentation = require('../presentation/progress-presentation')
+const LoadingPresentation = require('../presentation/loading-presentation')
 const anchoredPgpTablePresentation = require('../presentation/anchored-pgp-table-presentation')
 const answersPresentation = require('../presentation/answers-presentation')
 const sparqlPresentation = require('../presentation/sparql-presentation')
@@ -8,19 +8,19 @@ const sparqlPresentation = require('../presentation/sparql-presentation')
 module.exports = function(loader, resultDomId, progressDomId, isVerbose) {
   const model = new Model()
   const bindResult = new BindResult(loader.eventEmitter)
-  const progressPresentation = ProgressPresentation(progressDomId)
+  const loadingPresentation = LoadingPresentation(progressDomId)
 
 
   bindResult({
     ws_open: [
-      progressPresentation.show
+      loadingPresentation.show
     ],
     ws_close: [
-      progressPresentation.hide
+      loadingPresentation.hide
     ],
     sparqls: [
       () => model.resetSpraqlCount(),
-      (sparqls) => progressPresentation.setTotal(sparqls.length)
+      (sparqls) => loadingPresentation.setTotal(sparqls.length)
     ],
     anchored_pgp: [
       (data) => anchoredPgpTablePresentation.showAnchoredPgp(resultDomId, data),
@@ -34,7 +34,7 @@ module.exports = function(loader, resultDomId, progressDomId, isVerbose) {
         }
       },
       (data) => answersPresentation.showSolution(document.querySelector(`#${resultDomId}`), data),
-      progressPresentation.updateProgress
+      loadingPresentation.updateProgress
     ]
   })
 }
