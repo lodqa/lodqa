@@ -10,12 +10,12 @@ module Lodqa; end unless defined? Lodqa
 class Lodqa::TermFinder
   attr_reader :dictionary
 
-  def initialize (dictionary_url)
+  def initialize(dictionary_url)
     raise ArgumentError, "dictionary_url should be given." if dictionary_url.nil? || dictionary_url.empty?
     @dictionary = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}
   end
 
-  def find (terms)
+  def find(terms)
     return nil if terms.nil?
     return {} if terms.empty?
 
@@ -42,7 +42,7 @@ class Lodqa::TermFinder
 
   private
 
-  def _lookup   (terms)
+  def _lookup(terms)
     @dictionary.post terms.to_json do |response, request, result|
       case response.code
       when 200
