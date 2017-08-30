@@ -1,9 +1,13 @@
 .answer-index {
-    margin: 40px 10px;
+    margin: 30px 10px 40px 10px;
 }
 
 .hidden {
     display: none;
+}
+
+#answer-index {
+    margin-top: 15px;
 }
 
 #answer-index .solution {
