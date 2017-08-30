@@ -46,6 +46,7 @@ class LodqaWS < Sinatra::Base
 
 		@query  = params['query'] unless params['query'].nil?
 		@target = params['target'] || @targets.first
+		@read_timeout = params['read_timeout'] || 60
 
 		if @query
 			parser_url = @config["parser_url"]
@@ -69,6 +70,7 @@ class LodqaWS < Sinatra::Base
 
 		@targets = get_targets
 		@target = params['target'] || @targets.first
+		@read_timeout = params['read_timeout'] || 60
 
 		# For the label finder
 		@endpoint_url = config['endpoint_url']

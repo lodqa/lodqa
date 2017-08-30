@@ -39,7 +39,7 @@ function bindSearchButtonEventhandler() {
 
       const form = document.querySelector('#nlqform')
 
-      location.href = `/answer?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}`
+      location.href = `/answer?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}&read_timeout=${form.read_timeout.value}`
     })
 }
 
