@@ -1,0 +1,65 @@
+#progress-bar .simple-progress-bar .sparqls {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#progress-bar .detail-progress-bar .sparqls {
+    background-color: #222288;
+    border-radius: 3px;
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0 21px;
+    padding: 0;
+    width: 628px;
+}
+
+#progress-bar .sparql {
+    background-color: darkgray;
+    margin: 2px;
+    padding: 1px 2px;
+    width: 5.1em;
+}
+
+#progress-bar .sparql.no-answer {
+    background-color: darkgray;
+}
+
+#progress-bar.show-only-has-answers .sparql.no-answer {
+    display: none;
+}
+
+#progress-bar .sparql .except-from-answers {
+    display: none;
+}
+
+#progress-bar .sparql.has-answer {
+    background-color: white;
+}
+
+#progress-bar .sparql.has-answer .except-from-answers {
+    display: inline-block;
+}
+
+#progress-bar .sparql-number {
+    display: inline-block;
+    min-width: 2.1em;
+}
+
+#progress-bar .number-of-answers {
+    display: inline-block;
+    min-width: 1.3em;
+    text-align: right;
+}
+
+#progress-bar .number-of-answers .fa-spinner {
+    color: mediumvioletred;
+}
+
+#progress-bar .no-sparql {
+    color: white;
+    margin-left: 0.3em;
+}
