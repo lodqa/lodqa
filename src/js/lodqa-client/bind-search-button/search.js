@@ -3,9 +3,11 @@ module.exports = function(event, loader, pgpElement, mappingsElement) {
 
   const pgp = JSON.parse(pgpElement.innerHTML)
   const mappings = JSON.parse(mappingsElement.innerHTML)
-  const config = document.querySelector('#target')
+  const target = document.querySelector('#target')
+    .value
+  const readTimeout = document.querySelector('#read_timeout')
     .value
 
-  loader.beginSearch(pgp, mappings, '/solutions', config)
+  loader.beginSearch(pgp, mappings, '/solutions', target, readTimeout)
   loader.eventEmitter.once('ws_close', () => event.target.removeAttribute('disabled'))
 }

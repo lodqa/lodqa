@@ -5,8 +5,8 @@ module.exports = class {
     this.eventEmitter = new EventEmitter()
   }
 
-  beginSearch(pgp, mappings, pathname, config) {
-    this.ws = openConnection(this.eventEmitter, pathname, config)
+  beginSearch(pgp, mappings, pathname, target, readTimeout) {
+    this.ws = openConnection(this.eventEmitter, pathname, target, readTimeout)
 
     this.eventEmitter.once('ws_open', () => {
       this.ws.send(JSON.stringify({
@@ -23,8 +23,8 @@ module.exports = class {
   }
 }
 
-function openConnection(emitter, pathname, config) {
-  const ws = new WebSocket(`ws://${location.host}${pathname}?target=${config}`)
+function openConnection(emitter, pathname, target, readTimeout) {
+  const ws = new WebSocket(`ws://${location.host}${pathname}?target=${target}&read_timeout=${readTimeout}`)
 
   ws.onopen = function() {
     emitter.emit('ws_open')

@@ -119,9 +119,16 @@ class LodqaWS < Sinatra::Base
 		Lodqa::Logger.level = debug ? :debug : :info
 
 		config = get_config(params)
+		options = {
+			max_hop: config['max_hop'],
+			ignore_predicates: config['ignore_predicates'],
+			sortal_predicates: config['sortal_predicates'],
+			debug: debug,
+			endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
+		}
 
 		begin
-			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], {:max_hop => config['max_hop'], :ignore_predicates => config['ignore_predicates'], :sortal_predicates => config['sortal_predicates'], debug: debug})
+			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], options)
 
 			request.websocket do |ws|
 				request_id = SecureRandom.uuid

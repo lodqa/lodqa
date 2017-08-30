@@ -1,10 +1,12 @@
-module.exports = function(loader, pgpDomId, mappnigsDomId, targetDomId) {
+module.exports = function(loader, pgpDomId, mappnigsDomId, targetDomId, readTimeoutDomId) {
   const pgp = JSON.parse(document.querySelector(`#${pgpDomId}`)
     .innerHTML)
   const mappings = JSON.parse(document.querySelector(`#${mappnigsDomId}`)
     .innerHTML)
-  const config = document.querySelector(`#${targetDomId}`)
+  const target = document.querySelector(`#${targetDomId}`)
+    .value
+  const readTimeout = document.querySelector(`#${readTimeoutDomId}`)
     .value
 
-  loader.beginSearch(pgp, mappings, '/solutions', config)
+  loader.beginSearch(pgp, mappings, '/solutions', target, readTimeout)
 }
