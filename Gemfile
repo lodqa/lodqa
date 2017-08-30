@@ -7,7 +7,6 @@ gem 'rest-client'
 gem 'sinatra'
 gem 'sparql-client'
 gem 'sinatra-websocket'
-gem 'ruby-graphviz'
 
 gem 'app_config'
 

@@ -2,7 +2,6 @@
 #
 # It parses a query and produces its parse rendering and PGP.
 #
-require 'enju_access/enju_access'
 require 'net/http'
 require 'pp'
 
@@ -19,10 +18,6 @@ class Lodqa::Graphicator
 
   def parse(query)
     @parse = @parser.parse(query)
-  end
-
-  def get_rendering
-    EnjuAccess::get_graph_rendering(@parse)
   end
 
   def get_pgp

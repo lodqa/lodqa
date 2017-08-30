@@ -168,12 +168,12 @@ class GraphFinder
   # make variations by instantiating terms
   def generate_instantiation_variations(pgp)
     iids = {}
-    pgp[:nodes].each do |id, node|
+    pgp['nodes'].each do |id, node|
       iid = class?(node[:term]) ? 'i' + id : nil
       iids[id] = iid unless iid.nil?
     end
 
-    connections = pgp[:edges]
+    connections = pgp['edges']
     return [] if connections.empty?
     bgp = connections.map.with_index{|c, i| [c['subject'], "p#{i+1}", c['object']]}
 
@@ -183,7 +183,7 @@ class GraphFinder
     [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
       # id of the terms to be instantiated
       itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
-      next unless itids.include?(pgp[:focus])
+      next unless itids.include?(pgp['focus'])
 
       if bgps.empty? && !itids.empty?
         ibgp = itids.collect{|t| [iids[t], 's' + t, t]}
@@ -220,7 +220,7 @@ class GraphFinder
   end
 
   def compose_sparql(bgp, pgp)
-    nodes = pgp[:nodes]
+    nodes = pgp['nodes']
 
     # get the variables
     variables = bgp.flatten.uniq - nodes.keys

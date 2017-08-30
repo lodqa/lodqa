@@ -51,7 +51,7 @@ class LodqaWS < Sinatra::Base
 			parser_url = @config["parser_url"]
 			g = Lodqa::Graphicator.new(parser_url)
 			g.parse(@query)
-			@parse_rendering = g.get_rendering
+
 			@pgp = g.get_pgp
 		end
 
@@ -142,7 +142,7 @@ class LodqaWS < Sinatra::Base
 				ws.onmessage do |data|
 					json = JSON.parse(data)
 
-					lodqa.pgp = json['pgp'].symbolize_keys
+					lodqa.pgp = json['pgp']
 					lodqa.mappings = json['mappings']
 
 					EM.defer do

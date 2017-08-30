@@ -59,7 +59,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
-    ruby-graphviz (1.2.2)
     simplecov (0.12.0)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -98,7 +97,6 @@ DEPENDENCIES
   rack-test
   rest-client
   rspec
-  ruby-graphviz
   simplecov
   sinatra
   sinatra-websocket
