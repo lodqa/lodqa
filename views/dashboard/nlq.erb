@@ -21,6 +21,6 @@
         <% if @expert %>
           <button id="parse-it-button" class="button">Parse it!</button>
         <% end %>
-        The timeout value for sparql query:<input type="number" min="1" max="180" value="<%= @read_timeout %>" id="read_timeout" name="read_timeout">(s)
+        Queries timeout in<input type="number" min="1" max="180" value="<%= @read_timeout %>" id="read_timeout" name="read_timeout">seconds.
     </div>
 </form>
