@@ -1,3 +1,10 @@
+.dashboard {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 640px;
+}
+
 .dashboard--back {
     z-index: -1;
 }
