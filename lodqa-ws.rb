@@ -40,13 +40,37 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/' do
-		logger.info "access"
-		@config = get_config(params)
-		@targets = get_targets
+		logger.info "access /"
+		parse_params
+		erb :index
+	end
 
-		@query  = params['query'] unless params['query'].nil?
-		@target = params['target'] || @targets.first
-		@read_timeout = params['read_timeout'] || 60
+	get '/answer' do
+		parse_params
+
+		g = Lodqa::Graphicator.new(@config["parser_url"])
+		g.parse(params['query'])
+		@pgp = g.get_pgp
+
+		# For the label finder
+		@endpoint_url = @config['endpoint_url']
+		@need_proxy = @config['name'] == 'biogateway'
+
+		begin
+			# Find terms of nodes and edges.
+			tf = Lodqa::TermFinder.new(@config['dictionary_url'])
+			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
+
+			@mappings = tf.find(keywords)
+			erb :answer
+		rescue GatewayError
+			erb :dictionary_lookup_error
+		end
+	end
+
+	get '/expert' do
+		logger.info "access /expert"
+		parse_params
 
 		if @query
 			parser_url = @config["parser_url"]
@@ -56,36 +80,7 @@ class LodqaWS < Sinatra::Base
 			@pgp = g.get_pgp
 		end
 
-		erb :index
-	end
-
-	get '/answer' do
-		config = get_config(params)
-
-		@query = params['query']
-
-		g = Lodqa::Graphicator.new(config["parser_url"])
-		g.parse(params['query'])
-		@pgp = g.get_pgp
-
-		@targets = get_targets
-		@target = params['target'] || @targets.first
-		@read_timeout = params['read_timeout'] || 60
-
-		# For the label finder
-		@endpoint_url = config['endpoint_url']
-		@need_proxy = config['name'] == 'biogateway'
-
-		begin
-			# Find terms of nodes and edges.
-			tf = Lodqa::TermFinder.new(config['dictionary_url'])
-			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
-
-			@mappings = tf.find(keywords)
-			erb :answer
-		rescue GatewayError
-			erb :dictionary_lookup_error
-		end
+		erb :expert
 	end
 
 	# Command for test: curl -H "content-type:application/json" -d '{"keywords":["drug", "genes"]} http://localhost:9292/termfinder'
@@ -200,6 +195,14 @@ class LodqaWS < Sinatra::Base
 	end
 
 	private
+
+	def parse_params
+		@config = get_config(params)
+		@targets = get_targets
+		@target = params['target'] || @targets.first
+		@read_timeout = params['read_timeout'] || 60
+		@query  = params['query'] unless params['query'].nil?
+	end
 
 	def ws_send(eventMachine, websocket, key, value)
 		websocket.send({key => value}.to_json)

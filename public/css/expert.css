@@ -1,0 +1,61 @@
+.dashboard--back {
+    z-index: -1;
+}
+
+.results {
+    position: absolute;
+    width: 740px;
+    z-index: 2;
+}
+
+.results--hidden {
+    display: none;
+}
+
+.results--back {
+    z-index: -1;
+}
+
+@media (max-width: 1370px) {
+    #results {
+        right: 4px;
+    }
+}
+
+@media (min-width: 1371px) {
+    #results {
+        left: 600px;
+    }
+}
+
+.jsPlumb-container {
+    border: 1px solid green;
+    margin: 5px 0;
+}
+
+.table {
+    margin: 2px 0;
+}
+
+#lodqa-messages {
+    position: fixed;
+    top: 4px;
+    right: 4px;
+    height: 30px;
+    text-align: center;
+    z-index: 2;
+}
+
+.lodqa-message {
+    margin: auto;
+    padding: 1px;
+    border: 2px solid red;
+    border-radius: 5px;
+    background-color: #ffff66;
+    text-align: center;
+}
+
+#beginSearch, #stopSearch {
+    height: 34px;
+    width: 100px;
+}

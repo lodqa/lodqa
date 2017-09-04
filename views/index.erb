@@ -1,33 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>LODQA : Question-Answering over Linked Open Data</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-  <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
-  <link href="css/progress-bar.css" media="screen" rel="stylesheet" type="text/css">
-  <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
-  <link href="js/vender/grapheditor/index.css" rel="stylesheet">
-  <link href="js/vender/codemirror/lib/codemirror.css" rel="stylesheet">
+    <head>
+        <title>LODQA : Question-Answering over Linked Open Data</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+        <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
 
-  <script src="js/vender/Springy/springy.js"></script>
-  <script src="js/vender/jQuery/dist/jquery.min.js"></script>
-  <script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
-  <script src="js/vender/Springy/springyui.js"></script>
-  <script type="text/javascript" src="js/unhandled-error-message.js"></script>
-</head>
-<body>
+        <script type="text/javascript" src="js/unhandled-error-message.js"></script>
+    </head>
+    <body>
 
-<div id="dashboard" class="dashboard frame">
-	<%= erb :dashboard %>
-  <%= erb :graph %>
-</div>
-
-<div id="results" class="results results--hidden frame">
-	<%= erb :results %>
-</div>
-
-<div id="lodqa-messages"></div>
-
-<script src="js/index.js"></script>
-</body>
+        <div id="dashboard" class="dashboard frame">
+            <%= erb :dashboard %>
+        </div>
+    </body>
 </html>
