@@ -71,6 +71,7 @@ class LodqaWS < Sinatra::Base
 	get '/expert' do
 		logger.info "access /expert"
 		parse_params
+		@expert = true # A flag for the nlp.erb
 
 		if @query
 			parser_url = @config["parser_url"]

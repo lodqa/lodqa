@@ -2,17 +2,25 @@
     <i>query</i>
     and parse it.</h1>
 
-<form id="nlqform" action="/expert" method="get" entype="multipart/form-data">
+<form id="nlqform" action="/answer" method="get" entype="multipart/form-data">
 
-    <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
+    <div>
+        <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
 
-    <a id="button-show-queries" title="Sample queries" class="button">
-        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-    </a>
-    <input name="target" type="hidden"/>
-    <input id="endpoint-url" type="hidden"/>
-    <input id="need-proxy" type="hidden"/>
-    <input id="graphicateButton" class="button" type="submit" value="Parse it!"/>
-    <button id="search-button" class="button">search</button>
-    The timeout value for sparql query:<input type="number" min="1" max="180" value="<%= @read_timeout %>" id="read_timeout" name="read_timeout">(s)
+        <a id="button-show-queries" title="Sample queries" class="button">
+            <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+        </a>
+        <input name="target" type="hidden"/>
+        <input id="endpoint-url" type="hidden"/>
+        <input id="need-proxy" type="hidden"/>
+        <button id="search-button" class="button">Search</button>
+        <input id="expert-checkbox" type="checkbox" <% if @expert %>checked="checked"<% end %>/>
+        <label for="expert-checkbox">expert</label>
+    </div>
+    <div class="nlq-options">
+        <% if @expert %>
+          <button id="parse-it-button" class="button">Parse it!</button>
+        <% end %>
+        The timeout value for sparql query:<input type="number" min="1" max="180" value="<%= @read_timeout %>" id="read_timeout" name="read_timeout">(s)
+    </div>
 </form>
