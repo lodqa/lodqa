@@ -34,12 +34,15 @@ function initSampleQueries() {
 function bindSearchButtonEventhandler() {
   document.querySelector('#search-button')
     .addEventListener('click', (e) => {
-      // Do not submit form.
-      e.preventDefault()
-
       const form = document.querySelector('#nlqform')
 
-      location.href = `/answer?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}&read_timeout=${form.read_timeout.value}`
+      if (form.checkValidity()) {
+        // Do not submit form.
+        e.preventDefault()
+        location.href = `/answer?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}&read_timeout=${form.read_timeout.value}`
+      }else {
+        form.querySelector('#query').focus()
+      }
     })
 }
 
