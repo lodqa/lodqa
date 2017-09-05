@@ -2,7 +2,7 @@
     position: fixed;
     left: 0px;
     top: 0px;
-    width: 640px;
+    width: 642px;
 }
 
 .dashboard--back {
@@ -60,9 +60,4 @@
     border-radius: 5px;
     background-color: #ffff66;
     text-align: center;
-}
-
-#beginSearch, #stopSearch {
-    height: 34px;
-    width: 100px;
 }

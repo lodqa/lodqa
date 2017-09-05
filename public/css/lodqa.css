@@ -142,7 +142,11 @@ nav a {
 }
 
 .nlq-options {
-  margin-top: 10px;
+    margin-top: 10px;
+}
+
+.nlq-options input[type="number"] {
+    width: 3em;
 }
 
 h1 {
