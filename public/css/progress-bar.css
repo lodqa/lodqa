@@ -27,14 +27,14 @@
     list-style-type: none;
     margin: 0 2px;
     padding: 0;
-    width: 730px;
+    width: 669px;
 }
 
 .progress-bar__detail-progress-bar__sparqls__sparql {
     background-color: darkgray;
     margin: 2px;
-    padding: 1px 2px;
-    width: 5.2em;
+    padding: 1px 2px 2px 1px;
+    width: 4.79em;
 }
 
 .progress-bar__detail-progress-bar__sparqls__sparql--has-answer {
@@ -64,18 +64,50 @@
     display: inline;
 }
 
-.progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
-    display: inline-block;
-    min-width: 1.3em;
-    text-align: right;
+.progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox {
+    display: none;
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
 }
 
-.progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox {
+.progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
+    color: darkgrey;
+    cursor: default;
     display: none;
 }
 
-.progress-bar__detail-progress-bar__sparqls__sparql--has-answer .progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox {
+.progress-bar__detail-progress-bar__sparqls__sparql--has-answer .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
     display: inline-block;
+    border-radius: 3px;
+    font-weight: normal;
+    padding: 0px 6px;
+    text-align: right;
+    width: 1.66em;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql--has-answer .progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox:checked+.progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
+    border-style: inset;
+    color: rgb(43, 128, 255);
+    font-weight: bold;
+    position: relative;
+    top: 1px;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql--no-answer .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    color: darkgrey;
+    cursor: default;
+    display: inline-block;
+    font-weight: normal;
+    padding: 0;
 }
 
 .progress-bar__detail-progress-bar__sparqls__no-sparql-message {
