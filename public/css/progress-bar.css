@@ -34,7 +34,8 @@
 }
 
 #progress-bar .sparql.no-answer {
-    background-color: darkgray;
+    background-color: white;
+    color: darkgray;
 }
 
 #progress-bar.show-only-has-answers .sparql.no-answer {
