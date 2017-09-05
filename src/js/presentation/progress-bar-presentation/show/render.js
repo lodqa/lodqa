@@ -5,17 +5,7 @@ registerPartial()
 
 const template = handlebars.compile(`
   <div class="simple-progress-bar">
-    <ul class="sparqls">
-      {{#each sparqls}}
-        <li data-sparql-number="{{sparqlNumber}}">
-        {{#if @first}}
-        i
-        {{else}}
-        .
-        {{/if}}
-        </li>
-      {{/each}}
-    </ul>
+    <progress value="0" max="{{sparqls.length}}"></progress><span id="simple-progress-bar__percentage">0%</span>
   </div>
   <span>
     <input type="checkbox" id="show-detail-progress-bar">

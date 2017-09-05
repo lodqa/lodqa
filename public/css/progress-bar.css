@@ -1,9 +1,13 @@
-#progress-bar .simple-progress-bar .sparqls {
-    display: flex;
-    flex-wrap: wrap;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+#progress-bar .simple-progress-bar progress {
+    margin-left: 2px;
+    width: 470px;
+}
+
+#progress-bar .simple-progress-bar #simple-progress-bar__percentage {
+    display: inline-block;
+    text-align: right;
+    vertical-align: top;
+    width: 3em;
 }
 
 #progress-bar .detail-progress-bar .sparqls {
