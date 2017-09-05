@@ -8,6 +8,7 @@
 
 #answer-index {
     margin-top: 15px;
+    min-height: 20em;
 }
 
 #answer-index .solution {
