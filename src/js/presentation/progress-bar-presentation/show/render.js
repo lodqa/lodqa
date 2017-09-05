@@ -50,7 +50,7 @@ module.exports = function(domId, viewModel, onChange) {
     const sparql = e.target.closest('.sparql')
 
     if (sparql) {
-      onChange(sparql.getAttribute('data-sparql-number'), e.target.checked)
+      onChange(sparql.getAttribute('data-sparql-number'), !e.target.checked)
     }
   })
 }
