@@ -26,8 +26,8 @@ const template = handlebars.compile(`
               <i class="fa fa-spinner fa-spin fa-fw"></i>
             {{/if}}
           </span>
-          <span class="except-from-answers">
-            <input type="checkbox">
+          <span class="selected-answers">
+            <input type="checkbox" checked="checked">
           </span>
         </li>
       {{else}}
