@@ -35,8 +35,5 @@ module.exports = class {
   toggleDetail() {
     document.querySelector(`#${this.progressBarDomId} .detail-progress-bar`)
       .classList.toggle('hidden')
-
-    document.querySelector(`#${this.progressBarDomId} .simple-progress-bar`)
-      .classList.toggle('hidden')
   }
 }

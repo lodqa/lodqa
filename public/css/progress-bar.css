@@ -5,9 +5,14 @@
 
 #progress-bar .simple-progress-bar #simple-progress-bar__percentage {
     display: inline-block;
+    margin-right: 0.1em;
     text-align: right;
     vertical-align: top;
     width: 3em;
+}
+
+#progress-bar .simple-progress-bar .checkbox {
+    vertical-align: super;
 }
 
 #progress-bar .detail-progress-bar .sparqls {
