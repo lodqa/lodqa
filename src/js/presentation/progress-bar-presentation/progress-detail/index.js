@@ -5,7 +5,7 @@ const getNumberOfAnswers = require('../get-number-of-answers')
 
 module.exports = function(domId, solutions, sparqlCount, focusNode, sparqlTimeout) {
   const current = getCurrentSparql(domId, sparqlCount)
-  current.classList.remove('progress')
+  current.classList.remove('progress-bar__detail-progress-bar__sparqls__sparql--progress')
 
   if (sparqlTimeout) {
     showError(current, sparqlTimeout.error_message)
@@ -20,7 +20,7 @@ module.exports = function(domId, solutions, sparqlCount, focusNode, sparqlTimeou
   // Show the spinner icon for the next sparql
   const next = current.nextElementSibling
   if (next) {
-    next.classList.add('progress')
+    next.classList.add('progress-bar__detail-progress-bar__sparqls__sparql--progress')
   }
 }
 
@@ -29,8 +29,8 @@ function showNumbers(dom, uniqAnswersLength) {
     .innerHTML = uniqAnswersLength
 
   if (uniqAnswersLength) {
-    dom.classList.add('has-answer')
+    dom.classList.add('progress-bar__detail-progress-bar__sparqls__sparql--has-answer')
   } else {
-    dom.classList.add('no-answer')
+    dom.classList.add('progress-bar__detail-progress-bar__sparqls__sparql--no-answer')
   }
 }

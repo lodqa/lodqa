@@ -4,31 +4,29 @@ const registerPartial = require('../../../answer/register-partial')
 registerPartial()
 
 const template = handlebars.compile(`
-  <div class="simple-progress-bar">
-    <progress value="0" max="{{sparqls.length}}"></progress>
-    <span id="simple-progress-bar__percentage">0%</span>
-    <span class="checkbox">
+  <div class="progress-bar__simple-progress-bar">
+    <progress class="progress-bar__simple-progress-bar__progress" value="0" max="{{sparqls.length}}"></progress>
+    <span class="progress-bar__simple-progress-bar__percentage">0%</span>
+    <span class="progress-bar__simple-progress-bar__show-detail-checkbox">
       <input type="checkbox" id="show-detail-progress-bar">
       <label for="show-detail-progress-bar">Show detail</label>
     </span>
   </div>
-  <div class="detail-progress-bar hidden">
+  <div class="progress-bar__detail-progress-bar progress-bar__detail-progress-bar--hidden">
     <div>
         <input type="checkbox" id="show-only-has-answers">
         <label for="show-only-has-answers">Show only sparqls with answers</label>
     </div>
-    <ul class="sparqls">
+    <ul class="progress-bar__detail-progress-bar__sparqls">
       {{#each sparqls}}
-        <li class="sparql" data-sparql-number="{{sparqlNumber}}">
-          <span class="sparql-number">{{> sparql-link}}</span>
-          <span class="loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
-          <span class="selected-answers">
-            <label class="number-of-answers"></label>
-            <input type="checkbox" checked="checked">
-          </span>
+        <li class="progress-bar__detail-progress-bar__sparqls__sparql" data-sparql-number="{{sparqlNumber}}">
+          <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+          <span class="progress-bar__detail-progress-bar__sparqls__sparql__loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
+          <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers"></label>
+          <input class="progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox" type="checkbox" checked="checked">
         </li>
       {{else}}
-      <span class="no-sparql">No Sparql</span>
+      <span class="progress-bar__detail-progress-bar__sparqls__no-sparql-message">No Sparql</span>
       {{/each}}
     </ul>
   </div>
@@ -44,7 +42,7 @@ module.exports = function(domId, viewModel, onChange) {
 
   // Bind an event handler on change events of checkboxes.
   element.addEventListener('change', (e) => {
-    const sparql = e.target.closest('.sparql')
+    const sparql = e.target.closest('.progress-bar__detail-progress-bar__sparqls__sparql')
 
     if (sparql) {
       onChange(sparql.getAttribute('data-sparql-number'), !e.target.checked)

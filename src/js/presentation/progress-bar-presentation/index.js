@@ -28,12 +28,12 @@ module.exports = class {
   }
 
   toggleShowOnlyHasAnswers() {
-    document.querySelector(`#${this.progressBarDomId}`)
-      .classList.toggle('show-only-has-answers')
+    document.querySelector(`#${this.progressBarDomId} .progress-bar__detail-progress-bar`)
+      .classList.toggle('progress-bar__detail-progress-bar--show-only-has-answers')
   }
 
   toggleDetail() {
-    document.querySelector(`#${this.progressBarDomId} .detail-progress-bar`)
-      .classList.toggle('hidden')
+    document.querySelector(`#${this.progressBarDomId} .progress-bar__detail-progress-bar`)
+      .classList.toggle('progress-bar__detail-progress-bar--hidden')
   }
 }

@@ -1,9 +1,9 @@
-#progress-bar .simple-progress-bar progress {
+.progress-bar__simple-progress-bar__progress {
     margin-left: 2px;
     width: 472px;
 }
 
-#progress-bar .simple-progress-bar #simple-progress-bar__percentage {
+.progress-bar__simple-progress-bar__percentage {
     display: inline-block;
     margin-right: 0.1em;
     text-align: right;
@@ -11,11 +11,15 @@
     width: 3em;
 }
 
-#progress-bar .simple-progress-bar .checkbox {
+.progress-bar__simple-progress-bar__show-detail-checkbox {
     vertical-align: super;
 }
 
-#progress-bar .detail-progress-bar .sparqls {
+.progress-bar__detail-progress-bar--hidden {
+    display: none;
+}
+
+.progress-bar__detail-progress-bar__sparqls {
     background-color: #222288;
     border-radius: 3px;
     display: flex;
@@ -26,55 +30,55 @@
     width: 730px;
 }
 
-#progress-bar .sparql {
+.progress-bar__detail-progress-bar__sparqls__sparql {
     background-color: darkgray;
     margin: 2px;
     padding: 1px 2px;
     width: 5.2em;
 }
 
-#progress-bar .sparql.no-answer {
+.progress-bar__detail-progress-bar__sparqls__sparql--has-answer {
+    background-color: white;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql--no-answer {
     background-color: white;
     color: darkgray;
 }
 
-#progress-bar.show-only-has-answers .sparql.no-answer {
+.progress-bar__detail-progress-bar--show-only-has-answers .progress-bar__detail-progress-bar__sparqls__sparql--no-answer {
     display: none;
 }
 
-#progress-bar .sparql .selected-answers input[type="checkbox"]{
-    display: none;
-}
-
-#progress-bar .sparql.has-answer {
-    background-color: white;
-}
-
-#progress-bar .sparql.has-answer .selected-answers input[type="checkbox"] {
-    display: inline-block;
-}
-
-#progress-bar .sparql-number {
+.progress-bar__detail-progress-bar__sparqls__sparql__sparql-number {
     display: inline-block;
     min-width: 2.1em;
 }
 
-#progress-bar .number-of-answers {
+.progress-bar__detail-progress-bar__sparqls__sparql__loading {
+    display: none;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql--progress .progress-bar__detail-progress-bar__sparqls__sparql__loading {
+    color: mediumvioletred;
+    display: inline;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
     display: inline-block;
     min-width: 1.3em;
     text-align: right;
 }
 
-#progress-bar .no-sparql {
-    color: white;
-    margin-left: 0.3em;
-}
-
-/* show loading icon */
-#progress-bar .loading {
+.progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox {
     display: none;
 }
-#progress-bar .progress .loading {
-    color: mediumvioletred;
-    display: inline;
+
+.progress-bar__detail-progress-bar__sparqls__sparql--has-answer .progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox {
+    display: inline-block;
+}
+
+.progress-bar__detail-progress-bar__sparqls__no-sparql-message {
+    color: white;
+    margin-left: 0.3em;
 }
