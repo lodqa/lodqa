@@ -42,7 +42,7 @@
     display: none;
 }
 
-#progress-bar .sparql .selected-answers {
+#progress-bar .sparql .selected-answers input[type="checkbox"]{
     display: none;
 }
 
@@ -50,7 +50,7 @@
     background-color: white;
 }
 
-#progress-bar .sparql.has-answer .selected-answers {
+#progress-bar .sparql.has-answer .selected-answers input[type="checkbox"] {
     display: inline-block;
 }
 

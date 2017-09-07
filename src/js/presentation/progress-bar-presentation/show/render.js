@@ -22,8 +22,8 @@ const template = handlebars.compile(`
         <li class="sparql" data-sparql-number="{{sparqlNumber}}">
           <span class="sparql-number">{{> sparql-link}}</span>
           <span class="loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
-          <span class="number-of-answers"></span>
           <span class="selected-answers">
+            <label class="number-of-answers"></label>
             <input type="checkbox" checked="checked">
           </span>
         </li>
