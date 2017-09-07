@@ -65,11 +65,16 @@
     text-align: right;
 }
 
-#progress-bar .number-of-answers .fa-spinner {
-    color: mediumvioletred;
-}
-
 #progress-bar .no-sparql {
     color: white;
     margin-left: 0.3em;
+}
+
+/* show loading icon */
+#progress-bar .loading {
+    display: none;
+}
+#progress-bar .progress .loading {
+    color: mediumvioletred;
+    display: inline;
 }

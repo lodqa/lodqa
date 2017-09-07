@@ -7,6 +7,8 @@ module.exports = function stop(domId, sparqlCount, errorMessage = '') {
   const current = getCurrentSparql(domId, sparqlCount + 1)
 
   if (current) {
+    current.classList.remove('progress')
+
     // If there is errorMessage, show it with a bomb icon.
     if (errorMessage) {
       showError(current, errorMessage)
