@@ -12,9 +12,9 @@
         <a id="button-show-queries" title="Sample queries" class="button">
             <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
         </a>
-        <input name="target" type="hidden"/>
-        <input id="endpoint-url" type="hidden"/>
-        <input id="need-proxy" type="hidden"/>
+        <input name="target" id="target-value" type="hidden" value="<%= @target %>"/>
+        <input id="endpoint-url" type="hidden" value="<%= @endpoint_url %>"/>
+        <input id="need-proxy" type="hidden" value="<%= @need_proxy %>"/>
         <button id="search-button" class="button">Search</button>
         <input id="expert-checkbox" type="checkbox" <% if @expert %>checked="checked"<% end %>/>
         <label for="expert-checkbox">expert</label>

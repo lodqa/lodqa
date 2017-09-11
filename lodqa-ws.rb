@@ -45,26 +45,48 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
+
 	get '/answer' do
 		parse_params
 
 		g = Lodqa::Graphicator.new(@config[:parser_url])
 		g.parse(params['query'])
-		@pgp = g.get_pgp
 
+		@pgp = g.get_pgp
 		if @pgp[:nodes].keys.length == 0
 			# TODO: What's a better error message?
 			@message = 'The pgp has no nodes!'
 			return erb :error_before_answer
 		end
 
+		db = if params['target']
+			candidates = searchable? @pgp, [{name: @config[:name], dictionary_url: @config[:dictionary_url], endpoint_url: @config[:endpoint_url]}]
+			if candidates.length == 0
+				@message = "#{@config[:name]} is not an enough database for the query!"
+				return erb :error_before_answer
+			end
+
+			candidates[0]
+		else
+			candidates = select_db_for @pgp
+			if candidates.length == 0
+				@message = 'There is no db which has all words in the query!'
+				return erb :error_before_answer
+			end
+
+			candidates[0]
+		end
+
 		# For the label finder
-		@endpoint_url = @config[:endpoint_url]
-		@need_proxy = @config[:name] == 'biogateway'
+		@endpoint_url = db[:endpoint_url]
+		@need_proxy = db[:name] == 'biogateway'
+		@target = db[:name]
+
+		p db, @target
 
 		begin
 			# Find terms of nodes and edges.
-			tf = Lodqa::TermFinder.new(@config[:dictionary_url])
+			tf = Lodqa::TermFinder.new(db[:dictionary_url])
 			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
 			@mappings = tf.find(keywords)
@@ -252,5 +274,40 @@ class LodqaWS < Sinatra::Base
 	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 
 	  config
+	end
+
+	def searchable?(pgp, applicants)
+		keywords = pgp[:nodes].values.map{|n| n[:text]}
+		applicants
+			.map do |applicant|
+				begin
+					applicant[:terms] = Lodqa::TermFinder
+						.new(applicant[:dictionary_url])
+						.find(keywords)
+					applicant
+				rescue GatewayError
+					p "dictionary_url error for #{applicant[:name]}"
+					applicant
+				end
+			end
+			.select {|applicant| applicant[:terms] && applicant[:terms].all?{|t| t[1].length > 0 } }
+	end
+
+	def select_db_for(pgp)
+		targets_url = settings.target_db + '.json'
+
+		applicants = begin
+			RestClient.get targets_url do |response, request, result|
+				case response.code
+					when 200 then JSON.parse response
+					else raise IOError, "invalid url #{targets_url}"
+				end
+			end
+		rescue
+			raise IOError, "invalid url #{targets_url}"
+		end
+			.map{|config| {name: config['name'], dictionary_url: config['dictionary_url'], endpoint_url: config['endpoint_url']}}
+
+		searchable? pgp, applicants
 	end
 end

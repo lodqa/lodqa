@@ -1,6 +1,6 @@
 <div id="logo-box">
 <a href="<%= request.base_url %>"><img src="images/logo.svg" alt="LODQA" id='logo' title="Question-Answering over Linked Open Data" /></a>
-<span id="target-display"></span>
+<span id="target-display"><%= @target %></span>
 </div>
 
 <div id="logo-sub-box">
@@ -12,6 +12,7 @@
       <li><a href="https://github.com/lodqa/lodqa">github</a></li>
     </ul>
   </nav>
+  <% if @expert %>
   <div id="target-box">
     <select name="target" id="target">
       <% @targets.each do |t| %>
@@ -23,4 +24,5 @@
       <% end %>
     </select>
   </div>
+  <% end %>
 </div>

@@ -16,4 +16,4 @@ bindHandlerToShowSparql(['progress-bar', 'answer-index'], 'lightbox', model, loa
 
 bindLoaderEvents(loader, model, progressBarPresentation, 'answer-index')
 
-beginSearch(loader, 'pgp', 'mappings', 'target', 'read_timeout')
+beginSearch(loader, 'pgp', 'mappings', 'target-value', 'read_timeout')
