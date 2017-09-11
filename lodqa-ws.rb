@@ -48,7 +48,7 @@ class LodqaWS < Sinatra::Base
 	get '/answer' do
 		parse_params
 
-		g = Lodqa::Graphicator.new(@config["parser_url"])
+		g = Lodqa::Graphicator.new(@config[:parser_url])
 		g.parse(params['query'])
 		@pgp = g.get_pgp
 
@@ -59,12 +59,12 @@ class LodqaWS < Sinatra::Base
 		end
 
 		# For the label finder
-		@endpoint_url = @config['endpoint_url']
-		@need_proxy = @config['name'] == 'biogateway'
+		@endpoint_url = @config[:endpoint_url]
+		@need_proxy = @config[:name] == 'biogateway'
 
 		begin
 			# Find terms of nodes and edges.
-			tf = Lodqa::TermFinder.new(@config['dictionary_url'])
+			tf = Lodqa::TermFinder.new(@config[:dictionary_url])
 			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
 			@mappings = tf.find(keywords)
@@ -81,7 +81,7 @@ class LodqaWS < Sinatra::Base
 		@expert = true # A flag for the nlp.erb
 
 		if @query
-			parser_url = @config["parser_url"]
+			parser_url = @config[:parser_url]
 			g = Lodqa::Graphicator.new(parser_url)
 			g.parse(@query)
 
@@ -123,15 +123,15 @@ class LodqaWS < Sinatra::Base
 
 		config = get_config(params)
 		options = {
-			max_hop: config['max_hop'],
-			ignore_predicates: config['ignore_predicates'],
-			sortal_predicates: config['sortal_predicates'],
+			max_hop: config[:max_hop],
+			ignore_predicates: config[:ignore_predicates],
+			sortal_predicates: config[:sortal_predicates],
 			debug: debug,
 			endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
 		}
 
 		begin
-			lodqa = Lodqa::Lodqa.new(config['endpoint_url'], config['graph_uri'], options)
+			lodqa = Lodqa::Lodqa.new(config[:endpoint_url], config[:graph_uri], options)
 
 			request.websocket do |ws|
 				request_id = SecureRandom.uuid
@@ -228,7 +228,7 @@ class LodqaWS < Sinatra::Base
 	def get_config(params)
 		# default configuration
 		config_file = settings.root + '/config/default-setting.json'
-		config = JSON.parse File.read(config_file) if File.file?(config_file)
+		config = JSON.parse File.read(config_file), {:symbolize_names => true} if File.file?(config_file)
 		config = {} if config.nil?
 
 		# target name passed through params
@@ -237,8 +237,8 @@ class LodqaWS < Sinatra::Base
 			config_add = begin
 				RestClient.get target_url do |response, request, result|
 					case response.code
-						when 200 then JSON.parse response
-						else raise IOError, "invalid target"
+					when 200 then JSON.parse response, {:symbolize_names => true}
+					else raise IOError, "invalid target"
 					end
 				end
 			rescue
