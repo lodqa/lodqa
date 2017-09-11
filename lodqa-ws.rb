@@ -52,6 +52,12 @@ class LodqaWS < Sinatra::Base
 		g.parse(params['query'])
 		@pgp = g.get_pgp
 
+		if @pgp[:nodes].keys.length == 0
+			# TODO: What's a better error message?
+			@message = 'The pgp has no nodes!'
+			return erb :error_before_answer
+		end
+
 		# For the label finder
 		@endpoint_url = @config['endpoint_url']
 		@need_proxy = @config['name'] == 'biogateway'
@@ -64,7 +70,8 @@ class LodqaWS < Sinatra::Base
 			@mappings = tf.find(keywords)
 			erb :answer
 		rescue GatewayError
-			erb :dictionary_lookup_error
+			@message = 'Dictionary lookup error!'
+			erb :error_before_answer
 		end
 	end
 
