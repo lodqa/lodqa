@@ -56,13 +56,6 @@ a:hover {
     font-size: x-large;
 }
 
-#slogan {
-    display: inline-block;
-    font-size: small;
-    font-style: italic;
-    color: #8888ff;
-}
-
 #logo-sub-box {
     display: inline-block;
     position: absolute;
