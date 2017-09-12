@@ -1,7 +1,7 @@
 const Loader = require('./loader/load-solution')
-const bindSearchButton = require('./lodqa-client/bind-search-button')
-const bindStopSearchButton = require('./lodqa-client/bind-stop-search-button')
-const bindLoaderEvents = require('./lodqa-client/bind-loader-events')
+const bindSearchButton = require('./grapheditor/bind-search-button')
+const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
+const bindLoaderEvents = require('./grapheditor/bind-loader-events')
 const ProgressBarPresentation = require('./presentation/progress-bar-presentation')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
