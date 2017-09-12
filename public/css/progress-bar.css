@@ -37,13 +37,8 @@
     width: 4.79em;
 }
 
-.progress-bar__detail-progress-bar__sparqls__sparql--has-answer {
+.progress-bar__detail-progress-bar__sparqls__sparql--has-answer, .progress-bar__detail-progress-bar__sparqls__sparql--no-answer, .progress-bar__detail-progress-bar__sparqls__sparql--error {
     background-color: white;
-}
-
-.progress-bar__detail-progress-bar__sparqls__sparql--no-answer {
-    background-color: white;
-    color: darkgray;
 }
 
 .progress-bar__detail-progress-bar--show-only-has-answers .progress-bar__detail-progress-bar__sparqls__sparql--no-answer {
@@ -99,15 +94,22 @@
     top: 1px;
 }
 
-.progress-bar__detail-progress-bar__sparqls__sparql--no-answer .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
+.progress-bar__detail-progress-bar__sparqls__sparql--no-answer .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers, .progress-bar__detail-progress-bar__sparqls__sparql--error .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
     background-color: transparent;
     background-image: none;
     border: none;
-    color: darkgrey;
     cursor: default;
     display: inline-block;
     font-weight: normal;
     padding: 0;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql--no-answer .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
+    color: darkgrey;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql--error .progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers {
+    color: orangered;
 }
 
 .progress-bar__detail-progress-bar__sparqls__no-sparql-message {
