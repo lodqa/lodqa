@@ -18,8 +18,16 @@
         <script type="text/javascript" src="js/unhandled-error-message.js"></script>
     </head>
     <body>
-        <div id="dashboard" class="dashboard frame">
-            <%= erb :dashboard %>
+        <div id="dashboard" class="dashboard">
+            <div id="header">
+            	<%= erb :'dashboard/header' %>
+              <div id="nlq">
+              	<%= erb :'dashboard/nlq' %>
+              </div>
+              <%= erb :'dashboard/main-nav' %>
+            </div>
+
+
             <% if !@query.nil? %>
             <div class="answer-index">
                 <div class="hidden">

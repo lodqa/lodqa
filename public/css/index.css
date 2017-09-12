@@ -1,0 +1,15 @@
+#header {
+    display: flex;
+    height: 231px;
+    justify-content: center;
+}
+
+#logo-box {
+    height: 92px;
+    padding-top: 127px;
+}
+
+#nlq {
+    display: flex;
+    justify-content: center;
+}

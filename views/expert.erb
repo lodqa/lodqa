@@ -19,7 +19,38 @@
 <body>
 
 <div id="dashboard" class="dashboard frame">
-	<%= erb :dashboard %>
+  <div id="header">
+  	<%= erb :'dashboard/header' %>
+    <div class="target-display">
+      <span id="target-display">@<%= @target %></span>
+    </div>
+    <%= erb :'dashboard/main-nav' %>
+    <div id="target-box">
+      <select name="target" id="target">
+        <% @targets.each do |t| %>
+          <% if t == @target %>
+            <option value="<%= t %>" selected="selected"><%= t %></option>
+          <% else %>
+            <option value="<%= t %>"><%= t %></option>
+          <% end %>
+        <% end %>
+      </select>
+    </div>
+  </div>
+
+  <div id="nlq">
+      <h1>Step 1. Enter a
+      <i>query</i>
+      and parse it.</h1>
+
+  	<%= erb :'dashboard/nlq-expert' %>
+  </div>
+
+  <div id="examples" class="examples examples--hidden frame">
+  	<%= erb :examples %>
+  </div>
+
+  <script src="js/dashboard.js"></script>
   <%= erb :graph %>
 </div>
 

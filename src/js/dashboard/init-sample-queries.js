@@ -4,18 +4,24 @@ module.exports = function() {
     .addEventListener('click', (e) => {
       e.stopPropagation()
       const element = document.querySelector('.examples')
-      if (element.classList.contains('examples--hidden')) {
-        element.classList.remove('examples--hidden')
-      } else {
-        element.classList.add('examples--hidden')
+      if (element) {
+        if (element.classList.contains('examples--hidden')) {
+          element.classList.remove('examples--hidden')
+        } else {
+          element.classList.add('examples--hidden')
+        }
       }
     })
 
-  document.querySelector('.sample-queries')
-    .addEventListener('click', (e) => {
+  const queries = document.querySelector('.sample-queries')
+  if (queries) {
+    queries.addEventListener('click', (e) => {
       document.querySelector('#query')
         .value = e.target.text
-      document.querySelector('.examples')
-        .classList.add('examples--hidden')
+      const element = document.querySelector('.examples')
+      if (element) {
+        element.classList.add('examples--hidden')
+      }
     })
+  }
 }

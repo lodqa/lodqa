@@ -4,14 +4,24 @@
         <title>LODQA : Question-Answering over Linked Open Data</title>
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
         <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
+        <link href="css/index.css" media="screen" rel="stylesheet" type="text/css">
         <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
 
         <script type="text/javascript" src="js/unhandled-error-message.js"></script>
     </head>
     <body>
 
-        <div id="dashboard" class="dashboard frame">
-            <%= erb :dashboard %>
+        <div id="dashboard" class="dashboard">
+            <div id="header">
+              <%= erb :'dashboard/header' %>
+              <%= erb :'dashboard/main-nav' %>
+            </div>
+
+            <div id="nlq">
+              <%= erb :'dashboard/nlq' %>
+            </div>
+
         </div>
     </body>
+    <script src="js/index.js"></script>
 </html>

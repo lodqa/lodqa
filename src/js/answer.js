@@ -5,6 +5,7 @@ const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
 const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const bindLoaderEvents = require('./answer/bind-loader-events')
+const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
 const model = new Model()
 const loader = new Loader()
@@ -17,3 +18,5 @@ bindHandlerToShowSparql(['progress-bar', 'answer-index'], 'lightbox', model, loa
 bindLoaderEvents(loader, model, progressBarPresentation, 'answer-index')
 
 beginSearch(loader, 'pgp', 'mappings', 'target-value', 'read_timeout')
+
+bindModeButtonEventhandler('expert')

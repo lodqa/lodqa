@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(pathname) {
   document.querySelector('#mode-button')
     .addEventListener('click', (e) => {
       // Do not validate the form
@@ -15,10 +15,6 @@ module.exports = function() {
         parameters.push(`query=${encodeURIComponent(form.query.value)}`)
       }
 
-      if (location.pathname.includes('expert')) {
-        location.href = `/?${parameters.join('&')}`
-      } else {
-        location.href = `/expert?${parameters.join('&')}`
-      }
+      location.href = `/${pathname}?${parameters.join('&')}`
     })
 }

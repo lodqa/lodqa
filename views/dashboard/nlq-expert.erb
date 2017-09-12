@@ -3,13 +3,17 @@
         <div class="query-region">
             <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
         </div>
-        <input name="target" id="target-value" type="hidden" value="<%= @target %>"/>
+        <a id="button-show-queries" title="Sample queries" class="button">
+            <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+        </a>
+        <input name="target" type="hidden" value="<%= @target %>"/>
         <input id="endpoint-url" type="hidden" value="<%= @endpoint_url %>"/>
         <input id="need-proxy" type="hidden" value="<%= @need_proxy %>"/>
         <button id="search-button" class="button">Search</button>
-        <button id="mode-button" type="button" class="button">Expert</button>
+        <button id="mode-button" type="button" class="button">Simple</button>
     </div>
     <div class="nlq-options">
+        <button id="parse-it-button" class="button">Parse it!</button>
         Queries timeout in
         <input type="number" min="1" max="180" value="<%= @read_timeout %>" id="read_timeout" name="read_timeout">
         seconds.

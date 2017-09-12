@@ -1,28 +1,3 @@
 <div id="logo-box">
 <a href="<%= request.base_url %>"><img src="images/logo.svg" alt="LODQA" id='logo' title="Question-Answering over Linked Open Data" /></a>
-<span id="target-display"><%= @target %></span>
-</div>
-
-<div id="logo-sub-box">
-  <nav id="main-nav">
-    <ul>
-      <li><a href="<%= request.base_url %>">start</a></li>
-      <li><a href="<%= settings.target_db %>">targets</a></li>
-      <li><a href="http://www.lodqa.org/docs/intro/">doc</a></li>
-      <li><a href="https://github.com/lodqa/lodqa">github</a></li>
-    </ul>
-  </nav>
-  <% if @expert %>
-  <div id="target-box">
-    <select name="target" id="target">
-      <% @targets.each do |t| %>
-        <% if t == @target %>
-          <option value="<%= t %>" selected="selected"><%= t %></option>
-        <% else %>
-          <option value="<%= t %>"><%= t %></option>
-        <% end %>
-      <% end %>
-    </select>
-  </div>
-  <% end %>
 </div>

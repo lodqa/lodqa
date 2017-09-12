@@ -1,6 +1,15 @@
+.frame {
+    background-color: #ffffff;
+    border-style: solid;
+    border-width: 2px;
+    box-shadow: 4px 4px 4px #888888;
+    padding: 5px;
+    position: relative;
+}
+
 .dashboard {
-    position: fixed;
     left: 0px;
+    position: fixed;
     top: 0px;
     width: 642px;
 }
@@ -9,8 +18,39 @@
     z-index: -1;
 }
 
+#header {
+    align-items: baseline;
+}
+
+#logo-box {
+    width: 190px;
+}
+
+.target-display {
+    font-size: 22px;
+    width: 243px;
+}
+
+#target-box {
+    margin-top: 2em;
+}
+
+.examples {
+    left: 7px;
+    padding-left: 15px;
+    position: fixed;
+    top: 135px;
+    width: 533px;
+    z-index: 1;
+}
+
+.examples--hidden {
+    display: none;
+}
+
 .results {
     position: absolute;
+    right: 4px;
     width: 740px;
     z-index: 2;
 }
@@ -21,18 +61,6 @@
 
 .results--back {
     z-index: -1;
-}
-
-@media (max-width: 1370px) {
-    #results {
-        right: 4px;
-    }
-}
-
-@media (min-width: 1371px) {
-    #results {
-        left: 600px;
-    }
 }
 
 .jsPlumb-container {

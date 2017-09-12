@@ -1,5 +1,28 @@
+#header {
+    min-width: 1100px;
+}
+
+#logo {
+    height: 30px;
+    padding-left: 13px;
+    padding-right: 12px;
+    padding-top: 22px;
+    width: 120px;
+}
+
+.target-display {
+    display: none;
+}
+
+#nlq {
+    padding-top: 15px;
+}
+
 .answer-index {
-    margin: 30px 10px 40px 10px;
+    font-size: 18px;
+    min-width: 1100px;
+    padding-top: 60px;
+    padding-left: 161px;
 }
 
 .hidden {
