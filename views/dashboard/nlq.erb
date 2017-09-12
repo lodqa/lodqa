@@ -16,8 +16,11 @@
         <input id="endpoint-url" type="hidden" value="<%= @endpoint_url %>"/>
         <input id="need-proxy" type="hidden" value="<%= @need_proxy %>"/>
         <button id="search-button" class="button">Search</button>
-        <input id="expert-checkbox" type="checkbox" <% if @expert %>checked="checked"<% end %>/>
-        <label for="expert-checkbox">expert</label>
+        <% if @expert %>
+          <button id="mode-button" type="button" class="button">Simple</button>
+        <% else %>
+          <button id="mode-button" type="button" class="button">Expert</button>
+        <% end %>
     </div>
     <div class="nlq-options">
         <% if @expert %>

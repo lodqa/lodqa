@@ -1,6 +1,9 @@
-module.exports = function bindExpertCheckboxEventhandler() {
-  document.querySelector('#expert-checkbox')
+module.exports = function() {
+  document.querySelector('#mode-button')
     .addEventListener('click', (e) => {
+      // Do not validate the form
+      e.stopPropagation()
+
       const form = document.querySelector('#nlqform')
 
       const parameters = [
@@ -12,11 +15,10 @@ module.exports = function bindExpertCheckboxEventhandler() {
         parameters.push(`query=${encodeURIComponent(form.query.value)}`)
       }
 
-      if (e.target.checked) {
-
-        location.href = `/expert?${parameters.join('&')}`
-      } else {
+      if (location.pathname.includes('expert')) {
         location.href = `/?${parameters.join('&')}`
+      } else {
+        location.href = `/expert?${parameters.join('&')}`
       }
     })
 }
