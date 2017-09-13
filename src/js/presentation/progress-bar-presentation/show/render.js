@@ -9,7 +9,7 @@ const template = handlebars.compile(`
     <span class="progress-bar__simple-progress-bar__percentage">0%</span>
     <span class="progress-bar__simple-progress-bar__show-detail-checkbox">
       <input type="checkbox" id="show-detail-progress-bar">
-      <label for="show-detail-progress-bar">Show detail</label>
+      <label for="show-detail-progress-bar">Details</label>
     </span>
   </div>
   <div class="progress-bar__detail-progress-bar progress-bar__detail-progress-bar--hidden">
