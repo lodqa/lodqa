@@ -97,8 +97,8 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	get '/expert' do
-		logger.info "access /expert"
+	get '/grapheditor' do
+		logger.info "access /grapheditor"
 		parse_params
 
 		if @query
@@ -109,7 +109,7 @@ class LodqaWS < Sinatra::Base
 			@pgp = g.get_pgp
 		end
 
-		erb :expert
+		erb :grapheditor
 	end
 
 	# Command for test: curl -H "content-type:application/json" -d '{"keywords":["drug", "genes"]} http://localhost:9292/termfinder'

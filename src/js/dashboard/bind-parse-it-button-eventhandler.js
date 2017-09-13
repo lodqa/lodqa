@@ -8,7 +8,7 @@ module.exports = function() {
       if (form.checkValidity()) {
         // Do not submit form.
         e.preventDefault()
-        location.href = `/expert?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}&read_timeout=${form.read_timeout.value}`
+        location.href = `/grapheditor?query=${encodeURIComponent(form.query.value)}&target=${form.target.value}&read_timeout=${form.read_timeout.value}`
       } else {
         form.querySelector('#query')
           .focus()

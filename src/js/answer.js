@@ -19,4 +19,4 @@ bindLoaderEvents(loader, model, progressBarPresentation, 'answer-index')
 
 beginSearch(loader, 'pgp', 'mappings', 'target-value', 'read_timeout')
 
-bindModeButtonEventhandler('expert')
+bindModeButtonEventhandler('grapheditor')
