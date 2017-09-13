@@ -62,7 +62,7 @@ class LodqaWS < Sinatra::Base
 		db = if params['target']
 			candidates = searchable? @pgp, [{name: @config[:name], dictionary_url: @config[:dictionary_url], endpoint_url: @config[:endpoint_url]}]
 			if candidates.length == 0
-				@message = "#{@config[:name]} is not an enough database for the query!"
+				@message = "<strong>#{@config[:name]}</strong> is not an enough database for the query!"
 				return erb :error_before_answer
 			end
 
