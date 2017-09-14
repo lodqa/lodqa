@@ -28,7 +28,7 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
     solution: [
       () => model.incrementSparqlCount(),
       (data) => model.setSolution(data),
-      () => answerIndexPresentation.progress(model),
+      () => model.findLabel(),
       (data) => progressBarPresentation.progress(data.solutions, model.sparqlCount, model.focus, data.sparql_timeout)
     ],
     error: [
