@@ -4,7 +4,7 @@ const registerPartial = require('../../answer/register-partial')
 registerPartial()
 
 const template = Handlebars.compile(`
-  {{#each answers}}
+  {{#each currentContent}}
     <div class="solution">
       <div class="answer">
         <a href="{{url}}">{{label}}</a>
@@ -16,15 +16,22 @@ const template = Handlebars.compile(`
       </ul>
     </div>
   {{/each}}
+  {{#if isMulti}}
+  <button type="button" class="button" name="prev" {{#if disablePrev}}disabled="disabled"{{/if}}>prev</button>
+  {{/if}}
+  {{#each pages}}
+    {{#if isCurrent}}
+      <strong>{{page}}</strong>
+    {{else}}
+      {{page}}
+    {{/if}}
+  {{/each}}
+  {{#if isMulti}}
+  <button type="button" class="button" name="next" {{#if disableNext}}disabled="disabled"{{/if}}>next</button>
+  {{/if}}
 `)
 
-module.exports = function(domId, model) {
-  const {
-    answers
-  } = model
-
+module.exports = function(domId, pagination) {
   document.querySelector(`#${domId}`)
-    .innerHTML = template({
-      answers
-    })
+    .innerHTML = template(pagination)
 }
