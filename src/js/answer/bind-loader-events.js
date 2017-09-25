@@ -26,10 +26,8 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
       (data) => model.anchoredPgp = data
     ],
     solution: [
-      () => model.incrementSparqlCount(),
       (data) => model.setSolution(data),
-      () => model.findLabel(),
-      (data) => progressBarPresentation.progress(data.solutions, model.sparqlCount, model.focus, data.sparql_timeout)
+      () => progressBarPresentation.progress(model.currentSoluton.solutions, model.sparqlCount, model.focus, model.currentSoluton.sparql_timeout)
     ],
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data),

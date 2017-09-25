@@ -13,7 +13,7 @@ module.exports = class Model {
 
     // The answers is a map that has url as key and answer as value.
     // The answer is an object that has a url, a label and an array of sparql.
-    this._answersMap = new Map()
+    this._mergedAnswers = new Map()
 
     // The set of hide sparqls. This has only spraqlCount
     this._hideSparqls = new Set()
@@ -46,7 +46,7 @@ module.exports = class Model {
   }
 
   get answers() {
-    return filterVisibleAnswers(this._answersMap, this._hideSparqls)
+    return filterVisibleAnswers(this._mergedAnswers, this._hideSparqls)
   }
 
   get labelAndUrls() {
@@ -78,6 +78,7 @@ module.exports = class Model {
   }
 
   setSolution(solution) {
+    this._sparqlCount.increment()
     this._solution.set(`${this.sparqlCount}`, {
       solution,
       anchoredPgp: this.anchoredPgp
@@ -86,23 +87,14 @@ module.exports = class Model {
     const uniqAnswers = getUniqAnswers(this.currentSoluton.solutions, this.focus)
 
     addAnswersOfSparql(
-      this._answersMap,
+      this._mergedAnswers,
       uniqAnswers,
       this.sparqlCount
     )
 
+    findLabel1(this)
+
     emit(this)
-  }
-
-  findLabel() {
-    const uniqAnswers = getUniqAnswers(this.currentSoluton.solutions, this.focus)
-
-    findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
-      this._answersMap.get(url)
-        .label = label
-
-      emit(this)
-    })
   }
 
   updateSparqlHideStatus(sparqlCount, isHide) {
@@ -118,4 +110,18 @@ module.exports = class Model {
 
 function emit(model) {
   model._onAnswerChanges.forEach((c) => c())
+}
+
+function findLabel1(model) {
+  const uniqAnswers = getUniqAnswers(model.currentSoluton.solutions, model.focus)
+
+  findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
+
+    const answer = model._mergedAnswers.get(url)
+
+    answer.label = label
+    answer.labelFound = true
+
+    emit(model)
+  })
 }
