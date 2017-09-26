@@ -56,7 +56,7 @@ module.exports = class Model {
     }))
   }
 
-  get currentSoluton() {
+  get currentSolution() {
     return this.getSolution(this.sparqlCount)
       .solution
   }
@@ -84,7 +84,7 @@ module.exports = class Model {
       anchoredPgp: this.anchoredPgp
     })
 
-    const uniqAnswers = getUniqAnswers(this.currentSoluton.solutions, this.focus)
+    const uniqAnswers = getUniqAnswers(this.currentSolution.solutions, this.focus)
 
     addAnswersOfSparql(
       this._mergedAnswers,
@@ -113,7 +113,7 @@ function emit(model) {
 }
 
 function findLabel1(model) {
-  const uniqAnswers = getUniqAnswers(model.currentSoluton.solutions, model.focus)
+  const uniqAnswers = getUniqAnswers(model.currentSolution.solutions, model.focus)
 
   findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
 

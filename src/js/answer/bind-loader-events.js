@@ -27,7 +27,7 @@ module.exports = function bindLoaderEvents(loader, model, progressBarPresentatio
     ],
     solution: [
       (data) => model.setSolution(data),
-      () => progressBarPresentation.progress(model.currentSoluton.solutions, model.sparqlCount, model.focus, model.currentSoluton.sparql_timeout)
+      () => progressBarPresentation.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparql_timeout)
     ],
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data),
