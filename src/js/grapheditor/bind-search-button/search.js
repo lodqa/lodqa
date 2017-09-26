@@ -1,4 +1,6 @@
 module.exports = function(event, loader, pgpElement, mappingsElement) {
+  document.querySelector('#lodqa-results')
+    .innerHTML = ''
   event.target.setAttribute('disabled', 'disabled')
 
   const pgp = JSON.parse(pgpElement.innerHTML)
