@@ -60,18 +60,31 @@ class LodqaWS < Sinatra::Base
 		end
 
 		db = if params['target']
-			candidates = searchable? @pgp, [{name: @config[:name], dictionary_url: @config[:dictionary_url], endpoint_url: @config[:endpoint_url]}]
+			candidates = searchable? @pgp, [{
+				name: @config[:name],
+				dictionary_url: @config[:dictionary_url],
+				endpoint_url: @config[:endpoint_url]
+			}]
+
 			if candidates.length == 0
 				@message = "<strong>#{@config[:name]}</strong> is not an enough database for the query!"
 				return erb :error_before_answer
 			end
 
+			@target_params = @config[:name]
 			candidates[0]
 		else
 			candidates = select_db_for @pgp
 			if candidates.length == 0
 				@message = 'There is no db which has all words in the query!'
 				return erb :error_before_answer
+			end
+
+			@dbs =candidates.map do |e|
+				{
+					label: e[:name],
+					href: "#{request.url}&target=#{e[:name]}"
+				}
 			end
 
 			candidates[0]
@@ -81,8 +94,6 @@ class LodqaWS < Sinatra::Base
 		@endpoint_url = db[:endpoint_url]
 		@need_proxy = db[:name] == 'biogateway'
 		@target = db[:name]
-
-		p db, @target
 
 		begin
 			# Find terms of nodes and edges.
