@@ -89,3 +89,11 @@
     background-color: #ffff66;
     text-align: center;
 }
+
+.progress-bar__detail-progress-bar__sparqls {
+    width: 672px;
+}
+
+.progress-bar__detail-progress-bar__sparqls__sparql {
+    width: 4.81em;
+}
