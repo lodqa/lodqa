@@ -5,11 +5,7 @@ module.exports = function() {
       e.stopPropagation()
       const element = document.querySelector('.examples')
       if (element) {
-        if (element.classList.contains('examples--hidden')) {
-          element.classList.remove('examples--hidden')
-        } else {
-          element.classList.add('examples--hidden')
-        }
+        element.classList.toggle('examples--hidden')
       }
     })
 
