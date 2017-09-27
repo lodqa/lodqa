@@ -17,3 +17,19 @@
 .dashboard__target {
     text-align: right;
 }
+
+.description {
+    display: flex;
+    justify-content: center;
+}
+
+.description__sample-queries {
+    margin-top: 63px;
+    width: 600px;
+}
+
+.description__sample-queries__query-list {
+    list-style: none;
+    margin: 0;
+    margin-left: -27px;
+}
