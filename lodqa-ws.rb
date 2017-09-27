@@ -45,62 +45,51 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
-
 	get '/answer' do
 		parse_params
 
-		g = Lodqa::Graphicator.new(@config[:parser_url])
-		g.parse(params['query'])
-
-		@pgp = g.get_pgp
+		@pgp = get_pgp @config[:parser_url]
 		if @pgp[:nodes].keys.length == 0
-			# TODO: What's a better error message?
 			@message = 'The pgp has no nodes!'
 			return erb :error_before_answer
 		end
 
-		db = if params['target']
-			candidates = searchable? @pgp, [{
+		# Search datasets automatically unless target parametrs.
+		@candidate_datasets = if params['target']
+			searchable? @pgp, [{
 				name: @config[:name],
 				dictionary_url: @config[:dictionary_url],
 				endpoint_url: @config[:endpoint_url]
 			}]
-
-			if candidates.length == 0
-				@message = "<strong>#{@config[:name]}</strong> is not an enough database for the query!"
-				return erb :error_before_answer
-			end
-
-			@target_params = @config[:name]
-			candidates[0]
 		else
-			candidates = select_db_for @pgp
-			if candidates.length == 0
-				@message = 'There is no db which has all words in the query!'
-				return erb :error_before_answer
-			end
-
-			@dbs =candidates.map do |e|
-				{
-					label: e[:name],
-					href: "#{request.url}&target=#{e[:name]}"
-				}
-			end
-
-			candidates[0]
+			select_db_for @pgp
 		end
 
-		# For the label finder
-		@endpoint_url = db[:endpoint_url]
-		@need_proxy = db[:name] == 'biogateway'
+		# Show error message if there is no valid dataset.
+		if @candidate_datasets.empty?
+			@message = if params['target']
+				"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
+			else
+				'There is no db which has all words in the query!'
+			end
+			return erb :error_before_answer
+		end
 
+		# Show answers
 		begin
 			# Find terms of nodes and edges.
-			tf = Lodqa::TermFinder.new(db[:dictionary_url])
+			using_dataset = @candidate_datasets.first
+			tf = Lodqa::TermFinder.new(using_dataset[:dictionary_url])
 			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
-			@target = db[:name]
+			# Set parameters for seaching answers
+			@target = using_dataset[:name]
 			@mappings = tf.find(keywords)
+
+			# Set parameters for finding label of answers
+			@endpoint_url = using_dataset[:endpoint_url]
+			@need_proxy = using_dataset[:name] == 'biogateway'
+
 			erb :answer
 		rescue GatewayError
 			@message = 'Dictionary lookup error!'
@@ -112,12 +101,14 @@ class LodqaWS < Sinatra::Base
 		logger.info "access /grapheditor"
 		parse_params
 
-		if @query
-			parser_url = @config[:parser_url]
-			g = Lodqa::Graphicator.new(parser_url)
-			g.parse(@query)
+		# Set a parameter of candidates of the target
+		@targets = get_targets
 
-			@pgp = g.get_pgp
+		# Set a parameter of the default target
+		@target = params['target'] || @targets.first
+
+		if @query
+			@pgp = get_pgp @config[:parser_url]
 		end
 
 		erb :grapheditor
@@ -238,8 +229,6 @@ class LodqaWS < Sinatra::Base
 
 	def parse_params
 		@config = get_config(params)
-		@targets = get_targets
-		@target = params['target'] || @targets.first
 		@read_timeout = params['read_timeout'] || 60
 		@query  = params['query'] unless params['query'].nil?
 	end
@@ -284,6 +273,12 @@ class LodqaWS < Sinatra::Base
 	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 
 	  config
+	end
+
+	def get_pgp(parser_url)
+		g = Lodqa::Graphicator.new(parser_url)
+		g.parse(params['query'])
+		g.get_pgp
 	end
 
 	def searchable?(pgp, applicants)
