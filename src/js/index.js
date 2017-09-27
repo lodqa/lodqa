@@ -1,5 +1,6 @@
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
+const getTargetConfig = require('./get-target-config')
 const handlebars = require('handlebars')
 const template = handlebars.compile(`
   <div class="description__sample-queries">
@@ -46,18 +47,5 @@ if (target) {
         .innerHTML = template({
           sample_queries
         })
-    })
-}
-
-function getTargetConfig(target) {
-  const myHeaders = new Headers()
-  myHeaders.set('Accept', 'application/json')
-
-  return fetch(`http://targets.lodqa.org/targets/${target}`, {
-    method: 'GET',
-    headers: myHeaders
-  })
-    .then((response) => {
-      return response.json()
     })
 }
