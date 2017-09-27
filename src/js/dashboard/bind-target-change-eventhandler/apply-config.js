@@ -1,7 +1,7 @@
 const handlebars = require('handlebars')
 const template = handlebars.compile(`
-  {{#each sample_queries}}
-    <li><a href="#">{{this}}</a></li>
+  {{#each this}}
+    <li><a href="{{href}}">{{query}}</a></li>
   {{/each}}
 `)
 
@@ -37,12 +37,24 @@ function setEndpoint(config) {
 
 function updateExampleQeries(config) {
   const {
+    name,
     sample_queries
   } = config
   const dom = document.querySelector('.sample-queries')
 
   if (sample_queries) {
-    dom.innerHTML = template({sample_queries})
+    const url = new URL(location.href)
+    const data = sample_queries.map((query) => {
+      url.searchParams.set('target', name)
+      url.searchParams.set('query', query)
+
+      return {
+        query,
+        href: url.toString()
+      }
+    })
+
+    dom.innerHTML = template(data)
   } else {
     dom.innerHTML = ''
   }
