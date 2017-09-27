@@ -13,12 +13,17 @@
 
         <div id="dashboard" class="dashboard">
             <div id="header">
-              <%= erb :'dashboard/header' %>
-              <%= erb :'dashboard/main-nav' %>
+                <div class="">
+                    <%= erb :'dashboard/header' %>
+                    <div class="dashboard__target">
+                        <%= params['target'] %>
+                    </div>
+                </div>
+                <%= erb :'dashboard/main-nav' %>
             </div>
 
             <div id="nlq">
-              <%= erb :'dashboard/nlq' %>
+                <%= erb :'dashboard/nlq' %>
             </div>
 
         </div>
