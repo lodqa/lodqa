@@ -1,3 +1,10 @@
+const handlebars = require('handlebars')
+const template = handlebars.compile(`
+  {{#each sample_queries}}
+    <li><a href="#">{{this}}</a></li>
+  {{/each}}
+`)
+
 module.exports = function(config) {
   setTargetDisplay(config)
   setNlqFormTarget(config)
@@ -35,11 +42,7 @@ function updateExampleQeries(config) {
   const dom = document.querySelector('.sample-queries')
 
   if (sample_queries) {
-    const listItems = sample_queries
-      .map((q) => `<li><a href="#">${q}</a></li>`)
-      .join('')
-
-    dom.innerHTML = listItems
+    dom.innerHTML = template({sample_queries})
   } else {
     dom.innerHTML = ''
   }
