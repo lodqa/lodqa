@@ -3,7 +3,9 @@
         <div class="query-region">
             <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
         </div>
-        <input name="target" id="target-value" type="hidden" value="<%= @target %>"/>
+        <% if target_exists? %>
+        <input name="target" type="hidden" value="<%= params['target'] %>"/>
+        <% end %>
         <input id="endpoint-url" type="hidden" value="<%= @endpoint_url %>"/>
         <input id="need-proxy" type="hidden" value="<%= @need_proxy %>"/>
         <button id="search-button" class="button">Search</button>

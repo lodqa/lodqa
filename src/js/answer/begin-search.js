@@ -4,7 +4,7 @@ module.exports = function(loader, pgpDomId, mappnigsDomId, targetDomId, readTime
   const mappings = JSON.parse(document.querySelector(`#${mappnigsDomId}`)
     .innerHTML)
   const target = document.querySelector(`#${targetDomId}`)
-    .value
+    .innerHTML
   const readTimeout = document.querySelector(`#${readTimeoutDomId}`)
     .value
 

@@ -55,7 +55,7 @@ class LodqaWS < Sinatra::Base
 		end
 
 		# Search datasets automatically unless target parametrs.
-		@candidate_datasets = if params['target']
+		@candidate_datasets = if target_exists?
 			searchable? @pgp, [{
 				name: @config[:name],
 				dictionary_url: @config[:dictionary_url],
@@ -67,7 +67,7 @@ class LodqaWS < Sinatra::Base
 
 		# Show error message if there is no valid dataset.
 		if @candidate_datasets.empty?
-			@message = if params['target']
+			@message = if target_exists?
 				"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
 			else
 				'There is no db which has all words in the query!'
@@ -83,7 +83,6 @@ class LodqaWS < Sinatra::Base
 			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
 			# Set parameters for seaching answers
-			@target = using_dataset[:name]
 			@mappings = tf.find(keywords)
 
 			# Set parameters for finding label of answers
@@ -227,6 +226,10 @@ class LodqaWS < Sinatra::Base
 
 	private
 
+	def target_exists?
+		!params['target'].nil? && !params['target'].empty?
+	end
+
 	def parse_params
 		@config = get_config(params)
 		@read_timeout = params['read_timeout'] || 60
@@ -253,7 +256,7 @@ class LodqaWS < Sinatra::Base
 		config = {} if config.nil?
 
 		# target name passed through params
-		unless params['target'].nil?
+		if target_exists?
 			target_url = settings.target_db + '/' + params['target'] + '.json'
 			config_add = begin
 				RestClient.get target_url do |response, request, result|
