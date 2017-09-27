@@ -93,13 +93,13 @@ class LodqaWS < Sinatra::Base
 		# For the label finder
 		@endpoint_url = db[:endpoint_url]
 		@need_proxy = db[:name] == 'biogateway'
-		@target = db[:name]
 
 		begin
 			# Find terms of nodes and edges.
 			tf = Lodqa::TermFinder.new(db[:dictionary_url])
 			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
+			@target = db[:name]
 			@mappings = tf.find(keywords)
 			erb :answer
 		rescue GatewayError
