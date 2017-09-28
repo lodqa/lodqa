@@ -1,5 +1,6 @@
 const getTargetConfig = require('../get-target-config')
 const handlebars = require('handlebars')
+
 const template = handlebars.compile(`
   <div class="description__sample-queries">
     <ul class="description__sample-queries__query-list">
@@ -9,22 +10,37 @@ const template = handlebars.compile(`
     </ul>
   </div>
 `)
+const cache = {}
 
-module.exports =  function(target) {
-  getTargetConfig(target)
-    .then((json) => {
-      const url = new URL(location.href)
-      const sampleQueries = json.sample_queries.map((query) => {
-        url.searchParams.set('query', query)
-
-        return {
-          query,
-          href: url.toString()
-        }
+module.exports = {
+  updateTarget(target) {
+    getTargetConfig(target)
+      .then((json) => {
+        cache.config = json
+        update(cache.config, cache.readTimeout)
       })
+  },
+  updateReadTimeout(readTimeout) {
+    cache.readTimeout = readTimeout
+    update(cache.config, cache.readTimeout)
+  }
+}
 
-      document
-        .querySelector('.description')
-        .innerHTML = template(sampleQueries)
-    })
+function update(config, readTimeout) {
+  const url = new URL(location.href)
+  const sampleQueries = config.sample_queries.map((query) => {
+    url.searchParams.set('query', query)
+    if (readTimeout) {
+      url.searchParams.set('read_timeout', readTimeout)
+    }
+
+    return {
+      query,
+      href: url.toString()
+    }
+  })
+
+  document
+    .querySelector('.description')
+    .innerHTML = template(sampleQueries)
 }

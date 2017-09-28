@@ -1,15 +1,10 @@
-const handlebars = require('handlebars')
-const template = handlebars.compile(`
-  {{#each this}}
-    <li><a href="{{href}}">{{query}}</a></li>
-  {{/each}}
-`)
+const { updateConfig } = require('../update-sample-queries')
 
 module.exports = function(config) {
   setTargetDisplay(config)
   setNlqFormTarget(config)
   setEndpoint(config)
-  updateExampleQeries(config)
+  updateConfig(config)
 }
 
 function setTargetDisplay(config) {
@@ -33,29 +28,4 @@ function setEndpoint(config) {
     .value = config.endpoint_url
   document.querySelector('#need-proxy')
     .value = (config.name === 'biogateway')
-}
-
-function updateExampleQeries(config) {
-  const {
-    name,
-    sample_queries
-  } = config
-  const dom = document.querySelector('.sample-queries')
-
-  if (sample_queries) {
-    const url = new URL(location.href)
-    const data = sample_queries.map((query) => {
-      url.searchParams.set('target', name)
-      url.searchParams.set('query', query)
-
-      return {
-        query,
-        href: url.toString()
-      }
-    })
-
-    dom.innerHTML = template(data)
-  } else {
-    dom.innerHTML = ''
-  }
 }

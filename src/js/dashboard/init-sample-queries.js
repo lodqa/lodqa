@@ -1,5 +1,5 @@
 module.exports = function() {
-  // sample queries
+  // Show or hide sample queries when the button is clicked.
   document.querySelector('#button-show-queries')
     .addEventListener('click', (e) => {
       e.stopPropagation()
@@ -9,9 +9,10 @@ module.exports = function() {
       }
     })
 
+  // Hide sample queries when it is clicked.
   const queries = document.querySelector('.sample-queries')
   if (queries) {
-    queries.addEventListener('click', (e) => {
+    queries.addEventListener('click', () => {
       const element = document.querySelector('.examples')
       if (element) {
         element.classList.add('examples--hidden')
