@@ -286,6 +286,7 @@ class LodqaWS < Sinatra::Base
 		keywords = pgp[:nodes].values.map{|n| n[:text]}
 		applicants
 			.map do |applicant|
+				# Can an applicant answer terms of all nodes?
 				begin
 					applicant[:terms] = Lodqa::TermFinder
 						.new(applicant[:dictionary_url])
@@ -297,6 +298,28 @@ class LodqaWS < Sinatra::Base
 				end
 			end
 			.select {|applicant| applicant[:terms] && applicant[:terms].all?{|t| t[1].length > 0 } }
+			.map do |applicant|
+				# Can an applicant create at least one sparql.
+				options = {
+					max_hop: applicant[:max_hop],
+					ignore_predicates: applicant[:ignore_predicates],
+					sortal_predicates: applicant[:sortal_predicates],
+					debug: false,
+					endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
+				}
+
+				lodqa = Lodqa::Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], options)
+				lodqa.pgp = pgp
+
+				keywords = pgp[:nodes].values.map{|n| n[:text]}.concat(pgp[:edges].map{|e| e[:text]})
+				lodqa.mappings = Lodqa::TermFinder
+					.new(applicant[:dictionary_url])
+					.find(keywords)
+				applicant[:sparqls] = lodqa.sparqls
+
+				applicant
+			end
+			.select {|applicant| applicant[:sparqls] && applicant[:sparqls].length > 0}
 	end
 
 	def select_db_for(pgp)
