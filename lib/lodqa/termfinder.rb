@@ -26,7 +26,7 @@ class Lodqa::TermFinder
     # interpolation
     mappings.each_key do |k|
       if mappings[k].empty?
-        ngram = k.split
+        ngram = k.to_s.split
         length = ngram.length
         (1 ... length).reverse_each do |m|
           subkeys = (0 .. length - m).collect{|b| ngram[b, m].join(' ')}
@@ -46,7 +46,7 @@ class Lodqa::TermFinder
     @dictionary.post terms.to_json do |response, request, result|
       case response.code
       when 200
-        JSON.parse response
+        JSON.parse(response, symbolize_names: true)
       else
         # request to dictionary is not success
         raise GatewayError, "response:\n  status: #{response.code}\n  body: #{response}\nrequest:\n  method: #{request.method}\n  url: #{request.uri}\n  body: #{terms.to_json}"

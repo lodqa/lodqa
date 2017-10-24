@@ -174,10 +174,10 @@ class LodqaWS < Sinatra::Base
 				end
 
 				ws.onmessage do |data|
-					json = JSON.parse(data)
+					json = JSON.parse(data, {:symbolize_names => true})
 
-					lodqa.pgp = json['pgp']
-					lodqa.mappings = json['mappings']
+					lodqa.pgp = json[:pgp]
+					lodqa.mappings = json[:mappings]
 
 					EM.defer do
 						Thread.current.thread_variable_set(:request_id, request_id)

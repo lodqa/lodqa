@@ -63,36 +63,36 @@ class Lodqa::Lodqa
 
   def anchored_pgps
     nodes_to_delete = []
-    @pgp['nodes'].each_key do |n|
-      if @mappings[@pgp['nodes'][n]['text']].nil? || @mappings[@pgp['nodes'][n]['text']].empty?
+    @pgp[:nodes].each_key do |n|
+      if @mappings[@pgp[:nodes][n][:text]].nil? || @mappings[@pgp[:nodes][n][:text]].empty?
         connected_nodes = []
-        @pgp['edges'].each{|e| connected_nodes << e['object'] if e['subject'] == n}
-        @pgp['edges'].each{|e| connected_nodes << e['subject'] if e['object'] == n}
+        @pgp[:edges].each{|e| connected_nodes << e[:object] if e[:subject] == n}
+        @pgp[:edges].each{|e| connected_nodes << e[:subject] if e[:object] == n}
 
         # if it is a passing node
         if connected_nodes.length == 2
           nodes_to_delete << n
-          @pgp['edges'].each do |e|
-            e['object']  = connected_nodes[1] if e['subject'] == connected_nodes[0] && e['object']  == n
-            e['subject'] = connected_nodes[1] if e['subject'] == n && e['object']  == connected_nodes[0]
-            e['object']  = connected_nodes[0] if e['subject'] == connected_nodes[1] && e['object']  == n
-            e['subject'] = connected_nodes[0] if e['subject'] == n && e['object']  == connected_nodes[1]
+          @pgp[:edges].each do |e|
+            e[:object]  = connected_nodes[1] if e[:subject] == connected_nodes[0] && e[:object]  == n
+            e[:subject] = connected_nodes[1] if e[:subject] == n && e[:object]  == connected_nodes[0]
+            e[:object]  = connected_nodes[0] if e[:subject] == connected_nodes[1] && e[:object]  == n
+            e[:subject] = connected_nodes[0] if e[:subject] == n && e[:object]  == connected_nodes[1]
           end
         end
       end
     end
 
-    @pgp['nodes'].delete_if{|n| nodes_to_delete.include? n}
-    @pgp['edges'].uniq!
+    @pgp[:nodes].delete_if{|n| nodes_to_delete.include? n}
+    @pgp[:edges].uniq!
+    terms = @pgp[:nodes].values.map{|n| @mappings[n[:text].to_sym]}
 
-    terms = @pgp['nodes'].values.map{|n| @mappings[n['text']]}
     terms.map!{|t| t.nil? ? [] : t}
 
     terms.first.product(*terms.drop(1)).collect do |ts|
       anchored_pgp = pgp.dup
-      anchored_pgp['nodes'] = pgp['nodes'].dup
-      anchored_pgp['nodes'].each_key{|k| anchored_pgp['nodes'][k] = pgp['nodes'][k].dup}
-      anchored_pgp['nodes'].each_value.with_index{|n, i| n[:term] = ts[i]}
+      anchored_pgp[:nodes] = pgp[:nodes].dup
+      anchored_pgp[:nodes].each_key{|k| anchored_pgp[:nodes][k] = pgp[:nodes][k].dup}
+      anchored_pgp[:nodes].each_value.with_index{|n, i| n[:term] = ts[i]}
       anchored_pgp
     end
   end

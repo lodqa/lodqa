@@ -168,14 +168,14 @@ class GraphFinder
   # make variations by instantiating terms
   def generate_instantiation_variations(pgp)
     iids = {}
-    pgp['nodes'].each do |id, node|
-      iid = class?(node[:term]) ? 'i' + id : nil
+    pgp[:nodes].each do |id, node|
+      iid = class?(node[:term]) ? 'i' + id.to_s : nil
       iids[id] = iid unless iid.nil?
     end
 
-    connections = pgp['edges']
+    connections = pgp[:edges]
     return [] if connections.empty?
-    bgp = connections.map.with_index{|c, i| [c['subject'], "p#{i+1}", c['object']]}
+    bgp = connections.map.with_index{|c, i| [c[:subject].to_sym, "p#{i+1}".to_sym, c[:object].to_sym]}
 
     # instantiated BGPs
     ibgps = []
@@ -183,18 +183,18 @@ class GraphFinder
     [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
       # id of the terms to be instantiated
       itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
-      next unless itids.include?(pgp['focus'])
+      next unless itids.include?(pgp[:focus].to_sym)
 
       if bgps.empty? && !itids.empty?
-        ibgp = itids.collect{|t| [iids[t], 's' + t, t]}
+        ibgp = itids.collect{|t| [iids[t], 's' + t.to_s, t]}
         ibgps << ibgp
       else
         bgps.each do |bgp|
           # initialize the instantiated bgp with the triple patterns for term instantiation
-          ibgp = itids.collect{|t| [iids[t], 's' + t, t]}
+          ibgp = itids.collect{|t| [iids[t].to_s, 's' + t.to_s, t.to_s]}
 
           # add update triples
-          bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e] : e}}
+          bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e].to_s : e.to_s}}
 
           ibgps << ibgp
         end
@@ -220,10 +220,10 @@ class GraphFinder
   end
 
   def compose_sparql(bgp, pgp)
-    nodes = pgp['nodes']
+    nodes = pgp[:nodes]
 
     # get the variables
-    variables = bgp.flatten.uniq - nodes.keys
+    variables = bgp.flatten.uniq - nodes.keys.map(&:to_s)
 
     # initialize the query
     query  = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')}\n"
@@ -231,7 +231,7 @@ class GraphFinder
     query += "WHERE {"
 
     # stringify the bgp
-    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e)? "<#{nodes[e][:term]}>" : '?' + e}.join(' ')}.join(' . ') + ' .'
+    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e.to_sym) ? "<#{nodes[e.to_sym][:term]}>" : '?' + e}.join(' ')}.join(' . ') + ' .'
 
     ## constraints on x-variables (including i-variables)
     x_variables = variables.dup.keep_if {|v| v[0] == 'x' or v[0] == 'i'}

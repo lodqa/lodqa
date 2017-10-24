@@ -46,7 +46,7 @@ class Lodqa::Graphicator
     {
       :nodes => nodes,
       :edges => edges,
-      :focus => focus
+      :focus => focus.to_s
     }
   end
 
@@ -56,7 +56,7 @@ class Lodqa::Graphicator
     variable = 't0'
     parse[:base_noun_chunks].each do |c|
       variable = variable.next;
-      nodes[variable] = {
+      nodes[variable.to_sym] = {
         :head => c[:head],
         :text => parse[:tokens][c[:beg] .. c[:end]].collect{|t| t[:lex]}.join(' ')
       }
@@ -68,8 +68,8 @@ class Lodqa::Graphicator
   def get_edges(parse, node_index)
     parse[:relations].collect do |s, p, o|
       {
-        :subject => node_index[s],
-        :object => node_index[o],
+        :subject => node_index[s].to_s,
+        :object => node_index[o].to_s,
         :text => p.collect{|i| parse[:tokens][i][:lex]}.join(' ')
       }
     end
