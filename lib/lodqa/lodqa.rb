@@ -28,8 +28,40 @@ class Lodqa::Lodqa
     @endpoint = SPARQL::Client.new(ep_url, endpoint_options)
   end
 
+  def sparqls
+    anchored_pgps
+      .map {|anchored_pgp| GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options) }
+      .map {|gf| gf.queries }
+      .flatten
+      .map {|q| q[:sparql] }
+  end
+
   def each_anchored_pgp_and_sparql_and_solution(proc_sparqls = nil, proc_anchored_pgp = nil, proc_solution = nil)
-    # Join operation if there is a term mapping failure on a passing node
+    # Send number of spaqls before search
+    proc_sparqls.call(sparqls) if proc_sparqls
+
+    anchored_pgps.each do |anchored_pgp|
+      proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
+
+      Lodqa::Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
+
+      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
+
+      if @cancel_flag
+        Lodqa::Logger.debug "Stop during or after anchored_pgp: #{anchored_pgp}"
+        return
+      end
+    end
+  end
+
+  def dispose(request_id)
+    Lodqa::Logger.debug "Cancel query for pgp: #{@pgp}", request_id
+    @cancel_flag = true
+  end
+
+  private
+
+  def anchored_pgps
     nodes_to_delete = []
     @pgp['nodes'].each_key do |n|
       if @mappings[@pgp['nodes'][n]['text']].nil? || @mappings[@pgp['nodes'][n]['text']].empty?
@@ -56,40 +88,13 @@ class Lodqa::Lodqa
     terms = @pgp['nodes'].values.map{|n| @mappings[n['text']]}
     terms.map!{|t| t.nil? ? [] : t}
 
-    anchored_pgps = terms.first.product(*terms.drop(1)).collect do |ts|
+    terms.first.product(*terms.drop(1)).collect do |ts|
       anchored_pgp = pgp.dup
       anchored_pgp['nodes'] = pgp['nodes'].dup
       anchored_pgp['nodes'].each_key{|k| anchored_pgp['nodes'][k] = pgp['nodes'][k].dup}
       anchored_pgp['nodes'].each_value.with_index{|n, i| n[:term] = ts[i]}
       anchored_pgp
     end
-
-    # Send number of spaqls before search
-    sparqls = anchored_pgps
-      .map {|anchored_pgp| GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options) }
-      .map {|gf| gf.queries }
-      .flatten
-      .map {|q| q[:sparql] }
-
-    proc_sparqls.call(sparqls) if proc_sparqls
-
-    anchored_pgps.each do |anchored_pgp|
-      proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
-
-      Lodqa::Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
-
-      GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
-
-      if @cancel_flag
-        Lodqa::Logger.debug "Stop during or after anchored_pgp: #{anchored_pgp}"
-        return
-      end
-    end
-  end
-
-  def dispose(request_id)
-    Lodqa::Logger.debug "Cancel query for pgp: #{@pgp}", request_id
-    @cancel_flag = true
   end
 end
 
