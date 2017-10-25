@@ -28,17 +28,22 @@ class Lodqa::Lodqa
     @endpoint = SPARQL::Client.new(ep_url, endpoint_options)
   end
 
+  # Return an enumerator to speed up checking the existence of sparqls.
   def sparqls
-    anchored_pgps
-      .map {|anchored_pgp| GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options) }
-      .map {|gf| gf.queries }
-      .flatten
-      .map {|q| q[:sparql] }
+    Enumerator.new do |y|
+      anchored_pgps.each do |anchored_pgp|
+        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+          .queries
+          .each { |q| y << q[:sparql] }
+      end
+    end
   end
 
   def each_anchored_pgp_and_sparql_and_solution(proc_sparqls = nil, proc_anchored_pgp = nil, proc_solution = nil)
     # Send number of spaqls before search
-    proc_sparqls.call(sparqls) if proc_sparqls
+    # Note: Convert the sparqls to an array because it is an enumerator.
+    #       Unless do this only part of sparqls will be sent to client.
+    proc_sparqls.call(sparqls.to_a) if proc_sparqls
 
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?

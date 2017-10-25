@@ -315,11 +315,11 @@ class LodqaWS < Sinatra::Base
 				lodqa.mappings = Lodqa::TermFinder
 					.new(applicant[:dictionary_url])
 					.find(keywords)
-				applicant[:sparqls] = lodqa.sparqls
+				applicant[:sparqls] = lodqa.sparqls.first
 
 				applicant
 			end
-			.select {|applicant| applicant[:sparqls] && applicant[:sparqls].length > 0}
+			.select { |applicant| applicant[:sparqls] }
 	end
 
 	def select_db_for(pgp)
