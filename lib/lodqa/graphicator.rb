@@ -11,7 +11,7 @@ module Lodqa; end unless defined? Lodqa
 class Lodqa::Graphicator
   attr_reader :parser
 
-  def initialize (parser_url)
+  def initialize(parser_url)
     raise ArgumentError, "parser_url should be given." if parser_url.nil? || parser_url.empty?
     @parser = EnjuAccess::CGIAccessor.new(parser_url)
   end
@@ -24,7 +24,9 @@ class Lodqa::Graphicator
     graphicate(@parse)
   end
 
-  def graphicate (parse)
+  private
+
+  def graphicate(parse)
     nodes = get_nodes(parse)
 
     # index the nodes by their heads
@@ -41,14 +43,14 @@ class Lodqa::Graphicator
 
     post_processing!(edges)
 
-    graph = {
+    {
       :nodes => nodes,
       :edges => edges,
       :focus => focus
     }
   end
 
-  def get_nodes (parse)
+  def get_nodes(parse)
     nodes = {}
 
     variable = 't0'
@@ -63,8 +65,8 @@ class Lodqa::Graphicator
     nodes
   end
 
-  def get_edges (parse, node_index)
-    edges = parse[:relations].collect do |s, p, o|
+  def get_edges(parse, node_index)
+    parse[:relations].collect do |s, p, o|
       {
         :subject => node_index[s],
         :object => node_index[o],
@@ -74,10 +76,8 @@ class Lodqa::Graphicator
   end
 
   # post_processing may be dependent on Enju
-  def post_processing! (edges)
+  def post_processing!(edges)
     # 'and' coordination
     edges.reject!{|e| e[:text] == 'and'}
   end
-
-
 end
