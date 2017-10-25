@@ -56,11 +56,7 @@ class LodqaWS < Sinatra::Base
 
 		# Search datasets automatically unless target parametrs.
 		@candidate_datasets = if target_exists?
-			searchable? @pgp, [{
-				name: @config[:name],
-				dictionary_url: @config[:dictionary_url],
-				endpoint_url: @config[:endpoint_url]
-			}]
+			searchable? @pgp, [@config]
 		else
 			select_db_for @pgp
 		end
@@ -285,6 +281,8 @@ class LodqaWS < Sinatra::Base
 	end
 
 	def searchable?(pgp, applicants)
+		p applicants
+
 		keywords = pgp[:nodes].values.map{|n| n[:text]}
 		applicants
 			.map do |applicant|
@@ -307,14 +305,13 @@ class LodqaWS < Sinatra::Base
 		applicants = begin
 			RestClient.get targets_url do |response, request, result|
 				case response.code
-					when 200 then JSON.parse response
+				when 200 then JSON.parse(response, symbolize_names: true)
 					else raise IOError, "invalid url #{targets_url}"
 				end
 			end
 		rescue
 			raise IOError, "invalid url #{targets_url}"
 		end
-			.map{|config| {name: config['name'], dictionary_url: config['dictionary_url'], endpoint_url: config['endpoint_url']}}
 
 		searchable? pgp, applicants
 	end
