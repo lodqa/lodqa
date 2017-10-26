@@ -167,23 +167,35 @@ class GraphFinder
 
   # make variations by instantiating terms
   def generate_instantiation_variations(pgp)
+    return [] if pgp[:edges].empty?
+
+    iids = instantiation_ids pgp
+    bgps = [bgp(pgp)]
+
+    instantiated_BGPs(iids, bgps, pgp[:focus])
+  end
+
+  def instantiation_ids(pgp)
     iids = {}
     pgp[:nodes].each do |id, node|
       iid = class?(node[:term]) ? 'i' + id.to_s : nil
       iids[id] = iid unless iid.nil?
     end
 
-    connections = pgp[:edges]
-    return [] if connections.empty?
-    bgp = connections.map.with_index{|c, i| [c[:subject].to_sym, "p#{i+1}".to_sym, c[:object].to_sym]}
+    iids
+  end
 
-    # instantiated BGPs
+  def bgp(pgp)
+    connections = pgp[:edges]
+    connections.map.with_index{|c, i| [c[:subject].to_sym, "p#{i+1}".to_sym, c[:object].to_sym]}
+  end
+
+  def instantiated_BGPs(iids, bgps, focus_id)
     ibgps = []
-    bgps = [bgp]
     [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
       # id of the terms to be instantiated
       itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
-      next unless itids.include?(pgp[:focus].to_sym)
+      next unless itids.include?(focus_id.to_sym)
 
       if bgps.empty? && !itids.empty?
         ibgp = itids.collect{|t| [iids[t], 's' + t.to_s, t]}
@@ -209,14 +221,16 @@ class GraphFinder
   end
 
   def class?(term)
-    if /^http:/.match(term)
-      sparql  = "SELECT ?p\n"
-      sparql += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
-      sparql += "WHERE {?s ?p <#{term}> FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
-      result = @endpoint.query(sparql)
-      return true if result.length > 0
-    end
-    return false
+    return @endpoint.query(sparql_for(term)).length > 0 if /^http:/.match(term)
+
+    false
+  end
+
+  def sparql_for(term)
+    sparql  = "SELECT ?p\n"
+    sparql += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
+    sparql += "WHERE {?s ?p <#{term}> FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
+    sparql
   end
 
   def compose_sparql(bgp, pgp)
