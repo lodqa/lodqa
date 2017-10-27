@@ -158,15 +158,15 @@ class LodqaWS < Sinatra::Base
 				Lodqa::Logger.debug('Request start', request_id)
 
 				proc_sparqls = Proc.new do |sparqls|
-					ws_send(EM, ws, :sparqls, sparqls)
+					ws_send(ws, :sparqls, sparqls)
 				end
 
 				proc_anchored_pgp = Proc.new do |anchored_pgp|
-					ws_send(EM, ws, :anchored_pgp, anchored_pgp)
+					ws_send(ws, :anchored_pgp, anchored_pgp)
 				end
 
 				proc_solution = Proc.new do |solution|
-					ws_send(EM, ws, :solution, solution)
+					ws_send(ws, :solution, solution)
 				end
 
 				ws.onmessage do |data|
@@ -232,7 +232,7 @@ class LodqaWS < Sinatra::Base
 		@query  = params['query'] unless params['query'].nil?
 	end
 
-	def ws_send(eventMachine, websocket, key, value)
+	def ws_send(websocket, key, value)
 		websocket.send({key => value}.to_json)
 	end
 
