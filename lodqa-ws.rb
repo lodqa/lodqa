@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'sinatra/base'
+require 'sinatra/async'
 require 'rest_client'
 require 'sinatra-websocket'
 require 'erb'
@@ -10,8 +11,11 @@ require 'cgi/util'
 require 'securerandom'
 require "lodqa/gateway_error.rb"
 require 'lodqa/logger'
+require 'eventmachine'
 
 class LodqaWS < Sinatra::Base
+	register Sinatra::Async
+
 	configure do
 		set :root, File.dirname(__FILE__).gsub(/\/lib/, '')
 		set :protection, :except => :frame_options
@@ -45,7 +49,7 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
-	get '/answer' do
+	aget '/answer' do
 		parse_params
 
 		@pgp = get_pgp @config[:parser_url]
@@ -54,41 +58,45 @@ class LodqaWS < Sinatra::Base
 			return erb :error_before_answer
 		end
 
-		# Search datasets automatically unless target parametrs.
-		@candidate_datasets = if target_exists?
-			searchable? @pgp, [@config]
-		else
-			select_db_for @pgp
-		end
-
-		# Show error message if there is no valid dataset.
-		if @candidate_datasets.empty?
-			@message = if target_exists?
-				"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
-			else
-				'There is no db which has all words in the query!'
+		callback = -> (candidate_datasets) do
+			# Show error message if there is no valid dataset.
+			if candidate_datasets.empty?
+				@message = if target_exists?
+					"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
+				else
+					'There is no db which has all words in the query!'
+				end
+				return erb :error_before_answer
 			end
-			return erb :error_before_answer
+
+			# Show answers
+			begin
+				# Find terms of nodes and edges.
+				using_dataset = candidate_datasets.first
+				tf = Lodqa::TermFinder.new(using_dataset[:dictionary_url])
+				keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
+
+				# Set parameters for seaching answers
+				@mappings = tf.find(keywords)
+
+				# Set parameters for finding label of answers
+				@endpoint_url = using_dataset[:endpoint_url]
+				@need_proxy = using_dataset[:name] == 'biogateway'
+
+				@candidate_datasets = candidate_datasets
+
+				body erb(:answer)
+			rescue GatewayError
+				@message = 'Dictionary lookup error!'
+				body erb(:error_before_answer)
+			end
 		end
 
-		# Show answers
-		begin
-			# Find terms of nodes and edges.
-			using_dataset = @candidate_datasets.first
-			tf = Lodqa::TermFinder.new(using_dataset[:dictionary_url])
-			keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
-
-			# Set parameters for seaching answers
-			@mappings = tf.find(keywords)
-
-			# Set parameters for finding label of answers
-			@endpoint_url = using_dataset[:endpoint_url]
-			@need_proxy = using_dataset[:name] == 'biogateway'
-
-			erb :answer
-		rescue GatewayError
-			@message = 'Dictionary lookup error!'
-			erb :error_before_answer
+		# Search datasets automatically unless target parametrs.
+		if target_exists?
+			searchable?(@pgp, [@config]) { |dbs| callback.call dbs }
+		else
+			select_db_for(@pgp) { |dbs| callback.call dbs  }
 		end
 	end
 
@@ -281,10 +289,10 @@ class LodqaWS < Sinatra::Base
 	end
 
 	def searchable?(pgp, applicants)
+		# Can each applicant answer terms of all nodes?
 		keywords = pgp[:nodes].values.map{|n| n[:text]}
-		applicants
+		applicants = applicants
 			.map do |applicant|
-				# Can an applicant answer terms of all nodes?
 				begin
 					applicant[:terms] = Lodqa::TermFinder
 						.new(applicant[:dictionary_url])
@@ -296,7 +304,11 @@ class LodqaWS < Sinatra::Base
 				end
 			end
 			.select {|applicant| applicant[:terms] && applicant[:terms].all?{|t| t[1].length > 0 } }
-			.map do |applicant|
+
+		# Can each applicant generate at least one sparql?
+		do_applicants_have_sparql = applicants.map { |a| [a[:name], false] }.to_h
+		applicants
+			.each do |applicant|
 				# Can an applicant create at least one sparql.
 				options = {
 					max_hop: applicant[:max_hop],
@@ -313,11 +325,16 @@ class LodqaWS < Sinatra::Base
 				lodqa.mappings = Lodqa::TermFinder
 					.new(applicant[:dictionary_url])
 					.find(keywords)
-				applicant[:sparqls] = lodqa.sparqls.first
 
-				applicant
+				# Generating an instance of GraphFinder may spend time due to queries to some SPARQL endpoints is too slow.
+				# So we send SPARQL requests in parallel per endpoint.
+				EM.defer do
+					applicant[:sparqls] = lodqa.sparqls.first
+					do_applicants_have_sparql[applicant[:name]] = true
+
+					yield applicants.select { |a| a[:sparqls] } if do_applicants_have_sparql.values.all?{ |has_sparql| has_sparql }
+				end
 			end
-			.select { |applicant| applicant[:sparqls] }
 	end
 
 	def select_db_for(pgp)
@@ -334,6 +351,6 @@ class LodqaWS < Sinatra::Base
 			raise IOError, "invalid url #{targets_url}"
 		end
 
-		searchable? pgp, applicants
+		searchable?(pgp, applicants) { |dbs| yield dbs }
 	end
 end

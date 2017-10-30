@@ -5,8 +5,9 @@ gem 'erubis'
 
 gem 'rest-client'
 gem 'sinatra'
-gem 'sparql-client'
+gem 'async_sinatra'
 gem 'sinatra-websocket'
+gem 'sparql-client'
 
 gem 'app_config'
 
