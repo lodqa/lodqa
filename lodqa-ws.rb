@@ -281,8 +281,6 @@ class LodqaWS < Sinatra::Base
 	end
 
 	def searchable?(pgp, applicants)
-		p applicants
-
 		keywords = pgp[:nodes].values.map{|n| n[:text]}
 		applicants
 			.map do |applicant|
