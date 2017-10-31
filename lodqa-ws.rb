@@ -8,8 +8,6 @@ require 'lodqa'
 require 'json'
 require 'open-uri'
 require 'cgi/util'
-require 'securerandom'
-require 'eventmachine'
 
 class LodqaWS < Sinatra::Base
 	register Sinatra::Async
@@ -144,65 +142,23 @@ class LodqaWS < Sinatra::Base
 
 	# Websocket only!
 	get '/solutions' do
-		debug = false
-		Lodqa::Logger.level = debug ? :debug : :info
+		debug = false # Change true to output debug log.
 
+		Lodqa::Logger.level = debug ? :debug : :info
 		config = get_config(params)
-		options = {
-			max_hop: config[:max_hop],
-			ignore_predicates: config[:ignore_predicates],
-			sortal_predicates: config[:sortal_predicates],
-			debug: debug,
-			endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
-		}
 
 		begin
-			lodqa = Lodqa::Lodqa.new(config[:endpoint_url], config[:graph_uri], options)
-
 			request.websocket do |ws|
-				request_id = SecureRandom.uuid
-
-				# Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
-				Lodqa::Logger.debug('Request start', request_id)
-
-				proc_sparqls = Proc.new do |sparqls|
-					ws_send(ws, :sparqls, sparqls)
-				end
-
-				proc_anchored_pgp = Proc.new do |anchored_pgp|
-					ws_send(ws, :anchored_pgp, anchored_pgp)
-				end
-
-				proc_solution = Proc.new do |solution|
-					ws_send(ws, :solution, solution)
-				end
-
-				ws.onmessage do |data|
-					json = JSON.parse(data, {:symbolize_names => true})
-
-					lodqa.pgp = json[:pgp]
-					lodqa.mappings = json[:mappings]
-
-					EM.defer do
-						Thread.current.thread_variable_set(:request_id, request_id)
-
-						begin
-							ws.send("start")
-							lodqa.each_anchored_pgp_and_sparql_and_solution(proc_sparqls, proc_anchored_pgp, proc_solution)
-						rescue => e
-							Lodqa::Logger.error "error: #{e.inspect}, backtrace: #{e.backtrace}, data: #{data}"
-							ws.send({error: e}.to_json)
-						ensure
-							ws.close_connection(true)
-						end
-					end
-				end
-
-				ws.onclose do
-					# Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
-					Lodqa::Logger.debug 'The WebSocket connection is closed.', request_id
-					lodqa.dispose request_id
-				end
+				Lodqa::Runner.start(
+					ws,
+					endpoint_url: config[:endpoint_url],
+					graph_uri: config[:graph_uri],
+					max_hop: config[:max_hop],
+					ignore_predicates: config[:ignore_predicates],
+					sortal_predicates: config[:sortal_predicates],
+					debug: debug,
+					endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
+				)
 			end
 		rescue SPARQL::Client::ServerError => e
 			[502, "SPARQL endpoint does not respond."]
@@ -237,10 +193,6 @@ class LodqaWS < Sinatra::Base
 		@config = get_config(params)
 		@read_timeout = params['read_timeout'] || 5
 		@query  = params['query'] unless params['query'].nil?
-	end
-
-	def ws_send(websocket, key, value)
-		websocket.send({key => value}.to_json)
 	end
 
 	def get_targets

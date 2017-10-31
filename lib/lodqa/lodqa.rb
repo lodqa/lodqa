@@ -11,6 +11,7 @@ require 'lodqa/configuration'
 require "lodqa/gateway_error.rb"
 require 'lodqa/logger'
 require 'lodqa/cached_sparql_client'
+require 'lodqa/runner'
 
 module Lodqa; end unless defined? Lodqa
 
