@@ -256,30 +256,16 @@ class LodqaWS < Sinatra::Base
 
 	def get_config(params)
 		# default configuration
-		config_file = settings.root + '/config/default-setting.json'
-		config = JSON.parse File.read(config_file), {:symbolize_names => true} if File.file?(config_file)
-		config = {} if config.nil?
+		config = Lodqa::Configuration.default(settings.root)
 
 		# target name passed through params
 		if target_exists?
 			target_url = settings.target_db + '/' + params['target'] + '.json'
-			config_add = begin
-				RestClient.get target_url do |response, request, result|
-					case response.code
-					when 200 then JSON.parse response, {:symbolize_names => true}
-					else raise IOError, "invalid target"
-					end
-				end
-			rescue
-				raise IOError, "invalid target"
-			end
-
-			config_add.delete_if{|k, v| v.nil?}
+			config_add = Lodqa::Configuration.for_target target_url
 			config.merge! config_add unless config_add.nil?
 		end
 
 	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
-
 	  config
 	end
 end
