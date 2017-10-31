@@ -2,11 +2,12 @@ const updateDisplay = require('./update-display')
 const Pagenation = require('./Pagenation')
 
 module.exports = class {
-  constructor(domId) {
-    this.domId = domId
+  constructor(parent, domSelector) {
+    this.parent = parent
+    this.domSelector = domSelector
     this.pagination = new Pagenation(16)
 
-    document.querySelector(`#${this.domId}`)
+    parent.querySelector(`${this.domSelector}`)
       .addEventListener('click', (e) => {
         if (e.target.name === 'prev') {
           this.prev()
@@ -21,18 +22,18 @@ module.exports = class {
     this.answers = model.answers
     this.pagination.items = model.answers
 
-    updateDisplay(this.domId, this.pagination.dump)
+    updateDisplay(this.parent, this.domSelector, this.pagination.dump)
   }
 
   prev() {
     if (this.pagination.goPrev()) {
-      updateDisplay(this.domId, this.pagination.dump)
+      updateDisplay(this.parent, this.domSelector, this.pagination.dump)
     }
   }
 
   next() {
     if (this.pagination.goNext()) {
-      updateDisplay(this.domId, this.pagination.dump)
+      updateDisplay(this.parent, this.domSelector, this.pagination.dump)
     }
   }
 }

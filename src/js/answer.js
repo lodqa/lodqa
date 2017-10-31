@@ -7,16 +7,25 @@ const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const bindLoaderEvents = require('./answer/bind-loader-events')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
-const model = new Model()
-const loader = new Loader()
-const progressBarPresentation = new ProgressBarPresentation('progress-bar')
 
-bindHandlerForKeyEvents(loader)
+for (const parent of document.querySelectorAll('.answers-for-dataset')) {
+  const name = parent.getAttribute('data-dataset')
+  const model = new Model({
+    endpointUrl: parent.querySelector('.answers-for-dataset__endpoint-url')
+      .value,
+    needProxy: parent.querySelector('.answers-for-dataset__need-proxy')
+      .value === 'true'
+  })
+  const loader = new Loader()
+  const progressBarPresentation = new ProgressBarPresentation(name, parent, '.answers-for-dataset__progress-bar')
 
-bindHandlerToShowSparql(['progress-bar', 'answer-index'], 'lightbox', model, loader)
+  bindHandlerForKeyEvents(loader)
 
-bindLoaderEvents(loader, model, progressBarPresentation, 'answer-index')
+  bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', model, loader)
 
-beginSearch(loader, 'pgp', 'mappings', 'target', 'read_timeout')
+  bindLoaderEvents(loader, model, progressBarPresentation, parent, '.answers-for-dataset__answer-index')
 
-bindModeButtonEventhandler('grapheditor')
+  beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
+
+  bindModeButtonEventhandler('grapheditor')
+}

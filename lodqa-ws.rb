@@ -63,7 +63,7 @@ class LodqaWS < Sinatra::Base
 				else
 					'There is no db which has all words in the query!'
 				end
-				return erb :error_before_answer
+				return body erb :error_before_answer
 			end
 
 			# Show answers
@@ -80,12 +80,22 @@ class LodqaWS < Sinatra::Base
 				@endpoint_url = using_dataset[:endpoint_url]
 				@need_proxy = ['biogateway', 'ncats-experimental'].include? using_dataset[:name]
 
-				@candidate_datasets = candidate_datasets
+				@candidate_datasets = candidate_datasets.map do |ds|
+					tf = Lodqa::TermFinder.new(ds[:dictionary_url])
+					keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
+					ds[:mappings] = tf.find(keywords)
+					ds[:need_proxy] = ['biogateway', 'ncats-experimental'].include? ds[:name]
+					ds
+				end
 
 				body erb(:answer)
 			rescue GatewayError
 				@message = 'Dictionary lookup error!'
 				body erb(:error_before_answer)
+			rescue => e
+				Lodqa::Logger.error message: e.message, trace: e.backtrace
+				response.status = 500
+				body e.message
 			end
 		end
 

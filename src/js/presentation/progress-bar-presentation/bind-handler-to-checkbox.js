@@ -1,4 +1,4 @@
-module.exports = function (checkboxDomId, callback){
-  document.querySelector(`#${checkboxDomId}`)
+module.exports = function (dom, checkboxDomSelector, callback){
+  dom.querySelector(`${checkboxDomSelector}`)
     .addEventListener('click', callback)
 }

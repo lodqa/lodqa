@@ -37,10 +37,14 @@ class Lodqa::Lodqa
   # Return an enumerator to speed up checking the existence of sparqls.
   def sparqls
     Enumerator.new do |y|
-      anchored_pgps.each do |anchored_pgp|
-        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
-          .queries
-          .each { |q| y << q[:sparql] }
+      begin
+        anchored_pgps.each do |anchored_pgp|
+          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+            .queries
+            .each { |q| y << q[:sparql] }
+        end
+      rescue => e
+        Lodqa::Logger.error message: e.message, trace: e.backtrace
       end
     end
   end

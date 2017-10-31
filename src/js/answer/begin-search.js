@@ -1,10 +1,8 @@
-module.exports = function(loader, pgpDomId, mappnigsDomId, targetDomId, readTimeoutDomId) {
+module.exports = function(loader, pgpDomId, parent, mappnigsDomSelector, target, readTimeoutDomId) {
   const pgp = JSON.parse(document.querySelector(`#${pgpDomId}`)
     .innerHTML)
-  const mappings = JSON.parse(document.querySelector(`#${mappnigsDomId}`)
+  const mappings = JSON.parse(parent.querySelector(`${mappnigsDomSelector}`)
     .innerHTML)
-  const target = document.querySelector(`#${targetDomId}`)
-    .innerHTML
   const readTimeout = document.querySelector(`#${readTimeoutDomId}`)
     .value
 

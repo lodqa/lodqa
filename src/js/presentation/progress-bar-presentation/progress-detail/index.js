@@ -3,8 +3,8 @@ const getCurrentSparql = require('../get-current-sparql')
 const showError = require('../show-error')
 const getNumberOfAnswers = require('../get-number-of-answers')
 
-module.exports = function(domId, solutions, sparqlCount, focusNode, sparqlTimeout) {
-  const current = getCurrentSparql(domId, sparqlCount)
+module.exports = function(dom, solutions, sparqlCount, focusNode, sparqlTimeout) {
+  const current = getCurrentSparql(dom, sparqlCount)
   current.classList.remove('progress-bar__detail-progress-bar__sparqls__sparql--progress')
 
   if (sparqlTimeout) {

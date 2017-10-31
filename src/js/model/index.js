@@ -5,7 +5,8 @@ const findLabel = require('../find-label')
 const filterVisibleAnswers = require('./filter-visible-answers')
 
 module.exports = class Model {
-  constructor() {
+  constructor(options) {
+    this.options = options
     this._sparqls = null
     this._sparqlCount = new SparqlCount()
     this._anchoredPgp = null
@@ -92,7 +93,7 @@ module.exports = class Model {
       this.sparqlCount
     )
 
-    findLabel1(this)
+    findLabel1(this, this.options)
 
     emit(this)
   }
@@ -112,7 +113,7 @@ function emit(model) {
   model._onAnswerChanges.forEach((c) => c())
 }
 
-function findLabel1(model) {
+function findLabel1(model, options) {
   const uniqAnswers = getUniqAnswers(model.currentSolution.solutions, model.focus)
 
   findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
@@ -123,5 +124,5 @@ function findLabel1(model) {
     answer.labelFound = true
 
     emit(model)
-  })
+  }, options)
 }

@@ -13,14 +13,14 @@ const template = handlebars.compile(`
       <span class="progress-bar__simple-progress-bar__percentage">100%</span>
     {{/if}}
     <span class="progress-bar__simple-progress-bar__show-detail-checkbox">
-      <input type="checkbox" id="show-detail-progress-bar">
-      <label for="show-detail-progress-bar">Details</label>
+      <input type="checkbox" id="show-detail-progress-bar-{{name}}" class="show-detail-progress-bar">
+      <label for="show-detail-progress-bar-{{name}}">Details</label>
     </span>
   </div>
   <div class="progress-bar__detail-progress-bar progress-bar__detail-progress-bar--hidden">
     <div>
-        <input type="checkbox" id="show-only-has-answers">
-        <label for="show-only-has-answers">Show only sparqls with answers</label>
+        <input type="checkbox" id="show-only-has-answers-{{name}}" class="show-only-has-answers">
+        <label for="show-only-has-answers-{{name}}">Show only sparqls with answers</label>
     </div>
     <ul class="progress-bar__detail-progress-bar__sparqls">
       {{#each sparqls}}
@@ -37,11 +37,12 @@ const template = handlebars.compile(`
   </div>
 `)
 
-module.exports = function(domId, viewModel, onChange) {
-  const element = document.querySelector(`#${domId}`)
+module.exports = function(dom, name, viewModel, onChange) {
+  const element = dom
 
   element
     .innerHTML = template({
+      name,
       sparqls: viewModel
     })
 

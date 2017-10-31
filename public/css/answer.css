@@ -33,20 +33,20 @@
     display: none;
 }
 
-#answer-index {
+.answers-for-dataset__answer-index {
     margin-top: 15px;
     min-height: 20em;
 }
 
-#answer-index .solution {
+.answers-for-dataset__answer-index .solution {
     display: flex;
 }
 
-#answer-index .answer {
+.answers-for-dataset__answer-index .answer {
     width: 700px;
 }
 
-#answer-index .sparqls {
+.answers-for-dataset__answer-index .sparqls {
     display: flex;
     flex-wrap: wrap;
     list-style-type: none;
@@ -54,12 +54,12 @@
     padding: 0;
 }
 
-#answer-index .sparql {
+.answers-for-dataset__answer-index .sparql {
     margin: 0 0.1em;
     min-width: 2em;
 }
 
-#download {
+.answers-for-dataset__download {
     margin-top: 1em;
 }
 

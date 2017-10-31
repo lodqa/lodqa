@@ -1,7 +1,7 @@
 module.exports = class {
-  constructor(domId, onClick, formatter) {
-    this._domId = domId
-    this._dom = document.querySelector(`#${this._domId}`)
+  constructor(parent, domSelector, onClick, formatter) {
+    this._domSelector = domSelector
+    this._dom = parent.querySelector(`${this._domSelector}`)
     this._formatter = formatter
 
     this._dom.addEventListener('click', () => onClick(this))

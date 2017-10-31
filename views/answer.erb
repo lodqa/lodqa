@@ -51,12 +51,21 @@
                   If you want another one to be searched, please cileck the name of it.
                 </div>
                 <% end %>
-                <div id="progress-bar"></div>
-                <div id="answer-index"></div>
-                <div id="download">
-                  <a id="download-json-button" class="button" download="answer.json"><i class="fa fa-download" aria-hidden="true"></i> download json<span class="answers-length"></span></a>
-                  <a id="download-tsv-button" class="button" download="answer.tsv"><i class="fa fa-download" aria-hidden="true"></i> download tsv<span class="answers-length"></span></a>
-                </div>
+                <% @candidate_datasets.each do |e| %>
+                  <div class="answers-for-dataset" data-dataset="<%= e[:name] %>">
+                    <div class="hidden">
+                      <div class="answers-for-dataset__mappings"><%= e[:mappings].to_json %></div>
+                      <input class="answers-for-dataset__endpoint-url" type="hidden" value="<%= e[:endpoint_url] %>"/>
+                      <input class="answers-for-dataset__need-proxy" type="hidden" value="<%= e[:need_proxy] %>"/>
+                    </div>
+                    <div class="answers-for-dataset__progress-bar progress-bar"></div>
+                    <div class="answers-for-dataset__answer-index"></div>
+                    <div class="answers-for-dataset__download">
+                      <a class="answers-for-dataset__download-json-button button" download="answer.json"><i class="fa fa-download" aria-hidden="true"></i> download json<span class="answers-length"></span></a>
+                      <a class="answers-for-dataset__download-tsv-button button" download="answer.tsv"><i class="fa fa-download" aria-hidden="true"></i> download tsv<span class="answers-length"></span></a>
+                    </div>
+                  </div>
+                <% end %>
                 <div id="lightbox" class="hidden">
                     <p>Click to close</p>
                     <div class="content"></div>

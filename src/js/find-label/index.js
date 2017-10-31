@@ -22,11 +22,11 @@ const cache = new LabelCache()
 // The onFetch is a callback funciton.
 // It will be called whenever the label of a url will be get.
 // it is called with url and label as arguments.
-module.exports = function(urls, onFetch) {
+module.exports = function(urls, onFetch, options = {}) {
   const {
     endpointUrl,
     needProxy
-  } = getEndpointInformationFromDom()
+  } = Object.assign(getEndpointInformationFromDom(), options)
 
   for (const url of urls) {
     getLabelOfEachUrl(cache, endpointUrl, url, needProxy, onFetch)

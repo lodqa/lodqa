@@ -1,6 +1,6 @@
-module.exports = function(ids, handler) {
-  for (const id of ids) {
-    document.querySelector(`#${id}`)
+module.exports = function(parent, selectors, handler) {
+  for (const selector of selectors) {
+    parent.querySelector(`${selector}`)
       .addEventListener('click', (e) => {
         if (e.target.classList.contains('sparql-link')) {
           handler(e.target.getAttribute('data-sparql-number'))

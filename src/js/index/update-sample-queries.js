@@ -13,20 +13,20 @@ const template = handlebars.compile(`
 const cache = {}
 
 module.exports = {
-  updateTarget(target) {
+  updateTarget(dom, target) {
     getTargetConfig(target)
       .then((json) => {
         cache.config = json
-        update(cache.config, cache.readTimeout)
+        update(dom,  cache.config, cache.readTimeout)
       })
   },
-  updateReadTimeout(readTimeout) {
+  updateReadTimeout(dom, readTimeout) {
     cache.readTimeout = readTimeout
-    update(cache.config, cache.readTimeout)
+    update(dom, cache.config, cache.readTimeout)
   }
 }
 
-function update(config, readTimeout) {
+function update(dom, config, readTimeout) {
   const url = new URL(location.href)
   const sampleQueries = config.sample_queries.map((query) => {
     url.searchParams.set('query', query)
@@ -40,7 +40,5 @@ function update(config, readTimeout) {
     }
   })
 
-  document
-    .querySelector('.description')
-    .innerHTML = template(sampleQueries)
+  dom.innerHTML = template(sampleQueries)
 }

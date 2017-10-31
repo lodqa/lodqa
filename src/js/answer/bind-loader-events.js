@@ -3,11 +3,11 @@ const AnswerIndexPresentation = require('../presentation/answer-index-presentati
 const DownloadButton = require('../presentation/download-button')
 const DownloadTsvButton = require('../presentation/download-tsv-button')
 
-module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, answerIndexDomId) {
+module.exports = function bindLoaderEvents(loader, model, progressBarPresentation, parent, answerIndexDomSelector) {
   const bindResult = new BindResult(loader.eventEmitter)
-  const answerIndexPresentation = new AnswerIndexPresentation(answerIndexDomId)
-  const downloadJsonButton = new DownloadButton('download-json-button', (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
-  const downloadTsvButton = new DownloadTsvButton('download-tsv-button', (button) => button.updateContent(model.labelAndUrls))
+  const answerIndexPresentation = new AnswerIndexPresentation(parent, answerIndexDomSelector)
+  const downloadJsonButton = new DownloadButton(parent, '.answers-for-dataset__download-json-button', (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
+  const downloadTsvButton = new DownloadTsvButton(parent, '.answers-for-dataset__download-tsv-button', (button) => button.updateContent(model.labelAndUrls))
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
   model.onAnswerChange = () => downloadJsonButton.updateLength(model.answers.length)

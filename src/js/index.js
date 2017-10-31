@@ -9,8 +9,10 @@ bindModeButtonEventhandler('grapheditor')
 
 const target = new URL(location.href)
   .searchParams.get('target')
+const targetDom = document
+  .querySelector('.description')
 
-if (target) {
-  updateTarget(target)
-  bindReadTimeoutNumberEventhandler(updateReadTimeout)
+if (target && targetDom) {
+  updateTarget(targetDom, target)
+  bindReadTimeoutNumberEventhandler((readTimeout) => updateReadTimeout(targetDom, readTimeout))
 }
