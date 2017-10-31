@@ -166,6 +166,7 @@ class LodqaWS < Sinatra::Base
 		rescue JSON::ParserError => e
 			[500, "Invalid JSON object from the client."]
 		rescue => e
+			Lodqa::Logger.error message: e.message, trace: e.backtrace
 			[500, e.message]
 		end
 	end
