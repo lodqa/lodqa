@@ -151,6 +151,7 @@ class LodqaWS < Sinatra::Base
 			request.websocket do |ws|
 				Lodqa::Runner.start(
 					ws,
+					name: config[:name],
 					endpoint_url: config[:endpoint_url],
 					graph_uri: config[:graph_uri],
 					max_hop: config[:max_hop],

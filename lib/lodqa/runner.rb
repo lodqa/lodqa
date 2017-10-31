@@ -7,6 +7,7 @@ module Lodqa
     class << self
       def start(ws, options)
         lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options)
+        source = options[:name]
 
         request_id = SecureRandom.uuid
 
@@ -14,15 +15,15 @@ module Lodqa
         Logger.debug('Request start', request_id)
 
         proc_sparqls = Proc.new do |sparqls|
-          ws_send(ws, :sparqls, sparqls)
+          ws_send(ws, source: source, sparqls: sparqls)
         end
 
         proc_anchored_pgp = Proc.new do |anchored_pgp|
-          ws_send(ws, :anchored_pgp, anchored_pgp)
+          ws_send(ws, source: source, anchored_pgp: anchored_pgp)
         end
 
         proc_solution = Proc.new do |solution|
-          ws_send(ws, :solution, solution)
+          ws_send(ws, source: source, solution: solution)
         end
 
         ws.onmessage do |data|
@@ -55,8 +56,8 @@ module Lodqa
 
       private
 
-      def ws_send(websocket, key, value)
-        websocket.send({key => value}.to_json)
+      def ws_send(websocket, value)
+        websocket.send(value.to_json)
       end
     end
   end
