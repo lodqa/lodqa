@@ -18,9 +18,10 @@ class Lodqa::Graphicator
 
   def parse(query)
     @parse = @parser.parse(query)
+    self
   end
 
-  def get_pgp
+  def pgp
     graphicate(@parse)
   end
 
