@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require 'net/http'
-require 'sparql/client'
 require 'json'
 require 'enju_access/cgi_accessor'
 require 'lodqa/graph_finder'
@@ -11,28 +10,9 @@ require 'lodqa/pgp_factory'
 require 'lodqa/configuration'
 require "lodqa/gateway_error.rb"
 require 'lodqa/logger'
+require 'lodqa/cached_sparql_client'
 
 module Lodqa; end unless defined? Lodqa
-
-# Cache results of sparql to speed up SPARQL queries.
-class CachedSparqlClient
-  def initialize(client)
-    @client = client
-    @cache = {}
-  end
-
-  def query(sparql)
-    if @cache.key? sparql
-      @cache[sparql]
-    else
-      @client.query(sparql).tap{ |result| @cache[sparql] = result }
-    end
-  end
-
-  def select(*args)
-    @cilent.select(*args)
-  end
-end
 
 class Lodqa::Lodqa
   attr_reader   :parse_rendering
@@ -50,7 +30,7 @@ class Lodqa::Lodqa
     # If HTTP method is GET, when HTTP connection error occurs, a request is retried by HTTP stack of Ruby standard library.
     endpoint_options = @options[:endpoint_options] || {}
     endpoint_options[:method] ||= :get
-    @endpoint = CachedSparqlClient.new(SPARQL::Client.new(ep_url, endpoint_options))
+    @endpoint = Lodqa::CachedSparqlClient.new(ep_url, endpoint_options)
   end
 
   # Return an enumerator to speed up checking the existence of sparqls.
