@@ -9,8 +9,6 @@ require 'json'
 require 'open-uri'
 require 'cgi/util'
 require 'securerandom'
-require "lodqa/gateway_error.rb"
-require 'lodqa/logger'
 require 'eventmachine'
 
 class LodqaWS < Sinatra::Base

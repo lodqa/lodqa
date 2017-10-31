@@ -9,6 +9,8 @@ require 'lodqa/logger'
 require 'lodqa/sources'
 require 'lodqa/pgp_factory'
 require 'lodqa/configuration'
+require "lodqa/gateway_error.rb"
+require 'lodqa/logger'
 
 module Lodqa; end unless defined? Lodqa
 
