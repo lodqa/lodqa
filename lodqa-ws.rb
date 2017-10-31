@@ -78,7 +78,7 @@ class LodqaWS < Sinatra::Base
 
 				# Set parameters for finding label of answers
 				@endpoint_url = using_dataset[:endpoint_url]
-				@need_proxy = using_dataset[:name] == 'biogateway'
+				@need_proxy = ['biogateway', 'ncats-experimental'].include? using_dataset[:name]
 
 				@candidate_datasets = candidate_datasets
 
