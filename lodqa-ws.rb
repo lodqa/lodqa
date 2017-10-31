@@ -52,7 +52,7 @@ class LodqaWS < Sinatra::Base
 	aget '/answer' do
 		parse_params
 
-		@pgp = get_pgp @config[:parser_url]
+		@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
 		if @pgp[:nodes].keys.length == 0
 			@message = 'The pgp has no nodes!'
 			return erb :error_before_answer
@@ -113,7 +113,7 @@ class LodqaWS < Sinatra::Base
 		@target = params['target'] || @targets.first
 
 		if @query
-			@pgp = get_pgp @config[:parser_url]
+			@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
 		end
 
 		erb :grapheditor
@@ -281,11 +281,5 @@ class LodqaWS < Sinatra::Base
 	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 
 	  config
-	end
-
-	def get_pgp(parser_url)
-		g = Lodqa::Graphicator.new(parser_url)
-		g.parse(params['query'])
-		g.get_pgp
 	end
 end

@@ -7,7 +7,7 @@ require 'lodqa/graph_finder'
 require 'lodqa/termfinder'
 require 'lodqa/logger'
 require 'lodqa/sources'
-
+require 'lodqa/pgp_factory'
 
 module Lodqa; end unless defined? Lodqa
 
