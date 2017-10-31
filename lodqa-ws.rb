@@ -58,7 +58,8 @@ class LodqaWS < Sinatra::Base
 			return erb :error_before_answer
 		end
 
-		callback = -> (candidate_datasets) do
+		# Show result
+		show_result = -> (candidate_datasets) do
 			# Show error message if there is no valid dataset.
 			if candidate_datasets.empty?
 				@message = if target_exists?
@@ -93,10 +94,11 @@ class LodqaWS < Sinatra::Base
 		end
 
 		# Search datasets automatically unless target parametrs.
+		read_timeout = params['read_timeout'].to_i
 		if target_exists?
-			searchable?(@pgp, [@config]) { |dbs| callback.call dbs }
+			Lodqa::Sources.searchable?(@pgp, [@config], read_timeout) { |dbs| show_result.call dbs }
 		else
-			select_db_for(@pgp) { |dbs| callback.call dbs  }
+			Lodqa::Sources.select_db_for(@pgp, settings.target_db + '.json', read_timeout) { |dbs| show_result.call dbs  }
 		end
 	end
 
@@ -203,7 +205,6 @@ class LodqaWS < Sinatra::Base
 					Lodqa::Logger.debug 'The WebSocket connection is closed.', request_id
 					lodqa.dispose request_id
 				end
-
 			end
 		rescue SPARQL::Client::ServerError => e
 			[502, "SPARQL endpoint does not respond."]
@@ -286,71 +287,5 @@ class LodqaWS < Sinatra::Base
 		g = Lodqa::Graphicator.new(parser_url)
 		g.parse(params['query'])
 		g.get_pgp
-	end
-
-	def searchable?(pgp, applicants)
-		# Can each applicant answer terms of all nodes?
-		keywords = pgp[:nodes].values.map{|n| n[:text]}
-		applicants = applicants
-			.map do |applicant|
-				begin
-					applicant[:terms] = Lodqa::TermFinder
-						.new(applicant[:dictionary_url])
-						.find(keywords)
-					applicant
-				rescue GatewayError
-					p "dictionary_url error for #{applicant[:name]}"
-					applicant
-				end
-			end
-			.select {|applicant| applicant[:terms] && applicant[:terms].all?{|t| t[1].length > 0 } }
-
-		# Can each applicant generate at least one sparql?
-		do_applicants_have_sparql = applicants.map { |a| [a[:name], false] }.to_h
-		applicants
-			.each do |applicant|
-				# Can an applicant create at least one sparql.
-				options = {
-					max_hop: applicant[:max_hop],
-					ignore_predicates: applicant[:ignore_predicates],
-					sortal_predicates: applicant[:sortal_predicates],
-					debug: false,
-					endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
-				}
-
-				lodqa = Lodqa::Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], options)
-				lodqa.pgp = pgp
-
-				keywords = pgp[:nodes].values.map{|n| n[:text]}.concat(pgp[:edges].map{|e| e[:text]})
-				lodqa.mappings = Lodqa::TermFinder
-					.new(applicant[:dictionary_url])
-					.find(keywords)
-
-				# Generating an instance of GraphFinder may spend time due to queries to some SPARQL endpoints is too slow.
-				# So we send SPARQL requests in parallel per endpoint.
-				EM.defer do
-					applicant[:sparqls] = lodqa.sparqls.first
-					do_applicants_have_sparql[applicant[:name]] = true
-
-					yield applicants.select { |a| a[:sparqls] } if do_applicants_have_sparql.values.all?{ |has_sparql| has_sparql }
-				end
-			end
-	end
-
-	def select_db_for(pgp)
-		targets_url = settings.target_db + '.json'
-
-		applicants = begin
-			RestClient.get targets_url do |response, request, result|
-				case response.code
-				when 200 then JSON.parse(response, symbolize_names: true)
-					else raise IOError, "invalid url #{targets_url}"
-				end
-			end
-		rescue
-			raise IOError, "invalid url #{targets_url}"
-		end
-
-		searchable?(pgp, applicants) { |dbs| yield dbs }
 	end
 end

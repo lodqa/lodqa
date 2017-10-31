@@ -6,6 +6,8 @@ require 'enju_access/cgi_accessor'
 require 'lodqa/graph_finder'
 require 'lodqa/termfinder'
 require 'lodqa/logger'
+require 'lodqa/sources'
+
 
 module Lodqa; end unless defined? Lodqa
 
