@@ -1,19 +1,20 @@
-require 'securerandom'
-require 'eventmachine'
 require 'lodqa/lodqa'
 require 'lodqa/logger'
 require 'lodqa/source_channel'
+require 'lodqa/async'
 
 module Lodqa
   module Runner
     class << self
       def start(ws, options)
         # Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
-        request_id = SecureRandom.uuid
-        Logger.debug('Request start', request_id)
+        request_id = Logger.generate_request_id
+        Logger.debug("Request start #{options[:name]}", request_id)
 
         lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options)
         channel = SourceChannel.new ws, options[:name]
+
+        # Set a request_id to the Logger at the thread of WebSocket events.
         ws.onmessage { |recieve_data| start_search_solutions request_id, lodqa, recieve_data, channel }
         ws.onclose { close request_id, lodqa }
       end
@@ -21,14 +22,14 @@ module Lodqa
       private
 
       def start_search_solutions(request_id, lodqa, recieve_data, channel)
+        Logger.request_id = request_id
+
         json = JSON.parse(recieve_data, {:symbolize_names => true})
 
         lodqa.pgp = json[:pgp]
         lodqa.mappings = json[:mappings]
 
-        EM.defer do
-          Thread.current.thread_variable_set(:request_id, request_id)
-
+        Async.defer do
           begin
             channel.start
             lodqa.each_anchored_pgp_and_sparql_and_solution(
@@ -46,8 +47,8 @@ module Lodqa
       end
 
       def close(request_id, lodqa)
-        # Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
-        Logger.debug 'The WebSocket connection is closed.', request_id
+        Logger.request_id = request_id
+        Logger.debug 'The WebSocket connection is closed.', nil
         lodqa.dispose request_id
       end
     end

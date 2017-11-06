@@ -1,10 +1,13 @@
 require 'rest_client'
 require 'lodqa/termfinder'
+require 'lodqa/async'
 
 module Lodqa
   module Sources
     class << self
       def select_db_for(pgp, targets_url, read_timeout)
+        Logger.request_id = Logger.generate_request_id
+
         applicants = begin
           RestClient.get targets_url do |response, request, result|
             case response.code
@@ -20,6 +23,8 @@ module Lodqa
       end
 
       def searchable?(pgp, applicants, read_timeout)
+        Logger.request_id = Logger.generate_request_id
+
         applicants = select_db_that_can_answer_terms_of_all_nodes(applicants, pgp)
         select_db_that_can_generate_at_least_one_sparql(applicants, pgp, read_timeout) { |dbs| yield dbs }
       end
@@ -66,7 +71,7 @@ module Lodqa
 
             # Generating an instance of GraphFinder may spend time due to queries to some SPARQL endpoints is too slow.
             # So we send SPARQL requests in parallel per endpoint.
-            EM.defer do
+            Async.defer do
               applicant[:sparqls] = lodqa.sparqls.first
               do_applicants_have_sparql[applicant[:name]] = true
 

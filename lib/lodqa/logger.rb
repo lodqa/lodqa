@@ -7,16 +7,28 @@ module Lodqa
         @debug = (level == :debug)
       end
 
-      def debug(message, request_id = nil)
+      def generate_request_id
+        SecureRandom.uuid
+      end
+
+      def request_id
+        Thread.current.thread_variable_get(:request_id)
+      end
+
+      def request_id=(id)
+        Thread.current.thread_variable_set(:request_id, id)
+      end
+
+      def debug(message, name = nil, id = nil)
         if @debug
-          request_id ||= Thread.current.thread_variable_get(:request_id)
-          puts "request_id: #{request_id}, message: #{message}"
+          id ||= request_id
+          puts "request_id: #{id}, message: #{message}"
         end
       end
 
-      def error(message, request_id = nil)
-        request_id ||= Thread.current.thread_variable_get(:request_id)
-        puts "request_id: #{request_id}, message: #{message}"
+      def error(message, id = nil)
+        id ||= request_id
+        puts "request_id: #{id}, message: #{message}"
       end
     end
   end
