@@ -46,6 +46,9 @@ class LodqaWS < Sinatra::Base
 	end
 
 	aget '/answer' do
+		debug = false # Change true to output debug log.
+
+		Lodqa::Logger.level = debug ? :debug : :info
 		parse_params
 
 		@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
@@ -93,7 +96,7 @@ class LodqaWS < Sinatra::Base
 				@message = 'Dictionary lookup error!'
 				body erb(:error_before_answer)
 			rescue => e
-				Lodqa::Logger.error message: e.message, trace: e.backtrace
+				Lodqa::Logger.error e
 				response.status = 500
 				body e.message
 			end
@@ -176,7 +179,7 @@ class LodqaWS < Sinatra::Base
 		rescue JSON::ParserError => e
 			[500, "Invalid JSON object from the client."]
 		rescue => e
-			Lodqa::Logger.error message: e.message, trace: e.backtrace
+			Lodqa::Logger.error e
 			[500, e.message]
 		end
 	end

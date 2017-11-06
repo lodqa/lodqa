@@ -97,7 +97,7 @@ class GraphFinder
           proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
         end
       rescue Net::HTTP::Persistent::Error => e
-        Lodqa::Logger.error "Sparql Timeout: #{e}"
+        Lodqa::Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
 
         # Send back error
         if proc_solution

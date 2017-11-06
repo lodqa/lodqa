@@ -9,7 +9,7 @@ module Lodqa
       def start(ws, options)
         # Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
         request_id = Logger.generate_request_id
-        Logger.debug("Request start #{options[:name]}", request_id)
+        Logger.debug "Request start #{options[:name]}", request_id
 
         lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options)
         channel = SourceChannel.new ws, options[:name]
@@ -38,7 +38,7 @@ module Lodqa
               -> (data) { channel.send(solution: data) }
             )
           rescue => e
-            Logger.error "error: #{e.inspect}, backtrace: #{e.backtrace}, data: #{recieve_data}"
+            Logger.error e, data: recieve_data
             channel.error e
           ensure
             channel.close

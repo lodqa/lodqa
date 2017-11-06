@@ -43,8 +43,10 @@ class Lodqa::Lodqa
             .queries
             .each { |q| y << q[:sparql] }
         end
+      rescue OpenSSL::SSL::SSLError => e
+        Lodqa::Logger.debug 'Sparql SSL connection failed', error_message: e.message
       rescue => e
-        Lodqa::Logger.error message: e.message, trace: e.backtrace
+        Lodqa::Logger.error e
       end
     end
   end

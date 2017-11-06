@@ -19,16 +19,27 @@ module Lodqa
         Thread.current.thread_variable_set(:request_id, id)
       end
 
-      def debug(message, name = nil, id = nil)
+      def debug(message, id = nil, **rest)
         if @debug
-          id ||= request_id
-          puts "request_id: #{id}, message: #{message}"
+          puts "#{{
+            level: 'DEBUG',
+            request_id: id || request_id,
+            message: message
+          }
+          .merge(rest)
+          .to_json}"
         end
       end
 
-      def error(message, id = nil)
-        id ||= request_id
-        puts "request_id: #{id}, message: #{message}"
+      def error(error, **rest)
+        error_info = {
+          level: 'ERROR',
+          request_id: request_id,
+          message: error.message,
+          trace: error.backtrace
+        }.merge(rest)
+
+        puts "#{error_info.to_json}"
       end
     end
   end
