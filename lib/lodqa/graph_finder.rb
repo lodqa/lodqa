@@ -27,30 +27,16 @@ class GraphFinder
   # It generates bgps by applying variation operations to the pgp.
   # The option _max_hop_ specifies the maximum number of hops to be searched.
   def gen_bgps(pgp, max_hop = 1)
-    if @debug
-      puts "=== [Pseudo Graph Pattern] ====="
-      p pgp
-      puts "=== [Maximum number of hops]: #{max_hop} ====="
-    end
+    Lodqa::Logger.debug "=== [Pseudo Graph Pattern] =====\n#{pgp}\n=== [Maximum number of hops]: #{max_hop} ====="
 
     bgps = generate_instantiation_variations(pgp)
-    if @debug
-      puts "=== [instantiation variations] ====="
-      bgps.each {|bgp| pp bgp}
-    end
+    Lodqa::Logger.debug "=== [instantiation variations] =====\n#{bgps}"
 
     bgps = generate_split_variations(bgps, max_hop)
-
-    if @debug
-      puts "=== [split variations] ====="
-      bgps.each {|bgp| p bgp}
-    end
+    Lodqa::Logger.debug "=== [split variations] =====\n#{bgps}"
 
     bgps = generate_inverse_variations(bgps)
-    if @debug
-      puts "=== [inverse variations] ====="
-      bgps.each {|bgp| p bgp}
-    end
+    Lodqa::Logger.debug "=== [inverse variations] =====\n#{bgps}"
 
     bgps
   end
@@ -64,10 +50,7 @@ class GraphFinder
       begin
         result = @endpoint.query(sparql)
       rescue => detail
-        if @debug
-          p detail
-          puts "==========\n"
-        end
+        Lodqa::Logger.debug "#{detail}\n=========="
         sleep(2)
         next
         # print detail.backtrace.join("\n")
@@ -75,9 +58,7 @@ class GraphFinder
       result.each_solution do |solution|
         yield(solution)
       end
-      if @debug
-        puts "==========\n"
-      end
+      Lodqa::Logger.debug "=========="
       sleep(2)
     end
   end
