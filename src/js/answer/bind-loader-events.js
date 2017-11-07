@@ -4,12 +4,12 @@ const DownloadButton = require('../presentation/download-button')
 const DownloadTsvButton = require('../presentation/download-tsv-button')
 const ProgressBarPresentation = require('../presentation/progress-bar-presentation')
 
-module.exports = function bindLoaderEvents(loader, model, parent, name, answerIndexDomSelector) {
+module.exports = function bindLoaderEvents(loader, model, parent, name, selectors) {
   const bindResult = new BindResult(loader.eventEmitter)
-  const answerIndexPresentation = new AnswerIndexPresentation(parent, answerIndexDomSelector)
-  const downloadJsonButton = new DownloadButton(parent, '.answers-for-dataset__download-json-button', (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
-  const downloadTsvButton = new DownloadTsvButton(parent, '.answers-for-dataset__download-tsv-button', (button) => button.updateContent(model.labelAndUrls))
-  const progressBarPresentation = new ProgressBarPresentation(parent.querySelector('.answers-for-dataset__progress-bar'), name)
+  const answerIndexPresentation = new AnswerIndexPresentation(parent, selectors.answerIndexDomSelector)
+  const downloadJsonButton = new DownloadButton(parent, selectors.downloadJsonButtonSelector, (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
+  const downloadTsvButton = new DownloadTsvButton(parent, selectors.downloadTsvButtonSelector, (button) => button.updateContent(model.labelAndUrls))
+  const progressBarPresentation = new ProgressBarPresentation(parent.querySelector(selectors.progressBarSelector), name)
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
   model.onAnswerChange = () => downloadJsonButton.updateLength(model.answers.length)
