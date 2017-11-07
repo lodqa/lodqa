@@ -3,9 +3,9 @@ const DetailProgressBar = require('./detail-progress-bar')
 const bindHandlerToCheckbox = require('./bind-handler-to-checkbox')
 
 module.exports = class {
-  constructor(name, parent, domSelector) {
+  constructor(dom, name = '') {
+    this.dom = dom
     this.name = name
-    this.dom = parent.querySelector(`${domSelector}`)
   }
 
   show(sparqls, onChcekChange) {

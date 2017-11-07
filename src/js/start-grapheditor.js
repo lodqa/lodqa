@@ -11,7 +11,7 @@ function init() {
   const isVerbose = {
     value: false
   }
-  const progressBarPresentation = new ProgressBarPresentation('name', document, '#progress-bar')
+  const progressBarPresentation = new ProgressBarPresentation(document.querySelector('#progress-bar'))
 
   bindLoaderEvents(loader, 'lodqa-results', 'lodqa-messages', isVerbose, progressBarPresentation)
   bindSearchButton(loader)
