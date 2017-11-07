@@ -1,8 +1,6 @@
+const SimpleProgressBar = require('./simple-progress-bar')
+const DetailProgressBar = require('./detail-progress-bar')
 const bindHandlerToCheckbox = require('./bind-handler-to-checkbox')
-const show = require('./show')
-const progressDetail = require('./progress-detail')
-const progressSimple = require('./progress-simple')
-const stop = require('./stop')
 
 module.exports = class {
   constructor(name, parent, domSelector) {
@@ -11,30 +9,26 @@ module.exports = class {
   }
 
   show(sparqls, onChcekChange) {
-    show(this.dom, this.name, sparqls.length, onChcekChange)
+    // Clear old components.
+    this.dom.innerHTML = ''
+
+    // Append new components
+    const simpleProgressBar = new SimpleProgressBar(this.dom, this.name, sparqls.length)
+    const detailProgressBar = new DetailProgressBar(this.dom, this.name, sparqls.length, onChcekChange)
 
     // To switch showing detail of progress
-    bindHandlerToCheckbox(this.dom, '.show-detail-progress-bar', () => this.toggleDetail())
-    // To switch appearance of sparqls
-    bindHandlerToCheckbox(this.dom, '.show-only-has-answers', () => this.toggleShowOnlyHasAnswers())
+    bindHandlerToCheckbox(simpleProgressBar.dom, '.show-detail-progress-bar', () => detailProgressBar.toggleDetail())
+
+    this.simpleProgressBar = simpleProgressBar
+    this.detailProgressBar = detailProgressBar
   }
 
   progress(solutions, sparqlCount, focusNode, sparqlTimeout) {
-    progressSimple(this.dom, sparqlCount)
-    progressDetail(this.dom, solutions, sparqlCount, focusNode, sparqlTimeout)
+    this.simpleProgressBar.progress(sparqlCount)
+    this.detailProgressBar.progress(solutions, sparqlCount, focusNode, sparqlTimeout)
   }
 
   stop(sparqlCount, errorMessage) {
-    stop(this.dom, sparqlCount, errorMessage)
-  }
-
-  toggleShowOnlyHasAnswers() {
-    this.dom.querySelector('.progress-bar__detail-progress-bar')
-      .classList.toggle('progress-bar__detail-progress-bar--show-only-has-answers')
-  }
-
-  toggleDetail() {
-    this.dom.querySelector('.progress-bar__detail-progress-bar')
-      .classList.toggle('progress-bar__detail-progress-bar--hidden')
+    this.detailProgressBar.stop(sparqlCount, errorMessage)
   }
 }

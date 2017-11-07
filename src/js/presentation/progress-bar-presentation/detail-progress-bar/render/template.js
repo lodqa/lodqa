@@ -1,22 +1,9 @@
 const handlebars = require('handlebars')
-const registerPartial = require('../../../answer/register-partial')
+const registerPartial = require('../../../../answer/register-partial')
 
 registerPartial()
 
-const template = handlebars.compile(`
-  <div class="progress-bar__simple-progress-bar">
-    {{#if sparqls}}
-      <progress class="progress-bar__simple-progress-bar__progress" value="0" max="{{sparqls.length}}"></progress>
-      <span class="progress-bar__simple-progress-bar__percentage">0%</span>
-    {{else}}
-      <progress class="progress-bar__simple-progress-bar__progress"></progress>
-      <span class="progress-bar__simple-progress-bar__percentage">100%</span>
-    {{/if}}
-    <span class="progress-bar__simple-progress-bar__show-detail-checkbox">
-      <input type="checkbox" id="show-detail-progress-bar-{{name}}" class="show-detail-progress-bar">
-      <label for="show-detail-progress-bar-{{name}}">Details</label>
-    </span>
-  </div>
+module.exports = handlebars.compile(`
   <div class="progress-bar__detail-progress-bar progress-bar__detail-progress-bar--hidden">
     <div>
         <input type="checkbox" id="show-only-has-answers-{{name}}" class="show-only-has-answers">
@@ -36,22 +23,3 @@ const template = handlebars.compile(`
     </ul>
   </div>
 `)
-
-module.exports = function(dom, name, viewModel, onChange) {
-  const element = dom
-
-  element
-    .innerHTML = template({
-      name,
-      sparqls: viewModel
-    })
-
-  // Bind an event handler on change events of checkboxes.
-  element.addEventListener('change', (e) => {
-    const sparql = e.target.closest('.progress-bar__detail-progress-bar__sparqls__sparql')
-
-    if (sparql) {
-      onChange(sparql.getAttribute('data-sparql-number'), !e.target.checked)
-    }
-  })
-}

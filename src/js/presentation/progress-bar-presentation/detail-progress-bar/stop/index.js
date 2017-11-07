@@ -2,7 +2,7 @@ const getCurrentSparql = require('../get-current-sparql')
 const showError = require('../show-error')
 const getNumberOfAnswers = require('../get-number-of-answers')
 
-module.exports = function stop(dom, sparqlCount, errorMessage = '') {
+module.exports = function(dom, sparqlCount, errorMessage = '') {
   // The sparql count must be incremented because the next solution is not arrived yet.
   const current = getCurrentSparql(dom, sparqlCount + 1)
 
