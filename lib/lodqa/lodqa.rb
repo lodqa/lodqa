@@ -47,6 +47,7 @@ class Lodqa::Lodqa
         Lodqa::Logger.debug 'Sparql SSL connection failed', error_message: e.message
       rescue => e
         Lodqa::Logger.error e
+        raise e
       end
     end
   end
