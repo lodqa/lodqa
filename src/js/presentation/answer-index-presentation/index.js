@@ -17,9 +17,9 @@ module.exports = class {
       })
   }
 
-  updateDisplay(model) {
-    this.answers = model.answers
-    this._pagination.items = model.answers
+  updateDisplay(answers) {
+    this.answers = answers
+    this._pagination.items = answers
 
     updateDisplay(this._dom, this._pagination.dump)
   }

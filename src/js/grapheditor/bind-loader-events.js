@@ -10,6 +10,21 @@ module.exports = function(loader, resultDomId, progressDomId, isVerbose, progres
   const bindResult = new BindResult(loader.eventEmitter)
   const loadingPresentation = LoadingPresentation(progressDomId)
 
+  model.on('sparql_reset_event', (sparqls) => loadingPresentation.setTotal(sparqls.length))
+  model.on('sparql_reset_event', (sparqls) => progressBarPresentation.show(
+    sparqls,
+    (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
+  ))
+  model.on('anchored_pgp_reset_event', (anchoredPgp) => anchoredPgpTablePresentation.showAnchoredPgp(resultDomId, anchoredPgp))
+  model.on('anchored_pgp_reset_event', (anchoredPgp) => answersPresentation.setAnchoredPgp(anchoredPgp))
+  model.on('solution_add_event', (solution) => {
+    if (solution.solutions.length !== 0 || isVerbose.value) {
+      sparqlPresentation.show(document.querySelector(`#${resultDomId}`), model.sparqlCount, solution.sparql, solution.sparql_timeout)
+    }
+  })
+  model.on('solution_add_event', (solution) => answersPresentation.showSolution(document.querySelector(`#${resultDomId}`), solution))
+  model.on('solution_add_event', loadingPresentation.updateProgress)
+  model.on('solution_add_event', (solution) => progressBarPresentation.progress(solution.solutions, model.sparqlCount, model.focus, solution.sparql_timeout))
 
   bindResult({
     ws_open: [
@@ -20,28 +35,13 @@ module.exports = function(loader, resultDomId, progressDomId, isVerbose, progres
       () => progressBarPresentation.stop(model.sparqlCount)
     ],
     sparqls: [
-      () => model.resetSpraqlCount(),
-      (sparqls) => loadingPresentation.setTotal(sparqls.length),
-      (sparqls) => progressBarPresentation.show(
-        sparqls,
-        (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
-      )
+      (sparqls) => model.sparqls = sparqls,
     ],
     anchored_pgp: [
-      (data) => anchoredPgpTablePresentation.showAnchoredPgp(resultDomId, data),
-      (data) => answersPresentation.setAnchoredPgp(data),
       (data) => model.anchoredPgp = data
     ],
     solution: [
-      () => model.incrementSparqlCount(),
-      (data) => {
-        if (data.solutions.length !== 0 || isVerbose.value) {
-          sparqlPresentation.show(document.querySelector(`#${resultDomId}`), model.sparqlCount, data.sparql, data.sparql_timeout)
-        }
-      },
-      (data) => answersPresentation.showSolution(document.querySelector(`#${resultDomId}`), data),
-      loadingPresentation.updateProgress,
-      (data) => progressBarPresentation.progress(data.solutions, model.sparqlCount, model.focus, data.sparql_timeout)
+      (newSolution) => model.addSolution(newSolution)
     ],
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data)

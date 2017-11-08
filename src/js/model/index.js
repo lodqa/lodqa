@@ -1,11 +1,15 @@
+const {EventEmitter} = require('events')
+
 const SparqlCount = require('./sparql-count')
 const getUniqAnswers = require('../answer/get-uniq-answers')
 const addAnswersOfSparql = require('./add-answers-of-sparql')
 const findLabel = require('../find-label')
 const filterVisibleAnswers = require('./filter-visible-answers')
 
-module.exports = class Model {
+module.exports = class Model extends EventEmitter {
   constructor(options) {
+    super()
+
     this.options = options
     this._sparqls = null
     this._sparqlCount = new SparqlCount()
@@ -18,20 +22,18 @@ module.exports = class Model {
 
     // The set of hide sparqls. This has only spraqlCount
     this._hideSparqls = new Set()
-
-    this._onAnswerChanges =[]
   }
 
   set sparqls(sparqls) {
     this._sparqls = sparqls
+    this._sparqlCount.reset()
+
+    this.emit('sparql_reset_event', sparqls)
   }
 
   set anchoredPgp(anchoredPgp) {
     this._anchoredPgp = anchoredPgp
-  }
-
-  set onAnswerChange(callback) {
-    this._onAnswerChanges.push(callback)
+    this.emit('anchored_pgp_reset_event', anchoredPgp)
   }
 
   get anchoredPgp() {
@@ -46,7 +48,7 @@ module.exports = class Model {
     return this._sparqlCount.count
   }
 
-  get answers() {
+  get answerIndex() {
     return filterVisibleAnswers(this._mergedAnswers, this._hideSparqls)
   }
 
@@ -62,14 +64,6 @@ module.exports = class Model {
       .solution
   }
 
-  resetSpraqlCount() {
-    this._sparqlCount.reset()
-  }
-
-  incrementSparqlCount() {
-    this._sparqlCount.increment()
-  }
-
   getSparql(sparqlCount) {
     return this._sparqls[sparqlCount - 1]
   }
@@ -78,12 +72,14 @@ module.exports = class Model {
     return this._solution.get(sparqlCount.toString())
   }
 
-  setSolution(solution) {
+  addSolution(solution) {
     this._sparqlCount.increment()
     this._solution.set(`${this.sparqlCount}`, {
       solution,
       anchoredPgp: this.anchoredPgp
     })
+
+    this.emit('solution_add_event', solution)
 
     const uniqAnswers = getUniqAnswers(this.currentSolution.solutions, this.focus)
 
@@ -93,9 +89,9 @@ module.exports = class Model {
       this.sparqlCount
     )
 
-    findLabel1(this, this.options)
+    this.emit('answer_index_add_event')
 
-    emit(this)
+    findLabelOfAnswers(this, this.options)
   }
 
   updateSparqlHideStatus(sparqlCount, isHide) {
@@ -105,24 +101,19 @@ module.exports = class Model {
       this._hideSparqls.delete(sparqlCount)
     }
 
-    emit(this)
+    this.emit('answer_index_update_event')
   }
 }
 
-function emit(model) {
-  model._onAnswerChanges.forEach((c) => c())
-}
-
-function findLabel1(model, options) {
+function findLabelOfAnswers(model, options) {
   const uniqAnswers = getUniqAnswers(model.currentSolution.solutions, model.focus)
 
   findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
-
     const answer = model._mergedAnswers.get(url)
 
     answer.label = label
     answer.labelFound = true
 
-    emit(model)
+    model.emit('label_update_event')
   }, options)
 }

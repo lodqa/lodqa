@@ -11,25 +11,26 @@ module.exports = function bindLoaderEvents(loader, model, parent, name, selector
   const downloadTsvButton = new DownloadTsvButton(parent.querySelector(selectors.downloadTsvButtonSelector), (button) => button.updateContent(model.labelAndUrls))
   const progressBarPresentation = new ProgressBarPresentation(parent.querySelector(selectors.progressBarSelector), name)
 
-  model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)
-  model.onAnswerChange = () => downloadJsonButton.updateLength(model.answers.length)
-  model.onAnswerChange = () => downloadTsvButton.updateLength(model.answers.length)
+  model.on('sparql_reset_event', (sparqls) =>  progressBarPresentation.show(
+    sparqls,
+    (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
+  ))
+  model.on('solution_add_event', () => progressBarPresentation.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparql_timeout))
+  model.on('answer_index_add_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
+  model.on('answer_index_add_event', () => downloadJsonButton.updateLength(model.answerIndex.length))
+  model.on('answer_index_add_event', () => downloadTsvButton.updateLength(model.answerIndex.length))
+  model.on('answer_index_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
+  model.on('label_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
 
   bindResult({
     sparqls: [
-      (newSparqls) => model.sparqls = newSparqls,
-      () => model.resetSpraqlCount(),
-      (sparqls) => progressBarPresentation.show(
-        sparqls,
-        (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
-      )
+      (newSparqls) => model.sparqls = newSparqls
     ],
     anchored_pgp: [
       (data) => model.anchoredPgp = data
     ],
     solution: [
-      (data) => model.setSolution(data),
-      () => progressBarPresentation.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparql_timeout)
+      (data) => model.addSolution(data)
     ],
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data),
