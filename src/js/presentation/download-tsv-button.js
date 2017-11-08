@@ -7,7 +7,7 @@ const template = handlebars.compile(`{{#each this}}
 `)
 
 module.exports = class extends DownloadButton{
-  constructor(parent, domSelector, onClick) {
-    super(parent, domSelector, onClick, template)
+  constructor(dom, onClick) {
+    super(dom, onClick, template)
   }
 }

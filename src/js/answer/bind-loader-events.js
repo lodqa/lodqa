@@ -7,8 +7,8 @@ const ProgressBarPresentation = require('../presentation/progress-bar-presentati
 module.exports = function bindLoaderEvents(loader, model, parent, name, selectors) {
   const bindResult = new BindResult(loader.eventEmitter)
   const answerIndexPresentation = new AnswerIndexPresentation(parent.querySelector(selectors.answerIndexDomSelector))
-  const downloadJsonButton = new DownloadButton(parent, selectors.downloadJsonButtonSelector, (button) => button.updateContent(model.labelAndUrls), (data) => JSON.stringify(data, null, 2))
-  const downloadTsvButton = new DownloadTsvButton(parent, selectors.downloadTsvButtonSelector, (button) => button.updateContent(model.labelAndUrls))
+  const downloadJsonButton = new DownloadButton(parent.querySelector(selectors.downloadJsonButtonSelector), (button) => button.updateContent(model.labelAndUrls))
+  const downloadTsvButton = new DownloadTsvButton(parent.querySelector(selectors.downloadTsvButtonSelector), (button) => button.updateContent(model.labelAndUrls))
   const progressBarPresentation = new ProgressBarPresentation(parent.querySelector(selectors.progressBarSelector), name)
 
   model.onAnswerChange = () => answerIndexPresentation.updateDisplay(model)

@@ -1,7 +1,6 @@
 module.exports = class {
-  constructor(parent, domSelector, onClick, formatter) {
-    this._domSelector = domSelector
-    this._dom = parent.querySelector(`${this._domSelector}`)
+  constructor(dom, onClick, formatter = defaultFormatter) {
+    this._dom = dom
     this._formatter = formatter
 
     this._dom.addEventListener('click', () => onClick(this))
@@ -22,4 +21,8 @@ module.exports = class {
 
 function setContent(button, data) {
   button.href = `data:,${encodeURIComponent(data)}`
+}
+
+function defaultFormatter(data) {
+  return JSON.stringify(data, null, 2)
 }
