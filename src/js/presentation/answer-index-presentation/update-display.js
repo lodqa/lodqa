@@ -31,7 +31,6 @@ const template = Handlebars.compile(`
   {{/if}}
 `)
 
-module.exports = function(parent, domSelector, pagination) {
-  parent.querySelector(`${domSelector}`)
-    .innerHTML = template(pagination)
+module.exports = function(dom, pagination) {
+  dom.innerHTML = template(pagination)
 }
