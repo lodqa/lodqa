@@ -9,13 +9,13 @@ const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventh
 
 for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   const name = parent.getAttribute('data-dataset')
-  const model = new Model({
+  const loader = new Loader()
+  const model = new Model(loader, {
     endpointUrl: parent.querySelector('.answers-for-dataset__endpoint-url')
       .value,
     needProxy: parent.querySelector('.answers-for-dataset__need-proxy')
       .value === 'true'
   })
-  const loader = new Loader()
 
   bindHandlerForKeyEvents(loader)
 

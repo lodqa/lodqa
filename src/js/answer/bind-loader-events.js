@@ -23,15 +23,6 @@ module.exports = function bindLoaderEvents(loader, model, parent, name, selector
   model.on('label_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
 
   bindResult({
-    sparqls: [
-      (newSparqls) => model.sparqls = newSparqls
-    ],
-    anchored_pgp: [
-      (data) => model.anchoredPgp = data
-    ],
-    solution: [
-      (data) => model.addSolution(data)
-    ],
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data),
       (data) => console.error(data)

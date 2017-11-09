@@ -1,14 +1,16 @@
 const {EventEmitter} = require('events')
-
 const SparqlCount = require('./sparql-count')
 const getUniqAnswers = require('../answer/get-uniq-answers')
 const addAnswersOfSparql = require('./add-answers-of-sparql')
-const findLabel = require('../find-label')
 const filterVisibleAnswers = require('./filter-visible-answers')
+const bindModelToLoader = require('./bind-model-to-loader')
+const findLabelOfAnswers = require('./find-label-of-answers')
 
 module.exports = class Model extends EventEmitter {
-  constructor(options) {
+  constructor(loader, options) {
     super()
+
+    bindModelToLoader(loader, this)
 
     this.options = options
     this._sparqls = null
@@ -103,17 +105,4 @@ module.exports = class Model extends EventEmitter {
 
     this.emit('answer_index_update_event')
   }
-}
-
-function findLabelOfAnswers(model, options) {
-  const uniqAnswers = getUniqAnswers(model.currentSolution.solutions, model.focus)
-
-  findLabel(uniqAnswers.map((answer) => answer.url), (url, label) => {
-    const answer = model._mergedAnswers.get(url)
-
-    answer.label = label
-    answer.labelFound = true
-
-    model.emit('label_update_event')
-  }, options)
 }

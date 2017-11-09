@@ -6,7 +6,7 @@ const answersPresentation = require('../presentation/answers-presentation')
 const sparqlPresentation = require('../presentation/sparql-presentation')
 
 module.exports = function(loader, resultDomId, progressDomId, isVerbose, progressBarPresentation) {
-  const model = new Model()
+  const model = new Model(loader)
   const bindResult = new BindResult(loader)
   const loadingPresentation = LoadingPresentation(progressDomId)
 
@@ -33,15 +33,6 @@ module.exports = function(loader, resultDomId, progressDomId, isVerbose, progres
     ws_close: [
       loadingPresentation.hide,
       () => progressBarPresentation.stop(model.sparqlCount)
-    ],
-    sparqls: [
-      (sparqls) => model.sparqls = sparqls,
-    ],
-    anchored_pgp: [
-      (data) => model.anchoredPgp = data
-    ],
-    solution: [
-      (newSolution) => model.addSolution(newSolution)
     ],
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data)
