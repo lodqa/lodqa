@@ -1,4 +1,4 @@
-const bindResult = require('../controller/bind-result')
+const bindEvents = require('../controller/bind-events')
 const AnswerIndexPresentation = require('../presentation/answer-index-presentation')
 const DownloadButton = require('../presentation/download-button')
 const DownloadTsvButton = require('../presentation/download-tsv-button')
@@ -21,7 +21,7 @@ module.exports = function bindLoaderEvents(loader, model, parent, name, selector
   model.on('answer_index_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
   model.on('label_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
 
-  bindResult(loader, {
+  bindEvents(loader, {
     error: [
       (data) => progressBarPresentation.stop(model.sparqlCount, data),
       (data) => console.error(data)
