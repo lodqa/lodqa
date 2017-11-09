@@ -11,5 +11,5 @@ module.exports = function(event, loader, pgpElement, mappingsElement) {
     .value
 
   loader.beginSearch(pgp, mappings, '/solutions', target, readTimeout)
-  loader.eventEmitter.once('ws_close', () => event.target.removeAttribute('disabled'))
+  loader.once('ws_close', () => event.target.removeAttribute('disabled'))
 }

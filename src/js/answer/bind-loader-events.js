@@ -5,7 +5,7 @@ const DownloadTsvButton = require('../presentation/download-tsv-button')
 const ProgressBarPresentation = require('../presentation/progress-bar-presentation')
 
 module.exports = function bindLoaderEvents(loader, model, parent, name, selectors) {
-  const bindResult = new BindResult(loader.eventEmitter)
+  const bindResult = new BindResult(loader)
   const answerIndexPresentation = new AnswerIndexPresentation(parent.querySelector(selectors.answerIndexDomSelector))
   const downloadJsonButton = new DownloadButton(parent.querySelector(selectors.downloadJsonButtonSelector), (button) => button.updateContent(model.labelAndUrls))
   const downloadTsvButton = new DownloadTsvButton(parent.querySelector(selectors.downloadTsvButtonSelector), (button) => button.updateContent(model.labelAndUrls))

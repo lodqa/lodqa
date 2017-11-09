@@ -7,7 +7,7 @@ const sparqlPresentation = require('../presentation/sparql-presentation')
 
 module.exports = function(loader, resultDomId, progressDomId, isVerbose, progressBarPresentation) {
   const model = new Model()
-  const bindResult = new BindResult(loader.eventEmitter)
+  const bindResult = new BindResult(loader)
   const loadingPresentation = LoadingPresentation(progressDomId)
 
   model.on('sparql_reset_event', (sparqls) => loadingPresentation.setTotal(sparqls.length))
