@@ -1,22 +1,22 @@
-const events = [
-  'ws_open',
-  'ws_close',
-  'sparqls',
-  'anchored_pgp',
-  'solution',
-  'error'
-]
+// Bind callbacks to the eventEmitter.
+// An eventMap is excepted like:
+// {
+//   event1: [
+//     callback1,
+//     callback2
+//   ],
+//   event2: [
+//     callback1
+//   ]
+// }
+module.exports = function(eventEmitter, eventMap) {
+  for (const [event, callbacks] of new Map(Object.entries(eventMap)).entries()) {
+    if (!callbacks) {
+      return
+    }
 
-module.exports = function(eventEmitter) {
-  return (map) => {
-    for (const event of events) {
-      const callbacks = map[event]
-
-      if (callbacks) {
-        for (const callback of callbacks) {
-          eventEmitter.on(event, callback)
-        }
-      }
+    for (const callback of callbacks) {
+      eventEmitter.on(event, callback)
     }
   }
 }

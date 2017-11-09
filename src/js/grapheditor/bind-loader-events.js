@@ -1,5 +1,5 @@
 const Model = require('../model')
-const BindResult = require('../controller/bind-result')
+const bindResult = require('../controller/bind-result')
 const LoadingPresentation = require('../presentation/loading-presentation')
 const anchoredPgpTablePresentation = require('../presentation/anchored-pgp-table-presentation')
 const answersPresentation = require('../presentation/answers-presentation')
@@ -7,7 +7,6 @@ const sparqlPresentation = require('../presentation/sparql-presentation')
 
 module.exports = function(loader, resultDomId, progressDomId, isVerbose, progressBarPresentation) {
   const model = new Model(loader)
-  const bindResult = new BindResult(loader)
   const loadingPresentation = LoadingPresentation(progressDomId)
 
   model.on('sparql_reset_event', (sparqls) => loadingPresentation.setTotal(sparqls.length))
@@ -26,7 +25,7 @@ module.exports = function(loader, resultDomId, progressDomId, isVerbose, progres
   model.on('solution_add_event', loadingPresentation.updateProgress)
   model.on('solution_add_event', (solution) => progressBarPresentation.progress(solution.solutions, model.sparqlCount, model.focus, solution.sparql_timeout))
 
-  bindResult({
+  bindResult(loader, {
     ws_open: [
       loadingPresentation.show
     ],

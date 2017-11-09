@@ -1,8 +1,8 @@
-const BindResult = require('../controller/bind-result')
+const bindResult = require('../controller/bind-result')
 
 module.exports = function bindModelToLoader(loader, model) {
   // Bind self to loader
-  new BindResult(loader)({
+  bindResult(loader, {
     sparqls: [
       (sparqls) => model.sparqls = sparqls,
     ],
