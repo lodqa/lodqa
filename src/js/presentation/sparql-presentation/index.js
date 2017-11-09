@@ -1,7 +1,17 @@
 const createTable = require('./create-table')
 const createDom = require('../create-dom')
 
-class SparqlPresentation {
+module.exports = class {
+  constructor(resultDomId, isVerbose, model) {
+    model.on('solution_add_event',
+      (solution) => {
+        if (solution.solutions.length !== 0 || isVerbose.value) {
+          this.show(document.querySelector(`#${resultDomId}`), model.sparqlCount, solution.sparql, solution.sparql_timeout)
+        }
+      }
+    )
+  }
+
   show(dom, sparqlCount, sparql, sparql_timeout = null) {
     // Add line break to the sparql
     const formatedSparql = sparql
@@ -40,5 +50,3 @@ class SparqlPresentation {
     }
   }
 }
-
-module.exports = new SparqlPresentation

@@ -1,4 +1,5 @@
 const Loader = require('./loader/load-solution')
+const Model = require('./model')
 const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const bindLoaderEvents = require('./grapheditor/bind-loader-events')
@@ -11,9 +12,13 @@ function init() {
   const isVerbose = {
     value: false
   }
-  const progressBarPresentation = new ProgressBarPresentation(document.querySelector('#progress-bar'))
+  const model = new Model(loader)
+  const progressBarPresentation = new ProgressBarPresentation(
+    document.querySelector('#progress-bar'),
+    model
+  )
 
-  bindLoaderEvents(loader, 'lodqa-results', 'lodqa-messages', isVerbose, progressBarPresentation)
+  bindLoaderEvents(loader, 'lodqa-results', 'lodqa-messages', isVerbose, model, progressBarPresentation)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 

@@ -1,8 +1,9 @@
+const bindEvents = require('../../controller/bind-events')
 const updateDisplay = require('./update-display')
 const Pagenation = require('./Pagenation')
 
 module.exports = class {
-  constructor(dom) {
+  constructor(dom, model) {
     this._dom = dom
     this._pagination = new Pagenation(16)
 
@@ -15,6 +16,18 @@ module.exports = class {
           this.next()
         }
       })
+
+    bindEvents(model, {
+      'answer_index_add_event': [
+        () => this.updateDisplay(model.answerIndex),
+      ],
+      'answer_index_update_event': [
+        () => this.updateDisplay(model.answerIndex)
+      ],
+      'label_update_event': [
+        () => this.updateDisplay(model.answerIndex)
+      ]
+    })
   }
 
   updateDisplay(answers) {

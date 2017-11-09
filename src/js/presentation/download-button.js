@@ -1,9 +1,11 @@
 module.exports = class {
-  constructor(dom, onClick, formatter = defaultFormatter) {
+  constructor(dom, onClick, model, formatter = jsonFormatter) {
     this._dom = dom
     this._formatter = formatter
 
     this._dom.addEventListener('click', () => onClick(this))
+
+    model.on('answer_index_add_event',() => this.updateLength(model.answerIndex.length))
   }
 
   updateContent(labelAndUrls) {
@@ -23,6 +25,6 @@ function setContent(button, data) {
   button.href = `data:,${encodeURIComponent(data)}`
 }
 
-function defaultFormatter(data) {
+function jsonFormatter(data) {
   return JSON.stringify(data, null, 2)
 }

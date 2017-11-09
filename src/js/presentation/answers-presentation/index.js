@@ -7,7 +7,12 @@ const getUniqUrls = require('./get-uniq-urls')
 
 const privateData = {}
 
-class AnswersPresentation {
+module.exports = class {
+  constructor(resultDomId, model) {
+    model.on('anchored_pgp_reset_event', (anchoredPgp) => this.setAnchoredPgp(anchoredPgp))
+    model.on('solution_add_event', (solution) => this.showSolution(document.querySelector(`#${resultDomId}`), solution))
+  }
+
   setAnchoredPgp(anchored_pgp) {
     privateData.anchoredPgp = anchored_pgp
   }
@@ -36,5 +41,3 @@ class AnswersPresentation {
     })
   }
 }
-
-module.exports = new AnswersPresentation

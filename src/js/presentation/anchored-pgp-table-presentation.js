@@ -23,15 +23,22 @@ const template = handlebars.compile(`
   </div>
 `)
 
-module.exports = {
+module.exports = class {
+  constructor(resultDomId, model) {
+    model.on('anchored_pgp_reset_event', (anchoredPgp) => this.showAnchoredPgp(resultDomId, anchoredPgp))
+  }
+
   showAnchoredPgp(domId, anchored_pgp) {
     const nodes = Object.keys(anchored_pgp.nodes)
       .map((node_id) => toViewParameters(anchored_pgp, node_id))
       .reduce(toArray, [])
-    const table = template({nodes})
+    const table = template({
+      nodes
+    })
     const element = createDom(table)
 
-    document.querySelector(`#${domId}`).appendChild(element)
+    document.querySelector(`#${domId}`)
+      .appendChild(element)
   }
 }
 
