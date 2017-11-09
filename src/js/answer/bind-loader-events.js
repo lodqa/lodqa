@@ -10,16 +10,26 @@ module.exports = function bindLoaderEvents(loader, model, parent, name, selector
   const downloadTsvButton = new DownloadTsvButton(parent.querySelector(selectors.downloadTsvButtonSelector), (button) => button.updateContent(model.labelAndUrls))
   const progressBarPresentation = new ProgressBarPresentation(parent.querySelector(selectors.progressBarSelector), name)
 
-  model.on('sparql_reset_event', (sparqls) =>  progressBarPresentation.show(
-    sparqls,
-    (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
-  ))
-  model.on('solution_add_event', () => progressBarPresentation.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparql_timeout))
-  model.on('answer_index_add_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
-  model.on('answer_index_add_event', () => downloadJsonButton.updateLength(model.answerIndex.length))
-  model.on('answer_index_add_event', () => downloadTsvButton.updateLength(model.answerIndex.length))
-  model.on('answer_index_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
-  model.on('label_update_event', () => answerIndexPresentation.updateDisplay(model.answerIndex))
+  bindEvents(model, {
+    'sparql_reset_event': [(sparqls) =>  progressBarPresentation.show(
+      sparqls,
+      (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
+    )],
+    'solution_add_event': [
+      () => progressBarPresentation.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparql_timeout)
+    ],
+    'answer_index_add_event': [
+      () => answerIndexPresentation.updateDisplay(model.answerIndex),
+      () => downloadJsonButton.updateLength(model.answerIndex.length),
+      () => downloadTsvButton.updateLength(model.answerIndex.length)
+    ],
+    'answer_index_update_event': [
+      () => answerIndexPresentation.updateDisplay(model.answerIndex)
+    ],
+    'label_update_event': [
+      () => answerIndexPresentation.updateDisplay(model.answerIndex)
+    ]
+  })
 
   bindEvents(loader, {
     error: [
