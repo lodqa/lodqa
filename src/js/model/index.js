@@ -38,6 +38,10 @@ module.exports = class Model extends EventEmitter {
     this.emit('anchored_pgp_reset_event', anchoredPgp)
   }
 
+  set isVerbose(newValue) {
+    this.emit('is_verbose_update_event', newValue)
+  }
+
   get anchoredPgp() {
     return this._anchoredPgp
   }

@@ -9,15 +9,12 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
-  const isVerbose = {
-    value: false
-  }
   const model = new Model(loader, getEndpointInformationFromDom())
 
-  createPresentations('lodqa-results', 'lodqa-messages', isVerbose, model)
+  createPresentations('lodqa-results', 'lodqa-messages', model)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 
   const checkbox = document.querySelector('#verbose')
-  checkbox.addEventListener('change', (event) => isVerbose.value = event.target.checked)
+  checkbox.addEventListener('change', (event) => model.isVerbose = event.target.checked)
 }
