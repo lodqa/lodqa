@@ -25,7 +25,7 @@ const template = handlebars.compile(`
 
 module.exports = class {
   constructor(resultDomId, model) {
-    model.on('anchored_pgp_reset_event', (anchoredPgp) => this.showAnchoredPgp(resultDomId, anchoredPgp))
+    model.on('anchored_pgp_reset_event', () => this.showAnchoredPgp(resultDomId, model.anchoredPgp))
   }
 
   showAnchoredPgp(domId, anchored_pgp) {

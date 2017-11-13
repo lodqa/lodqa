@@ -8,17 +8,17 @@ module.exports = class {
     this.name = name
 
     // Bind Model's events
-    const onSparqlReset = (sparqls) => show(
+    const onSparqlReset = () => show(
       this,
       this.dom,
-      sparqls,
+      model.sparqlsMax,
       (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
     )
-    const onSolutionAdd = (currentSolution) => progress(
+    const onSolutionAdd = () => progress(
       this.simpleProgressBar,
       this.detailProgressBar,
-      currentSolution.solutions,
-      currentSolution.sparql_timeout,
+      model.currentSolution.solutions,
+      model.currentSolution.sparql_timeout,
       model.sparqlCount,
       model.focus
     )
@@ -34,13 +34,13 @@ module.exports = class {
   }
 }
 
-function show(progressBar, dom, sparqls, onChcekChange) {
+function show(progressBar, dom, max, onChcekChange) {
   // Clear old components.
   dom.innerHTML = ''
 
   // Append new components
-  const simpleProgressBar = new SimpleProgressBar(dom, this.name, sparqls.length)
-  const detailProgressBar = new DetailProgressBar(dom, this.name, sparqls.length, onChcekChange)
+  const simpleProgressBar = new SimpleProgressBar(dom, this.name, max)
+  const detailProgressBar = new DetailProgressBar(dom, this.name, max, onChcekChange)
 
   // To switch showing detail of progress
   bindHandlerToCheckbox(simpleProgressBar.dom, '.show-detail-progress-bar', () => detailProgressBar.toggleDetail())

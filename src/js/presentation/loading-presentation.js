@@ -5,9 +5,9 @@ module.exports = class {
     this._recieved = 0
 
     // Bind Model's events
-    const onSparqlReset = (sparqls) => {
-      this._total = sparqls.length
-      showProgress(this._element, 0, sparqls.length)
+    const onSparqlReset = () => {
+      this._total = model.sparqlsMax
+      showProgress(this._element, 0, model.sparqlsMax)
     }
     const onSolutionAdd = () => showProgress(
       this._element,

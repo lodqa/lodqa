@@ -26,32 +26,48 @@ module.exports = class Model extends EventEmitter {
     this._hideSparqls = new Set()
   }
 
+  // SPARQL
+  get sparqlCount() {
+    return this._sparqlCount.count
+  }
+
+  get sparqlsMax() {
+    return this._sparqls.length
+  }
+
+  getSparql(sparqlCount) {
+    return this._sparqls[sparqlCount - 1]
+  }
+
   set sparqls(sparqls) {
     this._sparqls = sparqls
     this._sparqlCount.reset()
 
-    this.emit('sparql_reset_event', sparqls)
+    this.emit('sparql_reset_event')
   }
 
-  set anchoredPgp(anchoredPgp) {
-    this._anchoredPgp = anchoredPgp
-    this.emit('anchored_pgp_reset_event', anchoredPgp)
-  }
-
-  set isVerbose(newValue) {
-    this.emit('is_verbose_update_event', newValue)
-  }
-
+  // AnchoerdPGP
   get anchoredPgp() {
     return this._anchoredPgp
   }
 
-  get focus() {
-    return this._anchoredPgp.focus
+  set anchoredPgp(anchoredPgp) {
+    this._anchoredPgp = anchoredPgp
+    this.emit('anchored_pgp_reset_event')
   }
 
-  get sparqlCount() {
-    return this._sparqlCount.count
+  // isVerbose
+  // Show SPARQLS without answers for debugging.
+  get isVerbose() {
+    return this._isVerbose
+  }
+  set isVerbose(newValue) {
+    this._isVerbose = newValue
+  }
+
+  // Others
+  get focus() {
+    return this._anchoredPgp.focus
   }
 
   get answerIndex() {
@@ -70,10 +86,6 @@ module.exports = class Model extends EventEmitter {
       .solution
   }
 
-  getSparql(sparqlCount) {
-    return this._sparqls[sparqlCount - 1]
-  }
-
   getSolution(sparqlCount) {
     return this._solution.get(sparqlCount.toString())
   }
@@ -85,7 +97,7 @@ module.exports = class Model extends EventEmitter {
       anchoredPgp: this.anchoredPgp
     })
 
-    this.emit('solution_add_event', solution)
+    this.emit('solution_add_event')
 
     const uniqAnswers = getUniqAnswers(this.currentSolution.solutions, this.focus)
 

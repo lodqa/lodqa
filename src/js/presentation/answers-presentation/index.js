@@ -11,8 +11,8 @@ module.exports = class {
   constructor(resultDomId, model, findLabelOptions) {
     this.findLabelOptions = findLabelOptions
 
-    model.on('anchored_pgp_reset_event', (anchoredPgp) => this.setAnchoredPgp(anchoredPgp))
-    model.on('solution_add_event', (solution) => this.showSolution(document.querySelector(`#${resultDomId}`), solution))
+    model.on('anchored_pgp_reset_event', () => this.setAnchoredPgp(model.anchoredPgp))
+    model.on('solution_add_event', () => this.showSolution(document.querySelector(`#${resultDomId}`), model.currentSolution))
   }
 
   setAnchoredPgp(anchored_pgp) {
