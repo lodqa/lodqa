@@ -1,6 +1,6 @@
 const handlebars = require('handlebars')
-const createDom = require('../../create-dom')
-const toAnswers = require('../../../to-answers')
+const createDom = require('../../../create-dom')
+const toAnswers = require('../../../../to-answers')
 
 const regionHtml = `<ul class="answers-region__answers-list">
   {{#answers}}

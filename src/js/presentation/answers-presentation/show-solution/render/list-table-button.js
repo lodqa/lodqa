@@ -1,4 +1,4 @@
-const createDom = require('../create-dom')
+const createDom = require('../../../create-dom')
 
 const regionHtml = `
   <input type="button" value="Table" class="answers-region__title__button"></input>

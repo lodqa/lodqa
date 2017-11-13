@@ -1,5 +1,5 @@
 /*global Springy:true*/
-const createDom = require('../../../create-dom')
+const createDom = require('../../../../create-dom')
 
 module.exports = function(options, className) {
   const element = createDom(`

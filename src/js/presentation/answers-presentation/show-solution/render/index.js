@@ -1,4 +1,4 @@
-const createDom = require('../create-dom')
+const createDom = require('../../../create-dom')
 const listTableButton = require('./list-table-button')
 const graphButton = require('./graph-button')
 

@@ -1,5 +1,5 @@
-const sparqlPresentation = require('../sparql-presentation')
-const answersPresentation = require('../answers-presentation')
+const sparqlPresentationShow = require('../sparql-presentation/show')
+const answersPresentationShow = require('../answers-presentation/show-solution')
 const bindClickOnSideOfLightBoxToCloseIt = require('./bind-click-on-side-of-lightbox-to-close-it')
 const bindOneKeyupHandler = require('../../answer/bind-one-keyup-handler')
 const doIfEsc = require('../../answer/do-if-esc')
@@ -31,11 +31,10 @@ module.exports = class {
         solution
       } = data
 
-      sparqlPresentation.show(content, sparqlCount, sparql, solution.sparql_timeout)
-      answersPresentation.setAnchoredPgp(anchoredPgp)
-      answersPresentation.showSolution(content, solution)
+      sparqlPresentationShow(content, sparqlCount, sparql, solution.sparql_timeout)
+      answersPresentationShow(content, anchoredPgp, solution)
     } else {
-      sparqlPresentation.show(content, sparqlCount, sparql)
+      sparqlPresentationShow(content, sparqlCount, sparql)
     }
   }
 }
