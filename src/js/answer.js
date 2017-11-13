@@ -3,7 +3,7 @@ const Model = require('./model')
 const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
 const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
-const bindLoaderEvents = require('./answer/bind-loader-events')
+const createPresentations = require('./answer/create-presentations')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
 
@@ -21,7 +21,7 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
 
   bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', model, loader)
 
-  bindLoaderEvents(model, parent, name, {
+  createPresentations(model, parent, name, {
     answerIndexDomSelector: '.answers-for-dataset__answer-index',
     downloadJsonButtonSelector: '.answers-for-dataset__download-json-button',
     downloadTsvButtonSelector: '.answers-for-dataset__download-tsv-button',
