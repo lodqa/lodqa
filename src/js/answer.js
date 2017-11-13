@@ -28,6 +28,8 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
     progressBarSelector: '.answers-for-dataset__progress-bar'
   })
 
+  loader.on('error', (data) => console.error(data))
+
   beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
 
   bindModeButtonEventhandler('grapheditor')

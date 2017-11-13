@@ -3,7 +3,6 @@ const Model = require('./model')
 const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const bindLoaderEvents = require('./grapheditor/bind-loader-events')
-const ProgressBarPresentation = require('./presentation/progress-bar-presentation')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
@@ -13,12 +12,8 @@ function init() {
     value: false
   }
   const model = new Model(loader)
-  const progressBarPresentation = new ProgressBarPresentation(
-    document.querySelector('#progress-bar'),
-    model
-  )
 
-  bindLoaderEvents(loader, 'lodqa-results', 'lodqa-messages', isVerbose, model, progressBarPresentation)
+  bindLoaderEvents(loader, 'lodqa-results', 'lodqa-messages', isVerbose, model)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 
