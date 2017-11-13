@@ -3,6 +3,7 @@ const Model = require('./model')
 const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const bindLoaderEvents = require('./grapheditor/bind-loader-events')
+const getEndpointInformationFromDom = require('./grapheditor/get-endpoint-information-from-dom')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
@@ -11,7 +12,7 @@ function init() {
   const isVerbose = {
     value: false
   }
-  const model = new Model(loader)
+  const model = new Model(loader, getEndpointInformationFromDom())
 
   bindLoaderEvents('lodqa-results', 'lodqa-messages', isVerbose, model)
   bindSearchButton(loader)

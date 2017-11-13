@@ -7,12 +7,12 @@ const bindModelToLoader = require('./bind-model-to-loader')
 const findLabelOfAnswers = require('./find-label-of-answers')
 
 module.exports = class Model extends EventEmitter {
-  constructor(loader, options) {
+  constructor(loader, findLabelOptions) {
     super()
 
     bindModelToLoader(loader, this)
 
-    this.options = options
+    this.findLabelOptions = findLabelOptions
     this._sparqls = null
     this._sparqlCount = new SparqlCount()
     this._anchoredPgp = null
@@ -93,7 +93,7 @@ module.exports = class Model extends EventEmitter {
 
     this.emit('answer_index_add_event')
 
-    findLabelOfAnswers(this, this.options)
+    findLabelOfAnswers(this, this.findLabelOptions)
   }
 
   updateSparqlHideStatus(sparqlCount, isHide) {

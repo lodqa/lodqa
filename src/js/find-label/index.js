@@ -1,5 +1,4 @@
 const LabelCache = require('./Label-cache')
-const getEndpointInformationFromDom = require('./get-endpoint-information-from-dom')
 const getLabelOfEachUrl = require('./get-label-of-each-url')
 
 const cache = new LabelCache()
@@ -22,12 +21,10 @@ const cache = new LabelCache()
 // The onFetch is a callback funciton.
 // It will be called whenever the label of a url will be get.
 // it is called with url and label as arguments.
-module.exports = function(urls, onFetch, options = {}) {
-  const {
-    endpointUrl,
-    needProxy
-  } = Object.assign(getEndpointInformationFromDom(), options)
-
+module.exports = function(urls, onFetch, {
+  endpointUrl,
+  needProxy
+}) {
   for (const url of urls) {
     getLabelOfEachUrl(cache, endpointUrl, url, needProxy, onFetch)
   }
