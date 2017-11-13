@@ -56,37 +56,14 @@ module.exports = class Model extends EventEmitter {
     this.emit('anchored_pgp_reset_event')
   }
 
-  // isVerbose
-  // Show SPARQLS without answers for debugging.
-  get isVerbose() {
-    return this._isVerbose
-  }
-  set isVerbose(newValue) {
-    this._isVerbose = newValue
-  }
-
-  // Others
-  get focus() {
-    return this._anchoredPgp.focus
-  }
-
-  get answerIndex() {
-    return filterVisibleAnswers(this._mergedAnswers, this._hideSparqls)
-  }
-
-  get labelAndUrls() {
-    return this.answers.map((s) => ({
-      label: s.label,
-      url: s.url
-    }))
-  }
-
+  // Solution
   get currentSolution() {
     return this.getSolution(this.sparqlCount)
       .solution
   }
 
   getSolution(sparqlCount) {
+    // Return solutions with anchoredPgp to show sparql detail in the serach page.
     return this._solution.get(sparqlCount.toString())
   }
 
@@ -110,6 +87,31 @@ module.exports = class Model extends EventEmitter {
     this.emit('answer_index_add_event')
 
     findLabelOfAnswers(this, this.findLabelOptions)
+  }
+
+  // isVerbose
+  // Show SPARQLS without answers for debugging.
+  get isVerbose() {
+    return this._isVerbose
+  }
+  set isVerbose(newValue) {
+    this._isVerbose = newValue
+  }
+
+  // Others
+  get focus() {
+    return this._anchoredPgp.focus
+  }
+
+  get answerIndex() {
+    return filterVisibleAnswers(this._mergedAnswers, this._hideSparqls)
+  }
+
+  get labelAndUrls() {
+    return this.answers.map((s) => ({
+      label: s.label,
+      url: s.url
+    }))
   }
 
   updateSparqlHideStatus(sparqlCount, isHide) {
