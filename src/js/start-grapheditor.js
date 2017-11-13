@@ -1,4 +1,4 @@
-const Loader = require('./loader/load-solution')
+const Loader = require('./loader')
 const Model = require('./model')
 const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')

@@ -1,5 +1,5 @@
 const Model = require('./model')
-const Loader = require('./loader/load-solution')
+const Loader = require('./loader')
 const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
 const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
