@@ -4,21 +4,22 @@ module.exports = class {
     this._total = 0
     this._recieved = 0
 
-    model.on('sparql_reset_event', (sparqls) => this.setTotal(sparqls.length))
-    model.on('solution_add_event', () => this.updateProgress())
+    const onSparqlReset = (sparqls) => {
+      this._total = sparqls.length
+      showProgress(this._element, 0, sparqls.length)
+    }
+    const onSolutionAdd = () => showProgress(
+      this._element,
+      ++this._recieved,
+      this._total
+    )
+
+    model.on('sparql_reset_event', onSparqlReset)
+    model.on('solution_add_event', onSolutionAdd)
   }
 
   show() {
     show(this._element)
-  }
-
-  setTotal(newTotal) {
-    this._total = newTotal
-    showProgress(this._element, 0, newTotal)
-  }
-
-  updateProgress() {
-    showProgress(this._element, ++this._recieved, this._total)
   }
 
   hide() {
