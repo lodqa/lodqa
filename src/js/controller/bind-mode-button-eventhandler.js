@@ -20,7 +20,6 @@ module.exports = function(pathname) {
 }
 
 function getTarget() {
-  console.log('hi');
   // A user can select the target at the expert mode.
   const element = document.querySelector('#target-value')
   if (element) {
