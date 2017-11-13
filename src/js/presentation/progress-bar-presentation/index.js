@@ -3,7 +3,7 @@ const DetailProgressBar = require('./detail-progress-bar')
 const bindHandlerToCheckbox = require('./bind-handler-to-checkbox')
 
 module.exports = class {
-  constructor(dom, model, loader, name = '') {
+  constructor(dom, model, name = '') {
     this.dom = dom
     this.name = name
 
@@ -25,10 +25,8 @@ module.exports = class {
 
     model.on('sparql_reset_event', onSparqlReset)
     model.on('solution_add_event', onSolutionAdd)
-
-    // Mind Loader's events
-    loader.on('error', (data) => this.stop(model.sparqlCount, data))
-    loader.on('ws_close', () => this.stop(model.sparqlCount))
+    model.on('error', (data) => this.stop(model.sparqlCount, data))
+    model.on('ws_close', () => this.stop(model.sparqlCount))
   }
 
   stop(sparqlCount, errorMessage) {

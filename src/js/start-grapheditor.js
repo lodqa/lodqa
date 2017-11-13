@@ -13,7 +13,7 @@ function init() {
   }
   const model = new Model(loader)
 
-  bindLoaderEvents(loader, 'lodqa-results', 'lodqa-messages', isVerbose, model)
+  bindLoaderEvents('lodqa-results', 'lodqa-messages', isVerbose, model)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 

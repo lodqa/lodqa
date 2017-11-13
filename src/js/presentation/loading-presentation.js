@@ -1,5 +1,5 @@
 module.exports = class {
-  constructor(domId, model, loader) {
+  constructor(domId, model) {
     this._element = document.getElementById(domId)
     this._total = 0
     this._recieved = 0
@@ -16,10 +16,8 @@ module.exports = class {
     )
     model.on('sparql_reset_event', onSparqlReset)
     model.on('solution_add_event', onSolutionAdd)
-
-    // Bind Loader's bindEvents
-    loader.on('ws_open', () => this.show())
-    loader.on('ws_close', () => this.hide())
+    model.on('ws_open', () => this.show())
+    model.on('ws_close', () => this.hide())
   }
 
   show() {

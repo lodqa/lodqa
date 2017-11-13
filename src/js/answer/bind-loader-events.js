@@ -3,7 +3,7 @@ const DownloadButton = require('../presentation/download-button')
 const DownloadTsvButton = require('../presentation/download-tsv-button')
 const ProgressBarPresentation = require('../presentation/progress-bar-presentation')
 
-module.exports = function(loader, model, parent, name, selectors) {
+module.exports = function(model, parent, name, selectors) {
   new AnswerIndexPresentation(parent.querySelector(selectors.answerIndexDomSelector), model)
   new DownloadButton(
     parent.querySelector(selectors.downloadJsonButtonSelector),
@@ -18,7 +18,6 @@ module.exports = function(loader, model, parent, name, selectors) {
   new ProgressBarPresentation(
     parent.querySelector(selectors.progressBarSelector),
     model,
-    loader,
     name
   )
 }
