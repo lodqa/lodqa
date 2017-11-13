@@ -1,4 +1,3 @@
-const bindEvents = require('../../controller/bind-events')
 const SimpleProgressBar = require('./simple-progress-bar')
 const DetailProgressBar = require('./detail-progress-bar')
 const bindHandlerToCheckbox = require('./bind-handler-to-checkbox')
@@ -8,38 +7,46 @@ module.exports = class {
     this.dom = dom
     this.name = name
 
-    bindEvents(model, {
-      'sparql_reset_event': [(sparqls) =>  this.show(
-        sparqls,
-        (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
-      )],
-      'solution_add_event': [
-        () => this.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparql_timeout)
-      ]
-    })
-  }
+    const onSparqlReset = (sparqls) => show(
+      this,
+      this.dom,
+      sparqls,
+      (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
+    )
+    const onSolutionAdd = (currentSolution) => progress(
+      this.simpleProgressBar,
+      this.detailProgressBar,
+      currentSolution.solutions,
+      currentSolution.sparql_timeout,
+      model.sparqlCount,
+      model.focus
+    )
 
-  show(sparqls, onChcekChange) {
-    // Clear old components.
-    this.dom.innerHTML = ''
-
-    // Append new components
-    const simpleProgressBar = new SimpleProgressBar(this.dom, this.name, sparqls.length)
-    const detailProgressBar = new DetailProgressBar(this.dom, this.name, sparqls.length, onChcekChange)
-
-    // To switch showing detail of progress
-    bindHandlerToCheckbox(simpleProgressBar.dom, '.show-detail-progress-bar', () => detailProgressBar.toggleDetail())
-
-    this.simpleProgressBar = simpleProgressBar
-    this.detailProgressBar = detailProgressBar
-  }
-
-  progress(solutions, sparqlCount, focusNode, sparqlTimeout) {
-    this.simpleProgressBar.progress(sparqlCount)
-    this.detailProgressBar.progress(solutions, sparqlCount, focusNode, sparqlTimeout)
+    model.on('sparql_reset_event', onSparqlReset)
+    model.on('solution_add_event', onSolutionAdd)
   }
 
   stop(sparqlCount, errorMessage) {
     this.detailProgressBar.stop(sparqlCount, errorMessage)
   }
+}
+
+function show(progressBar, dom, sparqls, onChcekChange) {
+  // Clear old components.
+  dom.innerHTML = ''
+
+  // Append new components
+  const simpleProgressBar = new SimpleProgressBar(dom, this.name, sparqls.length)
+  const detailProgressBar = new DetailProgressBar(dom, this.name, sparqls.length, onChcekChange)
+
+  // To switch showing detail of progress
+  bindHandlerToCheckbox(simpleProgressBar.dom, '.show-detail-progress-bar', () => detailProgressBar.toggleDetail())
+
+  progressBar.simpleProgressBar = simpleProgressBar
+  progressBar.detailProgressBar = detailProgressBar
+}
+
+function progress(simpleProgressBar, detailProgressBar, solutions, sparqlTimeout, sparqlCount, focusNode) {
+  simpleProgressBar.progress(sparqlCount)
+  detailProgressBar.progress(solutions, sparqlCount, focusNode, sparqlTimeout)
 }
