@@ -29,12 +29,15 @@ module.exports = class {
 
     model.on('sparql_reset_event', onSparqlReset)
     model.on('solution_add_event', onSolutionAdd)
-    model.on('error', (data) => this.stop(model.sparqlCount, data))
+    model.on('error', () => this.stop(model.sparqlCount, model.errorMessage))
     model.on('ws_close', () => this.stop(model.sparqlCount))
   }
 
   stop(sparqlCount, errorMessage) {
-    this._detailProgressBar.stop(sparqlCount, errorMessage)
+    // The _detailProgressBar does not exist when an error occurs before returning SPARQLs.
+    if(this._detailProgressBar){
+      this._detailProgressBar.stop(sparqlCount, errorMessage)
+    }
   }
 }
 

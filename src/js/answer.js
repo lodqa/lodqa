@@ -28,7 +28,7 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
     progressBarSelector: '.answers-for-dataset__progress-bar'
   }, name)
 
-  loader.on('error', (data) => console.error(data))
+  model.on('error', () => console.error(model.errorMessage))
 
   beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
 
