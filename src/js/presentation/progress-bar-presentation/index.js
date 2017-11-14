@@ -47,7 +47,7 @@ function show(dom, name, max, onChcekChange) {
 
   // Append new components
   const detailProgressBar = new DetailProgressBar(name, max, onChcekChange)
-  const simpleProgressBar = new SimpleProgressBar(name, max, detailProgressBar)
+  const simpleProgressBar = new SimpleProgressBar(name, max, () => detailProgressBar.toggleDetail())
   dom.appendChild(simpleProgressBar.dom)
   dom.appendChild(detailProgressBar.dom)
 
