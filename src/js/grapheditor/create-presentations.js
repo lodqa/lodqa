@@ -7,8 +7,8 @@ const getEndpointInformationFromDom = require('../grapheditor/get-endpoint-infor
 
 module.exports = function(resultDomId, progressDomId, model) {
   new AnchoredPgpTablePresentation(resultDomId, model)
+  new SparqlPresentation(resultDomId, model)
   new AnswersPresentation(resultDomId, model, getEndpointInformationFromDom())
   new LoadingPresentation(progressDomId, model)
   new ProgressBarPresentation(document.querySelector('#progress-bar'), model)
-  new SparqlPresentation(resultDomId, model)
 }
