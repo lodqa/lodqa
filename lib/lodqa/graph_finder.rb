@@ -84,6 +84,24 @@ class GraphFinder
         if proc_solution
           proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
         end
+      rescue SPARQL::Client::ServerError => e
+        Lodqa::Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
+
+        # Send back error
+        if proc_solution
+          proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
+        end
+      rescue SocketError => e
+        # Should we try again?
+        Lodqa::Logger.debug 'Socekt Error', error_messsage: e.message, trace: e.backtrace
+
+        # Send back error
+        if proc_solution
+          proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
+        end
+      rescue => e
+        puts "!!!!!! #{e.class}"
+        raise e
       ensure
         if proc_cancel_flag.call
           Lodqa::Logger.debug "Stop procedure after a sparql query ends"
