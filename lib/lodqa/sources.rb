@@ -26,6 +26,8 @@ module Lodqa
         Logger.request_id = Logger.generate_request_id
 
         applicants = select_db_that_can_answer_terms_of_all_nodes(applicants, pgp)
+        return  yield [] if applicants.empty?
+
         select_db_that_can_generate_at_least_one_sparql(applicants, pgp, read_timeout) { |dbs| yield dbs }
       end
 
