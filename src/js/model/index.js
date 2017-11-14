@@ -1,4 +1,6 @@
-const {EventEmitter} = require('events')
+const {
+  EventEmitter
+} = require('events')
 const SparqlCount = require('./sparql-count')
 const getUniqAnswers = require('../answer/get-uniq-answers')
 const addAnswersOfSparql = require('./add-answers-of-sparql')
@@ -86,7 +88,7 @@ module.exports = class Model extends EventEmitter {
 
     this.emit('answer_index_add_event')
 
-    findLabelOfAnswers(this, this.findLabelOptions)
+    findLabelOfAnswers(this, this.findLabelOptions, (url, label) => this.updateLabel(url, label))
   }
 
   // isVerbose
@@ -108,7 +110,7 @@ module.exports = class Model extends EventEmitter {
   }
 
   get labelAndUrls() {
-    return this.answers.map((s) => ({
+    return this.answerIndex.map((s) => ({
       label: s.label,
       url: s.url
     }))
@@ -122,5 +124,14 @@ module.exports = class Model extends EventEmitter {
     }
 
     this.emit('answer_index_update_event')
+  }
+
+  updateLabel(url, label) {
+    const answer = this._mergedAnswers.get(url)
+
+    if(answer.labelFound !== label){
+      answer.label = label
+      this.emit('label_update_event')
+    }
   }
 }

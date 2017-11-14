@@ -1,9 +1,30 @@
 const showSolution = require('./show-solution')
 
 module.exports = class {
-  constructor(resultDomId, model, findLabelOptions) {
-    this.findLabelOptions = findLabelOptions
+  constructor(resultDomId, model) {
+    this._components = []
 
-    model.on('solution_add_event', () => showSolution(document.querySelector(`#${resultDomId}`), model.anchoredPgp, model.currentSolution, findLabelOptions))
+    model.on('solution_add_event', () => this._components = this._components.concat(
+      showSolution(
+        document.querySelector(`#${resultDomId}`),
+        model.anchoredPgp,
+        model.currentSolution
+      )
+    ))
+
+    model.on('label_update_event', () => {
+      model.labelAndUrls.forEach(({
+        label,
+        url
+      }) => {
+        this._components
+          .forEach(c => {
+            // Elements of _components may be undefined when the SPARQL has no answers.
+            if (c && c.updateLabel) {
+              c.updateLabel(url, label)
+            }
+          })
+      })
+    })
   }
 }
