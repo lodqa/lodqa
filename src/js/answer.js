@@ -21,12 +21,12 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
 
   bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', model, loader)
 
-  createPresentations(model, parent, name, {
+  createPresentations(model, parent, {
     answerIndexDomSelector: '.answers-for-dataset__answer-index',
     downloadJsonButtonSelector: '.answers-for-dataset__download-json-button',
     downloadTsvButtonSelector: '.answers-for-dataset__download-tsv-button',
     progressBarSelector: '.answers-for-dataset__progress-bar'
-  })
+  }, name)
 
   loader.on('error', (data) => console.error(data))
 

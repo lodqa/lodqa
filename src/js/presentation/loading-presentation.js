@@ -1,6 +1,6 @@
 module.exports = class {
-  constructor(domId, model) {
-    this._element = document.getElementById(domId)
+  constructor(dom, model) {
+    this._element = dom
     this._total = 0
     this._recieved = 0
 

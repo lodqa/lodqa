@@ -11,7 +11,11 @@ function init() {
   const loader = new Loader()
   const model = new Model(loader, getEndpointInformationFromDom())
 
-  createPresentations('lodqa-results', 'lodqa-messages', model)
+  createPresentations(model, {
+    resultSelector: '#lodqa-results',
+    progressSelector: '#lodqa-messages',
+    progressBarSelector: '#progress-bar'
+  })
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 

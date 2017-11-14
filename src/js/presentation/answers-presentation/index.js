@@ -1,12 +1,12 @@
 const showSolution = require('./show-solution')
 
 module.exports = class {
-  constructor(resultDomId, model) {
+  constructor(dom, model) {
     this._components = []
 
     model.on('solution_add_event', () => this._components = this._components.concat(
       showSolution(
-        document.querySelector(`#${resultDomId}`),
+        dom,
         model.anchoredPgp,
         model.currentSolution
       )
