@@ -1,22 +1,26 @@
 const SimpleProgressBar = require('./simple-progress-bar')
 const DetailProgressBar = require('./detail-progress-bar')
-const bindHandlerToCheckbox = require('./bind-handler-to-checkbox')
 
 module.exports = class {
   constructor(dom, model, name = '') {
-    this.dom = dom
-    this.name = name
+    this._dom = dom
+    this._name = name
 
     // Bind Model's events
-    const onSparqlReset = () => show(
-      this,
-      this.dom,
-      model.sparqlsMax,
-      (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
-    )
+    const onSparqlReset = () => {
+      const [simpleProgressBar, detailProgressBar] = show(
+        this._dom,
+        this._name,
+        model.sparqlsMax,
+        (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
+      )
+
+      this._simpleProgressBar = simpleProgressBar
+      this._detailProgressBar = detailProgressBar
+    }
     const onSolutionAdd = () => progress(
-      this.simpleProgressBar,
-      this.detailProgressBar,
+      this._simpleProgressBar,
+      this._detailProgressBar,
       model.currentSolution.solutions,
       model.currentSolution.sparql_timeout,
       model.sparqlCount,
@@ -30,23 +34,21 @@ module.exports = class {
   }
 
   stop(sparqlCount, errorMessage) {
-    this.detailProgressBar.stop(sparqlCount, errorMessage)
+    this._detailProgressBar.stop(sparqlCount, errorMessage)
   }
 }
 
-function show(progressBar, dom, max, onChcekChange) {
+function show(dom, name, max, onChcekChange) {
   // Clear old components.
   dom.innerHTML = ''
 
   // Append new components
-  const simpleProgressBar = new SimpleProgressBar(dom, this.name, max)
-  const detailProgressBar = new DetailProgressBar(dom, this.name, max, onChcekChange)
+  const detailProgressBar = new DetailProgressBar(name, max, onChcekChange)
+  const simpleProgressBar = new SimpleProgressBar(name, max, detailProgressBar)
+  dom.appendChild(simpleProgressBar.dom)
+  dom.appendChild(detailProgressBar.dom)
 
-  // To switch showing detail of progress
-  bindHandlerToCheckbox(simpleProgressBar.dom, '.show-detail-progress-bar', () => detailProgressBar.toggleDetail())
-
-  progressBar.simpleProgressBar = simpleProgressBar
-  progressBar.detailProgressBar = detailProgressBar
+  return [simpleProgressBar, detailProgressBar]
 }
 
 function progress(simpleProgressBar, detailProgressBar, solutions, sparqlTimeout, sparqlCount, focusNode) {

@@ -1,14 +1,16 @@
 const render = require('./render')
 const progressSimple = require('./progress-simple')
+const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
 
 // Render all of the progress bar
 module.exports = class {
-  constructor(dom, name, total) {
-    const simpleProgressBar = render(name, total)
+  constructor(name, total, detailProgressBar) {
+    const dom = render(name, total)
 
-    dom.appendChild(simpleProgressBar)
+    this.dom = dom
 
-    this.dom = simpleProgressBar
+    // To switch showing detail of progress
+    bindHandlerToCheckbox(this.dom, '.show-detail-progress-bar', () => detailProgressBar.toggleDetail())
   }
 
   progress(sparqlCount) {
