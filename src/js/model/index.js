@@ -54,6 +54,7 @@ module.exports = class Model extends EventEmitter {
 
           return {
             sparqlNumber,
+            hasSolution: true,
             uniqAnswersLength,
             sparql_timeout
           }
@@ -63,12 +64,14 @@ module.exports = class Model extends EventEmitter {
         if (sparqlNumber === `${this.sparqlCount + 1}`) {
           return {
             sparqlNumber,
+            hasSolution: false,
             isProgress: true
           }
         }
 
         return {
-          sparqlNumber
+          sparqlNumber,
+          hasSolution: false,
         }
       })
   }
