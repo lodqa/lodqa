@@ -13,6 +13,10 @@ module.exports = class {
     bindHandlerToCheckbox(this.dom, '.show-detail-progress-bar', (event) => onClickDetailCheckbox(event.target.checked))
   }
 
+  set checked(value) {
+    this.dom.querySelector('.show-detail-progress-bar').checked = value 
+  }
+
   progress(sparqlCount) {
     progressSimple(this.dom, sparqlCount)
   }

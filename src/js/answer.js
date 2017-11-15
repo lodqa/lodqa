@@ -1,4 +1,5 @@
 const Loader = require('./loader')
+const IntegtatenDataset = require('./model/integratedDataset')
 const Dataset = require('./model/dataset')
 const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
@@ -6,6 +7,7 @@ const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const createPresentations = require('./answer/create-presentations')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
+const integratedDataset = new IntegtatenDataset()
 
 for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   const name = parent.getAttribute('data-dataset')
@@ -17,6 +19,8 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
       .value === 'true'
   })
 
+  integratedDataset.addDataset(name, dataset)
+
   bindHandlerForKeyEvents(loader)
 
   bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', dataset, loader)
@@ -26,7 +30,7 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
     downloadJsonButtonSelector: '.answers-for-dataset__download-json-button',
     downloadTsvButtonSelector: '.answers-for-dataset__download-tsv-button',
     progressBarSelector: '.answers-for-dataset__progress-bar'
-  }, name)
+  }, name, integratedDataset)
 
   dataset.on('error', () => console.error(dataset.errorMessage))
 

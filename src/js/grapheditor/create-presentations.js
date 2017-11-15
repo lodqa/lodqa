@@ -8,12 +8,12 @@ module.exports = function(dataset, {
   resultSelector,
   progressSelector,
   progressBarSelector
-}) {
+}, integratedDataset) {
   const resultDom = document.querySelector(resultSelector)
   new AnchoredPgpTablePresentation(resultDom, dataset)
   new SparqlPresentation(resultDom, dataset)
   new AnswersPresentation(resultDom, dataset)
 
   new LoadingPresentation(document.querySelector(progressSelector), dataset)
-  new ProgressBarPresentation(document.querySelector(progressBarSelector), dataset)
+  new ProgressBarPresentation(document.querySelector(progressBarSelector), integratedDataset, 'static', dataset)
 }

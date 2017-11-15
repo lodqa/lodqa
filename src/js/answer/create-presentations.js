@@ -8,7 +8,7 @@ module.exports = function(dataset, parent, {
   downloadJsonButtonSelector,
   downloadTsvButtonSelector,
   progressBarSelector
-}, name) {
+}, name, integratedDataset) {
   new AnswerIndexPresentation(
     parent.querySelector(answerIndexDomSelector),
     dataset
@@ -25,7 +25,8 @@ module.exports = function(dataset, parent, {
   )
   new ProgressBarPresentation(
     parent.querySelector(progressBarSelector),
-    dataset,
-    name
+    integratedDataset,
+    name,
+    dataset
   )
 }

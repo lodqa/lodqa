@@ -2,7 +2,7 @@ const SimpleProgressBar = require('./simple-progress-bar')
 const DetailProgressBar = require('./detail-progress-bar')
 
 module.exports = class {
-  constructor(dom, dataset, name = '') {
+  constructor(dom, integratedDataset, name, dataset) {
     this._dom = dom
     this._name = name
 
@@ -12,20 +12,33 @@ module.exports = class {
       listener: null
     }
     const onAnswerButtonClick = (sparqlNumber, isHide) => dataset.updateSparqlHideStatus(sparqlNumber, isHide)
-    const toggleDetailProgressBar = (isShow) => {
-      if (isShow) {
+    integratedDataset.on('dataset_displaying_detail_update_event', (selectedName, selectedDataset) => {
+      if (selectedName === name) {
         detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick)
-        detailProgressBar.instance.showCurrentStatus(dataset.currentStatusOfSparqls)
+        detailProgressBar.instance.showCurrentStatus(selectedDataset.currentStatusOfSparqls)
         dom.appendChild(detailProgressBar.instance.dom)
-        detailProgressBar.listner = () => detailProgressBar.instance.progress(dataset.currentUniqAnswersLength, dataset.sparqlCount, dataset.currentSolution.sparqlTimeout)
-        dataset.on('solution_add_event', detailProgressBar.listner)
+        detailProgressBar.listner = () => detailProgressBar.instance.progress(selectedDataset.currentUniqAnswersLength, selectedDataset.sparqlCount, selectedDataset.currentSolution.sparqlTimeout)
+        selectedDataset.on('solution_add_event', detailProgressBar.listner)
       } else {
-        dom.removeChild(detailProgressBar.instance.dom)
-        dataset.removeListener('solution_add_event', detailProgressBar.listner)
+        if (detailProgressBar.instance && detailProgressBar.instance.dom.parentElement) {
+          dom.removeChild(detailProgressBar.instance.dom)
+          dataset.removeListener('solution_add_event', detailProgressBar.listner)
+        }
+
+        if (this._simpleProgressBar) {
+          this._simpleProgressBar.checked = false
+        }
       }
-    }
+    })
 
     // Bind Model's events
+    const toggleDetailProgressBar = (isShow) => {
+      if (isShow) {
+        integratedDataset.displayingDetail = name
+      } else {
+        integratedDataset.displayingDetail = ''
+      }
+    }
     const onSparqlReset = () => {
       const simpleProgressBar = show(
         this._dom,
