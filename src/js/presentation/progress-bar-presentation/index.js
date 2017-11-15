@@ -6,26 +6,36 @@ module.exports = class {
     this._dom = dom
     this._name = name
 
+    // Setup the DetailProgressBar
+    const detailProgressBar = {
+      instance: null,
+      listener: null
+    }
+    const onAnswerButtonClick = (sparqlNumber, isHide) => model.updateSparqlHideStatus(sparqlNumber, isHide)
+    const toggleDetailProgressBar = (isShow) => {
+      if (isShow) {
+        detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick, model.currentStatusOfSparqls)
+        dom.appendChild(detailProgressBar.instance.dom)
+        detailProgressBar.listner = () => detailProgressBar.instance.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparqlTimeout)
+        model.on('solution_add_event', detailProgressBar.listner)
+      } else {
+        dom.removeChild(detailProgressBar.instance.dom)
+        model.removeListener('solution_add_event', detailProgressBar.listner)
+      }
+    }
+
     // Bind Model's events
     const onSparqlReset = () => {
-      const [simpleProgressBar, detailProgressBar] = show(
+      const simpleProgressBar = show(
         this._dom,
         this._name,
         model.sparqlsMax,
-        (sparqlCount, isHide) => model.updateSparqlHideStatus(sparqlCount, isHide)
+        toggleDetailProgressBar
       )
 
       this._simpleProgressBar = simpleProgressBar
-      this._detailProgressBar = detailProgressBar
     }
-    const onSolutionAdd = () => progress(
-      this._simpleProgressBar,
-      this._detailProgressBar,
-      model.currentSolution.solutions,
-      model.currentSolution.sparql_timeout,
-      model.sparqlCount,
-      model.focus
-    )
+    const onSolutionAdd = () => this._simpleProgressBar.progress(model.sparqlCount)
 
     model.on('sparql_reset_event', onSparqlReset)
     model.on('solution_add_event', onSolutionAdd)
@@ -35,26 +45,19 @@ module.exports = class {
 
   stop(sparqlCount, errorMessage) {
     // The _detailProgressBar does not exist when an error occurs before returning SPARQLs.
-    if(this._detailProgressBar){
+    if (this._detailProgressBar) {
       this._detailProgressBar.stop(sparqlCount, errorMessage)
     }
   }
 }
 
-function show(dom, name, max, onChcekChange) {
+function show(dom, name, max, onClickDetailCheckbox) {
   // Clear old components.
   dom.innerHTML = ''
 
   // Append new components
-  const detailProgressBar = new DetailProgressBar(name, max, onChcekChange)
-  const simpleProgressBar = new SimpleProgressBar(name, max, () => detailProgressBar.toggleDetail())
+  const simpleProgressBar = new SimpleProgressBar(name, max, onClickDetailCheckbox)
   dom.appendChild(simpleProgressBar.dom)
-  dom.appendChild(detailProgressBar.dom)
 
-  return [simpleProgressBar, detailProgressBar]
-}
-
-function progress(simpleProgressBar, detailProgressBar, solutions, sparqlTimeout, sparqlCount, focusNode) {
-  simpleProgressBar.progress(sparqlCount)
-  detailProgressBar.progress(solutions, sparqlCount, focusNode, sparqlTimeout)
+  return simpleProgressBar
 }

@@ -5,8 +5,8 @@ const stop = require('./stop')
 
 // Render all of the progress bar
 module.exports = class {
-  constructor(name, total, onChcekChange) {
-    const dom = render(name, total)
+  constructor(name, onChcekChange, currentStatusOfSparqls) {
+    const dom = render(name, currentStatusOfSparqls)
 
     // Bind an event handler on change events of checkboxes.
     dom.addEventListener('change', (e) => {
@@ -21,10 +21,6 @@ module.exports = class {
     bindHandlerToCheckbox(dom, '.show-only-has-answers', () => toggleShowOnlyHasAnswers(dom))
 
     this.dom = dom
-  }
-
-  toggleDetail() {
-    this.dom.classList.toggle('progress-bar__detail-progress-bar--hidden')
   }
 
   progress(solutions, sparqlCount, focusNode, sparqlTimeout) {
