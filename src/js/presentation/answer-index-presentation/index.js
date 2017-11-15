@@ -2,7 +2,7 @@ const updateDisplay = require('./update-display')
 const Pagenation = require('./Pagenation')
 
 module.exports = class {
-  constructor(dom, model) {
+  constructor(dom, dataset) {
     this._dom = dom
     this._pagination = new Pagenation(16)
 
@@ -16,9 +16,9 @@ module.exports = class {
         }
       })
 
-    model.on('answer_index_add_event', () => this.updateDisplay(model.answerIndex))
-    model.on('answer_index_update_event', () => this.updateDisplay(model.answerIndex))
-    model.on('label_update_event', () => this.updateDisplay(model.answerIndex))
+    dataset.on('answer_index_add_event', () => this.updateDisplay(dataset.answerIndex))
+    dataset.on('answer_index_update_event', () => this.updateDisplay(dataset.answerIndex))
+    dataset.on('label_update_event', () => this.updateDisplay(dataset.answerIndex))
   }
 
   updateDisplay(answers) {

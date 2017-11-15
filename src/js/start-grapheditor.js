@@ -1,5 +1,5 @@
 const Loader = require('./loader')
-const Model = require('./model')
+const Dataset = require('./model/dataset')
 const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const createPresentations = require('./grapheditor/create-presentations')
@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
-  const model = new Model(loader, getEndpointInformationFromDom())
+  const dataset = new Dataset(loader, getEndpointInformationFromDom())
 
-  createPresentations(model, {
+  createPresentations(dataset, {
     resultSelector: '#lodqa-results',
     progressSelector: '#lodqa-messages',
     progressBarSelector: '#progress-bar'
@@ -20,5 +20,5 @@ function init() {
   bindStopSearchButton(loader)
 
   const checkbox = document.querySelector('#verbose')
-  checkbox.addEventListener('change', (event) => model.isVerbose = event.target.checked)
+  checkbox.addEventListener('change', (event) => dataset.isVerbose = event.target.checked)
 }

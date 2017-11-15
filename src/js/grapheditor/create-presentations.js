@@ -4,16 +4,16 @@ const AnswersPresentation = require('../presentation/answers-presentation')
 const SparqlPresentation = require('../presentation/sparql-presentation')
 const ProgressBarPresentation = require('../presentation/progress-bar-presentation')
 
-module.exports = function(model, {
+module.exports = function(dataset, {
   resultSelector,
   progressSelector,
   progressBarSelector
 }) {
   const resultDom = document.querySelector(resultSelector)
-  new AnchoredPgpTablePresentation(resultDom, model)
-  new SparqlPresentation(resultDom, model)
-  new AnswersPresentation(resultDom, model)
+  new AnchoredPgpTablePresentation(resultDom, dataset)
+  new SparqlPresentation(resultDom, dataset)
+  new AnswersPresentation(resultDom, dataset)
 
-  new LoadingPresentation(document.querySelector(progressSelector), model)
-  new ProgressBarPresentation(document.querySelector(progressBarSelector), model)
+  new LoadingPresentation(document.querySelector(progressSelector), dataset)
+  new ProgressBarPresentation(document.querySelector(progressBarSelector), dataset)
 }

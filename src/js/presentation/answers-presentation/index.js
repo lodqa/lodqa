@@ -1,19 +1,19 @@
 const showSolution = require('./show-solution')
 
 module.exports = class {
-  constructor(dom, model) {
+  constructor(dom, dataset) {
     this._components = []
 
-    model.on('solution_add_event', () => this._components = this._components.concat(
+    dataset.on('solution_add_event', () => this._components = this._components.concat(
       showSolution(
         dom,
-        model.anchoredPgp,
-        model.currentSolution
+        dataset.anchoredPgp,
+        dataset.currentSolution
       )
     ))
 
-    model.on('label_update_event', () => {
-      model.labelAndUrls.forEach(({
+    dataset.on('label_update_event', () => {
+      dataset.labelAndUrls.forEach(({
         label,
         url
       }) => {

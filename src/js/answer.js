@@ -1,5 +1,5 @@
 const Loader = require('./loader')
-const Model = require('./model')
+const Dataset = require('./model/dataset')
 const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
 const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
@@ -10,7 +10,7 @@ const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventh
 for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   const name = parent.getAttribute('data-dataset')
   const loader = new Loader()
-  const model = new Model(loader, {
+  const dataset = new Dataset(loader, {
     endpointUrl: parent.querySelector('.answers-for-dataset__endpoint-url')
       .value,
     needProxy: parent.querySelector('.answers-for-dataset__need-proxy')
@@ -19,16 +19,16 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
 
   bindHandlerForKeyEvents(loader)
 
-  bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', model, loader)
+  bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', dataset, loader)
 
-  createPresentations(model, parent, {
+  createPresentations(dataset, parent, {
     answerIndexDomSelector: '.answers-for-dataset__answer-index',
     downloadJsonButtonSelector: '.answers-for-dataset__download-json-button',
     downloadTsvButtonSelector: '.answers-for-dataset__download-tsv-button',
     progressBarSelector: '.answers-for-dataset__progress-bar'
   }, name)
 
-  model.on('error', () => console.error(model.errorMessage))
+  dataset.on('error', () => console.error(dataset.errorMessage))
 
   beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
 

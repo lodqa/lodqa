@@ -1,11 +1,11 @@
 module.exports = class {
-  constructor(dom, onClick, model, formatter = jsonFormatter) {
+  constructor(dom, onClick, dataset, formatter = jsonFormatter) {
     this._dom = dom
     this._formatter = formatter
 
     this._dom.addEventListener('click', () => onClick(this))
 
-    model.on('answer_index_add_event',() => this.updateLength(model.answerIndex.length))
+    dataset.on('answer_index_add_event',() => this.updateLength(dataset.answerIndex.length))
   }
 
   updateContent(labelAndUrls) {

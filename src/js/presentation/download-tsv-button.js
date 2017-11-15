@@ -7,7 +7,7 @@ const tsvFormatter = handlebars.compile(`{{#each this}}
 `)
 
 module.exports = class extends DownloadButton{
-  constructor(dom, onClick, model) {
-    super(dom, onClick, model, tsvFormatter)
+  constructor(dom, onClick, dataset) {
+    super(dom, onClick, dataset, tsvFormatter)
   }
 }

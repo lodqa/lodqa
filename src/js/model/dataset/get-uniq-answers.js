@@ -1,4 +1,4 @@
-const toAnswers = require('../to-answers')
+const toAnswers = require('../../to-answers')
 
 module.exports = function(solutions, focus) {
   return Array

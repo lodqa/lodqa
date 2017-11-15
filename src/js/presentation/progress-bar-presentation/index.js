@@ -2,7 +2,7 @@ const SimpleProgressBar = require('./simple-progress-bar')
 const DetailProgressBar = require('./detail-progress-bar')
 
 module.exports = class {
-  constructor(dom, model, name = '') {
+  constructor(dom, dataset, name = '') {
     this._dom = dom
     this._name = name
 
@@ -11,17 +11,17 @@ module.exports = class {
       instance: null,
       listener: null
     }
-    const onAnswerButtonClick = (sparqlNumber, isHide) => model.updateSparqlHideStatus(sparqlNumber, isHide)
+    const onAnswerButtonClick = (sparqlNumber, isHide) => dataset.updateSparqlHideStatus(sparqlNumber, isHide)
     const toggleDetailProgressBar = (isShow) => {
       if (isShow) {
         detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick)
-        detailProgressBar.instance.showCurrentStatus(model.currentStatusOfSparqls)
+        detailProgressBar.instance.showCurrentStatus(dataset.currentStatusOfSparqls)
         dom.appendChild(detailProgressBar.instance.dom)
-        detailProgressBar.listner = () => detailProgressBar.instance.progress(model.currentUniqAnswersLength, model.sparqlCount, model.currentSolution.sparqlTimeout)
-        model.on('solution_add_event', detailProgressBar.listner)
+        detailProgressBar.listner = () => detailProgressBar.instance.progress(dataset.currentUniqAnswersLength, dataset.sparqlCount, dataset.currentSolution.sparqlTimeout)
+        dataset.on('solution_add_event', detailProgressBar.listner)
       } else {
         dom.removeChild(detailProgressBar.instance.dom)
-        model.removeListener('solution_add_event', detailProgressBar.listner)
+        dataset.removeListener('solution_add_event', detailProgressBar.listner)
       }
     }
 
@@ -30,18 +30,18 @@ module.exports = class {
       const simpleProgressBar = show(
         this._dom,
         this._name,
-        model.sparqlsMax,
+        dataset.sparqlsMax,
         toggleDetailProgressBar
       )
 
       this._simpleProgressBar = simpleProgressBar
     }
-    const onSolutionAdd = () => this._simpleProgressBar.progress(model.sparqlCount)
+    const onSolutionAdd = () => this._simpleProgressBar.progress(dataset.sparqlCount)
 
-    model.on('sparql_reset_event', onSparqlReset)
-    model.on('solution_add_event', onSolutionAdd)
-    model.on('error', () => this.stop(model.sparqlCount, model.errorMessage))
-    model.on('ws_close', () => this.stop(model.sparqlCount))
+    dataset.on('sparql_reset_event', onSparqlReset)
+    dataset.on('solution_add_event', onSolutionAdd)
+    dataset.on('error', () => this.stop(dataset.sparqlCount, dataset.errorMessage))
+    dataset.on('ws_close', () => this.stop(dataset.sparqlCount))
   }
 
   stop(sparqlCount, errorMessage) {
