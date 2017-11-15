@@ -5,6 +5,7 @@ const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const createPresentations = require('./grapheditor/create-presentations')
 const getEndpointInformationFromDom = require('./grapheditor/get-endpoint-information-from-dom')
+const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
@@ -14,11 +15,12 @@ function init() {
   const dataset = new Dataset(loader, getEndpointInformationFromDom())
   integratedDataset.addDataset('static', dataset)
 
-  createPresentations(dataset, {
+  const progressBarDom = createPresentations(dataset, {
     resultSelector: '#lodqa-results',
     progressSelector: '#lodqa-messages',
     progressBarSelector: '#progress-bar'
   }, integratedDataset)
+  bindDisplayingDetailUpdateEvent(progressBarDom, integratedDataset, 'static' , dataset)
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 

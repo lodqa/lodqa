@@ -1,4 +1,4 @@
-const createDom = require('../../create-dom')
+const createDom = require('../create-dom')
 const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
 const render = require('./render')
 const progressDetail = require('./progress-detail')

@@ -15,5 +15,5 @@ module.exports = function(dataset, {
   new AnswersPresentation(resultDom, dataset)
 
   new LoadingPresentation(document.querySelector(progressSelector), dataset)
-  new ProgressBarPresentation(document.querySelector(progressBarSelector), integratedDataset, 'static', dataset)
+  return new ProgressBarPresentation(document.querySelector(progressBarSelector), integratedDataset, 'static', dataset).dom
 }

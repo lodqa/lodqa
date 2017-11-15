@@ -1,6 +1,6 @@
 const render = require('./render')
 const progressSimple = require('./progress-simple')
-const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
+const bindHandlerToCheckbox = require('../../bind-handler-to-checkbox')
 
 // Render all of the progress bar
 module.exports = class {
@@ -14,7 +14,7 @@ module.exports = class {
   }
 
   set checked(value) {
-    this.dom.querySelector('.show-detail-progress-bar').checked = value 
+    this.dom.querySelector('.show-detail-progress-bar').checked = value
   }
 
   progress(sparqlCount) {

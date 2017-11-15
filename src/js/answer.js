@@ -6,6 +6,7 @@ const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
 const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const createPresentations = require('./answer/create-presentations')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
+const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
 
 const integratedDataset = new IntegtatenDataset()
 
@@ -32,9 +33,12 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
     progressBarSelector: '.answers-for-dataset__progress-bar'
   }, name, integratedDataset)
 
-  dataset.on('error', () => console.error(dataset.errorMessage))
+  bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, name, dataset)
+  bindHandlerToShowSparql(document, ['.detailProgressBar'], 'lightbox', dataset, loader)
 
   beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
 
   bindModeButtonEventhandler('grapheditor')
+
+  dataset.on('error', () => console.error(dataset.errorMessage))
 }
