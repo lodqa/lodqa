@@ -19,12 +19,19 @@ module.exports = class {
         detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick)
         detailProgressBar.instance.showCurrentStatus(selectedDataset.currentStatusOfSparqls)
         detailProgressBarHolder.appendChild(detailProgressBar.instance.dom)
-        detailProgressBar.listner = () => detailProgressBar.instance.progress(selectedDataset.currentUniqAnswersLength, selectedDataset.sparqlCount, selectedDataset.currentSolution.sparqlTimeout)
-        selectedDataset.on('solution_add_event', detailProgressBar.listner)
+        detailProgressBar.onSolutionAdd = () => detailProgressBar.instance.progress(selectedDataset.currentUniqAnswersLength, selectedDataset.sparqlCount, selectedDataset.currentSolution.sparqlTimeout)
+        selectedDataset.on('solution_add_event', detailProgressBar.onSolutionAdd)
+
+        detailProgressBar.onStop = () => detailProgressBar.instance.stop(selectedDataset.sparqlCount, selectedDataset.errorMessage)
+        selectedDataset.on('error', detailProgressBar.onStop)
+        selectedDataset.on('ws_close', detailProgressBar.onStop)
+
       } else {
         if (detailProgressBar.instance && detailProgressBar.instance.dom.parentElement) {
           detailProgressBarHolder.removeChild(detailProgressBar.instance.dom)
-          dataset.removeListener('solution_add_event', detailProgressBar.listner)
+          dataset.removeListener('solution_add_event', detailProgressBar.onSolutionAdd)
+          dataset.removeListener('error', detailProgressBar.onStop)
+          dataset.removeListener('ws_close', detailProgressBar.onStop)
         }
 
         if (this._simpleProgressBar) {
@@ -55,15 +62,6 @@ module.exports = class {
 
     dataset.on('sparql_reset_event', onSparqlReset)
     dataset.on('solution_add_event', onSolutionAdd)
-    dataset.on('error', () => this.stop(dataset.sparqlCount, dataset.errorMessage))
-    dataset.on('ws_close', () => this.stop(dataset.sparqlCount))
-  }
-
-  stop(sparqlCount, errorMessage) {
-    // The _detailProgressBar does not exist when an error occurs before returning SPARQLs.
-    if (this._detailProgressBar) {
-      this._detailProgressBar.stop(sparqlCount, errorMessage)
-    }
   }
 }
 
