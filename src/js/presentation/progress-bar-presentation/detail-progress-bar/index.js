@@ -30,7 +30,24 @@ module.exports = class {
     this.dom = dom
   }
 
-  showCurrentStatus(currentStatusOfSparqls){
+  set dataset(newDataset) {
+    if (newDataset) {
+      this._onSolutionAdd = () => this.progress(newDataset.currentUniqAnswersLength, newDataset.sparqlCount, newDataset.currentSolution.sparqlTimeout)
+      newDataset.on('solution_add_event', this._onSolutionAdd)
+
+      this._onStop = () => this.stop(newDataset.sparqlCount, newDataset.errorMessage)
+      newDataset.on('error', this._onStop)
+      newDataset.on('ws_close', this._onStop)
+
+      this._dataset = newDataset
+    } else {
+      this._dataset.removeListener('solution_add_event', this._onSolutionAdd)
+      this._dataset.removeListener('error', this._onStop)
+      this._dataset.removeListener('ws_close', this._onStop)
+    }
+  }
+
+  showCurrentStatus(currentStatusOfSparqls) {
     this.dom.appendChild(render(currentStatusOfSparqls))
   }
 

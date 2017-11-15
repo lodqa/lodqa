@@ -10,8 +10,7 @@ module.exports = class {
 
     // Setup the DetailProgressBar
     const detailProgressBar = {
-      instance: null,
-      listener: null
+      instance: null
     }
     const onAnswerButtonClick = (sparqlNumber, isHide) => dataset.updateSparqlHideStatus(sparqlNumber, isHide)
     integratedDataset.on('dataset_displaying_detail_update_event', (selectedName, selectedDataset) => {
@@ -19,19 +18,11 @@ module.exports = class {
         detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick)
         detailProgressBar.instance.showCurrentStatus(selectedDataset.currentStatusOfSparqls)
         detailProgressBarHolder.appendChild(detailProgressBar.instance.dom)
-        detailProgressBar.onSolutionAdd = () => detailProgressBar.instance.progress(selectedDataset.currentUniqAnswersLength, selectedDataset.sparqlCount, selectedDataset.currentSolution.sparqlTimeout)
-        selectedDataset.on('solution_add_event', detailProgressBar.onSolutionAdd)
-
-        detailProgressBar.onStop = () => detailProgressBar.instance.stop(selectedDataset.sparqlCount, selectedDataset.errorMessage)
-        selectedDataset.on('error', detailProgressBar.onStop)
-        selectedDataset.on('ws_close', detailProgressBar.onStop)
-
+        detailProgressBar.instance.dataset = selectedDataset
       } else {
         if (detailProgressBar.instance && detailProgressBar.instance.dom.parentElement) {
           detailProgressBarHolder.removeChild(detailProgressBar.instance.dom)
-          dataset.removeListener('solution_add_event', detailProgressBar.onSolutionAdd)
-          dataset.removeListener('error', detailProgressBar.onStop)
-          dataset.removeListener('ws_close', detailProgressBar.onStop)
+          detailProgressBar.instance.dataset = null
         }
 
         if (this._simpleProgressBar) {
