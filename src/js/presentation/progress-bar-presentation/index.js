@@ -2,9 +2,11 @@ const SimpleProgressBar = require('./simple-progress-bar')
 const DetailProgressBar = require('./detail-progress-bar')
 
 module.exports = class {
-  constructor(dom, integratedDataset, name, dataset) {
+  constructor(dom, integratedDataset, name, dataset, detailProgressBarDom) {
     this._dom = dom
     this._name = name
+
+    const detailProgressBarHolder = detailProgressBarDom || dom
 
     // Setup the DetailProgressBar
     const detailProgressBar = {
@@ -16,12 +18,12 @@ module.exports = class {
       if (selectedName === name) {
         detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick)
         detailProgressBar.instance.showCurrentStatus(selectedDataset.currentStatusOfSparqls)
-        dom.appendChild(detailProgressBar.instance.dom)
+        detailProgressBarHolder.appendChild(detailProgressBar.instance.dom)
         detailProgressBar.listner = () => detailProgressBar.instance.progress(selectedDataset.currentUniqAnswersLength, selectedDataset.sparqlCount, selectedDataset.currentSolution.sparqlTimeout)
         selectedDataset.on('solution_add_event', detailProgressBar.listner)
       } else {
         if (detailProgressBar.instance && detailProgressBar.instance.dom.parentElement) {
-          dom.removeChild(detailProgressBar.instance.dom)
+          detailProgressBarHolder.removeChild(detailProgressBar.instance.dom)
           dataset.removeListener('solution_add_event', detailProgressBar.listner)
         }
 

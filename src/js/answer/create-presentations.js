@@ -27,6 +27,7 @@ module.exports = function(dataset, parent, {
     parent.querySelector(progressBarSelector),
     integratedDataset,
     name,
-    dataset
+    dataset,
+    document.querySelector('.detailProgressBar')
   )
 }
