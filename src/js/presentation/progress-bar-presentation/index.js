@@ -14,7 +14,8 @@ module.exports = class {
     const onAnswerButtonClick = (sparqlNumber, isHide) => model.updateSparqlHideStatus(sparqlNumber, isHide)
     const toggleDetailProgressBar = (isShow) => {
       if (isShow) {
-        detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick, model.currentStatusOfSparqls)
+        detailProgressBar.instance = new DetailProgressBar(name, onAnswerButtonClick)
+        detailProgressBar.instance.showCurrentStatus(model.currentStatusOfSparqls)
         dom.appendChild(detailProgressBar.instance.dom)
         detailProgressBar.listner = () => detailProgressBar.instance.progress(model.currentSolution.solutions, model.sparqlCount, model.focus, model.currentSolution.sparqlTimeout)
         model.on('solution_add_event', detailProgressBar.listner)
