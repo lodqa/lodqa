@@ -37,6 +37,42 @@ module.exports = class Model extends EventEmitter {
     return this._sparqls.length
   }
 
+  // Return current status of SPARQLs
+  get currentStatusOfSparqls() {
+    return Array.from(Array(this.sparqlsMax))
+      .map((val, index) => {
+        const sparqlNumber = `${index + 1}`
+
+        // SPARQLs with solutions
+        if (this._solution.has(sparqlNumber)) {
+          const {
+            solution
+          } = this.getSolution(sparqlNumber)
+          const uniqAnswersLength = getUniqAnswers(solution.solutions, this.focus)
+            .length
+          const sparql_timeout = solution.spaqrl_timeout
+
+          return {
+            sparqlNumber,
+            uniqAnswersLength,
+            sparql_timeout
+          }
+        }
+
+        // The next SPARQL is progress
+        if (sparqlNumber === `${this.sparqlCount + 1}`) {
+          return {
+            sparqlNumber,
+            isProgress: true
+          }
+        }
+
+        return {
+          sparqlNumber
+        }
+      })
+  }
+
   getSparql(sparqlCount) {
     return this._sparqls[sparqlCount - 1]
   }
@@ -129,7 +165,7 @@ module.exports = class Model extends EventEmitter {
   updateLabel(url, label) {
     const answer = this._mergedAnswers.get(url)
 
-    if(answer.labelFound !== label){
+    if (answer.labelFound !== label) {
       answer.label = label
       this.emit('label_update_event')
     }
