@@ -2,7 +2,7 @@ const {
   EventEmitter
 } = require('events')
 const SparqlCount = require('./sparql-count')
-const getUniqAnswers = require('../answer/get-uniq-answers')
+const getUniqAnswers = require('./get-uniq-answers')
 const addAnswersOfSparql = require('./add-answers-of-sparql')
 const filterVisibleAnswers = require('./filter-visible-answers')
 const bindModelToLoader = require('./bind-model-to-loader')
@@ -101,6 +101,10 @@ module.exports = class Model extends EventEmitter {
   get currentSolution() {
     return this.getSolution(this.sparqlCount)
       .solution
+  }
+
+  get currentUniqAnswersLength () {
+    return getUniqAnswers(this.currentSolution.solutions, this.focus).length
   }
 
   getSolution(sparqlCount) {

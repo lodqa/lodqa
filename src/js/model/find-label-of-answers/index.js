@@ -1,4 +1,4 @@
-const getUniqAnswers = require('../../answer/get-uniq-answers')
+const getUniqAnswers = require('../get-uniq-answers')
 const findLabel = require('./find-label')
 
 module.exports = function(model, findLabelOptions, callback) {

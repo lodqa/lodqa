@@ -34,8 +34,8 @@ module.exports = class {
     this.dom.appendChild(render(currentStatusOfSparqls))
   }
 
-  progress(solutions, sparqlCount, focusNode, sparqlTimeout) {
-    progressDetail(this.dom, solutions, sparqlCount, focusNode, sparqlTimeout)
+  progress(uniqAnswersLength, sparqlCount, sparqlTimeout) {
+    progressDetail(this.dom, uniqAnswersLength, sparqlCount, sparqlTimeout)
   }
 
   stop(sparqlCount, errorMessage) {
