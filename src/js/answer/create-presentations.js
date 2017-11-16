@@ -1,14 +1,12 @@
 const AnswerIndexPresentation = require('../presentation/answer-index-presentation')
 const DownloadButton = require('../presentation/download-button')
 const DownloadTsvButton = require('../presentation/download-tsv-button')
-const ProgressBarPresentation = require('../presentation/progress-bar-presentation')
 
 module.exports = function(dataset, parent, {
   answerIndexDomSelector,
   downloadJsonButtonSelector,
-  downloadTsvButtonSelector,
-  progressBarSelector
-}, name, integratedDataset) {
+  downloadTsvButtonSelector
+}) {
   new AnswerIndexPresentation(
     parent.querySelector(answerIndexDomSelector),
     dataset
@@ -21,12 +19,6 @@ module.exports = function(dataset, parent, {
   new DownloadTsvButton(
     parent.querySelector(downloadTsvButtonSelector),
     (button) => button.updateContent(dataset.labelAndUrls),
-    dataset
-  )
-  new ProgressBarPresentation(
-    parent.querySelector(progressBarSelector),
-    integratedDataset,
-    name,
     dataset
   )
 }

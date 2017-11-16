@@ -5,6 +5,7 @@ const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const createPresentations = require('./grapheditor/create-presentations')
 const getEndpointInformationFromDom = require('./grapheditor/get-endpoint-information-from-dom')
+const createSimplpProgressBarOnSparqlReset = require('./controller/show-simple-progress-bar-on-sparql-reset')
 const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
@@ -15,12 +16,15 @@ function init() {
   const dataset = new Dataset(loader, getEndpointInformationFromDom())
   integratedDataset.addDataset('static', dataset)
 
-  const progressBarDom = createPresentations(dataset, {
+  createPresentations(dataset, {
     resultSelector: '#lodqa-results',
-    progressSelector: '#lodqa-messages',
-    progressBarSelector: '#progress-bar'
+    progressSelector: '#lodqa-messages'
   }, integratedDataset)
+
+  const progressBarDom = document.querySelector('#progress-bar')
+  createSimplpProgressBarOnSparqlReset(progressBarDom, integratedDataset, 'static', dataset)
   bindDisplayingDetailUpdateEvent(progressBarDom, integratedDataset, 'static' , dataset)
+
   bindSearchButton(loader)
   bindStopSearchButton(loader)
 
