@@ -75,10 +75,13 @@ module Lodqa
             # So we send SPARQL requests in parallel per endpoint.
             Async.defer do
               begin
-              applicant[:sparqls] = lodqa.sparqls.first
-              do_applicants_have_sparql[applicant[:name]] = true
+                applicant[:sparqls] = lodqa.sparqls.first
+                do_applicants_have_sparql[applicant[:name]] = true
 
-              yield applicants.select { |a| a[:sparqls] } if do_applicants_have_sparql.values.all?{ |has_sparql| has_sparql }
+                yield applicants.select { |a| a[:sparqls] } if do_applicants_have_sparql.values.all?{ |has_sparql| has_sparql }
+              rescue Net::HTTP::Persistent::Error, Errno::ECONNREFUSED => e
+                # Output error information and resume the next applicant.
+                Lodqa::Logger.debug "Cannot get SPARQLs for #{applicant[:name]}", error_messsage: e.message, trace: e.backtrace
               rescue => e
                 puts "Error at #{__method__} !!!!!! #{e.class}"
                 raise e
