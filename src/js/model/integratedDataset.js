@@ -10,6 +10,10 @@ module.exports = class extends EventEmitter {
     this._datasetsOrder = []
   }
 
+  getDataset(datasetNumber) {
+    return this._datasetsOrder[datasetNumber - 1].dataset
+  }
+
   addDataset(datasetName, dataset) {
     this._datasets.set(datasetName, dataset)
     this._datasetsOrder.push({
@@ -22,7 +26,6 @@ module.exports = class extends EventEmitter {
     dataset.on('answer_index_update_event', () => this.emit('answer_index_update_event'))
     dataset.on('label_update_event', () => this.emit('answer_index_update_event'))
   }
-
 
   // For example
   // {
@@ -110,13 +113,15 @@ function aggregateAnswers(integratedAnswers, datasetsOrder) {
 function getDatasetsForAnswer(answer, datasetsOrder) {
   return datasetsOrder.map(({
     dataset
-  }) => ({
-    sparqls: getSparqlsForAnswer(dataset.answerIndex, answer)
+  }, index) => ({
+    sparqls: getSparqlsForAnswer(dataset.answerIndex, answer, index)
   }))
 }
 
-function getSparqlsForAnswer(answerIndex, answer) {
+function getSparqlsForAnswer(answerIndex, answer, index) {
   return answerIndex
     .filter(a => a.label === answer.label)
-    .map(a => a.sparqls)[0]
+    .map(a => a.sparqls.map(s => ({
+      sparqlNumber: `${index + 1}-${s.sparqlNumber}`
+    })))[0]
 }
