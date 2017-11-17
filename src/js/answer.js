@@ -11,6 +11,7 @@ const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-de
 const IntegratedAnswerIndexPresentation = require('./presentation/integrated-answer-index-presentation')
 
 const integratedDataset = new IntegtatenDataset()
+const loaders = []
 
 for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   const name = parent.getAttribute('data-dataset')
@@ -23,10 +24,11 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   })
 
   integratedDataset.addDataset(name, dataset)
+  loaders.push(loader)
 
-  bindHandlerForKeyEvents(loader)
+  bindHandlerForKeyEvents(loaders)
 
-  bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', dataset, loader)
+  bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', dataset, loaders)
 
   createPresentations(dataset, parent, {
     answerIndexDomSelector: '.answers-for-dataset__answer-index',
@@ -47,7 +49,7 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   )
 
   bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, name, dataset)
-  bindHandlerToShowSparql(document, ['.detailProgressBar'], 'lightbox', dataset, loader)
+  bindHandlerToShowSparql(document, ['.detailProgressBar'], 'lightbox', dataset, loaders)
 
   beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
 
