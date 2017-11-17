@@ -89,3 +89,55 @@
     padding: 0.1em 1.5em 2em 1em;
     width: calc(100% - 100px);
 }
+
+
+/* Integrated Answer Index */
+
+.integrated-answer-index {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.integrated-answer-index__dataset-labels {
+    display: flex;
+}
+
+.integrated-answer-index__dataset-label:first-child {
+    padding-left: 600px;
+}
+
+.integrated-answer-index__dataset-label {
+    width: 300px;
+}
+
+.integrated-answer-index__answer {
+    display: flex;
+}
+
+.integrated-answer-index__answer-label {
+    width: 600px;
+}
+
+.integrated-answer-index__datasets {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.integrated-answer-index__dataset {
+    width: 300px;
+}
+
+.integrated-answer-index__dataset__sparqls {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.integrated-answer-index__dataset__sparql {
+    margin: 0 0.1em;
+    min-width: 2em;
+}

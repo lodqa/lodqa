@@ -21,4 +21,5 @@ module.exports = function(dataset, parent, {
     (button) => button.updateContent(dataset.labelAndUrls),
     dataset
   )
+
 }

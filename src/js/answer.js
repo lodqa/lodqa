@@ -8,6 +8,7 @@ const createPresentations = require('./answer/create-presentations')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 const createSimplpProgressBarOnSparqlReset = require('./controller/show-simple-progress-bar-on-sparql-reset')
 const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
+const IntegratedAnswerIndexPresentation = require('./presentation/integrated-answer-index-presentation')
 
 const integratedDataset = new IntegtatenDataset()
 
@@ -38,6 +39,11 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
     integratedDataset,
     name,
     dataset
+  )
+
+  new IntegratedAnswerIndexPresentation(
+    document.querySelector('.integrated-answer-index'),
+    integratedDataset
   )
 
   bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, name, dataset)
