@@ -110,6 +110,10 @@
     width: 300px;
 }
 
+.integrated-answer-index__progress-bar {
+    width: calc(100% - 80px);
+}
+
 .integrated-answer-index__answer {
     display: flex;
 }

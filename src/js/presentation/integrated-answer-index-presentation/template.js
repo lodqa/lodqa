@@ -5,6 +5,7 @@ module.exports = Handlebars.compile(`
     {{#each datasets}}
       <div class="integrated-answer-index__dataset-information">
         {{name}}
+        <progress class="integrated-answer-index__progress-bar" value="{{value}}" max="{{max}}"></progress>
         <span class="progress-bar__simple-progress-bar__percentage">{{percentage}}%</span>
       </div>
     {{/each}}
