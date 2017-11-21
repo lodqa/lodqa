@@ -36,6 +36,7 @@ module Lodqa
           level: 'ERROR',
           request_id: request_id,
           message: error.message,
+          class: error.class,
           trace: error.backtrace
         }.merge(rest)
 

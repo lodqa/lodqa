@@ -46,68 +46,73 @@ class LodqaWS < Sinatra::Base
 	end
 
 	aget '/answer' do
-		debug = false # Change true to output debug log.
+		begin
+			debug = false # Change true to output debug log.
 
-		Lodqa::Logger.level = debug ? :debug : :info
-		parse_params
+			Lodqa::Logger.level = debug ? :debug : :info
+			parse_params
 
-		@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
-		if @pgp[:nodes].keys.length == 0
-			@message = 'The pgp has no nodes!'
-			return erb :error_before_answer
-		end
-
-		# Show result
-		show_result = -> (candidate_datasets) do
-			# Show error message if there is no valid dataset.
-			if candidate_datasets.empty?
-				@message = if target_exists?
-					"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
-				else
-					'There is no db which has all words in the query!'
-				end
-				return body erb :error_before_answer
+			@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
+			if @pgp[:nodes].keys.length == 0
+				@message = 'The pgp has no nodes!'
+				return erb :error_before_answer
 			end
 
-			# Show answers
-			begin
-				# Find terms of nodes and edges.
-				using_dataset = candidate_datasets.first
-				tf = Lodqa::TermFinder.new(using_dataset[:dictionary_url])
-				keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
+			# Show result
+			show_result = -> (candidate_datasets) do
+				# Show error message if there is no valid dataset.
+				if candidate_datasets.empty?
+					@message = if target_exists?
+						"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
+					else
+						'There is no db which has all words in the query!'
+					end
+					return body erb :error_before_answer
+				end
 
-				# Set parameters for seaching answers
-				@mappings = tf.find(keywords)
-
-				# Set parameters for finding label of answers
-				@endpoint_url = using_dataset[:endpoint_url]
-				@need_proxy = ['biogateway', 'ncats-experimental'].include? using_dataset[:name]
-
-				@candidate_datasets = candidate_datasets.map do |ds|
-					tf = Lodqa::TermFinder.new(ds[:dictionary_url])
+				# Show answers
+				begin
+					# Find terms of nodes and edges.
+					using_dataset = candidate_datasets.first
+					tf = Lodqa::TermFinder.new(using_dataset[:dictionary_url])
 					keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
-					ds[:mappings] = tf.find(keywords)
-					ds[:need_proxy] = ['biogateway', 'ncats-experimental'].include? ds[:name]
-					ds
+
+					# Set parameters for seaching answers
+					@mappings = tf.find(keywords)
+
+					# Set parameters for finding label of answers
+					@endpoint_url = using_dataset[:endpoint_url]
+					@need_proxy = ['biogateway', 'ncats-experimental'].include? using_dataset[:name]
+
+					@candidate_datasets = candidate_datasets.map do |ds|
+						tf = Lodqa::TermFinder.new(ds[:dictionary_url])
+						keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
+						ds[:mappings] = tf.find(keywords)
+						ds[:need_proxy] = ['biogateway', 'ncats-experimental'].include? ds[:name]
+						ds
+					end
+
+					body erb(:answer)
+				rescue GatewayError
+					@message = 'Dictionary lookup error!'
+					body erb(:error_before_answer)
+				rescue => e
+					Lodqa::Logger.error e, request: request.env
+					response.status = 500
+					body e.message
 				end
-
-				body erb(:answer)
-			rescue GatewayError
-				@message = 'Dictionary lookup error!'
-				body erb(:error_before_answer)
-			rescue => e
-				Lodqa::Logger.error e
-				response.status = 500
-				body e.message
 			end
-		end
 
-		# Search datasets automatically unless target parametrs.
-		read_timeout = params['read_timeout'].to_i
-		if target_exists?
-			Lodqa::Sources.searchable?(@pgp, [@config], read_timeout) { |dbs| show_result.call dbs }
-		else
-			Lodqa::Sources.select_db_for(@pgp, settings.target_db + '.json', read_timeout) { |dbs| show_result.call dbs  }
+			# Search datasets automatically unless target parametrs.
+			read_timeout = params['read_timeout'].to_i
+			if target_exists?
+				Lodqa::Sources.searchable?(@pgp, [@config], read_timeout) { |dbs| show_result.call dbs }
+			else
+				Lodqa::Sources.select_db_for(@pgp, settings.target_db + '.json', read_timeout) { |dbs| show_result.call dbs  }
+			end
+		rescue => e
+			Lodqa::Logger.error e, request: request.env
+			raise e
 		end
 	end
 
@@ -179,7 +184,7 @@ class LodqaWS < Sinatra::Base
 		rescue JSON::ParserError => e
 			[500, "Invalid JSON object from the client."]
 		rescue => e
-			Lodqa::Logger.error e
+			Lodqa::Logger.error e, request: request.env
 			[500, e.message]
 		end
 	end

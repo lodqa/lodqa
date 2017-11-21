@@ -91,7 +91,7 @@ class GraphFinder
         if proc_solution
           proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
         end
-      rescue SocketError => e
+      rescue SocketError, Errno::ECONNREFUSED => e
         # Should we try again?
         Lodqa::Logger.debug 'Socekt Error', error_messsage: e.message, trace: e.backtrace
 
