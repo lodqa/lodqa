@@ -3,7 +3,10 @@ const Handlebars = require('handlebars')
 module.exports = Handlebars.compile(`
   <div class="integrated-answer-index__dataset-labels">
     {{#each datasets}}
-      <div class="integrated-answer-index__dataset-label">{{name}}</div>
+      <div class="integrated-answer-index__dataset-label">
+        {{name}}
+        <span class="progress-bar__simple-progress-bar__percentage">{{percentage}}%</span>
+      </div>
     {{/each}}
   </div>
   {{#each answers}}

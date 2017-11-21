@@ -85,7 +85,7 @@ module.exports = class extends EventEmitter {
         name: d.datasetName,
         value: d.dataset.sparqlCount,
         max: d.dataset.sparqlsMax,
-        percetage: Math.floor(d.dataset.sparqlCount / d.dataset.sparqlsMax * 1000) / 10
+        percentage: Math.floor(d.dataset.sparqlCount / d.dataset.sparqlsMax * 1000) / 10
       }))
 
     // Concat answers. Do not merge yet.
