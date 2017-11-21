@@ -4,9 +4,17 @@ module.exports = Handlebars.compile(`
   <div class="integrated-answer-index__dataset-information-list">
     {{#each datasets}}
       <div class="integrated-answer-index__dataset-information">
-        {{name}}
-        <progress class="integrated-answer-index__progress-bar" value="{{value}}" max="{{max}}"></progress>
-        <span class="progress-bar__simple-progress-bar__percentage">{{percentage}}%</span>
+        <div class="integrated-answer-index__dataset-information-row">
+          {{name}}
+          <div>
+            <input type="checkbox" id="integrated-answer-index__show-detail-progress-bar-{{name}}" class="show-detail-progress-bar">
+            <label for="integrated-answer-index__show-detail-progress-bar-{{name}}">Details</label>
+          </div>
+        </div>
+        <div class="integrated-answer-index__dataset-information-row">
+          <progress class="integrated-answer-index__progress-bar" value="{{value}}" max="{{max}}"></progress>
+          <span>{{percentage}}%</span>
+        </div>
       </div>
     {{/each}}
   </div>

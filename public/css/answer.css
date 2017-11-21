@@ -107,11 +107,17 @@
 }
 
 .integrated-answer-index__dataset-information {
+    padding-right: 1em;
     width: 300px;
 }
 
+.integrated-answer-index__dataset-information-row {
+    display: flex;
+    justify-content: space-between;
+}
+
 .integrated-answer-index__progress-bar {
-    width: calc(100% - 80px);
+    width: 100%;
 }
 
 .integrated-answer-index__answer {
