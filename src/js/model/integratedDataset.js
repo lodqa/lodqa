@@ -81,7 +81,9 @@ module.exports = class extends EventEmitter {
     // Show only datasets with answers.
     const datasets = this._datasetsOrder
       .filter(d => d.dataset.sparqlsMax)
-      .map(d => d.datasetName)
+      .map(d => ({
+        name: d.datasetName
+      }))
 
     // Concat answers. Do not merge yet.
     const integratedAnswers = this._datasetsOrder

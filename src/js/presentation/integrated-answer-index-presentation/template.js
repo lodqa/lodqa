@@ -3,7 +3,7 @@ const Handlebars = require('handlebars')
 module.exports = Handlebars.compile(`
   <div class="integrated-answer-index__dataset-labels">
     {{#each datasets}}
-      <div class="integrated-answer-index__dataset-label">{{this}}</div>
+      <div class="integrated-answer-index__dataset-label">{{name}}</div>
     {{/each}}
   </div>
   {{#each answers}}
