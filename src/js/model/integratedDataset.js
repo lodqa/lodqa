@@ -82,7 +82,10 @@ module.exports = class extends EventEmitter {
     const datasets = this._datasetsOrder
       .filter(d => d.dataset.sparqlsMax)
       .map(d => ({
-        name: d.datasetName
+        name: d.datasetName,
+        value: d.dataset.sparqlCount,
+        max: d.dataset.sparqlsMax,
+        percetage: Math.floor(d.dataset.sparqlCount / d.dataset.sparqlsMax * 1000) / 10
       }))
 
     // Concat answers. Do not merge yet.
