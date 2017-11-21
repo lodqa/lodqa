@@ -41,4 +41,10 @@ module.exports = Handlebars.compile(`
       </ul>
     </div>
   {{/each}}
+  {{#if answers}}
+    <div class="answers-for-dataset__download">
+      <a class="answers-for-dataset__download-json-button button" download="answer.json"><i class="fa fa-download" aria-hidden="true"></i> download json<span class="answers-length">({{answers.length}})</span></a>
+      <a class="answers-for-dataset__download-tsv-button button" download="answer.tsv"><i class="fa fa-download" aria-hidden="true"></i> download tsv<span class="answers-length">({{answers.length}})</span></a>
+    </div>
+  {{/if}}
 `)
