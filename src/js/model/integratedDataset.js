@@ -22,6 +22,7 @@ module.exports = class extends EventEmitter {
     })
 
     // Listen dataset
+    dataset.on('sparql_reset_event', () => this.emit('answer_index_update_event'))
     dataset.on('answer_index_add_event', () => this.emit('answer_index_update_event'))
     dataset.on('answer_index_update_event', () => this.emit('answer_index_update_event'))
     dataset.on('label_update_event', () => this.emit('answer_index_update_event'))
@@ -79,7 +80,7 @@ module.exports = class extends EventEmitter {
   get integratedAnswerIndex() {
     // Show only datasets with answers.
     const datasets = this._datasetsOrder
-      .filter(d => d.dataset.answerIndex.length)
+      .filter(d => d.dataset.sparqlsMax)
       .map(d => d.datasetName)
 
     // Concat answers. Do not merge yet.

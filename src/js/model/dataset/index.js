@@ -15,7 +15,7 @@ module.exports = class Model extends EventEmitter {
     bindModelToLoader(loader, this)
 
     this.findLabelOptions = findLabelOptions
-    this._sparqls = null
+    this._sparqls = []
     this._sparqlCount = new SparqlCount()
     this._anchoredPgp = null
     this._solution = new Map()
