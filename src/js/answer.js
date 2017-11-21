@@ -3,11 +3,8 @@ const IntegtatenDataset = require('./model/integratedDataset')
 const Dataset = require('./model/dataset')
 const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
-const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const bindHandlerToShowSparql2 = require('./answer/bind-handler-to-show-sparql2')
-const createPresentations = require('./answer/create-presentations')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
-const createSimplpProgressBarOnSparqlReset = require('./controller/show-simple-progress-bar-on-sparql-reset')
 const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
 const IntegratedAnswerIndexPresentation = require('./presentation/integrated-answer-index-presentation')
 
@@ -28,21 +25,6 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   loaders.push(loader)
 
   bindHandlerForKeyEvents(loaders)
-
-  bindHandlerToShowSparql(parent, ['.answers-for-dataset__progress-bar', '.answers-for-dataset__answer-index'], 'lightbox', dataset, loaders)
-
-  createPresentations(dataset, parent, {
-    answerIndexDomSelector: '.answers-for-dataset__answer-index',
-    downloadJsonButtonSelector: '.answers-for-dataset__download-json-button',
-    downloadTsvButtonSelector: '.answers-for-dataset__download-tsv-button'
-  })
-
-  createSimplpProgressBarOnSparqlReset(
-    parent.querySelector('.answers-for-dataset__progress-bar'),
-    integratedDataset,
-    name,
-    dataset
-  )
 
   bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, name, dataset)
 
