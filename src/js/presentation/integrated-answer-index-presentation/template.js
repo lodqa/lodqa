@@ -7,7 +7,12 @@ module.exports = Handlebars.compile(`
         <div class="integrated-answer-index__dataset-information-row">
           {{name}}
           <div>
-            <input type="checkbox" id="integrated-answer-index__show-detail-progress-bar-{{name}}" class="show-detail-progress-bar">
+            <input
+              type="checkbox"
+              id="integrated-answer-index__show-detail-progress-bar-{{name}}"
+              data-name="{{name}}" class="show-detail-progress-bar"
+              {{#if checked}}checked="checked"{{/if}}
+              >
             <label for="integrated-answer-index__show-detail-progress-bar-{{name}}">Details</label>
           </div>
         </div>

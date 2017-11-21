@@ -1,4 +1,5 @@
 const template = require('./template')
+const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
 
 module.exports = class {
   constructor(dom, integratedDataset) {
@@ -6,6 +7,10 @@ module.exports = class {
     this._integratedDataset = integratedDataset
 
     integratedDataset.on('answer_index_update_event', () => this.render())
+
+    // To switch showing detail of progress
+    const onClickDetailCheckbox = (event) => integratedDataset.displayingDetail = (event.target.checked ? event.target.dataset.name : '')
+    bindHandlerToCheckbox(dom, '.show-detail-progress-bar', onClickDetailCheckbox)
   }
 
   render() {

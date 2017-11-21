@@ -44,11 +44,6 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
     dataset
   )
 
-  new IntegratedAnswerIndexPresentation(
-    document.querySelector('.integrated-answer-index'),
-    integratedDataset
-  )
-
   bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, name, dataset)
 
   beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
@@ -57,5 +52,10 @@ for (const parent of document.querySelectorAll('.answers-for-dataset')) {
 
   dataset.on('error', () => console.error(dataset.errorMessage))
 }
+
+new IntegratedAnswerIndexPresentation(
+  document.querySelector('.integrated-answer-index'),
+  integratedDataset
+)
 
 bindHandlerToShowSparql2(document, ['.integrated-answer-index', '.detailProgressBar'], 'lightbox', integratedDataset, loaders)

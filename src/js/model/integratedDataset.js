@@ -85,7 +85,8 @@ module.exports = class extends EventEmitter {
         name: d.datasetName,
         value: d.dataset.sparqlCount,
         max: d.dataset.sparqlsMax,
-        percentage: Math.floor(d.dataset.sparqlCount / d.dataset.sparqlsMax * 1000) / 10
+        percentage: Math.floor(d.dataset.sparqlCount / d.dataset.sparqlsMax * 1000) / 10,
+        checked: d.datasetName === this._selectedDatasetName
       }))
 
     // Concat answers. Do not merge yet.
@@ -106,7 +107,9 @@ module.exports = class extends EventEmitter {
   }
 
   set displayingDetail(datasetName) {
+    this._selectedDatasetName = datasetName
     this.emit('dataset_displaying_detail_update_event', datasetName, this._datasets.get(datasetName))
+    this.emit('answer_index_update_event')
   }
 }
 
