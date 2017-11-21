@@ -98,15 +98,15 @@
     margin-bottom: 1em;
 }
 
-.integrated-answer-index__dataset-labels {
+.integrated-answer-index__dataset-information-list {
     display: flex;
 }
 
-.integrated-answer-index__dataset-label:first-child {
+.integrated-answer-index__dataset-information:first-child {
     padding-left: 600px;
 }
 
-.integrated-answer-index__dataset-label {
+.integrated-answer-index__dataset-information {
     width: 300px;
 }
 
@@ -118,18 +118,18 @@
     width: 600px;
 }
 
-.integrated-answer-index__datasets {
+.integrated-answer-index__dataset-sparql-list {
     display: flex;
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-.integrated-answer-index__dataset {
+.integrated-answer-index__dataset-sparql {
     width: 300px;
 }
 
-.integrated-answer-index__dataset__sparqls {
+.integrated-answer-index__sparql-list {
     display: flex;
     flex-wrap: wrap;
     list-style-type: none;
@@ -137,7 +137,7 @@
     padding: 0;
 }
 
-.integrated-answer-index__dataset__sparql {
+.integrated-answer-index__sparql {
     margin: 0 0.1em;
     min-width: 3em;
 }

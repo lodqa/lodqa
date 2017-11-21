@@ -1,9 +1,9 @@
 const Handlebars = require('handlebars')
 
 module.exports = Handlebars.compile(`
-  <div class="integrated-answer-index__dataset-labels">
+  <div class="integrated-answer-index__dataset-information-list">
     {{#each datasets}}
-      <div class="integrated-answer-index__dataset-label">
+      <div class="integrated-answer-index__dataset-information">
         {{name}}
         <span class="progress-bar__simple-progress-bar__percentage">{{percentage}}%</span>
       </div>
@@ -14,12 +14,12 @@ module.exports = Handlebars.compile(`
       <div class="integrated-answer-index__answer-label">
         <a href="{{url}}">{{label}}</a>
       </div>
-      <ul class="integrated-answer-index__datasets">
+      <ul class="integrated-answer-index__dataset-sparql-list">
         {{#each datasets}}
-          <li class="integrated-answer-index__dataset">
-            <ul class="integrated-answer-index__dataset__sparqls">
+          <li class="integrated-answer-index__dataset-sparql">
+            <ul class="integrated-answer-index__sparql-list">
               {{#each sparqls}}
-                <li class="integrated-answer-index__dataset__sparql">{{> sparql-link}}</li>
+                <li class="integrated-answer-index__sparql">{{> sparql-link}}</li>
               {{/each}}
             </ul>
           </li>
