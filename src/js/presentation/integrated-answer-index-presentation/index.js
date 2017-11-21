@@ -1,5 +1,11 @@
+const handlebars = require('handlebars')
 const template = require('./template')
 const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
+
+const tsvFormatter = handlebars.compile(`{{#each this}}
+{{label}}	{{url}}
+{{/each}}
+`)
 
 module.exports = class {
   constructor(dom, integratedDataset) {
@@ -11,6 +17,16 @@ module.exports = class {
     // To switch showing detail of progress
     const onClickDetailCheckbox = (event) => integratedDataset.displayingDetail = (event.target.checked ? event.target.dataset.name : '')
     bindHandlerToCheckbox(dom, '.show-detail-progress-bar', onClickDetailCheckbox)
+
+    dom.addEventListener('click', (e) => {
+      if (e.target.closest('.answers-for-dataset__download-json-button')) {
+        e.target.href = `data:,${encodeURIComponent(JSON.stringify(getData(integratedDataset),null, 2))}`
+      }
+
+      if (e.target.closest('.answers-for-dataset__download-tsv-button')) {
+        e.target.href = `data:,${encodeURIComponent(tsvFormatter(getData(integratedDataset)))}`
+      }
+    })
   }
 
   render() {
@@ -20,4 +36,15 @@ module.exports = class {
       this._dom.innerHTML = after
     }
   }
+}
+
+function getData(integratedDataset) {
+  const {
+    answers
+  } = integratedDataset.integratedAnswerIndex
+  const data = answers.map(a => ({
+    url: a.url,
+    label: a.label
+  }))
+  return data
 }
