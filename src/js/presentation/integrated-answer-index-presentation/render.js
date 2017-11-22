@@ -1,9 +1,7 @@
 const template = require('./template')
+const updateDomTree = require('./update-dom-tree')
 
 module.exports = function render(dom, integratedDataset) {
-  const before = dom.innerHTML
-  const after = template(integratedDataset.integratedAnswerIndex)
-  if (before !== after) {
-    dom.innerHTML = after
-  }
+  const html = template(integratedDataset.integratedAnswerIndex)
+  updateDomTree(dom, html)
 }
