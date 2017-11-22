@@ -26,7 +26,7 @@ module.exports = Handlebars.compile(`
   {{#each answers}}
     <div class="integrated-answer-index__answer">
       <div class="integrated-answer-index__answer-label">
-        <a href="{{url}}">{{label}}</a>
+        <a href="{{url}}" target="_blank">{{label}}</a>
       </div>
       <ul class="integrated-answer-index__dataset-sparql-list">
         {{#each datasets}}
