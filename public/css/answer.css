@@ -136,6 +136,7 @@
 }
 
 .integrated-answer-index__dataset-sparql {
+    padding-right: 1em;
     width: 300px;
 }
 
