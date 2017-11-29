@@ -105,10 +105,6 @@ module.exports = class Model extends EventEmitter {
       .solution
   }
 
-  get currentUniqAnswersLength () {
-    return getUniqAnswers(this.currentSolution.solutions, this.focus).length
-  }
-
   getSolution(sparqlCount) {
     // Return solutions with anchoredPgp to show sparql detail in the serach page.
     return this._solution.get(sparqlCount.toString())

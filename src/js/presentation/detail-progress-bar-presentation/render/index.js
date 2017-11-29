@@ -1,8 +1,10 @@
-const createDom = require('../../create-dom')
+const updateDomTree = require('../../update-dom-tree')
 const template = require('./template')
 
-module.exports = function(sparqls) {
-  return createDom(template({
-    sparqls
-  }))
+module.exports = function(dom, dataset) {
+  const html = template({
+    name: dataset.name,
+    sparqls: dataset.currentStatusOfSparqls
+  })
+  return (updateDomTree(dom, html))
 }

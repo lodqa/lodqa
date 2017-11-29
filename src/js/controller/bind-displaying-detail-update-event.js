@@ -11,7 +11,7 @@ module.exports = function(dom, integratedDataset, dataset) {
       dom.appendChild(detailProgressBar.dom)
     } else {
       if (detailProgressBar && detailProgressBar.dom.parentElement) {
-        detailProgressBar.dataset = null
+        detailProgressBar.dispose()
         dom.removeChild(detailProgressBar.dom)
       }
     }
@@ -19,9 +19,6 @@ module.exports = function(dom, integratedDataset, dataset) {
 }
 
 function creatDetailProgressBar(selectedDataset, onAnswerButtonClick) {
-  const detailProgressBar = new DetailProgressBar(selectedDataset.name, onAnswerButtonClick)
-  detailProgressBar.showCurrentStatus(selectedDataset.currentStatusOfSparqls)
-  detailProgressBar.dataset = selectedDataset
-
+  const detailProgressBar = new DetailProgressBar(selectedDataset, onAnswerButtonClick)
   return detailProgressBar
 }
