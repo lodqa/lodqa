@@ -32,7 +32,7 @@ module.exports = class {
 
   set dataset(newDataset) {
     if (newDataset) {
-      this._onSolutionAdd = () => this.progress(newDataset.currentUniqAnswersLength, newDataset.sparqlCount, newDataset.currentSolution.sparqlTimeout)
+      this._onSolutionAdd = () => progressDetail(this.dom, newDataset.currentUniqAnswersLength, newDataset.sparqlCount, newDataset.currentSolution.sparqlTimeout)
       newDataset.on('solution_add_event', this._onSolutionAdd)
 
       this._onStop = () => this.stop(newDataset.sparqlCount, newDataset.errorMessage)
@@ -49,10 +49,6 @@ module.exports = class {
 
   showCurrentStatus(currentStatusOfSparqls) {
     this.dom.appendChild(render(currentStatusOfSparqls))
-  }
-
-  progress(uniqAnswersLength, sparqlCount, sparqlTimeout) {
-    progressDetail(this.dom, uniqAnswersLength, sparqlCount, sparqlTimeout)
   }
 
   stop(sparqlCount, errorMessage) {
