@@ -30,4 +30,6 @@ function init() {
 
   const checkbox = document.querySelector('#verbose')
   checkbox.addEventListener('change', (event) => dataset.isVerbose = event.target.checked)
+
+  dataset.on('error', () => console.error(dataset.errorMessage))
 }
