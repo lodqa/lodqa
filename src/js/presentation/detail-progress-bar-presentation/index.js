@@ -4,7 +4,7 @@ const render = require('./render')
 
 // Render all of the progress bar
 module.exports = class {
-  constructor(dataset, onChcekChange) {
+  constructor(dataset) {
     const dom = createDom('<div class="progress-bar__detail-progress-bar"></div>')
 
     // Render contents
@@ -15,7 +15,7 @@ module.exports = class {
       const sparql = e.target.closest('.progress-bar__detail-progress-bar__sparqls__sparql')
 
       if (sparql) {
-        onChcekChange(sparql.getAttribute('data-sparql-number'), !e.target.checked)
+        dataset.updateSparqlHideStatus(sparql.getAttribute('data-sparql-number'), !e.target.checked)
       }
     })
 

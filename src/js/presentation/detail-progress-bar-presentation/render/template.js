@@ -29,7 +29,13 @@ module.exports = handlebars.compile(`
             {{/if}}
           " data-sparql-number="{{sparqlNumber}}">
             <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
-            <input class="progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox button" type="checkbox" checked="checked" id="sparql-number-{{sparqlNumber}}">
+            <input
+              class="progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox button"
+              type="checkbox"
+              {{#if visible}}
+                checked="checked"
+              {{/if}}
+              id="sparql-number-{{sparqlNumber}}">
             <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
           </li>
         {{else if isProgress}}

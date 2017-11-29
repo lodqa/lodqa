@@ -58,6 +58,7 @@ module.exports = class Model extends EventEmitter {
             sparqlNumber,
             hasSolution: true,
             uniqAnswersLength,
+            visible: !this._hideSparqls.has(sparqlNumber),
             error: error && error.error_message
           }
         }
@@ -164,6 +165,7 @@ module.exports = class Model extends EventEmitter {
       this._hideSparqls.delete(sparqlCount)
     }
 
+    // this.emit('sparql_hide_status_upadte_event')
     this.emit('answer_index_update_event')
   }
 
