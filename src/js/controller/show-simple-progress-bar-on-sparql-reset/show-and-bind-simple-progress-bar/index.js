@@ -1,11 +1,11 @@
 const show = require('./show')
 
-module.exports = function showAndBindSimpleProgeressBar(dom, integratedDataset, datasetName, dataset) {
+module.exports = function(dom, integratedDataset, dataset) {
   // Create a simpleProgressBar
-  const toggleDetailProgressBar = (isShow) => integratedDataset.displayingDetail = (isShow ? datasetName : '')
+  const toggleDetailProgressBar = (isShow) => integratedDataset.displayingDetail = (isShow ? dataset.name : '')
   const simpleProgressBar = show(
     dom,
-    datasetName,
+    dataset.name,
     dataset.sparqlsMax,
     toggleDetailProgressBar
   )
@@ -15,6 +15,6 @@ module.exports = function showAndBindSimpleProgeressBar(dom, integratedDataset, 
   dataset.on('solution_add_event', progressOnSolutionAdd)
 
   // Bind the Integrated Dataset's event.
-  const onDatasetDisplayingDetailUpdate = (selectedName) => simpleProgressBar.checked = (selectedName === datasetName)
+  const onDatasetDisplayingDetailUpdate = (selectedName) => simpleProgressBar.checked = (selectedName === dataset.name)
   integratedDataset.on('dataset_displaying_detail_update_event', onDatasetDisplayingDetailUpdate)
 }

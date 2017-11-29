@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 function init() {
   const loader = new Loader()
   const integratedDataset = new IntegtatenDataset()
-  const dataset = new Dataset(loader, getEndpointInformationFromDom())
-  integratedDataset.addDataset('static', dataset)
+  const dataset = new Dataset('static', loader, getEndpointInformationFromDom())
+  integratedDataset.addDataset(dataset)
 
   createPresentations(dataset, {
     resultSelector: '#lodqa-results',
@@ -22,8 +22,8 @@ function init() {
   }, integratedDataset)
 
   const progressBarDom = document.querySelector('#progress-bar')
-  createSimplpProgressBarOnSparqlReset(progressBarDom, integratedDataset, 'static', dataset)
-  bindDisplayingDetailUpdateEvent(progressBarDom, integratedDataset, 'static' , dataset)
+  createSimplpProgressBarOnSparqlReset(progressBarDom, integratedDataset, dataset)
+  bindDisplayingDetailUpdateEvent(progressBarDom, integratedDataset, dataset)
 
   bindSearchButton(loader)
   bindStopSearchButton(loader)

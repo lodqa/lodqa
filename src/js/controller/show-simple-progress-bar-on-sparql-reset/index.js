@@ -1,7 +1,7 @@
 const showAndBindSimpleProgeressBar = require('./show-and-bind-simple-progress-bar')
 
-module.exports = function(dom, integratedDataset, datasetName, dataset) {
+module.exports = function(dom, integratedDataset, dataset) {
   // Bind the Dataset's events
-  const onSparqlReset = () => showAndBindSimpleProgeressBar(dom, integratedDataset, datasetName, dataset)
+  const onSparqlReset = () => showAndBindSimpleProgeressBar(dom, integratedDataset, dataset)
   dataset.on('sparql_reset_event', onSparqlReset)
 }

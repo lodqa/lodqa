@@ -9,8 +9,10 @@ const bindModelToLoader = require('./bind-model-to-loader')
 const findLabelOfAnswers = require('./find-label-of-answers')
 
 module.exports = class Model extends EventEmitter {
-  constructor(loader, findLabelOptions) {
+  constructor(name, loader, findLabelOptions) {
     super()
+
+    this.name = name
 
     bindModelToLoader(loader, this)
 

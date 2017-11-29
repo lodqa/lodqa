@@ -1,12 +1,12 @@
 const DetailProgressBar = require('../presentation/detail-progress-bar-presentation')
 
-module.exports = function(dom, integratedDataset, name, dataset) {
+module.exports = function(dom, integratedDataset, dataset) {
   const onAnswerButtonClick = (sparqlNumber, isHide) => dataset.updateSparqlHideStatus(sparqlNumber, isHide)
 
   // Remember an instance of the DetailProgressBar to remove elements from dom and remove listners from the integratedDataset.
   let detailProgressBar
   integratedDataset.on('dataset_displaying_detail_update_event', (selectedName, selectedDataset) => {
-    if (selectedName === name) {
+    if (selectedName === dataset.name) {
       detailProgressBar = creatDetailProgressBar(selectedDataset, onAnswerButtonClick)
       dom.appendChild(detailProgressBar.dom)
     } else {
@@ -19,7 +19,7 @@ module.exports = function(dom, integratedDataset, name, dataset) {
 }
 
 function creatDetailProgressBar(selectedDataset, onAnswerButtonClick) {
-  const detailProgressBar = new DetailProgressBar(name, onAnswerButtonClick)
+  const detailProgressBar = new DetailProgressBar(selectedDataset.name, onAnswerButtonClick)
   detailProgressBar.showCurrentStatus(selectedDataset.currentStatusOfSparqls)
   detailProgressBar.dataset = selectedDataset
 

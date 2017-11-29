@@ -14,10 +14,10 @@ module.exports = class extends EventEmitter {
     return this._datasetsOrder[datasetNumber - 1].dataset
   }
 
-  addDataset(datasetName, dataset) {
-    this._datasets.set(datasetName, dataset)
+  addDataset(dataset) {
+    this._datasets.set(dataset.name, dataset)
     this._datasetsOrder.push({
-      datasetName,
+      datasetName: dataset.name,
       dataset
     })
 

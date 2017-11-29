@@ -14,21 +14,21 @@ const loaders = []
 for (const parent of document.querySelectorAll('.answers-for-dataset')) {
   const name = parent.getAttribute('data-dataset')
   const loader = new Loader()
-  const dataset = new Dataset(loader, {
+  const dataset = new Dataset(name, loader, {
     endpointUrl: parent.querySelector('.answers-for-dataset__endpoint-url')
       .value,
     needProxy: parent.querySelector('.answers-for-dataset__need-proxy')
       .value === 'true'
   })
 
-  integratedDataset.addDataset(name, dataset)
+  integratedDataset.addDataset(dataset)
   loaders.push(loader)
 
   bindHandlerForKeyEvents(loaders)
 
-  bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, name, dataset)
+  bindDisplayingDetailUpdateEvent(document.querySelector('.detailProgressBar'), integratedDataset, dataset)
 
-  beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', name, 'read_timeout')
+  beginSearch(loader, 'pgp', parent, '.answers-for-dataset__mappings', dataset.name, 'read_timeout')
 
   bindModeButtonEventhandler('grapheditor')
 
