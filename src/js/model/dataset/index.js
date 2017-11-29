@@ -52,13 +52,13 @@ module.exports = class Model extends EventEmitter {
           } = this.getSolution(sparqlNumber)
           const uniqAnswersLength = getUniqAnswers(solution.solutions, this.focus)
             .length
-          const sparql_timeout = solution.spaqrl_timeout
+          const error = solution.sparql_timeout
 
           return {
             sparqlNumber,
             hasSolution: true,
             uniqAnswersLength,
-            sparql_timeout
+            error: error && error.error_message
           }
         }
 

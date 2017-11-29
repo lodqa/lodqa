@@ -11,25 +11,45 @@ module.exports = handlebars.compile(`
     </div>
     <ul class="progress-bar__detail-progress-bar__sparqls">
       {{#each sparqls}}
-        <li class="
-          progress-bar__detail-progress-bar__sparqls__sparql
-          {{#if hasSolution}}
+        {{#if error}}
+          <li class="
+            progress-bar__detail-progress-bar__sparqls__sparql
+            progress-bar__detail-progress-bar__sparqls__sparql--error
+          " data-sparql-number="{{sparqlNumber}}">
+            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}"><i class="fa fa-bomb" aria-hidden="true" title="{{error}}"></i></label>
+          </li>
+        {{else if hasSolution}}
+          <li class="
+            progress-bar__detail-progress-bar__sparqls__sparql
             {{#if uniqAnswersLength}}
               progress-bar__detail-progress-bar__sparqls__sparql--has-answer
             {{else}}
               progress-bar__detail-progress-bar__sparqls__sparql--no-answer
             {{/if}}
-          {{else}}
+          " data-sparql-number="{{sparqlNumber}}">
+            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <input class="progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox button" type="checkbox" checked="checked" id="sparql-number-{{sparqlNumber}}">
+            <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
+          </li>
+        {{else if isProgress}}
+          <li class="
+            progress-bar__detail-progress-bar__sparqls__sparql
+            progress-bar__detail-progress-bar__sparqls__sparql--progress
+          " data-sparql-number="{{sparqlNumber}}">
+            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <span class="progress-bar__detail-progress-bar__sparqls__sparql__loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
+          </li>
+        {{else}}
+          <li class="
+            progress-bar__detail-progress-bar__sparqls__sparql
             {{#if isProgress}}
               progress-bar__detail-progress-bar__sparqls__sparql--progress
             {{/if}}
-          {{/if}}
-        " data-sparql-number="{{sparqlNumber}}">
-          <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
-          <span class="progress-bar__detail-progress-bar__sparqls__sparql__loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
-          <input class="progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox button" type="checkbox" checked="checked" id="sparql-number-{{sparqlNumber}}">
-          <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
-        </li>
+          " data-sparql-number="{{sparqlNumber}}">
+            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+          </li>
+        {{/if}}
       {{else}}
       <span class="progress-bar__detail-progress-bar__sparqls__no-sparql-message">No Sparql</span>
       {{/each}}

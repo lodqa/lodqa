@@ -41,17 +41,9 @@
     background-color: white;
 }
 
-.progress-bar__detail-progress-bar--show-only-has-answers .progress-bar__detail-progress-bar__sparqls__sparql--no-answer {
-    display: none;
-}
-
 .progress-bar__detail-progress-bar__sparqls__sparql__sparql-number {
     display: inline-block;
     min-width: 2.1em;
-}
-
-.progress-bar__detail-progress-bar__sparqls__sparql__loading {
-    display: none;
 }
 
 .progress-bar__detail-progress-bar__sparqls__sparql--progress .progress-bar__detail-progress-bar__sparqls__sparql__loading {
