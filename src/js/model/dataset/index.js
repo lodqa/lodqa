@@ -63,7 +63,7 @@ module.exports = class Model extends EventEmitter {
         }
 
         // The next SPARQL is progress
-        if (sparqlNumber === `${this.sparqlCount + 1}`) {
+        if (this._progress && sparqlNumber === `${this.sparqlCount + 1}`) {
           return {
             sparqlNumber,
             hasSolution: false,
@@ -174,5 +174,14 @@ module.exports = class Model extends EventEmitter {
       answer.label = label
       this.emit('label_update_event')
     }
+  }
+
+  get progress() {
+    return this._progress
+  }
+  set progress(status) {
+    this._progress = status
+
+    this.emit('state_change_event')
   }
 }

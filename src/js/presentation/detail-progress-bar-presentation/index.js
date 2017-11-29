@@ -1,7 +1,6 @@
 const createDom = require('../create-dom')
 const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
 const render = require('./render')
-const stop = require('./stop')
 
 // Render all of the progress bar
 module.exports = class {
@@ -27,25 +26,17 @@ module.exports = class {
     this._bindEventListeners(dataset)
   }
 
-  stop(sparqlCount, errorMessage) {
-    stop(this.dom, sparqlCount, errorMessage)
-  }
-
   dispose() {
     // Remove event listners.
-    this._dataset.removeListener('solution_add_event', this._onSolutionAdd)
-    this._dataset.removeListener('error', this._onStop)
-    this._dataset.removeListener('ws_close', this._onStop)
+    this._dataset.removeListener('solution_add_event', this._upddateDisplay)
+    this._dataset.removeListener('state_change_event', this._upddateDisplay)
   }
 
   _bindEventListeners(dataset) {
     this._dataset = dataset
-    this._onSolutionAdd = () => render(this.dom, this._dataset)
-    this._dataset.on('solution_add_event', this._onSolutionAdd)
-
-    this._onStop = () => this.stop(this._dataset.sparqlCount, this._dataset.errorMessage)
-    this._dataset.on('error', this._onStop)
-    this._dataset.on('ws_close', this._onStop)
+    this._upddateDisplay = () => render(this.dom, this._dataset)
+    this._dataset.on('solution_add_event', this._upddateDisplay)
+    this._dataset.on('state_change_event', this._upddateDisplay)
   }
 }
 

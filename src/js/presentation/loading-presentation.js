@@ -9,25 +9,25 @@ module.exports = class {
       this._total = dataset.sparqlsMax
       showProgress(this._element, 0, dataset.sparqlsMax)
     }
+    dataset.on('sparql_reset_event', onSparqlReset)
+
     const onSolutionAdd = () => showProgress(
       this._element,
       ++this._recieved,
       this._total
     )
-    dataset.on('sparql_reset_event', onSparqlReset)
     dataset.on('solution_add_event', onSolutionAdd)
-    dataset.on('ws_open', () => this.show())
-    dataset.on('ws_close', () => this.hide())
-  }
 
-  show() {
-    show(this._element)
-  }
-
-  hide() {
-    this._total = 0
-    this._recieved = 0
-    hide(this._element)
+    const onStateChange = () => {
+      if (dataset.progress) {
+        show(this._element)
+      } else {
+        this._total = 0
+        this._recieved = 0
+        hide(this._element)
+      }
+    }
+    dataset.on('state_change_event', onStateChange)
   }
 }
 
