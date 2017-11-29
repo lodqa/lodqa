@@ -100,20 +100,17 @@
 
 .integrated-answer-index__dataset-information-list {
     display: flex;
-}
-
-.integrated-answer-index__dataset-information:first-child {
     padding-left: 600px;
 }
 
 .integrated-answer-index__dataset-information {
-    padding-right: 1em;
-    width: 300px;
+    margin-right: 1em;
 }
 
 .integrated-answer-index__dataset-information-row {
     display: flex;
     justify-content: space-between;
+    width: 300px;
 }
 
 .integrated-answer-index__progress-bar {
@@ -125,7 +122,7 @@
 }
 
 .integrated-answer-index__answer-label {
-    width: 600px;
+    min-width: 600px;
 }
 
 .integrated-answer-index__dataset-sparql-list {
@@ -136,7 +133,7 @@
 }
 
 .integrated-answer-index__dataset-sparql {
-    padding-right: 1em;
+    margin-right: 1em;
     width: 300px;
 }
 
