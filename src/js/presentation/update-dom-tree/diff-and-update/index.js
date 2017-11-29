@@ -3,9 +3,11 @@ const updateElement = require('../update-element')
 const updateTextNode = require('./update-text-node')
 const removeExtraChildren = require('./remove-extra-children')
 
-module.exports = diffAndUpdate
-
-function diffAndUpdate(ast, node, parentNode = node) {
+module.exports = {
+  diffAndUpdate,
+  diffAndUpdateChildren
+}
+function diffAndUpdate(ast, node, parentNode) {
   if (!node) {
     // Add a new node.
     appendNewNode(ast, node, parentNode)
@@ -42,6 +44,10 @@ function updateExitingNode(ast, node, parentNode) {
     updateTextNode(ast, node)
   }
 
+  diffAndUpdateChildren(ast, node)
+}
+
+function diffAndUpdateChildren(ast, node) {
   if (ast.childNodes) {
     updateChildren(ast, node)
     removeExtraChildren(ast, node)

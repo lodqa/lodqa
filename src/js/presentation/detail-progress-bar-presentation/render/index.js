@@ -1,4 +1,6 @@
-const updateDomTree = require('../../update-dom-tree')
+const {
+  updateDom
+} = require('../../update-dom-tree')
 const template = require('./template')
 
 module.exports = function(dom, dataset) {
@@ -6,5 +8,5 @@ module.exports = function(dom, dataset) {
     name: dataset.name,
     sparqls: dataset.currentStatusOfSparqls
   })
-  return (updateDomTree(dom, html))
+  updateDom(dom, html)
 }
