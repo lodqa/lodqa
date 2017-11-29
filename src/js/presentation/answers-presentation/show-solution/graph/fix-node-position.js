@@ -45,7 +45,7 @@ function specialSort(nodeOrder, a, b) {
 }
 
 function getOrderWhenThreeNode(edges){
-  getNodeOrder(getTwoEdgeNode(countEdge(edges)))
+  return getNodeOrder(getTwoEdgeNode(countEdge(edges)))
 }
 
 function getNodeOrder(id) {
