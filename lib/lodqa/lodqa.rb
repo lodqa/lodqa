@@ -20,6 +20,8 @@ class Lodqa::Lodqa
   attr_accessor :pgp
   attr_accessor :mappings
 
+  attr_reader :endpoint
+
   def initialize(ep_url, graph_uri, options = {})
     @graph_uri = graph_uri
     @options = options || {}
@@ -73,8 +75,6 @@ class Lodqa::Lodqa
     Lodqa::Logger.debug "Cancel query for pgp: #{@pgp}", request_id
     @cancel_flag = true
   end
-
-  private
 
   def anchored_pgps
     nodes_to_delete = []

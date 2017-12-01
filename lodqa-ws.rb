@@ -75,18 +75,68 @@ class LodqaWS < Sinatra::Base
 		return [400, 'Please use websocket'] unless request.websocket?
 
 		request.websocket do |ws|
+			config = get_config(params)
+
 			ws.onopen do
 				applicants = if target_exists?
-					p 'for one dataset'
-					[get_config(params)]
+					[config]
 				else
-					p 'for all dataset'
 					Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 				end
 
 				applicants.each do | applicant |
-					ws.send(applicant.to_json)
-					# ws.close_connection(true)
+					Lodqa::Async.defer do
+						begin
+							ws.send({event: :datasets, dataset: applicant[:name]}.to_json)
+
+							# pgp
+							pgp = pgp(applicant[:parser_url] || config[:parser_url], params['query'])
+							ws.send({event: :pgp, dataset: applicant[:name], pgp: pgp}.to_json)
+
+							# mappings
+							mappings = mappings(applicant[:dictionary_url], pgp)
+							ws.send({event: :mappings, dataset: applicant[:name], pgp: pgp, mappings: mappings}.to_json)
+
+							#Lodqa(anchored_pgp)
+							options = {
+								max_hop: applicant[:max_hop],
+								ignore_predicates: applicant[:ignore_predicates],
+								sortal_predicates: applicant[:sortal_predicates],
+								debug: false,
+								endpoint_options: {read_timeout: params['read_timeout'] || 60}
+							}
+							lodqa = Lodqa::Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], options)
+							lodqa.pgp = pgp
+							lodqa.mappings = mappings
+							anchored_pgps = lodqa.anchored_pgps
+							ws.send({event: :anchored_pgps, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgps: anchored_pgps}.to_json)
+
+							endpoint = Lodqa::CachedSparqlClient.new(applicant[:endpoint_url], {method: :get})
+							anchored_pgps.each do |anchored_pgp|
+								#GraphFinder(bgb)
+								graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, options)
+								# TOOD bgps should be a Enumerator
+								bgps = graph_finder.bgps
+								if bgps.length > 0
+									ws.send({event: :bgps, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgps: anchored_pgps, bgps: bgps}.to_json)
+
+									#SPARQL
+									bgps.each do |bgp|
+										query = {bgp:bgp, sparql:graph_finder.compose_sparql(bgp, anchored_pgp)}
+										ws.send({event: :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query}.to_json)
+
+										#solution
+										solutions = endpoint.query(query[:sparql]).map{ |solution| solution.to_h }
+										ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions}.to_json)
+									end
+								end
+							end
+						rescue OpenSSL::SSL::SSLError => e
+							Lodqa::Logger.error e
+						rescue GatewayError => e
+							Lodqa::Logger.debug e
+						end
+					end
 				end
 			end
 		end
@@ -99,7 +149,7 @@ class LodqaWS < Sinatra::Base
 			Lodqa::Logger.level = debug ? :debug : :info
 			parse_params
 
-			@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
+			@pgp = pgp(@config[:parser_url], params['query'])
 			if @pgp[:nodes].keys.length == 0
 				@message = 'The pgp has no nodes!'
 				return erb :error_before_answer
@@ -121,20 +171,16 @@ class LodqaWS < Sinatra::Base
 				begin
 					# Find terms of nodes and edges.
 					using_dataset = candidate_datasets.first
-					tf = Lodqa::TermFinder.new(using_dataset[:dictionary_url])
-					keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
 
 					# Set parameters for seaching answers
-					@mappings = tf.find(keywords)
+					@mappings = mappings(using_dataset[:dictionary_url], @pgp)
 
 					# Set parameters for finding label of answers
 					@endpoint_url = using_dataset[:endpoint_url]
 					@need_proxy = ['biogateway', 'ncats-experimental'].include? using_dataset[:name]
 
 					@candidate_datasets = candidate_datasets.map do |ds|
-						tf = Lodqa::TermFinder.new(ds[:dictionary_url])
-						keywords = @pgp[:nodes].values.map{|n| n[:text]}.concat(@pgp[:edges].map{|e| e[:text]})
-						ds[:mappings] = tf.find(keywords)
+						ds[:mappings] = mappings(ds[:dictionary_url], @pgp)
 						ds[:need_proxy] = ['biogateway', 'ncats-experimental'].include? ds[:name]
 						ds
 					end
@@ -292,5 +338,15 @@ class LodqaWS < Sinatra::Base
 
 	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
 	  config
+	end
+
+	def pgp(parser_url, query)
+		Lodqa::PGPFactory.create parser_url, query
+	end
+
+	def mappings(dictionary_url, pgp)
+		tf = Lodqa::TermFinder.new(dictionary_url)
+		keywords = pgp[:nodes].values.map{|n| n[:text]}.concat(pgp[:edges].map{|e| e[:text]})
+		tf.find(keywords)
 	end
 end

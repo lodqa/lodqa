@@ -8,6 +8,8 @@ require 'pp'
 require 'lodqa/logger'
 
 class GraphFinder
+  attr_reader :bgps
+
   # This constructor takes the URL of an end point to be searched
   # optionally options can be passed to the server of the end point.
   def initialize(pgp, endpoint, graph_uri, options = {})
@@ -114,6 +116,55 @@ class GraphFinder
 
       sleep(2)
     end
+  end
+
+  def compose_sparql(bgp, pgp)
+    nodes = pgp[:nodes]
+
+    # get the variables
+    variables = bgp.flatten.uniq - nodes.keys.map(&:to_s)
+
+    # initialize the query
+    query  = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')}\n"
+    query += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
+    query += "WHERE {"
+
+    # stringify the bgp
+    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e.to_sym) ? "<#{nodes[e.to_sym][:term]}>" : '?' + e}.join(' ')}.join(' . ') + ' .'
+
+    ## constraints on x-variables (including i-variables)
+    x_variables = variables.dup.keep_if {|v| v[0] == 'x' or v[0] == 'i'}
+
+    # x-variables to be bound to IRIs
+    query += " FILTER (" + x_variables.map{|v| "isIRI(#{'?'+v})"}.join(" && ") + ")" if x_variables.length > 0
+
+    # x-variables to be bound to different IRIs
+    x_variables.combination(2) {|c| query += " FILTER (#{'?'+c[0]} != #{'?'+c[1]})"} if x_variables.length > 1
+
+    ## constraintes on p-variables
+    p_variables = variables.dup.keep_if{|v| v[0] == 'p'}
+
+    # initialize exclude predicates
+    ex_predicates = []
+
+    # filter out ignore predicates
+    ex_predicates += @ignore_predicates
+
+    # filter out sotral predicates
+    ex_predicates += @sortal_predicates
+
+    unless ex_predicates.empty?
+      p_variables.each {|v| query += %| FILTER (str(?#{v}) NOT IN (#{ex_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
+    end
+
+    ## constraintes on s-variables
+    s_variables = variables.dup.keep_if{|v| v[0] == 's'}
+
+    # s-variables to be bound to sortal predicates
+    s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
+
+    # query += "}"
+    query += "} LIMIT 10"
   end
 
   private
@@ -232,54 +283,6 @@ class GraphFinder
     sparql
   end
 
-  def compose_sparql(bgp, pgp)
-    nodes = pgp[:nodes]
-
-    # get the variables
-    variables = bgp.flatten.uniq - nodes.keys.map(&:to_s)
-
-    # initialize the query
-    query  = "SELECT #{variables.map{|v| '?' + v.to_s}.join(' ')}\n"
-    query += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
-    query += "WHERE {"
-
-    # stringify the bgp
-    query += bgp.map{|tp| tp.map{|e| nodes.has_key?(e.to_sym) ? "<#{nodes[e.to_sym][:term]}>" : '?' + e}.join(' ')}.join(' . ') + ' .'
-
-    ## constraints on x-variables (including i-variables)
-    x_variables = variables.dup.keep_if {|v| v[0] == 'x' or v[0] == 'i'}
-
-    # x-variables to be bound to IRIs
-    query += " FILTER (" + x_variables.map{|v| "isIRI(#{'?'+v})"}.join(" && ") + ")" if x_variables.length > 0
-
-    # x-variables to be bound to different IRIs
-    x_variables.combination(2) {|c| query += " FILTER (#{'?'+c[0]} != #{'?'+c[1]})"} if x_variables.length > 1
-
-    ## constraintes on p-variables
-    p_variables = variables.dup.keep_if{|v| v[0] == 'p'}
-
-    # initialize exclude predicates
-    ex_predicates = []
-
-    # filter out ignore predicates
-    ex_predicates += @ignore_predicates
-
-    # filter out sotral predicates
-    ex_predicates += @sortal_predicates
-
-    unless ex_predicates.empty?
-      p_variables.each {|v| query += %| FILTER (str(?#{v}) NOT IN (#{ex_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
-    end
-
-    ## constraintes on s-variables
-    s_variables = variables.dup.keep_if{|v| v[0] == 's'}
-
-    # s-variables to be bound to sortal predicates
-    s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
-
-    # query += "}"
-    query += "} LIMIT 10"
-  end
 
   def stringify_term(t)
     if (t.class == RDF::URI)
