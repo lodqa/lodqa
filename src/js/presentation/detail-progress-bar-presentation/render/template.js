@@ -6,6 +6,7 @@ registerPartial()
 module.exports = handlebars.compile(`
   <div class="detail-progress-bar">
     <div>
+        <span class="detail-progress-bar__dataset-name" data-dataset-name="{{name}}">{{name}}</span>
         <input type="checkbox" id="show-only-has-answers-{{name}}" class="show-only-has-answers">
         <label for="show-only-has-answers-{{name}}">Show only sparqls with answers</label>
     </div>

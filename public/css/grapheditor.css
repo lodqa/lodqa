@@ -90,6 +90,10 @@
     text-align: center;
 }
 
+.detail-progress-bar__dataset-name {
+    display: none;
+}
+
 .detail-progress-bar__sparqls {
     width: 672px;
 }
