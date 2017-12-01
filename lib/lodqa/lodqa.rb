@@ -35,7 +35,7 @@ class Lodqa::Lodqa
   end
 
   # Return an enumerator to speed up checking the existence of sparqls.
-  def sparqls
+  def sparqls(anchored_pgps)
     Enumerator.new do |y|
       begin
         anchored_pgps.each do |anchored_pgp|
@@ -53,7 +53,7 @@ class Lodqa::Lodqa
     # Send number of spaqls before search
     # Note: Convert the sparqls to an array because it is an enumerator.
     #       Unless do this only part of sparqls will be sent to client.
-    proc_sparqls.call(sparqls.to_a) if proc_sparqls
+    proc_sparqls.call(sparqls(anchored_pgps).to_a) if proc_sparqls
 
     anchored_pgps.each do |anchored_pgp|
       proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
