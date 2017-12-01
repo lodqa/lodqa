@@ -66,6 +66,29 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
+	get '/answer2' do
+		parse_params
+		erb :answer2
+	end
+
+	get '/answer3' do
+		return [400, 'Please use websocket'] unless request.websocket?
+
+		config = get_config(params)
+		request.websocket do |ws|
+			ws.onopen do
+				if target_exists?
+					p 'for one dataset'
+				else
+					p 'for all dataset'
+				end
+
+				ws.send(config.to_json)
+				ws.close_connection(true)
+			end
+		end
+	end
+
 	aget '/answer' do
 		begin
 			debug = false # Change true to output debug log.
