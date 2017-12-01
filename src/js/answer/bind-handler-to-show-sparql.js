@@ -11,6 +11,6 @@ module.exports = function bindHandlerToShowSparql(parent, linkContainerDomSelect
   bindSparqlLinkClick(parent, linkContainerDomSelectors, (datasetName, sparqlNumber) => {
     const dataset = integratedDataset.getDataset(datasetName)
 
-    sparqlAndAnswersPresentation.show(sparqlNumber, dataset.getSparql(sparqlNumber), dataset.getSolution(sparqlNumber))
+    sparqlAndAnswersPresentation.show(dataset, sparqlNumber, dataset.getSparql(sparqlNumber), dataset.getSolution(sparqlNumber))
   })
 }
