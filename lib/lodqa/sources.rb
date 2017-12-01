@@ -5,10 +5,8 @@ require 'lodqa/async'
 module Lodqa
   module Sources
     class << self
-      def select_db_for(pgp, targets_url, read_timeout)
-        Logger.request_id = Logger.generate_request_id
-
-        applicants = begin
+      def applicants_from(targets_url)
+        begin
           RestClient.get targets_url do |response, request, result|
             case response.code
             when 200 then JSON.parse(response, symbolize_names: true)
@@ -18,6 +16,12 @@ module Lodqa
         rescue
           raise IOError, "invalid url #{targets_url}"
         end
+      end
+
+      def select_db_for(pgp, targets_url, read_timeout)
+        Logger.request_id = Logger.generate_request_id
+
+        applicants = applicants_from targets_url
 
         searchable?(pgp, applicants, read_timeout) { |dbs| yield dbs }
       end

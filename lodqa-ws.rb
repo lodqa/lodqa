@@ -74,17 +74,20 @@ class LodqaWS < Sinatra::Base
 	get '/answer3' do
 		return [400, 'Please use websocket'] unless request.websocket?
 
-		config = get_config(params)
 		request.websocket do |ws|
 			ws.onopen do
-				if target_exists?
+				applicants = if target_exists?
 					p 'for one dataset'
+					[get_config(params)]
 				else
 					p 'for all dataset'
+					Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 				end
 
-				ws.send(config.to_json)
-				ws.close_connection(true)
+				applicants.each do | applicant |
+					ws.send(applicant.to_json)
+					# ws.close_connection(true)
+				end
 			end
 		end
 	end
