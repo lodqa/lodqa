@@ -4,60 +4,60 @@ const registerPartial = require('../../../answer/register-partial')
 registerPartial()
 
 module.exports = handlebars.compile(`
-  <div class="progress-bar__detail-progress-bar">
+  <div class="detail-progress-bar">
     <div>
         <input type="checkbox" id="show-only-has-answers-{{name}}" class="show-only-has-answers">
         <label for="show-only-has-answers-{{name}}">Show only sparqls with answers</label>
     </div>
-    <ul class="progress-bar__detail-progress-bar__sparqls">
+    <ul class="detail-progress-bar__sparqls">
       {{#each sparqls}}
         {{#if error}}
           <li class="
-            progress-bar__detail-progress-bar__sparqls__sparql
-            progress-bar__detail-progress-bar__sparqls__sparql--error
+            detail-progress-bar__sparqls__sparql
+            detail-progress-bar__sparqls__sparql--error
           " data-sparql-number="{{sparqlNumber}}">
-            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
-            <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}"><i class="fa fa-bomb" aria-hidden="true" title="{{error}}"></i></label>
+            <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <label class="detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}"><i class="fa fa-bomb" aria-hidden="true" title="{{error}}"></i></label>
           </li>
         {{else if hasSolution}}
           <li class="
-            progress-bar__detail-progress-bar__sparqls__sparql
+            detail-progress-bar__sparqls__sparql
             {{#if uniqAnswersLength}}
-              progress-bar__detail-progress-bar__sparqls__sparql--has-answer
+              detail-progress-bar__sparqls__sparql--has-answer
             {{else}}
-              progress-bar__detail-progress-bar__sparqls__sparql--no-answer
+              detail-progress-bar__sparqls__sparql--no-answer
             {{/if}}
           " data-sparql-number="{{sparqlNumber}}">
-            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
             <input
-              class="progress-bar__detail-progress-bar__sparqls__sparql__selected-answers-checkbox button"
+              class="detail-progress-bar__sparqls__sparql__selected-answers-checkbox button"
               type="checkbox"
               {{#if visible}}
                 checked="checked"
               {{/if}}
               id="sparql-number-{{sparqlNumber}}">
-            <label class="progress-bar__detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
+            <label class="detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
           </li>
         {{else if isProgress}}
           <li class="
-            progress-bar__detail-progress-bar__sparqls__sparql
-            progress-bar__detail-progress-bar__sparqls__sparql--progress
+            detail-progress-bar__sparqls__sparql
+            detail-progress-bar__sparqls__sparql--progress
           " data-sparql-number="{{sparqlNumber}}">
-            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
-            <span class="progress-bar__detail-progress-bar__sparqls__sparql__loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
+            <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <span class="detail-progress-bar__sparqls__sparql__loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
           </li>
         {{else}}
           <li class="
-            progress-bar__detail-progress-bar__sparqls__sparql
+            detail-progress-bar__sparqls__sparql
             {{#if isProgress}}
-              progress-bar__detail-progress-bar__sparqls__sparql--progress
+              detail-progress-bar__sparqls__sparql--progress
             {{/if}}
           " data-sparql-number="{{sparqlNumber}}">
-            <span class="progress-bar__detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+            <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
           </li>
         {{/if}}
       {{else}}
-      <span class="progress-bar__detail-progress-bar__sparqls__no-sparql-message">No Sparql</span>
+      <span class="detail-progress-bar__sparqls__no-sparql-message">No Sparql</span>
       {{/each}}
     </ul>
   </div>

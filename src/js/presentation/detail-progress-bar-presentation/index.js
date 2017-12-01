@@ -5,14 +5,14 @@ const render = require('./render')
 // Render all of the progress bar
 module.exports = class {
   constructor(dataset) {
-    const dom = createDom('<div class="progress-bar__detail-progress-bar"></div>')
+    const dom = createDom('<div class="detail-progress-bar"></div>')
 
     // Render contents
     render(dom, dataset)
 
     // Bind an event handler on change events of checkboxes.
     dom.addEventListener('change', (e) => {
-      const sparql = e.target.closest('.progress-bar__detail-progress-bar__sparqls__sparql')
+      const sparql = e.target.closest('.detail-progress-bar__sparqls__sparql')
 
       if (sparql) {
         dataset.updateSparqlHideStatus(sparql.getAttribute('data-sparql-number'), !e.target.checked)
@@ -41,5 +41,5 @@ module.exports = class {
 }
 
 function toggleShowOnlyHasAnswers(detailProgressBar) {
-  detailProgressBar.classList.toggle('progress-bar__detail-progress-bar--show-only-has-answers')
+  detailProgressBar.classList.toggle('detail-progress-bar--show-only-has-answers')
 }
