@@ -8,10 +8,9 @@ module.exports = function bindHandlerToShowSparql(parent, linkContainerDomSelect
 
   // Create and bind a handler to show sparql presentation
   const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation(sparqlDomId, () => bindOneKeyupHandler(stopSearchIfEsc))
-  bindSparqlLinkClick(parent, linkContainerDomSelectors, (sparqlNumber) => {
-    const [datestNumber, sparqlCount] = sparqlNumber.split('-')
-    const dataset = integratedDataset.getDataset(Number(datestNumber))
+  bindSparqlLinkClick(parent, linkContainerDomSelectors, (datasetName, sparqlNumber) => {
+    const dataset = integratedDataset.getDataset(datasetName)
 
-    sparqlAndAnswersPresentation.show(sparqlCount, dataset.getSparql(sparqlCount), dataset.getSolution(sparqlCount))
+    sparqlAndAnswersPresentation.show(sparqlNumber, dataset.getSparql(sparqlNumber), dataset.getSolution(sparqlNumber))
   })
 }

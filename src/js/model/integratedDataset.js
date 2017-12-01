@@ -10,8 +10,8 @@ module.exports = class extends EventEmitter {
     this._datasetsOrder = []
   }
 
-  getDataset(datasetNumber) {
-    return this._datasetsOrder[datasetNumber - 1].dataset
+  getDataset(datasetName) {
+    return this._datasets.get(datasetName)
   }
 
   addDataset(dataset) {
@@ -123,14 +123,16 @@ function getDatasetsForAnswer(answer, datasetsOrder) {
   return datasetsOrder.map(({
     dataset
   }, index) => ({
-    sparqls: getSparqlsForAnswer(dataset.answerIndex, answer, index)
+    sparqls: getSparqlsForAnswer(dataset.answerIndex, answer, dataset, index)
   }))
 }
 
-function getSparqlsForAnswer(answerIndex, answer, index) {
+function getSparqlsForAnswer(answerIndex, answer, dataset, index) {
   return answerIndex
     .filter(a => a.label === answer.label)
     .map(a => a.sparqls.map(s => ({
-      sparqlNumber: `${index + 1}-${s.sparqlNumber}`
+      datasetName: dataset.name,
+      sparqlNumber: s.sparqlNumber,
+      sparqlName: `${index + 1}-${s.sparqlNumber}`
     })))[0]
 }

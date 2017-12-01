@@ -44,6 +44,11 @@ module.exports = class Model extends EventEmitter {
     return Array.from(Array(this.sparqlsMax))
       .map((val, index) => {
         const sparqlNumber = `${index + 1}`
+        const sparqlLink = {
+          datasetName: this.name,
+          sparqlNumber,
+          sparqlName: sparqlNumber,
+        }
 
         // SPARQLs with solutions
         if (this._solution.has(sparqlNumber)) {
@@ -54,28 +59,25 @@ module.exports = class Model extends EventEmitter {
             .length
           const error = solution.sparql_timeout
 
-          return {
-            sparqlNumber,
+          return Object.assign(sparqlLink, {
             hasSolution: true,
             uniqAnswersLength,
             visible: !this._hideSparqls.has(sparqlNumber),
             error: error && error.error_message
-          }
+          })
         }
 
         // The next SPARQL is progress
         if (this._progress && sparqlNumber === `${this.sparqlCount + 1}`) {
-          return {
-            sparqlNumber,
+          return Object.assign(sparqlLink, {
             hasSolution: false,
             isProgress: true
-          }
+          })
         }
 
-        return {
-          sparqlNumber,
+        return Object.assign(sparqlLink, {
           hasSolution: false,
-        }
+        })
       })
   }
 
