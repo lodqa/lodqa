@@ -3,7 +3,7 @@ const IntegtatenDataset = require('./model/integratedDataset')
 const Dataset = require('./model/dataset')
 const beginSearch = require('./answer/begin-search')
 const bindHandlerForKeyEvents = require('./answer/bind-handler-for-key-events')
-const bindHandlerToShowSparql2 = require('./answer/bind-handler-to-show-sparql2')
+const bindHandlerToShowSparql = require('./answer/bind-handler-to-show-sparql')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
 const IntegratedAnswerIndexPresentation = require('./presentation/integrated-answer-index-presentation')
@@ -40,4 +40,4 @@ new IntegratedAnswerIndexPresentation(
   integratedDataset
 )
 
-bindHandlerToShowSparql2(document, ['.integrated-answer-index', '.detailProgressBar'], 'lightbox', integratedDataset, loaders)
+bindHandlerToShowSparql(document, ['.integrated-answer-index', '.detailProgressBar'], 'lightbox', integratedDataset, loaders)
