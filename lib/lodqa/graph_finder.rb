@@ -63,12 +63,12 @@ class GraphFinder
     end
   end
 
-  def queries
-    @bgps.map {|bgp| {bgp:bgp, sparql:compose_sparql(bgp, @pgp)} }
+  def queries(bgps)
+    bgps.map {|bgp| {bgp:bgp, sparql:compose_sparql(bgp, @pgp)} }
   end
 
   def each_sparql_and_solution(proc_solution = nil, proc_cancel_flag)
-    queries.each do |query|
+    queries(bgps).each do |query|
       Lodqa::Logger.debug "#{query[:sparql]}\n++++++++++"
 
       begin

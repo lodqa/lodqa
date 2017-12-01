@@ -39,8 +39,8 @@ class Lodqa::Lodqa
     Enumerator.new do |y|
       begin
         anchored_pgps.each do |anchored_pgp|
-          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
-            .queries
+          graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+          graph_finder.queries(graph_finder.bgps)
             .each { |q| y << q[:sparql] }
         end
       rescue OpenSSL::SSL::SSLError => e
