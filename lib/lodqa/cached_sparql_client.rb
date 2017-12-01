@@ -3,8 +3,8 @@ require 'sparql/client'
 # Cache results of sparql to speed up SPARQL queries.
 module Lodqa
   class CachedSparqlClient
-    def initialize(endpaint_url, endpoint_options)
-      @client = SPARQL::Client.new(endpaint_url, endpoint_options)
+    def initialize(endpoint_url, endpoint_options)
+      @client = SPARQL::Client.new(endpoint_url, endpoint_options)
       @cache = {}
     end
 
