@@ -74,6 +74,9 @@ class LodqaWS < Sinatra::Base
 	get '/answer3' do
 		return [400, 'Please use websocket'] unless request.websocket?
 
+		Lodqa::Logger.level = :info
+		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
+
 		request.websocket do |ws|
 			config = get_config(params)
 
@@ -126,15 +129,21 @@ class LodqaWS < Sinatra::Base
 										ws.send({event: :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query}.to_json)
 
 										#solution
-										solutions = endpoint.query(query[:sparql]).map{ |solution| solution.to_h }
-										ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions}.to_json)
+										begin
+											solutions = endpoint.query(query[:sparql]).map{ |solution| solution.to_h }
+											ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions}.to_json)
+										rescue Lodqa::SparqlEndpointTimeoutError => e
+											Lodqa::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+										rescue Lodqa::SparqlEndpointTemporaryError => e
+											Lodqa::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+										end
 									end
 								end
 							end
-						rescue OpenSSL::SSL::SSLError => e
-							Lodqa::Logger.error e
-						rescue GatewayError => e
-							Lodqa::Logger.debug e
+						rescue Lodqa::SparqlEndpointError => e
+							Lodqa::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
+						rescue Lodqa::TermFindError => e
+							Lodqa::Logger.debug e.message
 						end
 					end
 				end
@@ -186,7 +195,7 @@ class LodqaWS < Sinatra::Base
 					end
 
 					body erb(:answer)
-				rescue GatewayError
+				rescue Lodqa::TermFindError
 					@message = 'Dictionary lookup error!'
 					body erb(:error_before_answer)
 				rescue => e
@@ -240,7 +249,7 @@ class LodqaWS < Sinatra::Base
 				"Access-Control-Allow-Origin" => "*"
 			content_type :json
 			mappings.to_json
-		rescue GatewayError
+		rescue Lodqa::TermFindError
 			status 502
 		end
 	end

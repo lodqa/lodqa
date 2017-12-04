@@ -1,1 +1,0 @@
-class GatewayError < StandardError; end

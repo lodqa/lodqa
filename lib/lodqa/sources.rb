@@ -46,7 +46,7 @@ module Lodqa
                 .new(applicant[:dictionary_url])
                 .find(keywords)
               applicant
-            rescue GatewayError
+            rescue TermFindError
               p "dictionary_url error for #{applicant[:name]}"
               applicant
             end
