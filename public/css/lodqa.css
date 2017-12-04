@@ -83,7 +83,7 @@ a:visited {
 
 .query-region {
     border-radius: 2px;
-    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
     display: inline-block;
     padding: 6px 9px 0 16px;
@@ -94,7 +94,7 @@ a:visited {
 
 #query {
     border: none;
-    font: 16px arial,sans-serif;
+    font: 16px arial, sans-serif;
     line-height: 34px;
     margin: 0px;
     outline: none;
