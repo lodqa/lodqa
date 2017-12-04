@@ -2,7 +2,7 @@ const {
   EventEmitter
 } = require('events')
 const SparqlCount = require('./sparql-count')
-const getUniqAnswers = require('./get-uniq-answers')
+const getUniqAnswers = require('../get-uniq-answers')
 const addAnswersOfSparql = require('./add-answers-of-sparql')
 const filterVisibleAnswers = require('./filter-visible-answers')
 const bindModelToLoader = require('./bind-model-to-loader')
