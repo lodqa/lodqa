@@ -1,4 +1,6 @@
 #header {
+    background-color: #fafafa;
+    border-bottom: 1px solid #ebebeb;
     min-width: 1100px;
 }
 
@@ -6,7 +8,7 @@
     height: 30px;
     padding-left: 13px;
     padding-right: 12px;
-    padding-top: 22px;
+    padding-top: 29px;
     width: 120px;
 }
 
@@ -15,7 +17,8 @@
 }
 
 #nlq {
-    padding-top: 15px;
+    margin-left: 4px;
+    padding-top: 19px;
 }
 
 .datasets {
