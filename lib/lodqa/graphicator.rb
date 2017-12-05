@@ -25,7 +25,42 @@ class Lodqa::Graphicator
     graphicate(@parse)
   end
 
+  def template
+    pgp2template(graphicate(@parse))
+  end
+
   private
+
+  def pgp2template(pgp)
+    nodes, edges, focus = pgp[:nodes], pgp[:edges], pgp[:focus].to_sym
+
+    query  = "SELECT ?#{focus} WHERE {"
+    query += " ?#{focus} ?p0 ?c#{focus} ." unless nodes[focus][:text].downcase == 'what'
+    query += edges.map.with_index{|e, i| " ?#{e[:subject]} ?p#{i+1} ?#{e[:object]} ."}.join
+    query += " }"
+
+    slots = []
+
+    nodes.each do |k, n|
+      next if k == focus && nodes[focus][:text].downcase == 'what'
+
+      v    = (k == focus) ? "c#{k}" : k
+      type = (k == focus) ? "rdf:Class" : "rdf:Class|rdf:Resource"
+      text = n[:text]
+      text = "person" if text.downcase == 'who'
+
+      slots << {s:v, p:"is", o:type}
+      slots << {s:v, p:"verbalization", o:text}
+    end
+
+    slots << {s:"p0", p:"is", o:"<http://lodqa.org/vocabulary/sort_of>"} unless nodes[focus][:text].downcase == 'what'
+    edges.each_with_index do |e, i|
+      slots << {s:"p#{i+1}", p:"is", o:"rdf:Property"}
+      slots << {s:"p#{i+1}", p:"verbalization", o:e[:text]}
+    end
+
+    {query:query, slots:slots}
+  end
 
   def graphicate(parse)
     nodes = get_nodes(parse)
