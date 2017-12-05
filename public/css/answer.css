@@ -235,8 +235,22 @@
 
 .summary-progress {
     width: 600px;
+    margin-bottom: 1em;
 }
 
 .summary-progress__progress-bar {
     width: 100%
+}
+
+.datasets-progress {
+    width: 600px;
+}
+
+.datasets-progress__infomation {
+    display: flex;
+    justify-content: space-between;
+}
+
+.datasets-progress__progressbar {
+    width: calc(100% - 50px);
 }
