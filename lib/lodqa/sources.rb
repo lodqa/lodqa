@@ -1,20 +1,24 @@
 require 'rest_client'
 require 'lodqa/termfinder'
 require 'lodqa/async'
+require 'lodqa/configuration'
 
 module Lodqa
   module Sources
     class << self
-      def applicants_from(targets_url)
+      def applicants_from(target_url)
         begin
-          RestClient.get targets_url do |response, request, result|
+          RestClient.get target_url do |response, request, result|
             case response.code
-            when 200 then JSON.parse(response, symbolize_names: true)
-              else raise IOError, "invalid url #{targets_url}"
+            when 200 then JSON.parse response, {:symbolize_names => true}
+            else
+              Logger.error nil, message: "Configuration Server retrun an error for #{target_url}", response_code: response.code, response_body: response.body
+              raise IOError, "Response Error for url: #{target_url}"
             end
           end
         rescue
-          raise IOError, "invalid url #{targets_url}"
+          Logger.error nil, message: "Cannot connect the Configuration Server for #{target_url}"
+          raise IOError, "invalid url #{target_url}"
         end
       end
 

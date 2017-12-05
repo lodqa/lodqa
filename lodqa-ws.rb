@@ -81,16 +81,21 @@ class LodqaWS < Sinatra::Base
 			config = get_config(params)
 
 			ws.onopen do
-				applicants = if target_exists?
-					[config]
-				else
-					Lodqa::Sources.applicants_from "#{settings.target_db}.json"
-				end
-
-				applicants.each do | applicant |
-					Lodqa::Async.defer do
-						search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']
+				begin
+					applicants = if target_exists?
+						[config]
+					else
+						Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 					end
+
+					applicants.each do | applicant |
+						Lodqa::Async.defer do
+							search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']
+						end
+					end
+				rescue IOError => e
+					Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+					ws.close_connection
 				end
 			end
 		end

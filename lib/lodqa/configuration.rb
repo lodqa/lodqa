@@ -12,18 +12,8 @@ module Lodqa
       end
 
       def for_target(target_url)
-        config = begin
-  				RestClient.get target_url do |response, request, result|
-  					case response.code
-  					when 200 then JSON.parse response, {:symbolize_names => true}
-  					else raise IOError, "invalid target"
-  					end
-  				end
-  			rescue
-  				raise IOError, "invalid target"
-  			end
-
-  			config.delete_if{|k, v| v.nil?}
+        config = Sources.applicants_from target_url
+        config.delete_if{|k, v| v.nil?}
         config
       end
     end
