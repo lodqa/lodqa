@@ -156,10 +156,13 @@
 
 /* answer 2 */
 
-.answer-summary {
-    font-size: 18px;
+.content {
     padding-top: 32px;
     padding-left: 161px;
+}
+
+.answer-summary {
+    font-size: 18px;
 }
 
 .answer-summary__answer {
@@ -228,4 +231,12 @@
 
 .answer-summary__sparql a:link {
     color: #1a0dab;
+}
+
+.summary-progress {
+    width: 600px;
+}
+
+.summary-progress__progress-bar {
+    width: 100%
 }

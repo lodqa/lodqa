@@ -1,13 +1,16 @@
 const AnswerSummary = require('./model/answer-summary')
 const AnswerSummaryPresentation = require('./presentation/answer-summary-presentation')
+const SummaryProgress = require('./model/summary-progress')
+const SummaryProgressPresentation = require('./presentation/summary-progressbar-presentation')
 const LoaderForAnswer2 = require('./loader/loader-for-answer2')
 
 ;
 (() => {
-  const dom = document.querySelector('.answer-summary')
   const loader = new LoaderForAnswer2()
-  const model = new AnswerSummary(loader)
-  new AnswerSummaryPresentation(dom, model)
+  const answerSummary = new AnswerSummary(loader)
+  new AnswerSummaryPresentation(document.querySelector('.answer-summary'), answerSummary)
+  const summaryProgress = new SummaryProgress(loader)
+  new SummaryProgressPresentation(document.querySelector('.summary-progress'), summaryProgress)
 
   start(loader)
 })()
