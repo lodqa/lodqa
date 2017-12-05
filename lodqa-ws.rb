@@ -174,7 +174,7 @@ class LodqaWS < Sinatra::Base
 			show_result = -> (candidate_datasets) do
 				# Show error message if there is no valid dataset.
 				if candidate_datasets.empty?
-					@message = if target_exists?
+					@message = if target_exists? params
 						"<strong>#{@config[:name]}</strong> is not an enough database for the query!"
 					else
 						'There is no db which has all words in the query!'
@@ -213,7 +213,7 @@ class LodqaWS < Sinatra::Base
 
 			# Search datasets automatically unless target parametrs.
 			read_timeout = params['read_timeout'].to_i
-			if target_exists?
+			if target_exists? params
 				Lodqa::Sources.searchable?(@pgp, [@config], read_timeout) { |dbs| show_result.call dbs }
 			else
 				Lodqa::Sources.select_db_for(@pgp, settings.target_db + '.json', read_timeout) { |dbs| show_result.call dbs  }
@@ -321,7 +321,7 @@ class LodqaWS < Sinatra::Base
 
 	private
 
-	def target_exists?
+	def target_exists?(params)
 		!params['target'].nil? && !params['target'].empty?
 	end
 
@@ -345,7 +345,7 @@ class LodqaWS < Sinatra::Base
 		config = Lodqa::Configuration.default(settings.root)
 
 		# target name passed through params
-		if target_exists?
+		if target_exists? params
 			target_url = settings.target_db + '/' + params['target'] + '.json'
 			config_add = Lodqa::Configuration.for_target target_url
 			config.merge! config_add unless config_add.nil?

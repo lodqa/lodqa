@@ -34,7 +34,7 @@
                     <div id="mappings"><%= @mappings.to_json %></div>
                     <div id="target"><%= @candidate_datasets[0][:name] %></div>
                 </div>
-                <% if target_exists? %>
+                <% if target_exists? params %>
                 <strong><%= params['target'] %></strong> is being searched.
                 <% else %>
                 <div>
