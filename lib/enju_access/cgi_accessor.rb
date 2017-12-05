@@ -13,10 +13,10 @@ class EnjuAccess::CGIAccessor
 
   # Noun-chunk elements
   # (Note that PRP is not included. For dialog analysis however PRP (personal pronoun) would need to be included.)
-  NC_CAT      = ["NN", "NNP", "CD", "FW", "JJ"]
+  NC_CAT      = ["NN", "NNP", "CD", "FW", "JJ", "WP"]
 
   # Noun-chunk elements that may appear at the head position
-  NC_HEAD_CAT = ["NN", "NNP", "CD", "FW"]
+  NC_HEAD_CAT = ["NN", "NNP", "CD", "FW", "WP"]
 
   # wh-pronoun and wh-determiner
   WH_CAT      = ["WP", "WDT"]
@@ -141,25 +141,20 @@ class EnjuAccess::CGIAccessor
   def get_focus (tokens, base_noun_chunks)
     # find the wh-word
     # assumption: one query has one wh-word
-    wh = -1
-    tokens.each do |t|
-      if WH_CAT.include?(t[:cat])
-        wh = t[:idx]
-        break
-      end
-    end
+    wh_idx = tokens.index{|t| WH_CAT.include?(t[:cat])}
 
-    focus = if wh > -1
-              if tokens[wh][:args]
-                tokens[wh][:args][0][1]
-              else
-                wh
-              end
-            elsif base_noun_chunks.nil? || base_noun_chunks.empty?
-              0
-            else
-              base_noun_chunks[0][:head]
-            end
+    focus = if wh_idx
+      wh = tokens[wh_idx][:idx]
+      if tokens[wh][:args]
+        tokens[wh][:args][0][1]
+      else
+        wh
+      end
+    elsif base_noun_chunks.nil? || base_noun_chunks.empty?
+      0
+    else
+      base_noun_chunks[0][:head]
+    end
   end
 
 end
