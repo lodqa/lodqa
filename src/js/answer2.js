@@ -11,9 +11,10 @@ const LoaderForAnswer2 = require('./loader/loader-for-answer2')
   const loader = new LoaderForAnswer2()
   const answerSummary = new AnswerSummary(loader)
   new AnswerSummaryPresentation(document.querySelector('.answer-summary'), answerSummary)
-  const summaryProgress = new SummaryProgress(loader)
-  new SummaryProgressPresentation(document.querySelector('.summary-progress'), summaryProgress)
+
   const datasetsProgress = new DatasetsProgress(loader)
+  const summaryProgress = new SummaryProgress(loader, datasetsProgress)
+  new SummaryProgressPresentation(document.querySelector('.summary-progress'), summaryProgress)
   new DatasetsProgressPresentation(document.querySelector('.datasets-progress'), datasetsProgress)
 
   start(loader)

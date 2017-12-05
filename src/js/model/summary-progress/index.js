@@ -3,12 +3,13 @@ const {
 } = require('events')
 
 module.exports = class extends EventEmitter {
-  constructor(loader) {
+  constructor(loader, datasetsProgress) {
     super()
 
     this._max = 0
     this._value = 0
     this._showDatasets = false
+    this._datasetsProgress = datasetsProgress
 
     // A Dataset with bgps will have SPARQLs
     loader.on('bgps', ({
@@ -23,10 +24,10 @@ module.exports = class extends EventEmitter {
     })
   }
 
-  showDatasets(isShow) {
-    this._showDatasets = isShow
+  showDatasets(visible) {
+    this._showDatasets = visible
+    this._datasetsProgress.visible = visible
     this.emit('progress_summary_update_event')
-    console.log('show', isShow)
   }
 
   get snapshot() {

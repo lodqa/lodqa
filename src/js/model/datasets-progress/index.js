@@ -6,10 +6,8 @@ module.exports = class extends EventEmitter {
   constructor(loader) {
     super()
 
+    this._visible = false
     this._datasets = new Map()
-    this._max = 0
-    this._value = 0
-    this._showDatasets = false
 
     // A Dataset with bgps will have SPARQLs
     loader.on('bgps', ({
@@ -36,6 +34,11 @@ module.exports = class extends EventEmitter {
     })
   }
 
+  set visible(visible) {
+    this._visible = visible
+    this.emit('progress_datasets_update_event')
+  }
+
   showDataset(dataset, isShow) {
     for (const [name, state] of this._datasets.entries()) {
       state.show = name === dataset
@@ -45,6 +48,10 @@ module.exports = class extends EventEmitter {
   }
 
   get snapshot() {
+    if (!this._visible) {
+      return []
+    }
+
     return Array.from(this._datasets.entries())
       .map(([name, state]) => ({
         name,
