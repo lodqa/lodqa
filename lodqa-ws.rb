@@ -45,6 +45,27 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
+	get '/template.json' do
+		begin
+			# debug = true # to log for debugging.
+			debug = false
+
+			Lodqa::Logger.level = debug ? :debug : :info
+			parse_params
+
+			string = params['string']
+			language = params['language'] || 'en'
+
+			raise ArgumentError, "The parameter 'string' is missing." unless string
+			raise ArgumentError, "Currently only queries in English is accepted." unless language == 'en'
+
+			template = Lodqa::Graphicator.new(@config[:parser_url]).parse(string).template
+
+			headers 'Content-Type' => 'application/json'
+			body template.to_json
+		end
+	end
+
 	aget '/answer' do
 		begin
 			debug = false # Change true to output debug log.
@@ -201,6 +222,14 @@ class LodqaWS < Sinatra::Base
 		rescue OpenURI::HTTPError
 			status 502
 		end
+	end
+
+	not_found do
+		"unknown path.\n"
+	end
+
+	error do
+	  env['sinatra.error'].message + "\n"
 	end
 
 	private
