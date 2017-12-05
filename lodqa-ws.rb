@@ -68,7 +68,14 @@ class LodqaWS < Sinatra::Base
 
 	get '/answer2' do
 		parse_params
-		erb :answer2
+
+		applicants = applicants_dataset(params)
+		if applicants.length > 0
+			erb :answer2
+		else
+			response.status = 404
+			body 'No dataset found'
+		end
 	end
 
 	get '/answer3' do
@@ -82,12 +89,7 @@ class LodqaWS < Sinatra::Base
 
 			ws.onopen do
 				begin
-					applicants = if target_exists?
-						[config]
-					else
-						Lodqa::Sources.applicants_from "#{settings.target_db}.json"
-					end
-
+					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
 						Lodqa::Async.defer do
 							search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']
@@ -96,8 +98,18 @@ class LodqaWS < Sinatra::Base
 				rescue IOError => e
 					Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
 					ws.close_connection
+				rescue => e
+					Lodqa::Logger.error e
 				end
 			end
+		end
+	end
+
+	def applicants_dataset(params)
+		if target_exists? params
+			[get_config(params)]
+		else
+			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 		end
 	end
 
@@ -159,6 +171,8 @@ class LodqaWS < Sinatra::Base
 			Lodqa::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
 		rescue Lodqa::TermFindError => e
 			Lodqa::Logger.debug e.message
+		rescue => e
+			Lodqa::Logger.error e
 		end
 	end
 
