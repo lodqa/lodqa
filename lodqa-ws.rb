@@ -45,7 +45,7 @@ class LodqaWS < Sinatra::Base
 		erb :index
 	end
 
-	get '/template.json' do
+	post '/template.json' do
 		begin
 			# debug = true # to log for debugging.
 			debug = false
