@@ -211,6 +211,7 @@
 
 .answer-summary__sparql-list {
     display: flex;
+    flex-wrap: wrap;
     font-family: arial, sans-serif;
     font-size: small;
     line-height: 18px;
