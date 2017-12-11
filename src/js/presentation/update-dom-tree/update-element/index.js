@@ -1,5 +1,5 @@
 const createElement = require('../create-element')
-const uncheck = require('./uncheck')
+const updateBooleanAttribute = require('./update-boolean-attribute')
 
 module.exports = function(ast, element, parentNode) {
   if (ast.tagName.toUpperCase() === element.tagName) {
@@ -12,7 +12,8 @@ module.exports = function(ast, element, parentNode) {
         element.setAttribute(name, value)
       })
 
-    uncheck(ast, element)
+    updateBooleanAttribute(ast, element, 'checked')
+    updateBooleanAttribute(ast, element, 'disabled')
 
     return element
   } else {
