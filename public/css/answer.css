@@ -166,6 +166,10 @@
     font-size: 18px;
 }
 
+.answer-summary__answer-list {
+    height: 700px;
+}
+
 .answer-summary__answer {
     margin-bottom: 26px;
 }
@@ -233,6 +237,39 @@
 
 .answer-summary__sparql a:link {
     color: #1a0dab;
+}
+
+.answer-summary-pages {
+    display: flex;
+    justify-content: space-between;
+    width: 600px;
+}
+
+.answer-summary-pages__link-prev {
+    display: inline-block;
+    width: 100px;
+}
+
+.answer-summary-pages__page {
+    display: inline-block;
+    text-align: center;
+    width: 20px;
+}
+
+.answer-summary-pages__link-label {
+    color: #4285f4;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.answer-summary-pages__link-label--current {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.answer-summary-pages__link-next {
+    display: inline-block;
+    text-align: right;
+    width: 100px;
 }
 
 .summary-progress {

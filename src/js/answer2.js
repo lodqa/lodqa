@@ -1,5 +1,7 @@
 const AnswerSummary = require('./model/answer-summary')
 const AnswerSummaryPresentation = require('./presentation/answer-summary-presentation')
+const Pagination = require('./model/pagenation')
+const PaginationPresentation = require('./presentation/pagination-presentation')
 const SummaryProgress = require('./model/summary-progress')
 const SummaryProgressPresentation = require('./presentation/summary-progressbar-presentation')
 const DatasetsProgress = require('./model/datasets-progress')
@@ -12,7 +14,9 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
 (() => {
   const loader = new LoaderForAnswer2()
   const answerSummary = new AnswerSummary(loader)
-  new AnswerSummaryPresentation(document.querySelector('.answer-summary'), answerSummary)
+  const pagination = new Pagination(answerSummary)
+  new AnswerSummaryPresentation(document.querySelector('.answer-summary'), pagination)
+  new PaginationPresentation(document.querySelector('.answer-summary-pages'), pagination)
 
   const datasetsProgress = new DatasetsProgress(loader)
   const summaryProgress = new SummaryProgress(loader, datasetsProgress)

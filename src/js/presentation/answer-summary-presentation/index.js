@@ -11,23 +11,25 @@ module.exports = class {
 }
 
 const template = Handlebars.compile(`
-{{#each this}}
-<div class="answer-summary__answer">
-  <h3 class="answer-summary__answer-label"><a href="{{url}}" target="_blank">{{label}}</a></h3>
-  <div class="answer-summary__answer-summary">
-    <div class="answer-summary__answer-url">
-      <cite class="answer-summary__answer-url__cite">{{url}}</cite>
+<div class="answer-summary__answer-list">
+  {{#each this}}
+  <div class="answer-summary__answer">
+    <h3 class="answer-summary__answer-label"><a href="{{url}}" target="_blank">{{label}}</a></h3>
+    <div class="answer-summary__answer-summary">
+      <div class="answer-summary__answer-url">
+        <cite class="answer-summary__answer-url__cite">{{url}}</cite>
+      </div>
+      <ul class="answer-summary__sparql-list">
+        {{#each sparqls}}
+          <li class="answer-summary__sparql">
+            <a href="#" data-dataset-name="{{dataset}}" data-sparql-number="{{number}}">S{{parentNumber}}-{{number}}</a>
+          </li>
+        {{/each}}
+      </ul>
     </div>
-    <ul class="answer-summary__sparql-list">
-      {{#each sparqls}}
-        <li class="answer-summary__sparql">
-          <a href="#" data-dataset-name="{{dataset}}" data-sparql-number="{{number}}">S{{parentNumber}}-{{number}}</a>
-        </li>
-      {{/each}}
-    </ul>
   </div>
-</div>
-{{/each}}
+  {{/each}}
+</diz>
 `)
 
 function render(dom, model) {
