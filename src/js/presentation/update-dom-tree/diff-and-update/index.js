@@ -7,6 +7,7 @@ module.exports = {
   diffAndUpdate,
   diffAndUpdateChildren
 }
+
 function diffAndUpdate(ast, node, parentNode) {
   if (!node) {
     // Add a new node.
