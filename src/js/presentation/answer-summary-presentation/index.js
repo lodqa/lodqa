@@ -11,7 +11,7 @@ module.exports = class {
 }
 
 const template = Handlebars.compile(`
-{{#each answers}}
+{{#each this}}
 <div class="answer-summary__answer">
   <h3 class="answer-summary__answer-label"><a href="{{url}}" target="_blank">{{label}}</a></h3>
   <div class="answer-summary__answer-summary">

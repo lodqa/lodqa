@@ -23,8 +23,6 @@ module.exports = class AnswerContainer {
   get snapshot() {
     const answers = Array.from(this._answers.values())
 
-    return {
-      answers
-    }
+    return answers
   }
 }
