@@ -40,11 +40,17 @@ module.exports = class extends EventEmitter {
   }
 
   showDataset(dataset, isShow) {
-    for (const [name, state] of this._datasets.entries()) {
-      state.show = name === dataset
+    // Hide all datasets
+    for (const state of this._datasets.values()) {
+      state.show = false
     }
+
+    // Show or hide the specific dataset
+    Array.from(this._datasets.entries())
+      .filter(([name]) => name === dataset)
+      .forEach(([, state]) => state.show = isShow)
+
     this.emit('progress_datasets_update_event')
-    console.log('show', dataset, isShow)
   }
 
   get snapshot() {
