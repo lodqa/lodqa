@@ -5,6 +5,8 @@ const SummaryProgressPresentation = require('./presentation/summary-progressbar-
 const DatasetsProgress = require('./model/datasets-progress')
 const DatasetsProgressPresentation = require('./presentation/datasets-progressbar-presentation')
 const LoaderForAnswer2 = require('./loader/loader-for-answer2')
+const SparqlContainer = require('./model/sparql-container')
+const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
 
 ;
 (() => {
@@ -18,6 +20,9 @@ const LoaderForAnswer2 = require('./loader/loader-for-answer2')
   new DatasetsProgressPresentation(document.querySelector('.datasets-progress'), datasetsProgress)
 
   start(loader)
+
+  const sparqlContainer = new SparqlContainer(loader)
+  bindHandlerToShowSparql(document, ['.answer-summary__sparql'], 'lightbox', sparqlContainer)
 })()
 
 function start(loader) {

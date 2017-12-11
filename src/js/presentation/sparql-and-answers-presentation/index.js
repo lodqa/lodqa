@@ -39,6 +39,23 @@ module.exports = class {
       sparqlPresentationShow(content, sparqlNumber, sparql)
     }
   }
+
+  show2(sparqlNumber, datasetName, anchoredPgp, sparql, solution) {
+    const lightbox = document.querySelector(`#${this.lightboxDomId}`)
+    lightbox.classList.remove('hidden')
+
+    bindOneKeyupHandler(doIfEsc(this.close))
+
+    const content = lightbox.querySelector('.content')
+    content.innerHTML = datasetName
+
+    if (solution) {
+      sparqlPresentationShow(content, sparqlNumber, sparql, solution.sparql_timeout)
+      answersPresentationShow(content, anchoredPgp, solution)
+    } else {
+      sparqlPresentationShow(content, sparqlNumber, sparql)
+    }
+  }
 }
 
 function closeDialog(lightboxDomId) {
