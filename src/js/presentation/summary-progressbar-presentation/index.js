@@ -18,7 +18,7 @@ module.exports = class {
 }
 
 const template = Handlebars.compile(`
-  <progress class="summary-progress__progress-bar" max="{{max}}" value="{{value}}"></progress>
+  <progress class="summary-progress__progressbar" max="{{max}}" value="{{value}}"></progress>
   <input class="summary-progress__checkbox" id="summary-progress__checkbox" type="checkbox" {{#if showDatasets}}checked="checked"{{/if}}/>
   <label for="summary-progress__checkbox">Show progerss per datasets</label>
 `)
