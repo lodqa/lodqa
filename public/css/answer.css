@@ -288,6 +288,7 @@
 }
 
 .datasets-progressbar {
+    margin-bottom: 1em;
     width: 600px;
 }
 
@@ -298,4 +299,19 @@
 
 .datasets-progressbar__progressbar {
     width: calc(100% - 50px);
+}
+
+.detail-progressbar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-bottom: 350px;
+}
+
+.detail-progress-bar__sparqls {
+    width: 588px;
+}
+
+.detail-progress-bar__sparqls__sparql {
+    width: 4.81em;
 }

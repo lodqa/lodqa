@@ -6,6 +6,8 @@ const SummaryProgress = require('./model/summary-progress')
 const SummaryProgressbarPresentation = require('./presentation/summary-progressbar-presentation')
 const DatasetsProgress = require('./model/datasets-progress')
 const DatasetsProgressbarPresentation = require('./presentation/datasets-progressbar-presentation')
+const SparqlFilter = require('./model/sparql-filter')
+const DetailProgressbarPresentation = require('./presentation/detail-progressbar-presentation')
 const LoaderForAnswer2 = require('./loader/loader-for-answer2')
 const SparqlContainer = require('./model/sparql-container')
 const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
@@ -24,22 +26,25 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
   const summaryProgress = new SummaryProgress(loader, datasetsProgress)
   new SummaryProgressbarPresentation(document.querySelector('.summary-progressbar'), summaryProgress)
   new DatasetsProgressbarPresentation(document.querySelector('.datasets-progressbar'), datasetsProgress)
+  const sparqlFilter = new SparqlFilter(datasetsProgress)
+  new DetailProgressbarPresentation(document.querySelector('.detail-progressbar'), sparqlFilter)
 
   // Bind user's events.
-  document.addEventListener('click', (({
+  document.addEventListener('change', ({
     target
   }) => {
     if (target.closest('.summary-progressbar__checkbox')) {
       summaryProgress.showDatasets(target.checked)
     }
-  }))
-  document.addEventListener('click', (({
-    target
-  }) => {
+
     if (target.closest('.datasets-progressbar__checkbox')) {
       datasetsProgress.showDataset(target.dataset.name, target.checked)
     }
-  }))
+
+    if (target.closest('.show-only-has-answers')) {
+      sparqlFilter.showOnlyWithAnswer = target.checked
+    }
+  })
   const sparqlContainer = new SparqlContainer(loader)
   bindHandlerToShowSparql(document, 'lightbox', sparqlContainer)
 

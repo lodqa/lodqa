@@ -50,12 +50,17 @@ module.exports = class {
       visible: true,
       error: s.error
     }))
-      .concat([{
+      .concat(this._progress ? [{
         hasSolution: false,
         isProgress: true
-      }])
+      }] : [])
       .concat(this._bgps.map(() => ({
         hasSolution: false
       })))
+      .map((s, index) => Object.assign(s, {
+        datasetName: this.name,
+        sparqlNumber: index + 1,
+        sparqlName: index + 1,
+      }))
   }
 }

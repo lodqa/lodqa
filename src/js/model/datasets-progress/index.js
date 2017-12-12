@@ -53,6 +53,17 @@ module.exports = class extends EventEmitter {
     this.emit('progress_datasets_update_event')
   }
 
+  get stateOfSparqlsOfSelectedDataset() {
+    if (!this._visible) {
+      return
+    }
+
+    return this._selectdDataset && {
+      name: this._selectdDataset,
+      sparqls: this._datasets.get(this._selectdDataset).snapshot
+    }
+  }
+
   get snapshot() {
     if (!this._visible) {
       return []
