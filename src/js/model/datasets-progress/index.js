@@ -1,6 +1,7 @@
 const {
   EventEmitter
 } = require('events')
+const DatasetProgress = require('./dataset-progress')
 
 module.exports = class extends EventEmitter {
   constructor(loader) {
@@ -15,21 +16,19 @@ module.exports = class extends EventEmitter {
       bgps
     }) => {
       if (!this._datasets.has(dataset)) {
-        this._datasets.set(dataset, {
-          max: 0,
-          value: 0
-        })
+        this._datasets.set(dataset, new DatasetProgress(dataset))
       }
 
-      const state = this._datasets.get(dataset)
-      state.max += bgps.length
+      const progress = this._datasets.get(dataset)
+      progress.max += bgps.length
       this.emit('progress_datasets_update_event')
     })
+
     loader.on('solutions', ({
       dataset
     }) => {
-      const state = this._datasets.get(dataset)
-      state.value += 1
+      const progress = this._datasets.get(dataset)
+      progress.value += 1
       this.emit('progress_datasets_update_event')
     })
   }
@@ -41,14 +40,14 @@ module.exports = class extends EventEmitter {
 
   showDataset(dataset, isShow) {
     // Hide all datasets
-    for (const state of this._datasets.values()) {
-      state.show = false
+    for (const progress of this._datasets.values()) {
+      progress.show = false
     }
 
     // Show or hide the specific dataset
     Array.from(this._datasets.entries())
       .filter(([name]) => name === dataset)
-      .forEach(([, state]) => state.show = isShow)
+      .forEach(([, progress]) => progress.show = isShow)
 
     this.emit('progress_datasets_update_event')
   }
@@ -58,13 +57,13 @@ module.exports = class extends EventEmitter {
       return []
     }
 
-    return Array.from(this._datasets.entries())
-      .map(([name, state]) => ({
-        name,
-        max: state.max,
-        value: state.value,
-        percentage: Math.floor(state.value / state.max * 1000) / 10,
-        show: state.show
+    return Array.from(this._datasets.values())
+      .map((progress) => ({
+        name: progress.name,
+        max: progress.max,
+        value: progress.value,
+        percentage: progress.percentage,
+        show: progress.show
       }))
   }
 }
