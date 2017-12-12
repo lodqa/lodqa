@@ -19,16 +19,20 @@ module.exports = class extends EventEmitter {
         this._datasets.set(dataset, new DatasetProgress(dataset))
       }
 
-      const progress = this._datasets.get(dataset)
-      progress.max += bgps.length
+      this._datasets.get(dataset)
+        .addBgps(bgps)
       this.emit('progress_datasets_update_event')
     })
 
     loader.on('solutions', ({
-      dataset
+      dataset,
+      anchored_pgp,
+      bgp,
+      solutions,
+      error
     }) => {
-      const progress = this._datasets.get(dataset)
-      progress.value += 1
+      this._datasets.get(dataset)
+        .addSolutions(error, anchored_pgp, bgp, solutions)
       this.emit('progress_datasets_update_event')
     })
   }
@@ -47,7 +51,10 @@ module.exports = class extends EventEmitter {
     // Show or hide the specific dataset
     Array.from(this._datasets.entries())
       .filter(([name]) => name === dataset)
-      .forEach(([, progress]) => progress.show = isShow)
+      .forEach(([, progress]) => {
+        console.log(progress.snapshot)
+        progress.show = isShow
+      })
 
     this.emit('progress_datasets_update_event')
   }
