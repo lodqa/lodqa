@@ -29,14 +29,14 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
   document.addEventListener('click', (({
     target
   }) => {
-    if (target.closest('.summary-progress__checkbox')) {
+    if (target.closest('.summary-progressbar__checkbox')) {
       summaryProgress.showDatasets(target.checked)
     }
   }))
   document.addEventListener('click', (({
     target
   }) => {
-    if (target.closest('.datasets-progress__checkbox')) {
+    if (target.closest('.datasets-progressbar__checkbox')) {
       datasetsProgress.showDataset(target.dataset.name, target.checked)
     }
   }))

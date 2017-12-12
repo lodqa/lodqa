@@ -278,24 +278,24 @@
     width: 100px;
 }
 
-.summary-progress {
+.summary-progressbar {
     width: 600px;
     margin-bottom: 1em;
 }
 
-.summary-progress__progress-bar {
+.summary-progressbar__progressbar {
     width: 100%
 }
 
-.datasets-progress {
+.datasets-progressbar {
     width: 600px;
 }
 
-.datasets-progress__infomation {
+.datasets-progressbar__infomation {
     display: flex;
     justify-content: space-between;
 }
 
-.datasets-progress__progressbar {
+.datasets-progressbar__progressbar {
     width: calc(100% - 50px);
 }
