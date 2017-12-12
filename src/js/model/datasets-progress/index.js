@@ -43,18 +43,12 @@ module.exports = class extends EventEmitter {
   }
 
   showDataset(dataset, isShow) {
-    // Hide all datasets
-    for (const progress of this._datasets.values()) {
-      progress.show = false
-    }
-
     // Show or hide the specific dataset
-    Array.from(this._datasets.entries())
-      .filter(([name]) => name === dataset)
-      .forEach(([, progress]) => {
-        console.log(progress.snapshot)
-        progress.show = isShow
-      })
+    if (isShow) {
+      this._selectdDataset = dataset
+    } else {
+      this._selectdDataset = null
+    }
 
     this.emit('progress_datasets_update_event')
   }
@@ -70,7 +64,7 @@ module.exports = class extends EventEmitter {
         max: progress.max,
         value: progress.value,
         percentage: progress.percentage,
-        show: progress.show
+        show: progress.name === this._selectdDataset
       }))
   }
 }
