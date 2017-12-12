@@ -13,6 +13,8 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
 ;
 (() => {
   const loader = new LoaderForAnswer2()
+
+  // Create models and bind them to the presentations.
   const answerSummary = new AnswerSummary(loader)
   const pagination = new Pagination(answerSummary)
   new AnswerSummaryPresentation(document.querySelector('.answer-summary'), pagination)
@@ -23,10 +25,25 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
   new SummaryProgressbarPresentation(document.querySelector('.summary-progressbar'), summaryProgress)
   new DatasetsProgressbarPresentation(document.querySelector('.datasets-progressbar'), datasetsProgress)
 
-  start(loader)
-
+  // Bind user's events.
+  document.addEventListener('click', (({
+    target
+  }) => {
+    if (target.closest('.summary-progress__checkbox')) {
+      summaryProgress.showDatasets(target.checked)
+    }
+  }))
+  document.addEventListener('click', (({
+    target
+  }) => {
+    if (target.closest('.datasets-progress__checkbox')) {
+      datasetsProgress.showDataset(target.dataset.name, target.checked)
+    }
+  }))
   const sparqlContainer = new SparqlContainer(loader)
-  bindHandlerToShowSparql(document, ['.answer-summary__sparql'], 'lightbox', sparqlContainer)
+  bindHandlerToShowSparql(document, 'lightbox', sparqlContainer)
+
+  start(loader)
 })()
 
 function start(loader) {

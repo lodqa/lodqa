@@ -7,13 +7,6 @@ const {
 module.exports = class {
   constructor(dom, model) {
     model.on('progress_datasets_update_event', () => render(dom, model))
-    dom.addEventListener('click', (({
-      target
-    }) => {
-      if (target.closest('.datasets-progress__checkbox')) {
-        model.showDataset(target.dataset.name, target.checked)
-      }
-    }))
   }
 }
 
