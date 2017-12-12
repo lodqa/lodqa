@@ -19,13 +19,11 @@ const template = Handlebars.compile(`
       <div class="answer-summary__answer-url">
         <cite class="answer-summary__answer-url__cite">{{url}}</cite>
       </div>
-      <ul class="answer-summary__sparql-list">
+      <div class="answer-summary__sparql-list">
         {{#each sparqls}}
-          <li class="answer-summary__sparql">
-            <a href="#" data-dataset-name="{{dataset}}" data-sparql-number="{{number}}">S{{parentNumber}}-{{number}}</a>
-          </li>
+          <a href="#" class="answer-summary__sparql-link" data-dataset-name="{{dataset}}" data-sparql-number="{{number}}">S{{parentNumber}}-{{number}}</a>
         {{/each}}
-      </ul>
+      </div>
     </div>
   </div>
   {{/each}}
