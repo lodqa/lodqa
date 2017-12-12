@@ -40,4 +40,4 @@ new IntegratedAnswerIndexPresentation(
   integratedDataset
 )
 
-bindHandlerToShowSparql(document, ['.integrated-answer-index', '.detailProgressBar'], 'lightbox', integratedDataset, loaders)
+bindHandlerToShowSparql(document, 'lightbox', integratedDataset, loaders)
