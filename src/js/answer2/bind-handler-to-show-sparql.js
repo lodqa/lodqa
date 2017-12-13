@@ -13,8 +13,10 @@ module.exports = function bindHandlerToShowSparql(parent, sparqlDomId, sparqlCon
   }
   document.querySelector('.content')
     .addEventListener('click', ({target}) => {
-      if (target.dataset.datasetName && target.dataset.sparqlNumber) {
-        eventHandler(target.dataset.datasetName, target.dataset.sparqlNumber)
+      if (target.closest('.sparql-link')) {
+        if (target.dataset.datasetName && target.dataset.sparqlNumber) {
+          eventHandler(target.dataset.datasetName, target.dataset.sparqlNumber)
+        }
       }
     })
 }

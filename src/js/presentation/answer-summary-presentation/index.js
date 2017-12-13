@@ -21,7 +21,7 @@ const template = Handlebars.compile(`
       </div>
       <div class="answer-summary__sparql-list">
         {{#each sparqls}}
-          <a href="#" class="answer-summary__sparql-link" data-dataset-name="{{dataset}}" data-sparql-number="{{number}}">S{{parentNumber}}-{{number}}</a>
+          <a href="#" class="sparql-link answer-summary__sparql-link" data-dataset-name="{{dataset}}" data-sparql-number="{{number}}">S{{parentNumber}}-{{number}}</a>
         {{/each}}
       </div>
     </div>
