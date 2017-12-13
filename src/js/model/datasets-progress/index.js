@@ -22,6 +22,10 @@ module.exports = class extends EventEmitter {
       this._datasets.get(dataset)
         .addBgps(bgps)
       this.emit('progress_datasets_update_event')
+
+      if(dataset === this._selectdDataset){
+        this.emit('progress_selected_dataset_update_event')
+      }
     })
 
     loader.on('solutions', ({
@@ -34,12 +38,17 @@ module.exports = class extends EventEmitter {
       this._datasets.get(dataset)
         .addSolutions(error, anchored_pgp, bgp, solutions)
       this.emit('progress_datasets_update_event')
+
+      if(dataset === this._selectdDataset){
+        this.emit('progress_selected_dataset_update_event')
+      }
     })
   }
 
   set visible(visible) {
     this._visible = visible
     this.emit('progress_datasets_update_event')
+    this.emit('progress_selected_dataset_update_event')
   }
 
   showDataset(dataset, isShow) {
@@ -51,6 +60,7 @@ module.exports = class extends EventEmitter {
     }
 
     this.emit('progress_datasets_update_event')
+    this.emit('progress_selected_dataset_update_event')
   }
 
   hideSparql(dataset, sparqlNumber, show) {

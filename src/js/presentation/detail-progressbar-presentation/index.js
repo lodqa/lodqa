@@ -5,7 +5,7 @@ const template = require('./template')
 
 module.exports = class {
   constructor(dom, model) {
-    model.on('progress_datasets_update_event', () => render(dom, model))
+    model.on('progress_selected_dataset_update_event', () => render(dom, model))
   }
 }
 

@@ -9,12 +9,12 @@ module.exports = class extends EventEmitter {
     this._datasetsProgress = datasetsProgress
     this._showOnlyWithAnswer = false
 
-    datasetsProgress.on('progress_datasets_update_event', () => this.emit('progress_datasets_update_event'))
+    datasetsProgress.on('progress_selected_dataset_update_event', () => this.emit('progress_selected_dataset_update_event'))
   }
 
   set showOnlyWithAnswer(show) {
     this._showOnlyWithAnswer = show
-    this.emit('progress_datasets_update_event')
+    this.emit('progress_selected_dataset_update_event')
   }
 
   get stateOfSparqlsOfSelectedDataset() {
