@@ -1,6 +1,7 @@
 const AnswerSummary = require('./model/answer-summary')
-const AnswerSummaryPresentation = require('./presentation/answer-summary-presentation')
+const AnswerFilter = require('./model/answer-filter')
 const Pagination = require('./model/pagenation')
+const AnswerSummaryPresentation = require('./presentation/answer-summary-presentation')
 const PaginationPresentation = require('./presentation/pagination-presentation')
 const SummaryProgress = require('./model/summary-progress')
 const SummaryProgressbarPresentation = require('./presentation/summary-progressbar-presentation')
@@ -18,7 +19,8 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
 
   // Create models and bind them to the presentations.
   const answerSummary = new AnswerSummary(loader)
-  const pagination = new Pagination(answerSummary)
+  const answerFilter = new AnswerFilter(answerSummary)
+  const pagination = new Pagination(answerFilter)
   new AnswerSummaryPresentation(document.querySelector('.answer-summary'), pagination)
   new PaginationPresentation(document.querySelector('.answer-summary-pages'), pagination)
 
@@ -43,6 +45,11 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
 
     if (target.closest('.show-only-has-answers')) {
       sparqlFilter.showOnlyWithAnswer = target.checked
+    }
+
+    if (target.closest('.detail-progress-bar__sparqls__sparql__selected-answers-checkbox')) {
+      answerFilter.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
+      datasetsProgress.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
     }
   })
   const sparqlContainer = new SparqlContainer(loader)

@@ -53,6 +53,11 @@ module.exports = class extends EventEmitter {
     this.emit('progress_datasets_update_event')
   }
 
+  hideSparql(dataset, sparqlNumber, show) {
+    this._datasets.get(dataset)
+      .hideSparql(sparqlNumber, show)
+  }
+
   get stateOfSparqlsOfSelectedDataset() {
     if (!this._visible) {
       return

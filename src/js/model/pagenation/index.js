@@ -20,14 +20,17 @@ module.exports = class extends EventEmitter {
   set _page(itemCount) {
     const maxPageNumber = Math.ceil(itemCount / this._itemsPerPage)
 
-    if (this._maxPageNumber < maxPageNumber) {
+    if (this._maxPageNumber !== maxPageNumber) {
       this._maxPageNumber = maxPageNumber
+      if (this._maxPageNumber < this._currentPage) {
+        this._currentPage = this._maxPageNumber
+      }
       this.emit('answer_summary_page_update_event')
     }
   }
 
   goPrev() {
-    if (this._currentPage > 1) {
+    if (1 < this._currentPage) {
       this._currentPage -= 1
       this.emit('answer_summary_update_event')
       this.emit('answer_summary_page_update_event')
@@ -43,7 +46,7 @@ module.exports = class extends EventEmitter {
   }
 
   goPage(newPage) {
-    if(1 <= newPage && newPage <= this._maxPageNumber){
+    if (1 <= newPage && newPage <= this._maxPageNumber) {
       this._currentPage = newPage
       this.emit('answer_summary_update_event')
       this.emit('answer_summary_page_update_event')
@@ -57,7 +60,9 @@ module.exports = class extends EventEmitter {
         enableNext: this._currentPage !== this._maxPageNumber,
         disablePrev: this._currentPage === 1,
         disableNext: this._currentPage === this._maxPageNumber,
-        pages: Array.from(Array(this._maxPageNumber).keys())
+        pages: Array
+          .from(Array(this._maxPageNumber)
+            .keys())
           .map((page) => ({
             page: page + 1,
             isCurrent: page + 1 === this._currentPage

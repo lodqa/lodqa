@@ -32,11 +32,16 @@ module.exports = class {
 
     this._solutions.push({
       error,
-      answers: getUniqAnswers(solutions, anchoredPgp.focus)
+      answers: getUniqAnswers(solutions, anchoredPgp.focus),
+      visible: true
     })
 
     this._progress = this._bgps.shift()
     this.value += 1
+  }
+
+  hideSparql(sparqlNumber, visible) {
+    this._solutions[sparqlNumber - 1].visible = visible
   }
 
   get percentage() {
@@ -47,7 +52,7 @@ module.exports = class {
     return this._solutions.map(s => ({
       hasSolution: true,
       uniqAnswersLength: s.answers.length,
-      visible: true,
+      visible: s.visible,
       error: s.error
     }))
       .concat(this._progress ? [{
