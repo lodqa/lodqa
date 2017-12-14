@@ -40,20 +40,26 @@ module.exports = class {
     }
   }
 
-  show2(sparqlNumber, datasetName, anchoredPgp, sparql, solution) {
+  show2(sparqlNumber, datasetName, anchoredPgp, sparql, solution, answers, error) {
     const lightbox = document.querySelector(`#${this.lightboxDomId}`)
     lightbox.classList.remove('hidden')
 
     bindOneKeyupHandler(doIfEsc(this.close))
 
-    const content = lightbox.querySelector('.content')
-    content.innerHTML = datasetName
+    const dom = lightbox.querySelector('.content')
+    dom.innerHTML = datasetName
 
-    if (solution) {
-      sparqlPresentationShow(content, sparqlNumber, sparql, solution.sparql_timeout)
-      answersPresentationShow(content, anchoredPgp, solution)
+    if (solution && solution.solutions.length) {
+      sparqlPresentationShow(dom, sparqlNumber, sparql)
+      const [list, table, graph] = answersPresentationShow(dom, anchoredPgp, solution)
+
+      for (const {url, label} of answers) {
+        list.updateLabel(url, label)
+        table.updateLabel(url, label)
+        graph.updateLabel(url, label)
+      }
     } else {
-      sparqlPresentationShow(content, sparqlNumber, sparql)
+      sparqlPresentationShow(dom, sparqlNumber, sparql, error)
     }
   }
 }

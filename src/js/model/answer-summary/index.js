@@ -3,7 +3,6 @@ const {
 } = require('events')
 const DatasetContainer = require('./dataset-container')
 const AnswerContainer = require('./answer-container')
-const getUniqAnswers = require('../get-uniq-answers')
 
 module.exports = class extends EventEmitter {
   constructor(loader) {
@@ -20,24 +19,26 @@ module.exports = class extends EventEmitter {
       dataset,
       query
     }) => this._datasetContainer.addSparql(dataset, query.sparql))
-    loader.on('solutions', ({
+    loader.on('answer', ({
       dataset,
       anchored_pgp,
       query,
-      solutions
-    }) => this._addSolutions(dataset, anchored_pgp, query.sparql, solutions))
+      answer,
+      label
+    }) => this._addAnswer(dataset, anchored_pgp, query.sparql, answer[1], label))
   }
 
-  _addSolutions(dataset, anchored_pgp, sparql, solutions) {
+  _addAnswer(dataset, anchored_pgp, sparql, url, label) {
     const {
       datasetName,
       datasetNumber,
       sparqlNumber
     } = this._datasetContainer.getSparqlNumer(dataset, sparql)
-    const answers = getUniqAnswers(solutions, anchored_pgp.focus)
 
-    answers.forEach((answer) => this._answerContainer.addAnswer(answer, datasetName, datasetNumber, sparqlNumber))
-
+    this._answerContainer.addAnswer({
+      url,
+      label
+    }, datasetName, datasetNumber, sparqlNumber)
     this.emit('answer_summary_update_event')
   }
 

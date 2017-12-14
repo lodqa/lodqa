@@ -2,7 +2,7 @@ module.exports = class {
   constructor(loader) {
     this._datasets = new Map()
 
-    loader.on('solutions', ({
+    loader.on('sparql', ({
       dataset,
       anchored_pgp,
       query
@@ -20,14 +20,33 @@ module.exports = class {
     loader.on('solutions', ({
       dataset,
       query,
-      solutions
+      solutions,
+      error
     }) => {
       this._datasets.get(dataset)
         .filter((sparql) => sparql.sparql === query.sparql)
-        .forEach((sparql) => sparql.solutions = {
-          bgp: query.bgp,
-          solutions: solutions
+        .forEach((sparql) => {
+          sparql.solutions = {
+            solutions,
+            bgp: query.bgp
+          },
+          sparql.error = error
+          sparql.answers = []
         })
+    })
+
+    loader.on('answer', ({
+      dataset,
+      query,
+      answer,
+      label
+    }) => {
+      this._datasets.get(dataset)
+        .filter((sparql) => sparql.sparql === query.sparql)
+        .forEach((sparql) => sparql.answers.push({
+          url: answer[1],
+          label: label
+        }))
     })
   }
 

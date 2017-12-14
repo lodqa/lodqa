@@ -190,6 +190,7 @@
     text-align: left;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: auto;
 }
 
 .answer-summary__answer-label .answer-summary__sparql-link {
