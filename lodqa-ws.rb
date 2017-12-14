@@ -92,7 +92,7 @@ class LodqaWS < Sinatra::Base
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
 						Lodqa::Async.defer do
-							search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']
+							search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout'].to_i
 						end
 					end
 				rescue IOError => e
@@ -139,7 +139,7 @@ class LodqaWS < Sinatra::Base
 			anchored_pgps = lodqa.anchored_pgps
 			ws.send({event: :anchored_pgps, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgps: anchored_pgps}.to_json)
 
-			endpoint = Lodqa::CachedSparqlClient.new(applicant[:endpoint_url], {method: :get})
+			endpoint = Lodqa::CachedSparqlClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
 			anchored_pgps.each do |anchored_pgp|
 				#GraphFinder(bgb)
 				graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, options)
