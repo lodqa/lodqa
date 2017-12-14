@@ -12,6 +12,7 @@ const DetailProgressbarPresentation = require('./presentation/detail-progressbar
 const LoaderForAnswer2 = require('./loader/loader-for-answer2')
 const SparqlContainer = require('./model/sparql-container')
 const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
+const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
 ;
 (() => {
@@ -54,6 +55,7 @@ const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
   })
   const sparqlContainer = new SparqlContainer(loader)
   bindHandlerToShowSparql(document, 'lightbox', sparqlContainer)
+  bindModeButtonEventhandler('grapheditor')
 
   start(loader)
 })()
