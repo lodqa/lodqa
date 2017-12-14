@@ -2,13 +2,17 @@
     <div>
         <div class="query-region">
             <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
+            <button id="search-button" class="search-button">
+                <span class="search-button__icon">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </span>
+            </button>
         </div>
         <% if target_exists? params %>
         <input name="target" type="hidden" value="<%= params['target'] %>"/>
         <% end %>
         <input id="endpoint-url" type="hidden" value="<%= @endpoint_url %>"/>
         <input id="need-proxy" type="hidden" value="<%= @need_proxy %>"/>
-        <button id="search-button" class="button">Search</button>
         <button id="mode-button" type="button" class="button">Expert</button>
     </div>
     <div class="nlq-options">

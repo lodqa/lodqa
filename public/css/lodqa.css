@@ -87,10 +87,10 @@ a:visited {
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
     display: inline-block;
-    padding: 6px 9px 4px 16px;
+    padding: 6px 0 4px 16px;
     transition: box-shadow 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
     vertical-align: top;
-    width: 470px;
+    width: 544px;
 }
 
 #query {
@@ -100,11 +100,29 @@ a:visited {
     margin: 0px;
     outline: none;
     padding: 0px;
-    width: 100%;
+    width: calc(100% - 47px)
+}
+
+.search-button {
+    border: 0;
+    float: right;
+    height: 34px;
+    line-height: 34px;
+    outline: 0;
+    padding-right: 16px;
+}
+
+.search-button__icon {
+    color: #4285f4;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 24px;
+    line-height: 24px;
+    padding-top: 3px;
 }
 
 #nlqform .button {
-    margin-top: 5px;
+    margin-top: 7px;
 }
 
 .nlq-options {

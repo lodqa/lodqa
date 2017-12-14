@@ -30,8 +30,12 @@
                         <div>
                             <div class="query-region">
                                 <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
+                                <button id="search-button" class="search-button">
+                                    <span class="search-button__icon">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                    </span>
+                                </button>
                             </div>
-                            <button id="search-button" class="button">Search</button>
                             <button id="mode-button" type="button" class="button">Expert</button>
                         </div>
                         <div class="nlq-options">
