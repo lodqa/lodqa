@@ -153,10 +153,22 @@ class LodqaWS < Sinatra::Base
 						query = {bgp:bgp, sparql:graph_finder.compose_sparql(bgp, anchored_pgp)}
 						ws.send({event: :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query}.to_json)
 
-						#solution
+						# Get solutions of SPARQL
 						begin
 							solutions = endpoint.query(query[:sparql]).map{ |solution| solution.to_h }
 							ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions}.to_json)
+
+							# Find the answer of the solutions.
+							solutions.each do |solution|
+								solution.each do |node|
+									# The answer is instance node of focus node.
+									if(anchored_pgp[:focus] == node[0].to_s.gsub(/^i/, ''))
+										label = label(endpoint, node)
+										ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: node, label: label}.to_json)
+									end
+								end
+							end
+
 						rescue Lodqa::SparqlEndpointTimeoutError => e
 							Lodqa::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
 							ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: [], error: 'sparql timeout error'}.to_json)
@@ -382,5 +394,10 @@ class LodqaWS < Sinatra::Base
 		tf = Lodqa::TermFinder.new(dictionary_url)
 		keywords = pgp[:nodes].values.map{|n| n[:text]}.concat(pgp[:edges].map{|e| e[:text]})
 		tf.find(keywords)
+	end
+
+	def label(endpoint, node)
+		query_for_solution = "select ?label where { <#{node[1]}>  rdfs:label ?label }"
+		endpoint.query(query_for_solution).map{ |s| s.to_h[:label] }.first
 	end
 end
