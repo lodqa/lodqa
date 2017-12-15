@@ -84,7 +84,7 @@ module Lodqa
               # So we send SPARQL requests in parallel per endpoint.
               Async.defer do
                 begin
-                  applicant[:sparqls] = lodqa.sparqls(lodqa.anchored_pgps).first
+                  applicant[:sparqls] = lodqa.sparqls.first
                   do_applicants_have_sparql[applicant[:name]] = true
 
                   yield applicants.select { |a| a[:sparqls] } if do_applicants_have_sparql.values.all?{ |has_sparql| has_sparql }

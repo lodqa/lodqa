@@ -35,7 +35,7 @@ module Lodqa
     end
 
     # Return an enumerator to speed up checking the existence of sparqls.
-    def sparqls(anchored_pgps)
+    def sparqls
       Logger.debug "start #{self.class.name}##{__method__}"
 
       Enumerator.new do |y|
@@ -49,27 +49,7 @@ module Lodqa
       end
     end
 
-    def to_sparql(anchored_pgp)
-      if @cancel_flag
-        Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
-        return
-      end
-
-      Logger.debug "create graph finder"
-      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
-
-      if @cancel_flag
-        Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
-        return
-      end
-
-      Logger.debug "return SPARQLs of bgps"
-      graph_finder
-        .queries
-        .each { |q| yield q[:sparql] }
-    end
-
-    def each_anchored_pgp_and_sparql_and_solution(proc_sparqls = nil, proc_anchored_pgp = nil, proc_solution = nil)
+    def each_anchored_pgp_and_sparql_and_solution(proc_sparqls, proc_anchored_pgp, proc_solution)
       Logger.debug "start #{self.class.name}##{__method__}"
 
       if @cancel_flag
@@ -83,14 +63,11 @@ module Lodqa
           return
         end
 
-        # Send number of spaqls before search
-        to_sparql(anchored_pgp) { |sparql| proc_sparqls.call sparql } if proc_sparqls
-
-        proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
+        proc_anchored_pgp.call(anchored_pgp)
 
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
-        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
+        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
 
         Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
       end
@@ -126,6 +103,26 @@ module Lodqa
     end
 
     private
+
+    def to_sparql(anchored_pgp)
+      if @cancel_flag
+        Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
+        return
+      end
+
+      Logger.debug "create graph finder"
+      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+
+      if @cancel_flag
+        Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
+        return
+      end
+
+      Logger.debug "return SPARQLs of bgps"
+      graph_finder.bgps.each do |bgp|
+        yield graph_finder.compose_sparql(bgp, anchored_pgp)
+      end
+    end
 
     def nodes_to_delete
       Logger.debug "start #{self.class.name}##{__method__}"

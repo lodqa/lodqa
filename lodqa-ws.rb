@@ -167,7 +167,7 @@ class LodqaWS < Sinatra::Base
 
 						ws.send({event: :bgp, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp}.to_json)
 
-						query = {bgp:bgp, sparql:graph_finder.compose_sparql(bgp, anchored_pgp)}
+						query = {bgp: bgp, sparql: graph_finder.compose_sparql(bgp, anchored_pgp)}
 						ws.send({event: :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query}.to_json)
 
 						# Get solutions of SPARQL

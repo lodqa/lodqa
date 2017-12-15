@@ -62,20 +62,23 @@ class GraphFinder
     end
   end
 
-  def queries
-    bgps.map {|bgp| {bgp:bgp, sparql:compose_sparql(bgp, @pgp)} }
-  end
+  def each_sparql_and_solution(proc_sparqls, proc_solution, proc_cancel_flag)
+    bgps.each do |bgp|
+      sparql = compose_sparql(bgp, @pgp)
 
-  def each_sparql_and_solution(proc_solution = nil, proc_cancel_flag)
-    queries.each do |query|
-      Lodqa::Logger.debug "#{query[:sparql]}\n++++++++++"
+      Lodqa::Logger.debug "#{sparql}\n++++++++++"
+
+      # Send number of spaqls before search
+      proc_sparqls.call sparql
 
       begin
-        result = @endpoint.query(query[:sparql])
-
-        if proc_solution
-          proc_solution.call(query.merge(solutions: result.map{ |solution| solution.to_h }))
-        end
+        result = @endpoint.query(sparql)
+        solution = {
+          bgp: bgp,
+          sparql: sparql,
+          solutions: result.map{ |s| s.to_h }
+        }
+        proc_solution.call(solution)
       rescue Lodqa::SparqlEndpointTimeoutError => e
         Lodqa::Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
 

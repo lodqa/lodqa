@@ -6,11 +6,12 @@ module.exports = function(dom, integratedDataset, dataset) {
   const simpleProgressBar = show(
     dom,
     dataset.name,
-    dataset.sparqlsMax,
     toggleDetailProgressBar
   )
 
   // Bind the Dataset's events
+  dataset.on('sparql_reset_event', () => simpleProgressBar.reset())
+
   dataset.on('sparql_add_event', () => simpleProgressBar.max = dataset.sparqlsMax)
 
   const progressOnSolutionAdd = () => simpleProgressBar.progress(dataset.sparqlCount)
