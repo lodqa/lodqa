@@ -1,4 +1,5 @@
 const render = require('./render')
+const setMax = require('./set-max.js')
 const progressSimple = require('./progress-simple')
 const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
 
@@ -13,11 +14,15 @@ module.exports = class {
     bindHandlerToCheckbox(this.dom, '.show-detail-progress-bar', (event) => onClickDetailCheckbox(event.target.checked))
   }
 
+  set max(value) {
+    setMax(this.dom, value)
+  }
+
   set checked(value) {
     this.dom.querySelector('.show-detail-progress-bar').checked = value
   }
 
-  progress(sparqlCount) {
-    progressSimple(this.dom, sparqlCount)
+  progress(value) {
+    progressSimple(this.dom, value)
   }
 }

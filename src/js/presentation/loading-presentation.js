@@ -5,11 +5,11 @@ module.exports = class {
     this._recieved = 0
 
     // Bind Model's events
-    const onSparqlReset = () => {
+    const onSparqlAdd = () => {
       this._total = dataset.sparqlsMax
       showProgress(this._element, 0, dataset.sparqlsMax)
     }
-    dataset.on('sparql_reset_event', onSparqlReset)
+    dataset.on('sparql_add_event', onSparqlAdd)
 
     const onSolutionAdd = () => showProgress(
       this._element,

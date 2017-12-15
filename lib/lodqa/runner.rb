@@ -40,7 +40,7 @@ module Lodqa
 
             channel.start
             lodqa.each_anchored_pgp_and_sparql_and_solution(
-              -> (data) { channel.send(sparqls: data) },
+              -> (data) { channel.send(sparql: data) },
               -> (data){ channel.send(anchored_pgp: data) },
               -> (data) { channel.send(solution: data) }
             )

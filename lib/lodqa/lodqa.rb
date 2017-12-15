@@ -70,7 +70,7 @@ module Lodqa
       # Send number of spaqls before search
       # Note: Convert the sparqls to an array because it is an enumerator.
       #       Unless do this only part of sparqls will be sent to client.
-      proc_sparqls.call(sparqls(anchored_pgps).to_a) if proc_sparqls
+      sparqls(anchored_pgps).each { |sparql| proc_sparqls.call sparql } if proc_sparqls
 
       if @cancel_flag
         Logger.debug "Stop before processing anchored_pgps"

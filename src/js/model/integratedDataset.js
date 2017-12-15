@@ -23,6 +23,7 @@ module.exports = class extends EventEmitter {
 
     // Listen dataset
     dataset.on('sparql_reset_event', () => this.emit('answer_index_update_event'))
+    dataset.on('sparql_add_event', () => this.emit('answer_index_update_event'))
     dataset.on('answer_index_add_event', () => this.emit('answer_index_update_event'))
     dataset.on('answer_index_update_event', () => this.emit('answer_index_update_event'))
     dataset.on('label_update_event', () => this.emit('answer_index_update_event'))

@@ -8,7 +8,7 @@ module Lodqa
     end
 
     def start
-      @socket.send 'start'
+      send start: 'start'
     end
 
     def send(data)

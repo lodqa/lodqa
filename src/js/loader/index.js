@@ -33,11 +33,9 @@ function openConnection(emitter, pathname, target, readTimeout) {
     emitter.emit('ws_close')
   }
   ws.onmessage = function(m) {
-    if (m.data === 'start') return
-
     const jsondata = JSON.parse(m.data);
 
-    ['sparqls', 'anchored_pgp', 'solution', 'error']
+    ['start', 'sparql', 'anchored_pgp', 'solution', 'error']
       .forEach((event) => {
         if (jsondata.hasOwnProperty(event)) {
           emitter.emit(event, jsondata[event])

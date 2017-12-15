@@ -85,11 +85,17 @@ module.exports = class Model extends EventEmitter {
     return this._sparqls[sparqlCount - 1]
   }
 
-  set sparqls(sparqls) {
-    this._sparqls = sparqls
+  reset() {
+    this._sparqls = []
     this._sparqlCount.reset()
 
     this.emit('sparql_reset_event')
+  }
+
+  addSparql(sparql) {
+    this._sparqls.push(sparql)
+
+    this.emit('sparql_add_event')
   }
 
   // AnchoerdPGP
