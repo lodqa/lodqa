@@ -41,8 +41,18 @@ module Lodqa
       Enumerator.new do |y|
         begin
           anchored_pgps.each do |anchored_pgp|
+            if @cancel_flag
+              Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
+              break
+            end
+
             Logger.debug "create graph finder"
             graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+
+            if @cancel_flag
+              Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
+              break
+            end
 
             Logger.debug "return SPARQLs of bgps"
             graph_finder.queries(graph_finder.bgps)
@@ -62,7 +72,17 @@ module Lodqa
       #       Unless do this only part of sparqls will be sent to client.
       proc_sparqls.call(sparqls(anchored_pgps).to_a) if proc_sparqls
 
+      if @cancel_flag
+        Logger.debug "Stop before processing anchored_pgps"
+        return
+      end
+
       anchored_pgps.each do |anchored_pgp|
+        if @cancel_flag
+          Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
+          return
+        end
+
         proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
 
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
@@ -70,11 +90,6 @@ module Lodqa
         GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
 
         Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
-
-        if @cancel_flag
-          Logger.debug "Stop during or after anchored_pgp: #{anchored_pgp}"
-          return
-        end
       end
     end
 
