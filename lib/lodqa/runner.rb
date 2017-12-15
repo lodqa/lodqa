@@ -14,14 +14,20 @@ module Lodqa
         lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options)
         channel = SourceChannel.new ws, options[:name]
 
+        Logger.debug "Setuped"
+
         # Set a request_id to the Logger at the thread of WebSocket events.
-        ws.onmessage { |recieve_data| start_search_solutions request_id, lodqa, recieve_data, channel }
+        ws.onmessage do |recieve_data|
+          Logger.debug "on message"
+          start_search_solutions request_id, lodqa, recieve_data, channel
+        end
         ws.onclose { close request_id, lodqa }
       end
 
       private
 
       def start_search_solutions(request_id, lodqa, recieve_data, channel)
+        Logger.debug "start #{self.class.name}##{__method__}"
 
         json = JSON.parse(recieve_data, {:symbolize_names => true})
 
@@ -30,6 +36,8 @@ module Lodqa
 
         Async.defer do
           begin
+            Logger.debug "start async func"
+
             channel.start
             lodqa.each_anchored_pgp_and_sparql_and_solution(
               -> (data) { channel.send(sparqls: data) },

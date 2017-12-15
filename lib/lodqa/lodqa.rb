@@ -36,10 +36,15 @@ module Lodqa
 
     # Return an enumerator to speed up checking the existence of sparqls.
     def sparqls(anchored_pgps)
+      Logger.debug "start #{self.class.name}##{__method__}"
+
       Enumerator.new do |y|
         begin
           anchored_pgps.each do |anchored_pgp|
+            Logger.debug "create graph finder"
             graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+
+            Logger.debug "return SPARQLs of bgps"
             graph_finder.queries(graph_finder.bgps)
               .each { |q| y << q[:sparql] }
           end
@@ -50,6 +55,8 @@ module Lodqa
     end
 
     def each_anchored_pgp_and_sparql_and_solution(proc_sparqls = nil, proc_anchored_pgp = nil, proc_solution = nil)
+      Logger.debug "start #{self.class.name}##{__method__}"
+
       # Send number of spaqls before search
       # Note: Convert the sparqls to an array because it is an enumerator.
       #       Unless do this only part of sparqls will be sent to client.
@@ -61,6 +68,8 @@ module Lodqa
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
         GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
+
+        Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
 
         if @cancel_flag
           Logger.debug "Stop during or after anchored_pgp: #{anchored_pgp}"
