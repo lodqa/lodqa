@@ -8,8 +8,6 @@ require 'pp'
 require 'lodqa/logger'
 
 class GraphFinder
-  attr_reader :bgps
-
   # This constructor takes the URL of an end point to be searched
   # optionally options can be passed to the server of the end point.
   def initialize(pgp, endpoint, graph_uri, options = {})
@@ -21,56 +19,58 @@ class GraphFinder
     @graph_uri = graph_uri
     @ignore_predicates = options[:ignore_predicates] || []
     @sortal_predicates = options[:sortal_predicates] || []
-
-    max_hop = options[:max_hop] || 2
-    @bgps = gen_bgps(pgp, max_hop)
+    @max_hop = options[:max_hop] || 2
   end
 
   # It generates bgps by applying variation operations to the pgp.
   # The option _max_hop_ specifies the maximum number of hops to be searched.
-  def gen_bgps(pgp, max_hop = 1)
-    Lodqa::Logger.debug "=== [Pseudo Graph Pattern] =====\n#{pgp}\n=== [Maximum number of hops]: #{max_hop} ====="
+  def bgps
+    pgp = @pgp
+    max_hop = @max_hop
 
-    bgps = generate_instantiation_variations(pgp)
-    Lodqa::Logger.debug "=== [instantiation variations] =====\n#{bgps}"
-
-    bgps = generate_split_variations(bgps, max_hop)
-    Lodqa::Logger.debug "=== [split variations] =====\n#{bgps}"
-
-    bgps = generate_inverse_variations(bgps)
-    Lodqa::Logger.debug "=== [inverse variations] =====\n#{bgps}"
-
-    bgps
+    Enumerator.new do |y|
+      generate_inverse_variations(
+        generate_split_variations(
+          generate_instantiation_variations(pgp)
+              .tap{ |bgps| Lodqa::Logger.debug "=== [instantiation variations] =====\n#{bgps}" },
+          max_hop
+        )
+        .tap{ |bgps| Lodqa::Logger.debug "=== [split variations] =====\n#{bgps}" }
+      )
+      .tap{ |bgps| Lodqa::Logger.debug "=== [inverse variations] =====\n#{bgps}" }
+      .each { |bgp| y << bgp }
+    end
   end
 
   def each_solution
-    @bgps.each do |bgp|
+    bgps.each do |bgp|
       sparql = compose_sparql(bgp, @pgp)
-      if @debug
-        puts "#{sparql}\n++++++++++"
-      end
+      Lodqa::Logger.debug "#{sparql}\n++++++++++"
+
       begin
         result = @endpoint.query(sparql)
       rescue => detail
         Lodqa::Logger.debug "#{detail}\n=========="
         sleep(2)
         next
-        # print detail.backtrace.join("\n")
       end
+
       result.each_solution do |solution|
         yield(solution)
       end
+
       Lodqa::Logger.debug "=========="
+
       sleep(2)
     end
   end
 
-  def queries(bgps)
+  def queries
     bgps.map {|bgp| {bgp:bgp, sparql:compose_sparql(bgp, @pgp)} }
   end
 
   def each_sparql_and_solution(proc_solution = nil, proc_cancel_flag)
-    queries(bgps).each do |query|
+    queries.each do |query|
       Lodqa::Logger.debug "#{query[:sparql]}\n++++++++++"
 
       begin
@@ -101,7 +101,6 @@ class GraphFinder
       end
 
       Lodqa::Logger.debug "==========\n"
-
 
       sleep(2)
     end

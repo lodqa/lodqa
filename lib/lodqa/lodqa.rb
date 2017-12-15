@@ -55,7 +55,8 @@ module Lodqa
             end
 
             Logger.debug "return SPARQLs of bgps"
-            graph_finder.queries(graph_finder.bgps)
+            graph_finder
+              .queries
               .each { |q| y << q[:sparql] }
           end
         rescue SparqlEndpointError => e

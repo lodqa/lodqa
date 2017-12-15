@@ -143,13 +143,13 @@ class LodqaWS < Sinatra::Base
 			anchored_pgps.each do |anchored_pgp|
 				#GraphFinder(bgb)
 				graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, options)
-				# TOOD bgps should be a Enumerator
 				bgps = graph_finder.bgps
-				if bgps.length > 0
-					ws.send({event: :bgps, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgps: anchored_pgps, bgps: bgps}.to_json)
 
+				if bgps.any?
 					#SPARQL
 					bgps.each do |bgp|
+						ws.send({event: :bgp, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp}.to_json)
+
 						query = {bgp:bgp, sparql:graph_finder.compose_sparql(bgp, anchored_pgp)}
 						ws.send({event: :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query}.to_json)
 

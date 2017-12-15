@@ -11,8 +11,8 @@ module.exports = class extends EventEmitter {
     this._datasetContainer = new DatasetContainer()
     this._answerContainer = new AnswerContainer()
 
-    // A Dataset with bgps will have SPARQLs
-    loader.on('bgps', ({
+    // A Dataset with bgp will have SPARQLs
+    loader.on('bgp', ({
       dataset
     }) => this._datasetContainer.addDataset(dataset))
     loader.on('sparql', ({

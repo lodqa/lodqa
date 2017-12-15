@@ -10,17 +10,17 @@ module.exports = class extends EventEmitter {
     this._visible = false
     this._datasets = new Map()
 
-    // A Dataset with bgps will have SPARQLs
-    loader.on('bgps', ({
+    // The number of bpgs is same the number of SPARQLs.
+    loader.on('bgp', ({
       dataset,
-      bgps
+      bgp
     }) => {
       if (!this._datasets.has(dataset)) {
         this._datasets.set(dataset, new DatasetProgress(dataset))
       }
 
       this._datasets.get(dataset)
-        .addBgps(bgps)
+        .addBgp(bgp)
       this.emit('progress_datasets_update_event')
 
       if(dataset === this._selectdDataset){

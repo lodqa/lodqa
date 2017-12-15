@@ -11,11 +11,9 @@ module.exports = class extends EventEmitter {
     this._showDatasets = false
     this._datasetsProgress = datasetsProgress
 
-    // A Dataset with bgps will have SPARQLs
-    loader.on('bgps', ({
-      bgps
-    }) => {
-      this._max += bgps.length
+    // The number of bpgs is same the number of SPARQLs.
+    loader.on('bgp', () => {
+      this._max += 1
       this.emit('progress_summary_update_event')
     })
     loader.on('solutions', () => {

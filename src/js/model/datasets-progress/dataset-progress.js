@@ -13,14 +13,14 @@ module.exports = class {
     this.show = false
   }
 
-  addBgps(bgps) {
-    this._bgps = this._bgps.concat(bgps)
+  addBgp(bgp) {
+    this._bgps.push(bgp)
 
     if (this._bgps.length && !this._progress) {
       this._progress = this._bgps.shift()
     }
 
-    this.max += bgps.length
+    this.max += 1
   }
 
   addSolutions(error, anchoredPgp, bgp, solutions) {
