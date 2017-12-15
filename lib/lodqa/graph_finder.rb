@@ -31,13 +31,10 @@ class GraphFinder
     Enumerator.new do |y|
       generate_inverse_variations(
         generate_split_variations(
-          generate_instantiation_variations(pgp)
-              .tap{ |bgps| Lodqa::Logger.debug "=== [instantiation variations] =====\n#{bgps}" },
+          generate_instantiation_variations(pgp),
           max_hop
         )
-        .tap{ |bgps| Lodqa::Logger.debug "=== [split variations] =====\n#{bgps}" }
       )
-      .tap{ |bgps| Lodqa::Logger.debug "=== [inverse variations] =====\n#{bgps}" }
       .each { |bgp| y << bgp }
     end
   end
@@ -158,18 +155,15 @@ class GraphFinder
   private
 
   def generate_split_variations(bgps, max_hop = 2)
-    return [] if bgps.empty?
-
-    sbgps = []
-    bgps.each do |bgp|
-      sortal_tps, non_sortal_tps = bgp.partition{|tp| tp[1].start_with? 's'}
-      (1 .. max_hop).to_a.repeated_permutation(non_sortal_tps.length) do |split_scheme|
-        split_tps = generate_split_tps(non_sortal_tps, split_scheme)
-        sbgps << sortal_tps + split_tps
+    Enumerator.new do |sbgps|
+      bgps.each do |bgp|
+        sortal_tps, non_sortal_tps = bgp.partition{|tp| tp[1].start_with? 's'}
+        (1 .. max_hop).to_a.repeated_permutation(non_sortal_tps.length) do |split_scheme|
+          split_tps = generate_split_tps(non_sortal_tps, split_scheme)
+          sbgps << sortal_tps + split_tps
+        end
       end
     end
-
-    sbgps
   end
 
   def generate_split_tps(tps, split_scheme)
@@ -190,17 +184,15 @@ class GraphFinder
 
   # make variations by inversing each triple pattern
   def generate_inverse_variations(bgps)
-    rbgps = []
+    Enumerator.new do |rbgps|
+      bgps.each do |bgp|
+        sortal_tps, non_sortal_tps = bgp.partition{|tp| tp[1].start_with? 's'}
 
-    bgps.each do |bgp|
-      sortal_tps, non_sortal_tps = bgp.partition{|tp| tp[1].start_with? 's'}
-
-      [false, true].repeated_permutation(non_sortal_tps.length) do |inverse_scheme|
-        rbgps << sortal_tps + non_sortal_tps.map.with_index {|tp, i| inverse_scheme[i]? tp.reverse : tp}
+        [false, true].repeated_permutation(non_sortal_tps.length) do |inverse_scheme|
+          rbgps << sortal_tps + non_sortal_tps.map.with_index {|tp, i| inverse_scheme[i]? tp.reverse : tp}
+        end
       end
     end
-
-    rbgps
   end
 
   # make variations by instantiating terms
@@ -229,29 +221,28 @@ class GraphFinder
   end
 
   def instantiated_BGPs(iids, bgps, focus_id)
-    ibgps = []
-    [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
-      # id of the terms to be instantiated
-      itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
-      next unless itids.include?(focus_id.to_sym)
+    Enumerator.new do |ibgps|
+      [false, true].repeated_permutation(iids.keys.length) do |instantiate_scheme|
+        # id of the terms to be instantiated
+        itids = iids.keys.keep_if.with_index{|t, i| instantiate_scheme[i]}
+        next unless itids.include?(focus_id.to_sym)
 
-      if bgps.empty? && !itids.empty?
-        ibgp = itids.collect{|t| [iids[t], 's' + t.to_s, t]}
-        ibgps << ibgp
-      else
-        bgps.each do |bgp|
-          # initialize the instantiated bgp with the triple patterns for term instantiation
-          ibgp = itids.collect{|t| [iids[t].to_s, 's' + t.to_s, t.to_s]}
-
-          # add update triples
-          bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e].to_s : e.to_s}}
-
+        if bgps.empty? && !itids.empty?
+          ibgp = itids.collect{|t| [iids[t], 's' + t.to_s, t]}
           ibgps << ibgp
+        else
+          bgps.each do |bgp|
+            # initialize the instantiated bgp with the triple patterns for term instantiation
+            ibgp = itids.collect{|t| [iids[t].to_s, 's' + t.to_s, t.to_s]}
+
+            # add update triples
+            bgp.each{|tp| ibgp << tp.map{|e| itids.include?(e)? iids[e].to_s : e.to_s}}
+
+            ibgps << ibgp
+          end
         end
       end
     end
-
-    ibgps
   end
 
   def uri?(term)
