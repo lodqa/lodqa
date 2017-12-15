@@ -1,6 +1,6 @@
 version: '2'
 services:
-  lodaqa:
+  lodqa:
     build: .
     ports:
       - 80:9292
