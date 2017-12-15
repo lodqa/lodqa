@@ -11,7 +11,5 @@ module.exports = function(dataset, {
   new AnchoredPgpTablePresentation(resultDom, dataset)
   new SparqlPresentation(resultDom, dataset)
   new AnswersPresentation(resultDom, dataset)
-
   new LoadingPresentation(document.querySelector(progressSelector), dataset)
-
 }
