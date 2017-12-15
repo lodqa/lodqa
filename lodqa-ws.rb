@@ -145,11 +145,9 @@ class LodqaWS < Sinatra::Base
 			lodqa = Lodqa::Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], options)
 			lodqa.pgp = pgp
 			lodqa.mappings = mappings
-			anchored_pgps = lodqa.anchored_pgps
-			ws.send({event: :anchored_pgps, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgps: anchored_pgps}.to_json)
 
 			endpoint = Lodqa::CachedSparqlClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
-			anchored_pgps.each do |anchored_pgp|
+			lodqa.anchored_pgps.each do |anchored_pgp|
 				if cancel_flag
 					Lodqa::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
 					return

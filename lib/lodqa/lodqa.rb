@@ -41,23 +41,7 @@ module Lodqa
       Enumerator.new do |y|
         begin
           anchored_pgps.each do |anchored_pgp|
-            if @cancel_flag
-              Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
-              break
-            end
-
-            Logger.debug "create graph finder"
-            graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
-
-            if @cancel_flag
-              Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
-              break
-            end
-
-            Logger.debug "return SPARQLs of bgps"
-            graph_finder
-              .queries
-              .each { |q| y << q[:sparql] }
+            to_sparql(anchored_pgp){ |sparql| y << sparql}
           end
         rescue SparqlEndpointError => e
           Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
@@ -65,13 +49,28 @@ module Lodqa
       end
     end
 
+    def to_sparql(anchored_pgp)
+      if @cancel_flag
+        Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
+        return
+      end
+
+      Logger.debug "create graph finder"
+      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+
+      if @cancel_flag
+        Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
+        return
+      end
+
+      Logger.debug "return SPARQLs of bgps"
+      graph_finder
+        .queries
+        .each { |q| yield q[:sparql] }
+    end
+
     def each_anchored_pgp_and_sparql_and_solution(proc_sparqls = nil, proc_anchored_pgp = nil, proc_solution = nil)
       Logger.debug "start #{self.class.name}##{__method__}"
-
-      # Send number of spaqls before search
-      # Note: Convert the sparqls to an array because it is an enumerator.
-      #       Unless do this only part of sparqls will be sent to client.
-      sparqls(anchored_pgps).each { |sparql| proc_sparqls.call sparql } if proc_sparqls
 
       if @cancel_flag
         Logger.debug "Stop before processing anchored_pgps"
@@ -83,6 +82,9 @@ module Lodqa
           Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
           return
         end
+
+        # Send number of spaqls before search
+        to_sparql(anchored_pgp) { |sparql| proc_sparqls.call sparql } if proc_sparqls
 
         proc_anchored_pgp.call(anchored_pgp) unless proc_anchored_pgp.nil?
 
@@ -100,6 +102,28 @@ module Lodqa
     end
 
     def anchored_pgps
+      Enumerator.new do |anchored_pgps|
+        @pgp[:nodes].delete_if{|n| nodes_to_delete.include? n}
+        @pgp[:edges].uniq!
+        terms = @pgp[:nodes].values.map{|n| @mappings[n[:text].to_sym]}
+
+        terms.map!{|t| t.nil? ? [] : t}
+
+        product(terms.first, *terms.drop(1))
+          .each do |ts|
+            anchored_pgp = pgp.dup
+            anchored_pgp[:nodes] = pgp[:nodes].dup
+            anchored_pgp[:nodes].each_key{|k| anchored_pgp[:nodes][k] = pgp[:nodes][k].dup}
+            anchored_pgp[:nodes].each_value.with_index{|n, i| n[:term] = ts[i]}
+
+            anchored_pgps << anchored_pgp
+          end
+      end
+    end
+
+    private
+
+    def nodes_to_delete
       nodes_to_delete = []
       @pgp[:nodes].each_key do |n|
         if @mappings[@pgp[:nodes][n][:text]].nil? || @mappings[@pgp[:nodes][n][:text]].empty?
@@ -119,19 +143,12 @@ module Lodqa
           end
         end
       end
+      nodes_to_delete
+    end
 
-      @pgp[:nodes].delete_if{|n| nodes_to_delete.include? n}
-      @pgp[:edges].uniq!
-      terms = @pgp[:nodes].values.map{|n| @mappings[n[:text].to_sym]}
-
-      terms.map!{|t| t.nil? ? [] : t}
-
-      terms.first.product(*terms.drop(1)).collect do |ts|
-        anchored_pgp = pgp.dup
-        anchored_pgp[:nodes] = pgp[:nodes].dup
-        anchored_pgp[:nodes].each_key{|k| anchored_pgp[:nodes][k] = pgp[:nodes][k].dup}
-        anchored_pgp[:nodes].each_value.with_index{|n, i| n[:term] = ts[i]}
-        anchored_pgp
+    def product(xs, *yss)
+      Enumerator.new do |p|
+        xs.each{ |x| yss.each{ |ys| ys.each{ |y| p << [x, y]}}}
       end
     end
   end
