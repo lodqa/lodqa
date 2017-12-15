@@ -102,12 +102,16 @@ module Lodqa
     end
 
     def anchored_pgps
+      Logger.debug "start #{self.class.name}##{__method__}"
+
       Enumerator.new do |anchored_pgps|
         @pgp[:nodes].delete_if{|n| nodes_to_delete.include? n}
         @pgp[:edges].uniq!
         terms = @pgp[:nodes].values.map{|n| @mappings[n[:text].to_sym]}
 
         terms.map!{|t| t.nil? ? [] : t}
+
+        Logger.debug "terms: #{ terms.first.product(*terms.drop(1)) }"
 
         product(terms.first, *terms.drop(1))
           .each do |ts|
@@ -124,6 +128,8 @@ module Lodqa
     private
 
     def nodes_to_delete
+      Logger.debug "start #{self.class.name}##{__method__}"
+
       nodes_to_delete = []
       @pgp[:nodes].each_key do |n|
         if @mappings[@pgp[:nodes][n][:text]].nil? || @mappings[@pgp[:nodes][n][:text]].empty?
