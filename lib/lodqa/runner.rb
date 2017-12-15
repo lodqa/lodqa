@@ -55,7 +55,7 @@ module Lodqa
 
       def close(request_id, lodqa)
         Logger.request_id = request_id
-        Logger.debug 'The WebSocket connection is closed.', nil
+        Logger.debug 'The WebSocket connection is closed.'
         lodqa.dispose request_id
       end
     end

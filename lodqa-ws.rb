@@ -115,6 +115,15 @@ class LodqaWS < Sinatra::Base
 
 	def search_query(ws, applicant, default_parse_url, query, read_timeout = 60)
 		begin
+      # Prepare to cancel
+			request_id = Lodqa::Logger.request_id
+			cancel_flag = false
+			ws.onclose do
+				Lodqa::Logger.request_id = request_id
+				Lodqa::Logger.debug 'The WebSocket connection is closed.'
+				cancel_flag = true
+			end
+
 			ws.send({event: :datasets, dataset: applicant[:name]}.to_json)
 
 			# pgp
@@ -141,6 +150,11 @@ class LodqaWS < Sinatra::Base
 
 			endpoint = Lodqa::CachedSparqlClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
 			anchored_pgps.each do |anchored_pgp|
+				if cancel_flag
+					Lodqa::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
+					return
+				end
+
 				#GraphFinder(bgb)
 				graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, options)
 				bgps = graph_finder.bgps
@@ -148,6 +162,11 @@ class LodqaWS < Sinatra::Base
 				if bgps.any?
 					#SPARQL
 					bgps.each do |bgp|
+						if cancel_flag
+							Lodqa::Logger.debug "Stop during processing an bgp: #{bgp}"
+							return
+						end
+
 						ws.send({event: :bgp, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp}.to_json)
 
 						query = {bgp:bgp, sparql:graph_finder.compose_sparql(bgp, anchored_pgp)}
