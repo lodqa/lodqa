@@ -50,7 +50,7 @@ class LodqaWS < Sinatra::Base
 			# debug = true # to log for debugging.
 			debug = false
 
-			Lodqa::Logger.level = debug ? :debug : :info
+			Lodqa::Logger.level = debug ? Logger::DEBUG : Logger::INFO
 			parse_params
 
 			string = params['string']
@@ -81,7 +81,7 @@ class LodqaWS < Sinatra::Base
 	get '/answer3' do
 		return [400, 'Please use websocket'] unless request.websocket?
 
-		Lodqa::Logger.level = :info
+		Lodqa::Logger.level =  Logger::INFO
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
 
 		request.websocket do |ws|
@@ -192,7 +192,7 @@ class LodqaWS < Sinatra::Base
 		begin
 			debug = false # Change true to output debug log.
 
-			Lodqa::Logger.level = debug ? :debug : :info
+			Lodqa::Logger.level = debug ? Logger::DEBUG : Logger::INFO
 			parse_params
 
 			@pgp = pgp(@config[:parser_url], params['query'])
@@ -301,7 +301,7 @@ class LodqaWS < Sinatra::Base
 	get '/solutions' do
 		debug = false # Change true to output debug log.
 
-		Lodqa::Logger.level = debug ? :debug : :info
+		Lodqa::Logger.level = debug ? Logger::DEBUG : Logger::INFO
 		config = get_config(params)
 
 		begin

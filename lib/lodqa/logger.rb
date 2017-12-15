@@ -1,14 +1,16 @@
+require 'logger'
+
 module Lodqa
-  module Logger
+  class Logger
     class << self
       $stdout.sync = true
 
       def level=(level)
-        @debug = (level == :debug)
+        @log.level = level
       end
 
       def generate_request_id
-        SecureRandom.uuid
+        SecureRandom.uuid.tap{ |id| self.request_id = id }
       end
 
       def request_id
@@ -20,28 +22,32 @@ module Lodqa
       end
 
       def debug(message, id = nil, **rest)
-        if @debug
-          puts "#{{
-            level: 'DEBUG',
-            request_id: id || request_id,
-            message: message
-          }
-          .merge(rest)
-          .to_json}"
-        end
+        @log.debug "#{{
+          request_id: id || request_id,
+          message: message
+        }
+        .merge(rest)
+        .to_json}"
       end
 
       def error(error, **rest)
         error_info = {
-          level: 'ERROR',
           request_id: request_id,
           message: error.message,
           class: error.class,
           trace: error.backtrace
         }.merge(rest)
 
-        puts "#{error_info.to_json}"
+        @log.error "#{error_info.to_json}"
+      end
+
+      protected
+
+      def init()
+        @log = ::Logger.new(STDOUT)
       end
     end
+
+    self.init
   end
 end

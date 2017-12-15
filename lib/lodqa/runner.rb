@@ -9,7 +9,7 @@ module Lodqa
       def start(ws, options)
         # Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
         request_id = Logger.generate_request_id
-        Logger.debug "Request start #{options[:name]}", request_id
+        Logger.debug "Request start #{options[:name]}"
 
         lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options)
         channel = SourceChannel.new ws, options[:name]
@@ -22,7 +22,6 @@ module Lodqa
       private
 
       def start_search_solutions(request_id, lodqa, recieve_data, channel)
-        Logger.request_id = request_id
 
         json = JSON.parse(recieve_data, {:symbolize_names => true})
 
