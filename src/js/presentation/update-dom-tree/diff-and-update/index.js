@@ -42,7 +42,13 @@ function updateExitingNode(ast, node, parentNode) {
     // Creat a new Element if the tagName is changed.
     node = updateElement(ast, node, parentNode)
   } else {
-    updateTextNode(ast, node)
+    if (node.tagName) {
+      // Change an existing Element to a text node.
+      parentNode.replaceChild(document.createTextNode(ast.value), node)
+    } else {
+      // Both the ast and the node are Element
+      updateTextNode(ast, node)
+    }
   }
 
   diffAndUpdateChildren(ast, node)
