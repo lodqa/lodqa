@@ -65,5 +65,8 @@ module.exports = Handlebars.compile(`
       {{/if}}
     {{/each}}
   </ul>
+  {{#if overLimit}}
+    Limit the number of displayed SPARQL to {{limit}}. There are {{overLimit}} SPARQL in total.
+  {{/if}}
 {{/if}}
 `)

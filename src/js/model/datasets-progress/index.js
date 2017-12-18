@@ -23,7 +23,7 @@ module.exports = class extends EventEmitter {
         .addBgp(bgp)
       this.emit('progress_datasets_update_event')
 
-      if(dataset === this._selectdDataset){
+      if (dataset === this._selectdDataset) {
         this.emit('progress_selected_dataset_update_event')
       }
     })
@@ -39,7 +39,7 @@ module.exports = class extends EventEmitter {
         .addSolutions(error, anchored_pgp, bgp, solutions)
       this.emit('progress_datasets_update_event')
 
-      if(dataset === this._selectdDataset){
+      if (dataset === this._selectdDataset) {
         this.emit('progress_selected_dataset_update_event')
       }
     })
@@ -73,9 +73,16 @@ module.exports = class extends EventEmitter {
       return
     }
 
-    return this._selectdDataset && {
-      name: this._selectdDataset,
-      sparqls: this._datasets.get(this._selectdDataset).snapshot
+    if (this._selectdDataset) {
+      return {
+        name: this._selectdDataset,
+        sparqls: this._datasets.get(this._selectdDataset)
+          .snapshot
+      }
+    }
+
+    return {
+      sparqls: []
     }
   }
 

@@ -10,6 +10,12 @@ module.exports = class {
 }
 
 function render(dom, model) {
-  const html = template(model.stateOfSparqlsOfSelectedDataset)
+  const data = model.stateOfSparqlsOfSelectedDataset
+  const limit = 500
+  const html = template(Object.assign({}, data, {
+    sparqls: data.sparqls.slice(0, limit),
+    limit,
+    overLimit: data.sparqls.length > limit && data.sparqls.length
+  }))
   updateChildren(dom, html)
 }
