@@ -20,8 +20,8 @@ module.exports = class extends EventEmitter {
 
 function openConnection(emitter, pathname, query, target, readTimeout) {
   const ws = new WebSocket(`ws://${location.host}${pathname}?query=${query}&target=${target}&read_timeout=${readTimeout}`)
-  ws.onopen = () => console.log('open')
-  ws.onclose = () => console.log('close')
+  ws.onopen = () => emitter.emit('open')
+  ws.onclose = () => emitter.emit('close')
   ws.onmessage = ({
     data
   }) => {

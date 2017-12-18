@@ -93,6 +93,10 @@ class LodqaWS < Sinatra::Base
 					applicants.each do | applicant |
 						Lodqa::Async.defer do
 							search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout'].to_i
+
+              # Close the web socket when all applicants are finished
+							applicant[:finished] = true
+							ws.close_connection(true) if applicants.all? { |a| a[:finished] }
 						end
 					end
 				rescue IOError => e

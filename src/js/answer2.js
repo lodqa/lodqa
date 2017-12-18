@@ -1,3 +1,5 @@
+const Message = require('./model/message')
+const MessagePresentation = require('./presentation/message-presentation')
 const AnswerSummary = require('./model/answer-summary')
 const AnswerFilter = require('./model/answer-filter')
 const Pagination = require('./model/pagenation')
@@ -19,6 +21,9 @@ const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventh
   const loader = new LoaderForAnswer2()
 
   // Create models and bind them to the presentations.
+  const message = new Message(loader)
+  new MessagePresentation(document.querySelector('.message'), message)
+
   const answerSummary = new AnswerSummary(loader)
   const answerFilter = new AnswerFilter(answerSummary)
   const pagination = new Pagination(answerFilter)
