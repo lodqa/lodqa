@@ -5,7 +5,17 @@ const template = require('./template')
 
 module.exports = class {
   constructor(dom, model) {
-    model.on('progress_selected_dataset_update_event', () => render(dom, model))
+    model.on('progress_selected_dataset_update_event', () => this.throttle(() => render(dom, model)))
+  }
+
+  throttle(process) {
+    if (!this._rendering) {
+      this._rendering = true
+      requestAnimationFrame(() => {
+        process()
+        this._rendering = false
+      })
+    }
   }
 }
 
