@@ -69,11 +69,7 @@ module.exports = class extends EventEmitter {
   }
 
   get stateOfSparqlsOfSelectedDataset() {
-    if (!this._visible) {
-      return
-    }
-
-    if (this._selectdDataset) {
+    if (this._visible && this._selectdDataset) {
       return {
         name: this._selectdDataset,
         sparqls: this._datasets.get(this._selectdDataset)
