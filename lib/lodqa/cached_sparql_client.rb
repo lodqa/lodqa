@@ -27,7 +27,8 @@ module Lodqa
           # A temporary error was reterned from the Endpoint
           Logger.debug 'SPARQL Endpoint Temporary Error', error_messsage: e.message, trace: e.backtrace
           raise SparqlEndpointTemporaryError.new e, @endpoint_url, sparql
-        rescue OpenSSL::SSL::SSLError => e
+        rescue OpenSSL::SSL::SSLError, SPARQL::Client::ClientError => e
+          # TODO What is the SPARQL::Client::ClientError?
           Logger.debug 'SPARQL Endpoint Persistent Error', error_messsage: e.message, trace: e.backtrace
           raise SparqlEndpointError.new e, @endpoint_url
         rescue => e

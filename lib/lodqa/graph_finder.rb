@@ -81,14 +81,14 @@ class GraphFinder
 
         # Send back error
         if proc_solution
-          proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
+          proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
         end
       rescue Lodqa::SparqlEndpointTemporaryError => e
         Lodqa::Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
 
         # Send back error
         if proc_solution
-          proc_solution.call(query.merge(sparql_timeout: {error_message: e}, solutions: []))
+          proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
         end
       ensure
         if proc_cancel_flag.call
@@ -99,7 +99,8 @@ class GraphFinder
 
       Lodqa::Logger.debug "==========\n"
 
-      sleep(2)
+      # TODO http://rdf.pubannotation.org/sparql requires 2 seconds wait ?
+      # sleep 2
     end
   end
 
