@@ -1,9 +1,9 @@
-const SummaryProgress = require('../../model/summary-progress')
-const SummaryProgressbarPresentation = require('../../presentation/summary-progressbar-presentation')
-const DatasetsProgress = require('../../model/datasets-progress')
-const DatasetsProgressbarPresentation = require('../../presentation/datasets-progressbar-presentation')
-const FilterSparqlWithAnswer = require('../../model/filter-sparql-with-answer')
-const DetailProgressbarPresentation = require('../../presentation/detail-progressbar-presentation')
+const SummaryProgress = require('../../../model/summary-progress')
+const SummaryProgressbarPresentation = require('../../../presentation/summary-progressbar-presentation')
+const DatasetsProgress = require('../../../model/datasets-progress')
+const DatasetsProgressbarPresentation = require('../../../presentation/datasets-progressbar-presentation')
+const FilterSparqlWithAnswer = require('../../../model/filter-sparql-with-answer')
+const DetailProgressbarPresentation = require('../../../presentation/detail-progressbar-presentation')
 
 module.exports = function(loader) {
   const datasetsProgress = new DatasetsProgress(loader)

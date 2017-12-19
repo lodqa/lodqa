@@ -1,4 +1,4 @@
-const SimpleProgressBar = require('../../../presentation/simple-progress-bar-presentation')
+const SimpleProgressBar = require('../../../../presentation/simple-progress-bar-presentation')
 
 module.exports = function show(dom, datasetName, onClickDetailCheckbox) {
   // Append new components

@@ -1,7 +1,7 @@
 const LoaderForAnswer2 = require('./loader/loader-for-answer2')
-const createModelsAndBindItToLoader = require('./answer2/create-models-and-bind-it-to-loader')
-const bindUserEvents = require('./answer2/bind-user-events')
-const start = require('./answer2/start')
+const createModelsAndBindItToLoader = require('./controller/answer2/create-models-and-bind-it-to-loader')
+const bindUserEvents = require('./controller/answer2/bind-user-events')
+const start = require('./controller/answer2/start')
 
 ;
 (() => {

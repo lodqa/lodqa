@@ -1,7 +1,7 @@
 const prepareMessage = require('./prepare-message')
 const prepareAnswerSummary = require('./prepare-answer-summary')
 const prepareProgressbars = require('./prepare-progressbars')
-const SparqlInformatianContainer = require('../../model/sparql-information-container')
+const SparqlInformatianContainer = require('../../../model/sparql-information-container')
 
 module.exports = function(loader) {
   // Message

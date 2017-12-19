@@ -5,8 +5,8 @@ const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const createPresentations = require('./grapheditor/create-presentations')
 const getEndpointInformationFromDom = require('./grapheditor/get-endpoint-information-from-dom')
-const createSimplpProgressBarOnSparqlReset = require('./controller/show-simple-progress-bar-on-sparql-reset')
-const bindDisplayingDetailUpdateEvent = require('./controller/bind-displaying-detail-update-event')
+const createSimplpProgressBarOnSparqlReset = require('./controller/start-grapheditor/show-simple-progress-bar-on-sparql-reset')
+const bindDisplayingDetailUpdateEvent = require('./controller/start-grapheditor/bind-displaying-detail-update-event')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 

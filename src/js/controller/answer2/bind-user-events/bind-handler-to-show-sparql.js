@@ -1,4 +1,4 @@
-const SparqlAndAnswersPresentation = require('../../presentation/sparql-and-answers-presentation')
+const SparqlAndAnswersPresentation = require('../../../presentation/sparql-and-answers-presentation')
 
 module.exports = function (parent, displayAreaDomId, model) {
   // Create and bind a handler to show sparql presentation

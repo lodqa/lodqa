@@ -1,4 +1,4 @@
-const bindModeButtonEventhandler = require('../../controller/bind-mode-button-eventhandler')
+const bindModeButtonEventhandler = require('../../../controller/bind-mode-button-eventhandler')
 const toDownloadData = require('./to-download-data')
 const tsvFormatter = require('./tsv-formatter')
 const bindHandlerToShowSparql = require('./bind-handler-to-show-sparql')

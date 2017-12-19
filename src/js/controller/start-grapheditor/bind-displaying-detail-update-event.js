@@ -1,4 +1,4 @@
-const DetailProgressBar = require('../presentation/detail-progress-bar-presentation')
+const DetailProgressBar = require('../../presentation/detail-progress-bar-presentation')
 
 module.exports = function(dom, integratedDataset, dataset) {
   // Remember an instance of the DetailProgressBar to remove elements from dom and remove listners from the integratedDataset.
