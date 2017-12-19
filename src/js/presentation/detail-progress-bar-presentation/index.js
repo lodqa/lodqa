@@ -1,45 +1,9 @@
-const createDom = require('../create-dom')
-const bindHandlerToCheckbox = require('../bind-handler-to-checkbox')
 const render = require('./render')
 
 // Render all of the progress bar
 module.exports = class {
-  constructor(dataset) {
-    const dom = createDom('<div class="detail-progress-bar"></div>')
-
-    // Render contents
-    render(dom, dataset)
-
-    // Bind an event handler on change events of checkboxes.
-    dom.addEventListener('change', (e) => {
-      const sparql = e.target.closest('.detail-progress-bar__sparqls__sparql')
-
-      if (sparql) {
-        dataset.updateSparqlHideStatus(sparql.getAttribute('data-sparql-number'), !e.target.checked)
-      }
-    })
-
-    // To switch appearance of sparqls
-    bindHandlerToCheckbox(dom, '.show-only-has-answers', () => toggleShowOnlyHasAnswers(dom))
-
-    this.dom = dom
-    this._bindEventListeners(dataset)
+  constructor(dom, dataset) {
+    dataset.on('sparql_progress_change_event', () => render(dom, dataset))
+    dataset.on('sparql_progress_show_detail_event', () => render(dom, dataset))
   }
-
-  dispose() {
-    // Remove event listners.
-    this._dataset.removeListener('solution_add_event', this._upddateDisplay)
-    this._dataset.removeListener('state_change_event', this._upddateDisplay)
-  }
-
-  _bindEventListeners(dataset) {
-    this._dataset = dataset
-    this._upddateDisplay = () => render(this.dom, this._dataset)
-    this._dataset.on('solution_add_event', this._upddateDisplay)
-    this._dataset.on('state_change_event', this._upddateDisplay)
-  }
-}
-
-function toggleShowOnlyHasAnswers(detailProgressBar) {
-  detailProgressBar.classList.toggle('detail-progress-bar--show-only-has-answers')
 }

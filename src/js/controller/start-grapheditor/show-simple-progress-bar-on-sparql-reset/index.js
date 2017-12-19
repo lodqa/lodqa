@@ -1,7 +1,12 @@
-const showAndBindSimpleProgeressBar = require('./show-and-bind-simple-progress-bar')
+const SimpleProgressBar = require('../../../presentation/simple-progress-bar-presentation')
+const bindHandlerToCheckbox = require('../../../presentation/bind-handler-to-checkbox')
 
-module.exports = function(dom, integratedDataset, dataset) {
-  // Bind the Dataset's events
-  const onSparqlReset = () => showAndBindSimpleProgeressBar(dom, integratedDataset, dataset)
-  dataset.once('sparql_reset_event', onSparqlReset)
+module.exports = function(dom, sparqlProgress) {
+  // Create a simpleProgressBar
+  new SimpleProgressBar(dom, sparqlProgress)
+
+  // To switch showing detail of progress
+  bindHandlerToCheckbox(dom, '.show-detail-progress-bar', ({
+    target
+  }) => sparqlProgress.showDetail = target.checked)
 }

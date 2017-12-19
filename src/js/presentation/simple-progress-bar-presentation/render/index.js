@@ -1,8 +1,8 @@
-const createDom = require('../../create-dom')
+const {
+  updateChildren
+} = require('../../update-dom-tree')
 const template = require('./template')
 
-module.exports = function(name) {
-  return createDom(template({
-    name
-  }))
+module.exports = function(dom, data) {
+  updateChildren(dom, template(data))
 }
