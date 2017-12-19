@@ -19,7 +19,7 @@ function init() {
   createPresentations(dataset, {
     resultSelector: '#lodqa-results',
     progressSelector: '#lodqa-messages'
-  }, integratedDataset)
+  })
 
   const progressBarDom = document.querySelector('#progress-bar')
   createSimplpProgressBarOnSparqlReset(progressBarDom, integratedDataset, dataset)
