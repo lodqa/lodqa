@@ -1,8 +1,8 @@
-const SparqlAndAnswersPresentation = require('../presentation/sparql-and-answers-presentation')
+const SparqlAndAnswersPresentation = require('../../presentation/sparql-and-answers-presentation')
 
-module.exports = function (parent, sparqlDomId, sparqlContainer) {
+module.exports = function (parent, displayAreaDomId, model) {
   // Create and bind a handler to show sparql presentation
-  const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation(sparqlDomId, () => {})
+  const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation(displayAreaDomId, () => {})
   const eventHandler = (datasetName, sparqlNumber) => {
     const {
       anchoredPgp,
@@ -10,7 +10,7 @@ module.exports = function (parent, sparqlDomId, sparqlContainer) {
       solutions,
       answers,
       error
-    } = sparqlContainer.getSparql(datasetName, sparqlNumber)
+    } = model.getSparql(datasetName, sparqlNumber)
     sparqlAndAnswersPresentation.show2(sparqlNumber, datasetName, anchoredPgp, sparql, solutions, answers, error)
   }
   document.querySelector('.content')
