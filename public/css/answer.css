@@ -12,58 +12,14 @@
     width: 120px;
 }
 
-.target-display {
-    display: none;
-}
-
 #nlq {
     margin-left: 4px;
     padding-top: 19px;
 }
 
-.datasets {
-    margin-left: 1em;
-}
-
-.answer-index {
-    font-size: 18px;
-    min-width: 1100px;
-    padding-top: 60px;
-    padding-left: 161px;
-}
 
 .hidden {
     display: none;
-}
-
-.answers-for-dataset__answer-index {
-    margin-top: 15px;
-    min-height: 20em;
-}
-
-.answers-for-dataset__answer-index .solution {
-    display: flex;
-}
-
-.answers-for-dataset__answer-index .answer {
-    width: 700px;
-}
-
-.answers-for-dataset__answer-index .sparqls {
-    display: flex;
-    flex-wrap: wrap;
-    list-style-type: none;
-    margin: 0 1em;
-    padding: 0;
-}
-
-.answers-for-dataset__answer-index .sparql {
-    margin: 0 0.1em;
-    min-width: 2em;
-}
-
-.answers-for-dataset__download {
-    margin-top: 1em;
 }
 
 #lightbox {
@@ -92,67 +48,6 @@
     padding: 0.1em 1.5em 2em 1em;
     width: calc(100% - 100px);
 }
-
-
-/* Integrated Answer Index */
-
-.integrated-answer-index {
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
-
-.integrated-answer-index__dataset-information-list {
-    display: flex;
-    padding-left: 600px;
-}
-
-.integrated-answer-index__dataset-information {
-    margin-right: 1em;
-}
-
-.integrated-answer-index__dataset-information-row {
-    display: flex;
-    justify-content: space-between;
-    width: 300px;
-}
-
-.integrated-answer-index__progressbar {
-    width: 100%;
-}
-
-.integrated-answer-index__answer {
-    display: flex;
-}
-
-.integrated-answer-index__answer-label {
-    min-width: 600px;
-}
-
-.integrated-answer-index__dataset-sparql-list {
-    display: flex;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.integrated-answer-index__dataset-sparql {
-    margin-right: 1em;
-    width: 300px;
-}
-
-.integrated-answer-index__sparql-list {
-    display: flex;
-    flex-wrap: wrap;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.integrated-answer-index__sparql {
-    margin: 0 0.1em;
-    min-width: 3em;
-}
-
 
 /* answer 2 */
 

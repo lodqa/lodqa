@@ -1,5 +1,5 @@
 const Handlebars = require('handlebars')
-const registerPartial = require('../../answer/register-partial')
+const registerPartial = require('../register-partial')
 
 registerPartial()
 
