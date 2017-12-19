@@ -4,6 +4,7 @@ const AnswerSummary = require('./model/answer-summary')
 const AnswerFilter = require('./model/answer-filter')
 const Pagination = require('./model/pagenation')
 const AnswerSummaryPresentation = require('./presentation/answer-summary-presentation')
+const DownloadButtonPresentation = require('./presentation/download-button-presentation')
 const PaginationPresentation = require('./presentation/pagination-presentation')
 const SummaryProgress = require('./model/summary-progress')
 const SummaryProgressbarPresentation = require('./presentation/summary-progressbar-presentation')
@@ -13,6 +14,8 @@ const SparqlFilter = require('./model/sparql-filter')
 const DetailProgressbarPresentation = require('./presentation/detail-progressbar-presentation')
 const LoaderForAnswer2 = require('./loader/loader-for-answer2')
 const SparqlContainer = require('./model/sparql-container')
+const toDownloadData = require('./answer2/to-download-data')
+const tsvFormatter = require('./answer2/tsv-formatter')
 const bindHandlerToShowSparql = require('./answer2/bind-handler-to-show-sparql')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
 
@@ -28,6 +31,7 @@ const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventh
   const answerFilter = new AnswerFilter(answerSummary)
   const pagination = new Pagination(answerFilter)
   new AnswerSummaryPresentation(document.querySelector('.answer-summary'), pagination)
+  new DownloadButtonPresentation(document.querySelector('.download-buttons'), answerFilter)
   new PaginationPresentation(document.querySelector('.answer-summary-pages'), pagination)
 
   const datasetsProgress = new DatasetsProgress(loader)
@@ -38,6 +42,20 @@ const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventh
   new DetailProgressbarPresentation(document.querySelector('.detail-progressbar'), sparqlFilter)
 
   // Bind user's events.
+  document.addEventListener('click', ({
+    target
+  }) => {
+    if (target.closest('.download-buttons__download-json-button')) {
+      const data = toDownloadData(answerFilter)
+      target.href = `data:,${encodeURIComponent(JSON.stringify(data,null, 2))}`
+    }
+
+    if (target.closest('.download-buttons__download-tsv-button')) {
+      const data = toDownloadData(answerFilter)
+      target.href = `data:,${encodeURIComponent(tsvFormatter(data))}`
+    }
+  })
+
   document.addEventListener('change', ({
     target
   }) => {

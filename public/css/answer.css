@@ -242,6 +242,36 @@
     color: #1a0dab;
 }
 
+.download-buttons {
+    margin-bottom: 26px;
+}
+
+.download-buttons__download-json-button,
+.download-buttons__download-tsv-button {
+    background-color: rgba(0,0,0,0.04);
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: #444;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    margin-right: 4px;
+    line-height: 20px;
+    text-transform: uppercase;
+    z-index: 0;
+    padding: 7px 12px 5px 12px;
+}
+
+.download-buttons__download-json-button:hover,
+.download-buttons__download-tsv-button:hover {
+    background-color: rgba(0,0,0,0.07);
+}
+
+.download-buttons__download-json-button:active,
+.download-buttons__download-tsv-button:active {
+    background-color: rgba(0,0,0,0.1);
+}
+
 .answer-summary-pages {
     display: flex;
     justify-content: space-between;
