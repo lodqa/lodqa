@@ -11,7 +11,7 @@ module.exports = function (parent, displayAreaDomId, model) {
       answers,
       error
     } = model.getSparql(datasetName, sparqlNumber)
-    sparqlAndAnswersPresentation.show2(sparqlNumber, datasetName, anchoredPgp, sparql, solutions, answers, error)
+    sparqlAndAnswersPresentation.show(sparqlNumber, datasetName, anchoredPgp, sparql, solutions, answers, error)
   }
   document.querySelector('.content')
     .addEventListener('click', ({target}) => {
