@@ -13,11 +13,16 @@
 
         <div id="dashboard" class="dashboard">
             <div id="header">
-                <div class="">
-                    <%= erb :'dashboard/header' %>
-                    <div class="dashboard__target">
-                        <%= params['target'] %>
-                    </div>
+                <div class="logo">
+                    <% if params['target'] %>
+                      <div class="dashboard__target"><%= params['target'] %></div>
+                      <div class="logo--with-target">
+                          powered by
+                          <%= erb :'dashboard/header' %>
+                      </div>
+                    <% else %>
+                      <%= erb :'dashboard/header' %>
+                    <% end %>
                 </div>
                 <%= erb :'dashboard/main-nav' %>
             </div>
