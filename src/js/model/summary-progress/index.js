@@ -24,7 +24,7 @@ module.exports = class extends EventEmitter {
 
   showDatasets(visible) {
     this._showDatasets = visible
-    this._datasetsProgress.visible = visible
+    this._datasetsProgress.showProgressPerDataset = visible
     this.emit('progress_summary_update_event')
   }
 

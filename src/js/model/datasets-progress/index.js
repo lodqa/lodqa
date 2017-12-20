@@ -7,7 +7,7 @@ module.exports = class extends EventEmitter {
   constructor(loader) {
     super()
 
-    this._visible = false
+    this._showProgressPerDataset = false
     this._datasets = new Map()
 
     // The number of bpgs is same the number of SPARQLs.
@@ -45,8 +45,8 @@ module.exports = class extends EventEmitter {
     })
   }
 
-  set visible(visible) {
-    this._visible = visible
+  set showProgressPerDataset(visible) {
+    this._showProgressPerDataset = visible
     this.emit('progress_datasets_update_event')
     this.emit('progress_selected_dataset_update_event')
   }
@@ -69,8 +69,9 @@ module.exports = class extends EventEmitter {
   }
 
   get stateOfSparqlsOfSelectedDataset() {
-    if (this._visible && this._selectdDataset) {
+    if (this._showProgressPerDataset && this._selectdDataset) {
       return {
+        show: true,
         name: this._selectdDataset,
         sparqls: this._datasets.get(this._selectdDataset)
           .snapshot
@@ -78,12 +79,13 @@ module.exports = class extends EventEmitter {
     }
 
     return {
+      show: false,
       sparqls: []
     }
   }
 
   get snapshot() {
-    if (!this._visible) {
+    if (!this._showProgressPerDataset) {
       return []
     }
 
