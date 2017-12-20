@@ -3,9 +3,18 @@ const updateElement = require('../update-element')
 const updateTextNode = require('./update-text-node')
 const removeExtraChildren = require('./remove-extra-children')
 
-module.exports = {
-  diffAndUpdate,
-  diffAndUpdateChildren
+module.exports = diffAndUpdateChildren
+
+function diffAndUpdateChildren(ast, node) {
+  if (ast.childNodes) {
+    updateChildren(ast, node)
+    removeExtraChildren(ast, node)
+  }
+}
+
+function updateChildren(ast, node) {
+  // Update children
+  ast.childNodes.forEach((astChildNode, index) => diffAndUpdate(astChildNode, node.childNodes[index], node))
 }
 
 function diffAndUpdate(ast, node, parentNode) {
@@ -52,16 +61,4 @@ function updateExitingNode(ast, node, parentNode) {
   }
 
   diffAndUpdateChildren(ast, node)
-}
-
-function diffAndUpdateChildren(ast, node) {
-  if (ast.childNodes) {
-    updateChildren(ast, node)
-    removeExtraChildren(ast, node)
-  }
-}
-
-function updateChildren(ast, node) {
-  // Update children
-  ast.childNodes.forEach((astChildNode, index) => diffAndUpdate(astChildNode, node.childNodes[index], node))
 }

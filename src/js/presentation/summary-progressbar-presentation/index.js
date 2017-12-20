@@ -1,8 +1,5 @@
 const Handlebars = require('handlebars')
-
-const {
-  updateChildren
-} = require('../update-dom-tree')
+const updateDomTree = require('../update-dom-tree')
 
 module.exports = class {
   constructor(dom, model) {
@@ -18,5 +15,5 @@ const template = Handlebars.compile(`
 
 function render(dom, model) {
   const html = template(model.snapshot)
-  updateChildren(dom, html)
+  updateDomTree(dom, html)
 }

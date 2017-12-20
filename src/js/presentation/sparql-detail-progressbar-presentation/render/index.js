@@ -1,6 +1,4 @@
-const {
-  updateChildren
-} = require('../../update-dom-tree')
+const updateDomTree = require('../../update-dom-tree')
 const template = require('./template')
 
 module.exports = function(dom, model) {
@@ -11,5 +9,5 @@ module.exports = function(dom, model) {
     limit,
     overLimit: data.sparqls.length > limit
   }))
-  updateChildren(dom, html)
+  updateDomTree(dom, html)
 }

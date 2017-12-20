@@ -1,6 +1,4 @@
-const {
-  updateChildren
-} = require('../update-dom-tree')
+const updateDomTree = require('../update-dom-tree')
 
 module.exports = class {
   constructor(dom, model) {
@@ -15,5 +13,5 @@ function render(dom, model) {
   <a class="download-buttons__download-tsv-button" download="answer.tsv"><i class="fa fa-download" aria-hidden="true"></i> Download TSV (${quantity})</a>
   `
   const html = template
-  updateChildren(dom, html)
+  updateDomTree(dom, html)
 }

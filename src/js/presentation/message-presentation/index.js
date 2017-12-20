@@ -1,6 +1,4 @@
-const {
-  updateChildren
-} = require('../update-dom-tree')
+const updateDomTree = require('../update-dom-tree')
 
 module.exports = class {
   constructor(dom, model) {
@@ -10,5 +8,5 @@ module.exports = class {
 
 function render(dom, model) {
   const html = `${model.message}`
-  updateChildren(dom, html)
+  updateDomTree(dom, html)
 }

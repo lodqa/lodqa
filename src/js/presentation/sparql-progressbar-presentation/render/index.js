@@ -1,8 +1,6 @@
-const {
-  updateChildren
-} = require('../../update-dom-tree')
+const updateDomTree = require('../../update-dom-tree')
 const template = require('./template')
 
 module.exports = function(dom, data) {
-  updateChildren(dom, template(data))
+  updateDomTree(dom, template(data))
 }
