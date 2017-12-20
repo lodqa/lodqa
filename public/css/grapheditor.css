@@ -90,15 +90,33 @@
     text-align: center;
 }
 
-.detail-progress-bar__sparql-list {
+/* progressbar */
+.sparlq-progressbar__progress {
+    margin-left: 2px;
+    width: 600px;
+}
+
+.sparlq-progressbar__percentage {
+    display: inline-block;
+    margin-right: 0.1em;
+    text-align: right;
+    vertical-align: top;
+    width: 3em;
+}
+
+.sparlq-progressbar__show-detail-checkbox {
+    vertical-align: super;
+}
+
+.detail-progressbar__sparql-list {
     width: 694px;
 }
 
-.detail-progress-bar__sparql {
+.detail-progressbar__sparql {
     width: 3.899em;
 }
 
-.detail-progress-bar__sparql--has-answer .detail-progress-bar__number-of-answers {
+.detail-progressbar__sparql--has-answer .detail-progressbar__number-of-answers {
     color: #222;
     padding: 0;
     width: auto;

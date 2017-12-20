@@ -33,7 +33,7 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
       filterSparqlWithAnswer.showOnlyWithAnswer = target.checked
     }
 
-    if (target.closest('.detail-progress-bar__sparql__selected-answers-checkbox')) {
+    if (target.closest('.detail-progressbar__sparql__selected-answers-checkbox')) {
       answerSummary.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
       datasetsProgress.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
     }

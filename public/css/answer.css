@@ -231,10 +231,18 @@
     padding-bottom: 350px;
 }
 
-.detail-progress-bar__sparql-list {
+.detail-progressbar__sparql-list {
     width: 588px;
 }
 
-.detail-progress-bar__sparql {
+.detail-progressbar__sparql {
     width: 4.81em;
+}
+
+.detail-progressbar__sparql--has-answer .detail-progressbar__number-of-answers {
+    border-radius: 3px;
+    font-weight: normal;
+    padding: 0px 6px;
+    text-align: right;
+    width: 1.66em;
 }

@@ -20,8 +20,8 @@ function init() {
     progressSelector: '#lodqa-messages'
   })
 
-  createSparqlProgressbarOnSparqlReset(document.querySelector('.progress-bar__simple-progress-bar'), sparqlProgress)
-  new DetailProgressbar(document.querySelector('.detail-progress-bar'), sparqlProgress)
+  createSparqlProgressbarOnSparqlReset(document.querySelector('.sparlq-progressbar'), sparqlProgress)
+  new DetailProgressbar(document.querySelector('.detail-progressbar'), sparqlProgress)
 
   bindSearchButton(loader)
   bindStopSearchButton(loader)

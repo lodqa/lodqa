@@ -6,7 +6,7 @@ module.exports = function(dom, sparqlProgress) {
   new SparqlProgressbar(dom, sparqlProgress)
 
   // To switch showing detail of progress
-  bindHandlerToCheckbox(dom, '.show-detail-progress-bar', ({
+  bindHandlerToCheckbox(dom, '.show-detail-progressbar', ({
     target
   }) => sparqlProgress.showDetail = target.checked)
 }
