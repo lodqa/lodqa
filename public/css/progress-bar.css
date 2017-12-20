@@ -104,7 +104,8 @@
     color: orangered;
 }
 
-.detail-progress-bar__sparql-list__no-sparql-message {
+.detail-progress-bar__waiting-sparql-message {
     color: white;
+    line-height: 1.5em;
     margin-left: 0.3em;
 }

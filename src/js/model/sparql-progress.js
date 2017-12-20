@@ -26,11 +26,13 @@ module.exports = class extends EventEmitter {
 
   get currentStatusOfSparqls() {
     if(!this._showDetail) {
-      return null
+      return {
+        show: false
+      }
     }
 
     // Return current status of SPARQLs
-    return Array.from(Array(this._dataset.sparqlsMax))
+    const sparqls = Array.from(Array(this._dataset.sparqlsMax))
       .map((val, index) => {
         const sparqlNumber = `${index + 1}`
         const sparqlLink = {
@@ -65,6 +67,11 @@ module.exports = class extends EventEmitter {
           hasSolution: false,
         })
       })
+
+    return {
+      show: true,
+      sparqls
+    }
   }
 
   set showDetail(isShow) {

@@ -4,8 +4,6 @@ const {
 const template = require('./template')
 
 module.exports = function(dom, dataset) {
-  const html = template({
-    sparqls: dataset.currentStatusOfSparqls
-  })
+  const html = template(dataset.currentStatusOfSparqls)
   updateChildren(dom, html)
 }
