@@ -1,9 +1,9 @@
-const SimpleProgressBar = require('../../../presentation/simple-progress-bar-presentation')
+const SparqlProgressbar = require('../../../presentation/sparql-progressbar-presentation')
 const bindHandlerToCheckbox = require('../../../presentation/bind-handler-to-checkbox')
 
 module.exports = function(dom, sparqlProgress) {
   // Create a simpleProgressBar
-  new SimpleProgressBar(dom, sparqlProgress)
+  new SparqlProgressbar(dom, sparqlProgress)
 
   // To switch showing detail of progress
   bindHandlerToCheckbox(dom, '.show-detail-progress-bar', ({

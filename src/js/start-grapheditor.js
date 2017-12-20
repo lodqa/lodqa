@@ -5,8 +5,8 @@ const bindSearchButton = require('./grapheditor/bind-search-button')
 const bindStopSearchButton = require('./grapheditor/bind-stop-search-button')
 const createPresentations = require('./grapheditor/create-presentations')
 const getEndpointInformationFromDom = require('./grapheditor/get-endpoint-information-from-dom')
-const createSimplpProgressBarOnSparqlReset = require('./controller/start-grapheditor/show-simple-progress-bar-on-sparql-reset')
-const DetailProgressBar = require('./presentation/detail-progress-bar-presentation')
+const createSparqlProgressbarOnSparqlReset = require('./controller/start-grapheditor/show-sparql-progressbar-on-sparql-reset')
+const DetailProgressbar = require('./presentation/sparql-detail-progressbar-presentation')
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
@@ -20,8 +20,8 @@ function init() {
     progressSelector: '#lodqa-messages'
   })
 
-  createSimplpProgressBarOnSparqlReset(document.querySelector('.progress-bar__simple-progress-bar'), sparqlProgress)
-  new DetailProgressBar(document.querySelector('.detail-progress-bar'), sparqlProgress)
+  createSparqlProgressbarOnSparqlReset(document.querySelector('.progress-bar__simple-progress-bar'), sparqlProgress)
+  new DetailProgressbar(document.querySelector('.detail-progress-bar'), sparqlProgress)
 
   bindSearchButton(loader)
   bindStopSearchButton(loader)
