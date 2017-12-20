@@ -12,4 +12,4 @@ COPY Gemfile.lock /app
 WORKDIR /app
 RUN bundle install --jobs=4 --retry=10 --clean --without test development
 
-CMD ["bundle", "exec", "rackup", "-o", "0.0.0.0"]
+CMD ["bundle", "exec", "rackup", "-s", "puma", "-E", "deployment"]

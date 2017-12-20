@@ -22,7 +22,7 @@ module Lodqa
     end
 
     def close
-      @socket.close_connection(true)
+      @socket.close
     end
   end
 end

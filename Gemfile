@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
 
-gem 'thin'
+gem 'puma'
 gem 'erubis'
 
 gem 'rest-client'
 gem 'sinatra'
-gem 'sinatra-websocket'
+gem 'faye-websocket'
 gem 'sparql-client'
 
 gem 'app_config'

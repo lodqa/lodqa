@@ -22,8 +22,10 @@ Released under the [MIT license](http://opensource.org/licenses/MIT).
 ```
 git clone git@github.com:lodqa/lodqa.git
 cd lodqa
-rackup
+bundle Install
+bundle exec rackup -s puma -E deployment
 ```
+
 ### Prerequisites
 
 LODQA depends on [graphviz](http://www.graphviz.org/) and some ruby gems.

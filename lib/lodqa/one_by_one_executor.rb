@@ -11,7 +11,7 @@ module Lodqa
           # Prepare to cancel
           request_id = Logger.request_id
           cancel_flag = false
-          ws.onclose do
+          ws.on :close do
             Logger.request_id = request_id
             Logger.debug 'The WebSocket connection is closed.'
             cancel_flag = true

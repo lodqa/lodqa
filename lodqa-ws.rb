@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'sinatra/base'
 require 'rest_client'
-require 'sinatra-websocket'
+require 'faye/websocket'
 require 'erb'
 require 'lodqa'
 require 'lodqa/one_by_one_executor'
@@ -127,16 +127,17 @@ class LodqaWS < Sinatra::Base
 
 	# Websocket only!
 	get '/one_by_one_execute' do
-		return [400, 'Please use websocket'] unless request.websocket?
+		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Lodqa::Logger.level =  Logger::INFO
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
 
-		request.websocket do |ws|
+		begin
+			ws = Faye::WebSocket.new(env)
 			config = get_config(params)
 
-			ws.onopen do
+			ws.on :open do
 				begin
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
@@ -145,45 +146,48 @@ class LodqaWS < Sinatra::Base
 
 							# Close the web socket when all applicants are finished
 							applicant[:finished] = true
-							ws.close_connection(true) if applicants.all? { |a| a[:finished] }
+							ws.close if applicants.all? { |a| a[:finished] }
 						end
 					end
 				rescue IOError => e
 					Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
-					ws.close_connection
+					ws.close
 				rescue => e
 					Lodqa::Logger.error e
 				end
 			end
 		end
+
+		return ws.rack_response
 	end
 
 	get '/solutions' do
-		return [400, 'Please use websocket'] unless request.websocket?
+		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Lodqa::Logger.level = Logger::INFO
 		config = get_config(params)
 
 		begin
-			request.websocket do |ws|
-				Lodqa::Runner.start(
-					ws,
-					name: config[:name],
-					endpoint_url: config[:endpoint_url],
-					graph_uri: config[:graph_uri],
-					endpoint_options: {
-						read_timeout: params['read_timeout']&.to_i
-					},
-					graph_finder_options: {
-						max_hop: config[:max_hop],
-						ignore_predicates: config[:ignore_predicates],
-						sortal_predicates: config[:sortal_predicates],
-						sparql_limit: params['sparql_limit']&.to_i,
-						answer_limit: params['answer_limit']&.to_i
-					}
-				)
-			end
+			ws = Faye::WebSocket.new(env)
+			Lodqa::Runner.start(
+				ws,
+				name: config[:name],
+				endpoint_url: config[:endpoint_url],
+				graph_uri: config[:graph_uri],
+				endpoint_options: {
+					read_timeout: params['read_timeout']&.to_i
+				},
+				graph_finder_options: {
+					max_hop: config[:max_hop],
+					ignore_predicates: config[:ignore_predicates],
+					sortal_predicates: config[:sortal_predicates],
+					sparql_limit: params['sparql_limit']&.to_i,
+					answer_limit: params['answer_limit']&.to_i
+				}
+			)
+
+			ws.rack_response
 		rescue SPARQL::Client::ServerError => e
 			[502, "SPARQL endpoint does not respond."]
 		rescue JSON::ParserError => e
