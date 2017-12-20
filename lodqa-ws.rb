@@ -63,12 +63,12 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	get '/answer2' do
+	get '/answer' do
 		parse_params
 
 		applicants = applicants_dataset(params)
 		if applicants.length > 0
-			erb :answer2
+			erb :answer
 		else
 			response.status = 404
 			body 'No dataset found'

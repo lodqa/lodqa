@@ -34,6 +34,6 @@
     "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
     "browserify:start-grapheditor": "browserify -d -o public/js/start-grapheditor.js src/js/start-grapheditor.js",
     "browserify:dashboard": "browserify -d -o public/js/dashboard.js src/js/dashboard.js",
-    "browserify:answer2": "browserify -d -o public/js/answer2.js src/js/answer2.js"
+    "browserify:answer": "browserify -d -o public/js/answer.js src/js/answer.js"
   }
 }
