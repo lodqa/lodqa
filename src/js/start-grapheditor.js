@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
   const loader = new Loader()
-  const dataset = new Dataset('static', loader, getEndpointInformationFromDom())
+  const dataset = new Dataset(loader, getEndpointInformationFromDom())
   const sparqlProgress = new SparqlProgress(dataset)
 
   createPresentations(dataset, {

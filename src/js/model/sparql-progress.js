@@ -1,6 +1,7 @@
 const {
   EventEmitter
 } = require('events')
+const getUniqAnswers = require('./get-uniq-answers')
 
 module.exports = class extends EventEmitter {
   constructor(dataset) {
@@ -24,9 +25,46 @@ module.exports = class extends EventEmitter {
   }
 
   get currentStatusOfSparqls() {
-    if(this._showDetail) {
-      return this._dataset.currentStatusOfSparqls
+    if(!this._showDetail) {
+      return null
     }
+
+    // Return current status of SPARQLs
+    return Array.from(Array(this._dataset.sparqlsMax))
+      .map((val, index) => {
+        const sparqlNumber = `${index + 1}`
+        const sparqlLink = {
+          sparqlNumber
+        }
+
+        // SPARQLs with solutions
+        if (this._dataset.hasSolution(sparqlNumber)) {
+          const {
+            solution
+          } = this._dataset.getSolution(sparqlNumber)
+          const uniqAnswersLength = getUniqAnswers(solution.solutions, this._dataset.focus)
+            .length
+          const error = solution.sparql_timeout
+
+          return Object.assign(sparqlLink, {
+            hasSolution: true,
+            uniqAnswersLength,
+            error: error && error.error_message
+          })
+        }
+
+        // The next SPARQL is progress
+        if (this._dataset.progress && sparqlNumber === `${this.sparqlCount + 1}`) {
+          return Object.assign(sparqlLink, {
+            hasSolution: false,
+            isProgress: true
+          })
+        }
+
+        return Object.assign(sparqlLink, {
+          hasSolution: false,
+        })
+      })
   }
 
   set showDetail(isShow) {

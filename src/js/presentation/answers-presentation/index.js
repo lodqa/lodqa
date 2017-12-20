@@ -13,10 +13,10 @@ module.exports = class {
     ))
 
     dataset.on('label_update_event', () => {
-      dataset.labelAndUrls.forEach(({
+      for (const {
         label,
         url
-      }) => {
+      } of dataset.labelAndUrls) {
         this._components
           .forEach(c => {
             // Elements of _components may be undefined when the SPARQL has no answers.
@@ -24,7 +24,7 @@ module.exports = class {
               c.updateLabel(url, label)
             }
           })
-      })
+      }
     })
   }
 }
