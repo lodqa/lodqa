@@ -8,6 +8,7 @@ require 'lodqa/one_by_one_executor'
 require 'json'
 require 'open-uri'
 require 'cgi/util'
+require 'uri'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -40,6 +41,10 @@ class LodqaWS < Sinatra::Base
 	get '/' do
 		logger.info "access /"
 		parse_params
+
+		applicants = applicants_dataset(params)
+		@sample_queries = sample_queries_for applicants, params
+
 		erb :index
 	end
 
@@ -244,5 +249,34 @@ class LodqaWS < Sinatra::Base
 		else
 			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 		end
+	end
+
+	def sample_queries_for(applicants, params)
+		applicant_queries = applicants
+			.map do |a|
+				a[:sample_queries].map do |sample_query|
+					# Create url for a sample_query.
+					uri = URI("/")
+					queries = {
+						query: sample_query
+					}
+
+					# Set parameters if exists
+					queries[:target] = params[:target] if params[:target]
+					queries[:read_timeout] = @read_timeout
+
+					uri.query = URI.encode_www_form(queries)
+
+					{
+						url: uri.to_s,
+						sample_query: sample_query
+					}
+				end
+			end
+
+		applicant_queries.first.zip(*applicant_queries.drop(1))
+			.flatten
+			.compact
+			.slice(0, 15)
 	end
 end

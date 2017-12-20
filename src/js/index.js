@@ -1,18 +1,11 @@
 const bindReadTimeoutNumberEventhandler = require('./controller/bind-read-timeout-number-eventhandler')
 const bindModeButtonEventhandler = require('./controller/bind-mode-button-eventhandler')
-const {
-  updateTarget,
-  updateReadTimeout
-} = require('./index/update-sample-queries')
 
 bindModeButtonEventhandler('grapheditor')
-
-const target = new URL(location.href)
-  .searchParams.get('target')
-const targetDom = document
-  .querySelector('.description')
-
-if (target && targetDom) {
-  updateTarget(targetDom, target)
-  bindReadTimeoutNumberEventhandler((readTimeout) => updateReadTimeout(targetDom, readTimeout))
-}
+bindReadTimeoutNumberEventhandler((readTimeout) => {
+  for (const link of document.querySelectorAll('.sample-queries__link')) {
+    const url = new URL(link.href)
+    url.searchParams.set('read_timeout', readTimeout)
+    link.href= url.toString()
+  }
+})

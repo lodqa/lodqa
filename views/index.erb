@@ -27,7 +27,14 @@
             </div>
         </div>
 
-        <div class="description">
+        <div class="sample-queries">
+          <ul class="sample-queries__query-list">
+            <% @sample_queries.each do |sample_query| %>
+              <li>
+                <a class="sample-queries__link" href="<%= sample_query[:url] %>"><%= sample_query[:sample_query] %></a>
+              </li>
+            <% end %>
+          </ul>
         </div>
 
     </body>
