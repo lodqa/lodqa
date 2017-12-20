@@ -43,5 +43,8 @@ module.exports = handlebars.compile(`
       <span class="detail-progress-bar__waiting-sparql-message">Waiting SPARQLs ...</span>
     {{/each}}
   </ul>
+  {{#if overLimit}}
+    Limit the number of displayed SPARQL to {{limit}}.
+  {{/if}}
 {{/if}}
 `)
