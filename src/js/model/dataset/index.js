@@ -45,9 +45,7 @@ module.exports = class Model extends EventEmitter {
       .map((val, index) => {
         const sparqlNumber = `${index + 1}`
         const sparqlLink = {
-          datasetName: this.name,
-          sparqlNumber,
-          sparqlName: sparqlNumber,
+          sparqlNumber
         }
 
         // SPARQLs with solutions

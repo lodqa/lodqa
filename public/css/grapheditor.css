@@ -90,14 +90,16 @@
     text-align: center;
 }
 
-.detail-progress-bar__dataset-name {
-    display: none;
-}
-
 .detail-progress-bar__sparqls {
-    width: 672px;
+    width: 694px;
 }
 
 .detail-progress-bar__sparqls__sparql {
-    width: 4.81em;
+    width: 3.899em;
+}
+
+.detail-progress-bar__sparqls__sparql--has-answer .detail-progress-bar__sparqls__sparql__number-of-answers {
+    color: #222;
+    padding: 0;
+    width: auto;
 }

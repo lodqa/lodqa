@@ -1,7 +1,4 @@
 const handlebars = require('handlebars')
-const registerPartial = require('../../register-partial')
-
-registerPartial()
 
 module.exports = handlebars.compile(`
 <ul class="detail-progress-bar__sparqls">
@@ -11,7 +8,7 @@ module.exports = handlebars.compile(`
         detail-progress-bar__sparqls__sparql
         detail-progress-bar__sparqls__sparql--error
       " data-sparql-number="{{sparqlNumber}}">
-        <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+        <span class="detail-progress-bar__sparqls__sparql__sparql-number">S{{sparqlNumber}}</span>
         <label class="detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}"><i class="fa fa-bomb" aria-hidden="true" title="{{error}}"></i></label>
       </li>
     {{else if hasSolution}}
@@ -23,22 +20,15 @@ module.exports = handlebars.compile(`
           detail-progress-bar__sparqls__sparql--no-answer
         {{/if}}
       " data-sparql-number="{{sparqlNumber}}">
-        <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
-        <input
-          class="detail-progress-bar__sparqls__sparql__selected-answers-checkbox button"
-          type="checkbox"
-          {{#if visible}}
-            checked="checked"
-          {{/if}}
-          id="sparql-number-{{sparqlNumber}}">
-        <label class="detail-progress-bar__sparqls__sparql__number-of-answers button" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
+        <span class="detail-progress-bar__sparqls__sparql__sparql-number">S{{sparqlNumber}}</span>
+        <label class="detail-progress-bar__sparqls__sparql__number-of-answers" for="sparql-number-{{sparqlNumber}}">{{uniqAnswersLength}}</label>
       </li>
     {{else if isProgress}}
       <li class="
         detail-progress-bar__sparqls__sparql
         detail-progress-bar__sparqls__sparql--progress
       " data-sparql-number="{{sparqlNumber}}">
-        <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+        <span class="detail-progress-bar__sparqls__sparql__sparql-number">S{{sparqlNumber}}</span>
         <span class="detail-progress-bar__sparqls__sparql__loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
       </li>
     {{else}}
@@ -48,7 +38,7 @@ module.exports = handlebars.compile(`
           detail-progress-bar__sparqls__sparql--progress
         {{/if}}
       " data-sparql-number="{{sparqlNumber}}">
-        <span class="detail-progress-bar__sparqls__sparql__sparql-number">{{> sparql-link}}</span>
+        <span class="detail-progress-bar__sparqls__sparql__sparql-number">S{{sparqlNumber}}</span>
       </li>
     {{/if}}
   {{/each}}
