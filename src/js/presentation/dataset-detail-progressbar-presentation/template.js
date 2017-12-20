@@ -1,7 +1,7 @@
 const Handlebars = require('handlebars')
-const registerPartial = require('../register-partial')
+const registerPartialSparqlLink = require('./register-partial-sparql-link')
 
-registerPartial()
+registerPartialSparqlLink()
 
 module.exports = Handlebars.compile(`
 {{#if sparqls}}
