@@ -90,15 +90,15 @@
     text-align: center;
 }
 
-.detail-progress-bar__sparqls {
+.detail-progress-bar__sparql-list {
     width: 694px;
 }
 
-.detail-progress-bar__sparqls__sparql {
+.detail-progress-bar__sparql {
     width: 3.899em;
 }
 
-.detail-progress-bar__sparqls__sparql--has-answer .detail-progress-bar__sparqls__sparql__number-of-answers {
+.detail-progress-bar__sparql--has-answer .detail-progress-bar__number-of-answers {
     color: #222;
     padding: 0;
     width: auto;
