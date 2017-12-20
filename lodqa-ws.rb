@@ -76,7 +76,7 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	get '/answer3' do
+	get '/one_by_one_execute' do
 		return [400, 'Please use websocket'] unless request.websocket?
 
 		Lodqa::Logger.level =  Logger::INFO
