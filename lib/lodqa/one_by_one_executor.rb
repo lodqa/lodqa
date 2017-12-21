@@ -30,7 +30,6 @@ module Lodqa
             max_hop: applicant[:max_hop],
             ignore_predicates: applicant[:ignore_predicates],
             sortal_predicates: applicant[:sortal_predicates],
-            debug: false,
             endpoint_options: {read_timeout: read_timeout}
           }
           lodqa = Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], options)

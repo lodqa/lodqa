@@ -50,10 +50,9 @@ class LodqaWS < Sinatra::Base
 
 	post '/template.json' do
 		begin
-			# debug = true # to log for debugging.
-			debug = false
+			# Change value to Logger::DEBUG to log for debugging.
+			Lodqa::Logger.level = Logger::INFO
 
-			Lodqa::Logger.level = debug ? Logger::DEBUG : Logger::INFO
 			parse_params
 
 			string = params['string']
@@ -127,6 +126,7 @@ class LodqaWS < Sinatra::Base
 	get '/one_by_one_execute' do
 		return [400, 'Please use websocket'] unless request.websocket?
 
+		# Change value to Logger::DEBUG to log for debugging.
 		Lodqa::Logger.level =  Logger::INFO
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
 
@@ -158,8 +158,8 @@ class LodqaWS < Sinatra::Base
 	get '/solutions' do
 		return [400, 'Please use websocket'] unless request.websocket?
 
-		debug = false # Change true to output debug log.
-		Lodqa::Logger.level = debug ? Logger::DEBUG : Logger::INFO
+		# Change value to Logger::DEBUG to log for debugging.
+		Lodqa::Logger.level = Logger::INFO
 		config = get_config(params)
 
 		begin
@@ -172,7 +172,6 @@ class LodqaWS < Sinatra::Base
 					max_hop: config[:max_hop],
 					ignore_predicates: config[:ignore_predicates],
 					sortal_predicates: config[:sortal_predicates],
-					debug: debug,
 					endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
 				)
 			end

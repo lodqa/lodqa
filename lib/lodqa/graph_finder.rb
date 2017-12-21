@@ -14,9 +14,6 @@ module Lodqa
     # This constructor takes the URL of an end point to be searched
     # optionally options can be passed to the server of the end point.
     def initialize(pgp, endpoint, graph_uri, options = {})
-      options ||= {}
-      @debug = options[:debug] || false
-
       @pgp = pgp
       @endpoint = endpoint
       @graph_uri = graph_uri

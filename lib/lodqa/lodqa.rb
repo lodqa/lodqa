@@ -22,8 +22,7 @@ module Lodqa
 
     def initialize(ep_url, graph_uri, options = {})
       @graph_uri = graph_uri
-      @options = options || {}
-      @debug = @options[:debug] || false
+      @options = options
 
       # Set default HTTP method to GET.
       # Default HTTP method of SparqlClient is POST.
