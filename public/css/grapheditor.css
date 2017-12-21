@@ -90,6 +90,14 @@
     text-align: center;
 }
 
+/* search-controller */
+
+.serach-controller {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+}
+
 /* progressbar */
 .sparlq-progressbar__progress {
     margin-left: 2px;

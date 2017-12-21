@@ -1,4 +1,8 @@
 <h1>Ready for Search</h1>
-<input id="beginSearch" type="button" class="button" value="Begin Search"></input>
-<input id="stopSearch" type="button" class="button hidden" value="Stop Search"></input>
-<label><input id="verbose" type="checkbox">verbose</label>
+<div class="serach-controller">
+  <input id="beginSearch" type="button" class="button" value="Begin Search"></input>
+  <input id="stopSearch" type="button" class="button hidden" value="Stop Search"></input>
+  <label><input id="verbose" type="checkbox">verbose</label>
+  <span>SPARQL limit:<input id="sparql-limit" type="number" min="3" max="1000" value="100"></span>
+  <span>answer limit:<input id="answer-limit" type="number" min="1" max="100" value="10"></span>
+</div>

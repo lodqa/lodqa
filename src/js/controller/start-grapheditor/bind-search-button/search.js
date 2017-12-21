@@ -9,7 +9,9 @@ module.exports = function(event, loader, pgpElement, mappingsElement) {
     .value
   const readTimeout = document.querySelector('#read_timeout')
     .value
+  const sparqlLimit = document.querySelector('#sparql-limit').value
+  const answerLimit = document.querySelector('#answer-limit').value
 
-  loader.beginSearch(pgp, mappings, '/solutions', target, readTimeout)
+  loader.beginSearch(pgp, mappings, '/solutions', target, readTimeout, sparqlLimit, answerLimit)
   loader.once('ws_close', () => event.target.removeAttribute('disabled'))
 }

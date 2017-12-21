@@ -1,12 +1,14 @@
-const {EventEmitter} = require('events')
+const {
+  EventEmitter
+} = require('events')
 
-module.exports = class extends EventEmitter{
+module.exports = class extends EventEmitter {
   constructor() {
     super()
   }
 
-  beginSearch(pgp, mappings, pathname, target, readTimeout) {
-    this.ws = openConnection(this, pathname, target, readTimeout)
+  beginSearch(pgp, mappings, pathname, target, readTimeout, sparqlLimit, answerLimit) {
+    this.ws = openConnection(this, pathname, target, readTimeout, sparqlLimit, answerLimit)
 
     this.once('ws_open', () => {
       this.ws.send(JSON.stringify({
@@ -17,14 +19,14 @@ module.exports = class extends EventEmitter{
   }
 
   stopSearch() {
-    if(this.ws){
+    if (this.ws) {
       this.ws.close()
     }
   }
 }
 
-function openConnection(emitter, pathname, target, readTimeout) {
-  const ws = new WebSocket(`ws://${location.host}${pathname}?target=${target}&read_timeout=${readTimeout}`)
+function openConnection(emitter, pathname, target, readTimeout, sparqlLimit, answerLimit) {
+  const ws = new WebSocket(`ws://${location.host}${pathname}?target=${target}&read_timeout=${readTimeout}&sparql_limit=${sparqlLimit}&answer_limit=${answerLimit}`)
 
   ws.onopen = function() {
     emitter.emit('ws_open')

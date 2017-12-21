@@ -175,7 +175,9 @@ class LodqaWS < Sinatra::Base
 					graph_finder_options: {
 						max_hop: config[:max_hop],
 						ignore_predicates: config[:ignore_predicates],
-						sortal_predicates: config[:sortal_predicates]
+						sortal_predicates: config[:sortal_predicates],
+						sparql_limit: params['sparql_limit']&.to_i,
+						answer_limit: params['answer_limit']&.to_i
 					}
 				)
 			end
