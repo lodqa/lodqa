@@ -1,4 +1,4 @@
-const Loader = require('./loader')
+const SolutionsLoader = require('./loader/solutions-loader')
 const SparqlProgress = require('./model/sparql-progress')
 const Dataset = require('./model/dataset')
 const bindSearchButton = require('./grapheditor/bind-search-button')
@@ -11,7 +11,7 @@ const DetailProgressbar = require('./presentation/sparql-detail-progressbar-pres
 document.addEventListener('DOMContentLoaded', () => setTimeout(init, 150))
 
 function init() {
-  const loader = new Loader()
+  const loader = new SolutionsLoader()
   const dataset = new Dataset(loader, getEndpointInformationFromDom())
   const sparqlProgress = new SparqlProgress(dataset)
 
