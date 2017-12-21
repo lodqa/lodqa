@@ -64,14 +64,11 @@ module Lodqa
       end
     end
 
-    def each_sparql_and_solution(proc_sparqls, proc_solution, proc_cancel_flag)
+    def each_sparql_and_solution(proc_solution, proc_cancel_flag)
       bgps.each do |bgp|
         sparql = compose_sparql(bgp, @pgp)
 
         Logger.debug "#{sparql}\n++++++++++"
-
-        # Send number of spaqls before search
-        proc_sparqls.call
 
         begin
           result = @endpoint.query(sparql)

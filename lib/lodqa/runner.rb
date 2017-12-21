@@ -39,8 +39,8 @@ module Lodqa
             Logger.debug "start async func"
 
             channel.start
+            channel.send :sparql_count, { count: lodqa.sparqls.count }
             lodqa.each_anchored_pgp_and_sparql_and_solution(
-              -> { channel.send :sparql },
               -> data { channel.send :anchored_pgp, data },
               -> data { channel.send :solution, data }
             )

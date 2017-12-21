@@ -1,7 +1,9 @@
 module.exports = function bindModelToLoader(loader, dataset) {
   // Bind self to loader
   loader.on('start', () => dataset.reset())
-  loader.on('sparql', () => dataset.addSparql())
+  loader.on('sparql_count', ({
+    count
+  }) => dataset.sparqlsMax = count)
   loader.on('anchored_pgp', (anchoredPgp) => dataset.anchoredPgp = anchoredPgp)
   loader.on('solution', (newSolution) => dataset.addSolution(newSolution))
 

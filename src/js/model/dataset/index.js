@@ -33,17 +33,16 @@ module.exports = class Model extends EventEmitter {
     return this._sparqlsMax
   }
 
+  set sparqlsMax(max) {
+    this._sparqlsMax = max
+    this.emit('sparql_add_event')
+  }
+
   reset() {
     this._sparqlsMax = 0
     this._sparqlCount.reset()
 
     this.emit('sparql_reset_event')
-  }
-
-  addSparql() {
-    this._sparqlsMax += 1
-
-    this.emit('sparql_add_event')
   }
 
   // AnchoerdPGP
