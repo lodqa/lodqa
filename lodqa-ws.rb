@@ -169,10 +169,14 @@ class LodqaWS < Sinatra::Base
 					name: config[:name],
 					endpoint_url: config[:endpoint_url],
 					graph_uri: config[:graph_uri],
-					max_hop: config[:max_hop],
-					ignore_predicates: config[:ignore_predicates],
-					sortal_predicates: config[:sortal_predicates],
-					endpoint_options: {read_timeout: params['read_timeout'].to_i || 60}
+					endpoint_options: {
+						read_timeout: params['read_timeout'].to_i || 60
+					},
+					graph_finder_options: {
+						max_hop: config[:max_hop],
+						ignore_predicates: config[:ignore_predicates],
+						sortal_predicates: config[:sortal_predicates]
+					}
 				)
 			end
 		rescue SPARQL::Client::ServerError => e

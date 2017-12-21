@@ -66,7 +66,7 @@ module Lodqa
 
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
-        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
+        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options[:graph_finder_options]).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
 
         Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
       end
@@ -110,7 +110,7 @@ module Lodqa
       end
 
       Logger.debug "create graph finder"
-      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options)
+      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options[:graph_finder_options])
 
       if @cancel_flag
         Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"

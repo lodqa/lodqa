@@ -26,13 +26,10 @@ module Lodqa
           ws.send({event: :mappings, dataset: applicant[:name], pgp: pgp, mappings: mappings}.to_json)
 
           #Lodqa(anchored_pgp)
-          options = {
-            max_hop: applicant[:max_hop],
-            ignore_predicates: applicant[:ignore_predicates],
-            sortal_predicates: applicant[:sortal_predicates],
-            endpoint_options: {read_timeout: read_timeout}
+          endpoint_options = {
+            read_timeout: read_timeout
           }
-          lodqa = Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], options)
+          lodqa = Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], endpoint_options)
           lodqa.pgp = pgp
           lodqa.mappings = mappings
 
@@ -44,7 +41,12 @@ module Lodqa
             end
 
             #GraphFinder(bgb)
-            graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, options)
+            graph_finder_options = {
+              max_hop: applicant[:max_hop],
+              ignore_predicates: applicant[:ignore_predicates],
+              sortal_predicates: applicant[:sortal_predicates]
+            }
+            graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, graph_finder_options)
             bgps = graph_finder.bgps
 
             if bgps.any?
