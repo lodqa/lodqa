@@ -20,6 +20,8 @@ module Lodqa
       @ignore_predicates = options[:ignore_predicates] || []
       @sortal_predicates = options[:sortal_predicates] || []
       @max_hop = options[:max_hop] || 2
+      @sparql_limit = options[:sparql_limit] || 100
+      @answer_limit = options[:answer_limit] || 10
     end
 
     # It generates bgps by applying variation operations to the pgp.
@@ -32,7 +34,10 @@ module Lodqa
             @max_hop
           )
         )
-        .each { |bgp| y << bgp }
+        .each_with_index do |bgp, idx|
+           break if idx > @sparql_limit
+           y << bgp
+         end
       end
     end
 
@@ -150,7 +155,7 @@ module Lodqa
       s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
 
       # query += "}"
-      query += "} LIMIT 10"
+      query += "} LIMIT #{@answer_limit}"
     end
 
     private
