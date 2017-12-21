@@ -81,37 +81,6 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	get '/one_by_one_execute' do
-		return [400, 'Please use websocket'] unless request.websocket?
-
-		Lodqa::Logger.level =  Logger::INFO
-		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
-
-		request.websocket do |ws|
-			config = get_config(params)
-
-			ws.onopen do
-				begin
-					applicants = applicants_dataset(params)
-					applicants.each do | applicant |
-						Lodqa::Async.defer do
-							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout'].to_i
-
-							# Close the web socket when all applicants are finished
-							applicant[:finished] = true
-							ws.close_connection(true) if applicants.all? { |a| a[:finished] }
-						end
-					end
-				rescue IOError => e
-					Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
-					ws.close_connection
-				rescue => e
-					Lodqa::Logger.error e
-				end
-			end
-		end
-	end
-
 	get '/grapheditor' do
 		logger.info "access /grapheditor"
 		parse_params
@@ -155,9 +124,41 @@ class LodqaWS < Sinatra::Base
 	end
 
 	# Websocket only!
-	get '/solutions' do
-		debug = false # Change true to output debug log.
+	get '/one_by_one_execute' do
+		return [400, 'Please use websocket'] unless request.websocket?
 
+		Lodqa::Logger.level =  Logger::INFO
+		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
+
+		request.websocket do |ws|
+			config = get_config(params)
+
+			ws.onopen do
+				begin
+					applicants = applicants_dataset(params)
+					applicants.each do | applicant |
+						Lodqa::Async.defer do
+							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout'].to_i
+
+							# Close the web socket when all applicants are finished
+							applicant[:finished] = true
+							ws.close_connection(true) if applicants.all? { |a| a[:finished] }
+						end
+					end
+				rescue IOError => e
+					Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+					ws.close_connection
+				rescue => e
+					Lodqa::Logger.error e
+				end
+			end
+		end
+	end
+
+	get '/solutions' do
+		return [400, 'Please use websocket'] unless request.websocket?
+
+		debug = false # Change true to output debug log.
 		Lodqa::Logger.level = debug ? Logger::DEBUG : Logger::INFO
 		config = get_config(params)
 
