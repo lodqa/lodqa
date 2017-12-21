@@ -11,7 +11,7 @@ module Lodqa
         request_id = Logger.generate_request_id
         Logger.debug "Request start #{options[:name]}"
 
-        lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options)
+        lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options[:endpoint_options], options[:graph_finder_options])
         channel = SourceChannel.new ws, options[:name]
 
         Logger.debug "Setuped"

@@ -20,17 +20,10 @@ module Lodqa
 
     attr_reader :endpoint
 
-    def initialize(ep_url, graph_uri, options = {})
-      @graph_uri = graph_uri
-      @options = options
-
-      # Set default HTTP method to GET.
-      # Default HTTP method of SparqlClient is POST.
-      # But POST method in HTTP 1.1 may occurs conection broken error.
-      # If HTTP method is GET, when HTTP connection error occurs, a request is retried by HTTP stack of Ruby standard library.
-      endpoint_options = @options[:endpoint_options] || {}
-      endpoint_options[:method] ||= :get
+    def initialize(ep_url, graph_uri, endpoint_options, graph_finder_options = {})
       @endpoint = CachedSparqlClient.new(ep_url, endpoint_options)
+      @graph_uri = graph_uri
+      @graph_finder_options = graph_finder_options
     end
 
     # Return an enumerator to speed up checking the existence of sparqls.
@@ -67,7 +60,7 @@ module Lodqa
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
         begin
-          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options[:graph_finder_options]).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
+          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @graph_finder_options).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
         rescue SparqlEndpointTimeoutError => e
           Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
         rescue SparqlEndpointTemporaryError => e
@@ -116,7 +109,7 @@ module Lodqa
       end
 
       Logger.debug "create graph finder"
-      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options[:graph_finder_options])
+      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @graph_finder_options)
 
       if @cancel_flag
         Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
@@ -214,8 +207,7 @@ module Lodqa
     # puts "[dictionary URL] #{dictionary_url}"
     # puts "[Maximum number of hops] #{maxhop}"
 
-    # lodqa = Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {:debug => false, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
-    lodqa = Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {:debug => debug, :ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+    lodqa = Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {}, {:ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
     # lodqa.find_answer
 
     proc_anchored_pgp = Proc.new do |anchored_pgp|

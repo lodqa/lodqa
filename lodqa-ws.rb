@@ -138,7 +138,7 @@ class LodqaWS < Sinatra::Base
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
 						Lodqa::Async.defer do
-							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout'].to_i
+							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']&.to_i
 
 							# Close the web socket when all applicants are finished
 							applicant[:finished] = true
@@ -170,7 +170,7 @@ class LodqaWS < Sinatra::Base
 					endpoint_url: config[:endpoint_url],
 					graph_uri: config[:graph_uri],
 					endpoint_options: {
-						read_timeout: params['read_timeout'].to_i || 60
+						read_timeout: params['read_timeout']&.to_i
 					},
 					graph_finder_options: {
 						max_hop: config[:max_hop],

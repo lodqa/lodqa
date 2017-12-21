@@ -4,7 +4,7 @@ require 'lodqa/logger'
 module Lodqa
   module OneByOneExecutor
     class << self
-      def search_query(ws, applicant, default_parse_url, query, read_timeout = 60)
+      def search_query(ws, applicant, default_parse_url, query, read_timeout)
         begin
           # Prepare to cancel
           request_id = Logger.request_id
