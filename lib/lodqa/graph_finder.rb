@@ -25,14 +25,11 @@ module Lodqa
     # It generates bgps by applying variation operations to the pgp.
     # The option _max_hop_ specifies the maximum number of hops to be searched.
     def bgps
-      pgp = @pgp
-      max_hop = @max_hop
-
       Enumerator.new do |y|
         generate_inverse_variations(
           generate_split_variations(
-            generate_instantiation_variations(pgp),
-            max_hop
+            generate_instantiation_variations(@pgp),
+            @max_hop
           )
         )
         .each { |bgp| y << bgp }
