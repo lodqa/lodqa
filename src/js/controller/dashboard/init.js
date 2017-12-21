@@ -1,4 +1,4 @@
-const bindModeButtonEventhandler = require('../controller/bind-mode-button-eventhandler')
+const bindModeButtonEventhandler = require('../bind-mode-button-eventhandler')
 const initSampleQueries = require('./init-sample-queries')
 const bindParseItButtonEventhandler = require('./bind-parse-it-button-eventhandler')
 const initGrpahEditor = require('./init-grpah-editor')

@@ -1,3 +1,3 @@
-const init = require('./dashboard/init')
+const init = require('./controller/dashboard/init')
 
 document.addEventListener('DOMContentLoaded', init)

@@ -1,7 +1,7 @@
-const LoadingPresentation = require('../presentation/loading-presentation')
-const AnchoredPgpTablePresentation = require('../presentation/anchored-pgp-table-presentation')
-const AnswersPresentation = require('../presentation/answers-presentation')
-const SparqlPresentation = require('../presentation/sparql-presentation')
+const LoadingPresentation = require('../../presentation/loading-presentation')
+const AnchoredPgpTablePresentation = require('../../presentation/anchored-pgp-table-presentation')
+const AnswersPresentation = require('../../presentation/answers-presentation')
+const SparqlPresentation = require('../../presentation/sparql-presentation')
 
 module.exports = function(dataset, {
   resultSelector,

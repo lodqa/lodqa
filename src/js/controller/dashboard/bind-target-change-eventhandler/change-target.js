@@ -1,4 +1,4 @@
-const getTargetConfig = require('../../get-target-config')
+const getTargetConfig = require('../../../get-target-config')
 const applyConfig = require('./apply-config')
 const setDictionaryUrl = require('./set-dictionary-url')
 
