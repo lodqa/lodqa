@@ -14,7 +14,7 @@ module.exports = class Model extends EventEmitter {
     bindModelToLoader(loader, this)
 
     this._findLabelOptions = findLabelOptions
-    this._sparqls = []
+    this._sparqlsMax = 0
     this._sparqlCount = new SparqlCount()
     this._anchoredPgp = null
     this._solution = new Map()
@@ -30,22 +30,18 @@ module.exports = class Model extends EventEmitter {
   }
 
   get sparqlsMax() {
-    return this._sparqls.length
-  }
-
-  getSparql(sparqlCount) {
-    return this._sparqls[sparqlCount - 1]
+    return this._sparqlsMax
   }
 
   reset() {
-    this._sparqls = []
+    this._sparqlsMax = 0
     this._sparqlCount.reset()
 
     this.emit('sparql_reset_event')
   }
 
-  addSparql(sparql) {
-    this._sparqls.push(sparql)
+  addSparql() {
+    this._sparqlsMax += 1
 
     this.emit('sparql_add_event')
   }

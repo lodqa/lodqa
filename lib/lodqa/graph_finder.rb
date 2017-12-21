@@ -71,7 +71,7 @@ module Lodqa
         Logger.debug "#{sparql}\n++++++++++"
 
         # Send number of spaqls before search
-        proc_sparqls.call sparql
+        proc_sparqls.call
 
         begin
           result = @endpoint.query(sparql)

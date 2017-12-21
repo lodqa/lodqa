@@ -8,10 +8,12 @@ module Lodqa
     end
 
     def start
-      send start: 'start'
+      send :start
     end
 
-    def send(data)
+    def send(event, data = nil)
+      data ||= {}
+      data[:event] = event
       @socket.send @data.format data
     end
 
