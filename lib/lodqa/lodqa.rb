@@ -66,7 +66,13 @@ module Lodqa
 
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
-        GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options[:graph_finder_options]).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
+        begin
+          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @options[:graph_finder_options]).each_sparql_and_solution(proc_sparqls, proc_solution, -> {@cancel_flag})
+        rescue SparqlEndpointTimeoutError => e
+          Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+        rescue SparqlEndpointTemporaryError => e
+          Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+        end
 
         Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
       end
