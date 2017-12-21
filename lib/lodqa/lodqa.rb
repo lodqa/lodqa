@@ -20,20 +20,19 @@ module Lodqa
 
     attr_reader :endpoint
 
-    def initialize(ep_url, graph_uri, endpoint_options, graph_finder_options = {})
+    def initialize(ep_url, graph_uri, endpoint_options)
       @endpoint = CachedSparqlClient.new(ep_url, endpoint_options)
       @graph_uri = graph_uri
-      @graph_finder_options = graph_finder_options
     end
 
     # Return an enumerator to speed up checking the existence of sparqls.
-    def sparqls
+    def sparqls(graph_finder_options)
       Logger.debug "start #{self.class.name}##{__method__}"
 
       Enumerator.new do |y|
         begin
           anchored_pgps.each do |anchored_pgp|
-            to_sparql(anchored_pgp){ |sparql| y << sparql}
+            to_sparql(anchored_pgp, graph_finder_options){ |sparql| y << sparql}
           end
         rescue SparqlEndpointError => e
           Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
@@ -41,7 +40,7 @@ module Lodqa
       end
     end
 
-    def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_solution)
+    def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_solution, graph_finder_options)
       Logger.debug "start #{self.class.name}##{__method__}"
 
       if @cancel_flag
@@ -60,7 +59,7 @@ module Lodqa
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
         begin
-          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @graph_finder_options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
+          GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, graph_finder_options).each_sparql_and_solution(proc_solution, -> {@cancel_flag})
         rescue SparqlEndpointTimeoutError => e
           Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
         rescue SparqlEndpointTemporaryError => e
@@ -102,14 +101,14 @@ module Lodqa
 
     private
 
-    def to_sparql(anchored_pgp)
+    def to_sparql(anchored_pgp, graph_finder_options)
       if @cancel_flag
         Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
         return
       end
 
       Logger.debug "create graph finder"
-      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, @graph_finder_options)
+      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, graph_finder_options)
 
       if @cancel_flag
         Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
@@ -207,7 +206,7 @@ module Lodqa
     # puts "[dictionary URL] #{dictionary_url}"
     # puts "[Maximum number of hops] #{maxhop}"
 
-    lodqa = Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {}, {:ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
+    lodqa = Lodqa.new(query, parser_url, dictionary_url, endpoint_url, {})
     # lodqa.find_answer
 
     proc_anchored_pgp = Proc.new do |anchored_pgp|
@@ -227,7 +226,7 @@ module Lodqa
       p solution
     end
 
-    lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution)
+    lodqa.each_anchored_pgp_and_solution(proc_anchored_pgp, proc_solution, {:ignore_predicates => ignore_predicates, :sortal_predicates => sortal_predicates})
     # lodqa.each_anchored_pgp_and_solution(nil, proc_solution)
   end
 end
