@@ -4,7 +4,7 @@ module.exports = function(beginSearch, loader, pgpElement, mappingsElement) {
   beginSearch
     .addEventListener('click', (e) => {
       e.target.classList.toggle('hidden')
-      document.querySelector('#stopSearch')
+      document.querySelector('#stop-search')
         .classList.toggle('hidden')
       document.querySelector('.dashboard')
         .classList.add('dashboard--back')
