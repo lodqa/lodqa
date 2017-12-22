@@ -33,9 +33,9 @@ module Lodqa
       def error(error, **rest)
         error_info = {
           request_id: request_id,
-          message: error.message,
-          class: error.class,
-          trace: error.backtrace
+          message: error&.message,
+          class: error&.class,
+          trace: error&.backtrace
         }.merge(rest)
 
         @log.error "#{error_info.to_json}"
