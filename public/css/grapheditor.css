@@ -98,6 +98,10 @@
     justify-content: space-between;
 }
 
+.serach-controller [type="number"]{
+    width: 3em;
+}
+
 /* progressbar */
 .sparlq-progressbar__progress {
     margin-left: 2px;
