@@ -7,20 +7,29 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
   document.addEventListener('click', ({
     target
   }) => {
-    if (target.closest('.download-buttons__download-json-button')) {
+    if (target.closest('.download-answers__download-button')) {
       const data = toDownloadData(answerSummary)
-      target.href = `data:,${encodeURIComponent(JSON.stringify(data,null, 2))}`
-    }
 
-    if (target.closest('.download-buttons__download-tsv-button')) {
-      const data = toDownloadData(answerSummary)
-      target.href = `data:,${encodeURIComponent(tsvFormatter(data))}`
+      const select = target.nextElementSibling
+      let formmated
+      switch (select.value) {
+      case 'json':
+        formmated = encodeURIComponent(JSON.stringify(data,null, 2))
+        break
+      case 'tsv':
+        formmated = encodeURIComponent(tsvFormatter(data))
+        break
+      default:
+        console.error(`${target.value} is not supported format.`)
+      }
+
+      // Do download.
+      target.href = `data:,${formmated}`
+      target.download = `lodqa-download.${select.value}`
     }
   })
 
-  document.addEventListener('change', ({
-    target
-  }) => {
+  document.addEventListener('change', ({target}) => {
     if (target.closest('.summary-progressbar__checkbox')) {
       summaryProgress.showDatasets(target.checked)
     }
@@ -37,7 +46,7 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
       answerSummary.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
       datasetsProgress.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
     }
-  })
+  }, true)
   bindHandlerToShowSparql(document, 'lightbox', sparqlInformationContainer)
   bindModeButtonEventhandler('grapheditor')
 }

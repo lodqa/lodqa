@@ -9,8 +9,12 @@ module.exports = class {
 function render(dom, model) {
   const quantity = model.snapshot.length
   const template = `
-  <a class="download-buttons__download-json-button" download="answer.json"><i class="fa fa-download" aria-hidden="true"></i> Download JSON (${quantity})</a>
-  <a class="download-buttons__download-tsv-button" download="answer.tsv"><i class="fa fa-download" aria-hidden="true"></i> Download TSV (${quantity})</a>
+  ${quantity} answers are found.
+  <a class="download-answers__download-button">download answers</a> in
+  <select class="download-answers__select-format">
+    <option value="json">json</option>
+    <option value="tsv">tsv</option>
+  </select> format.
   `
   const html = template
   updateDomTree(dom, html)

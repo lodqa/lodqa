@@ -10,7 +10,7 @@ module.exports = function(loader) {
   const answerFilter = new AnswerFilter(answerSummary)
   const pagination = new Pagination(answerFilter)
   new AnswerSummaryPresentation(document.querySelector('.answer-summary'), pagination)
-  new DownloadButtonPresentation(document.querySelector('.download-buttons'), answerFilter)
+  new DownloadButtonPresentation(document.querySelector('.download-answers'), answerFilter)
   new PaginationPresentation(document.querySelector('.answer-summary-pages'), pagination)
 
   return answerFilter
