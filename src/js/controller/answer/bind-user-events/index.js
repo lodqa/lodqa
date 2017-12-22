@@ -10,7 +10,7 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
     if (target.closest('.download-answers__download-button')) {
       const data = toDownloadData(answerSummary)
 
-      const select = target.nextElementSibling
+      const [select] = target.nextElementSibling.children
       let formmated
       switch (select.value) {
       case 'json':

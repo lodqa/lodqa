@@ -11,10 +11,13 @@ function render(dom, model) {
   const template = `
   ${quantity} answers are found.
   <a class="download-answers__download-button">download answers</a> in
-  <select class="download-answers__select-format">
-    <option value="json">json</option>
-    <option value="tsv">tsv</option>
-  </select> format.
+  <label for="select-format" class="download-answers__select-format-label">
+    <select class="download-answers__select-format">
+      <option value="json" selected>json</option>
+      <option value="tsv">tsv</option>
+    </select>
+  </label>
+  format.
   `
   const html = template
   updateDomTree(dom, html)

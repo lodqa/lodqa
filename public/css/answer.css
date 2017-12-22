@@ -153,7 +153,7 @@
     border: 1px solid #f2f2f2;
     border-radius: 4px;
     box-sizing: border-box;
-    color: #757575;
+    color: #444;
     cursor: pointer;
     display: inline-block;
     font-family: arial,sans-serif;
@@ -167,12 +167,30 @@
 .download-answers__download-button:hover {
     border: 1px solid #c6c6c6;
     box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-    color: #222;
     text-decoration: none;
 }
 
 .download-answers__download-button:active {
     border-color: rgb(62, 120, 254);
+}
+
+.download-answers__select-format-label {
+    position: relative;
+}
+
+/* Down arrow style for the select box. see: https://qiita.com/hiloki@github/items/844726db4128ebb0fdd8 */
+.download-answers__select-format-label::after {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAZklEQVQ4jc3M0QnAIAxF0TtEh8jmAZdwBheS/mgpQU1qoTTgj7xz4U8nb7YCVEADWNv2inTc3yqiZisA2XxWIA1wGuwywAEUJzLCpVm8iIu9SAhHI0vsRUJ4FnmEbWQL3yPb+Js7AcYwSU2dUZtsAAAAAElFTkSuQmCC);
+    background-position: center;
+    background-repeat: no-repeat;
+    bottom: 0;
+    content: "";
+    display: block;
+    pointer-events: none;
+    position: absolute;
+    right: 4px;
+    width: 1.8em;
+    top: 0;
 }
 
 .download-answers__select-format {
@@ -181,19 +199,19 @@
     appearance: none;
     background-color: #f2f2f2;
     border: 1px solid #f2f2f2;
-    color: #757575;
+    border-radius: 4px;
+    color: #444;
     font-size: 13px;
     font-weight: bold;
     height: 29px;
     outline-style: none;
-    padding: 4px 7px 3px 7px;
+    padding: 4px 24px 3px 7px;
     text-transform: uppercase;
 }
 
 .download-answers__select-format:hover {
     border: 1px solid #c6c6c6;
     box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-    color: #222;
     text-decoration: none;
 }
 
