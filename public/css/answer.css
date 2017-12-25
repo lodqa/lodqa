@@ -215,7 +215,7 @@
     text-decoration: none;
 }
 
-.answer-summary-pages__link-prev {
+.answer-summary-pages__prev-link {
     display: inline-block;
     width: 100px;
 }
@@ -226,17 +226,17 @@
     width: 20px;
 }
 
-.answer-summary-pages__link-label {
-    color: #4285f4;
+.answer-summary-pages__label {
+    color: rgba(0, 0, 0, 0.87);
     cursor: pointer;
     font-size: 13px;
 }
 
-.answer-summary-pages__link-label--current {
-    color: rgba(0, 0, 0, 0.87);
+.answer-summary-pages__label--with-link {
+    color: #4285f4;
 }
 
-.answer-summary-pages__link-next {
+.answer-summary-pages__next-link {
     display: inline-block;
     text-align: right;
     width: 100px;
