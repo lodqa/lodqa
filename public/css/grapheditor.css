@@ -35,6 +35,10 @@
     margin-top: 2em;
 }
 
+.query-region {
+    width: 530px
+}
+
 .examples {
     left: 7px;
     padding-left: 15px;
