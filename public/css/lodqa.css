@@ -87,6 +87,7 @@ a:visited {
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
     display: inline-block;
+    margin-bottom: 1em;
     padding: 6px 0 4px 16px;
     transition: box-shadow 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
     vertical-align: top;

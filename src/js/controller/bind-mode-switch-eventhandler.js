@@ -7,19 +7,39 @@ module.exports = function(pathname) {
       // Do not add a # URL to the location history.
       e.preventDefault()
 
-      const form = document.querySelector('#nlqform')
-      const parameters = [`read_timeout=${form.read_timeout.value}`]
+      const parameters = []
+
+      const readTimeout = getReadTimeout()
+      if(readTimeout){
+        parameters.push(`read_timeout=${readTimeout}`)
+      }
+
       const target = getTarget()
       if (target) {
         parameters.push(`target=${target}`)
       }
 
+      const form = document.querySelector('#nlqform')
       if (form.query.value) {
         parameters.push(`query=${encodeURIComponent(form.query.value)}`)
       }
 
       location.href = `/${pathname}?${parameters.join('&')}`
     })
+}
+
+function getReadTimeout() {
+  const form = document.querySelector('#nlqform')
+  if (form.read_timeout) {
+    return form.read_timeout.value
+  }
+
+  // The read_timeout is not chenged in the simple mode or the answer page.
+  const parameter = new URL(location.href)
+    .searchParams.get('read_timeout')
+  if (parameter) {
+    return decodeURIComponent(parameter)
+  }
 }
 
 function getTarget() {
@@ -30,8 +50,9 @@ function getTarget() {
   }
 
   // The target is not chenged in the simple mode or the answer page.
-  const targetParameter = new URL(location.href).searchParams.get('target')
-  if (targetParameter) {
-    return decodeURIComponent(targetParameter)
+  const parameter = new URL(location.href)
+    .searchParams.get('target')
+  if (parameter) {
+    return decodeURIComponent(parameter)
   }
 }
