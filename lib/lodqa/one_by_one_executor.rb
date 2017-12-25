@@ -1,5 +1,7 @@
 require 'lodqa'
+require 'lodqa/graph_finder'
 require 'lodqa/logger'
+require 'lodqa/term_finder'
 
 module Lodqa
   module OneByOneExecutor

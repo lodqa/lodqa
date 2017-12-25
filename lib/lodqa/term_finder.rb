@@ -52,6 +52,9 @@ module Lodqa
           raise TermFindError, "Term find error to #{request.uri}"
         end
       end
+    rescue RestClient::Exceptions::ReadTimeout => e
+      Logger.debug "A requet to the dictionary was timeout", message: e.message, method: request.method, url: request.uri, requet_body: terms.to_json
+      raise TermFindError, "Term find timeout error to #{request.uri}"
     end
   end
 end
