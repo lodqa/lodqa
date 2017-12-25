@@ -54,20 +54,14 @@ module.exports = class extends EventEmitter {
   }
 
   get pages() {
-    if (this._maxPageNumber > 1) {
-      return {
-        enablePrev: this._currentPage !== 1,
-        enableNext: this._currentPage !== this._maxPageNumber,
-        disablePrev: this._currentPage === 1,
-        disableNext: this._currentPage === this._maxPageNumber,
-        pages: Array
-          .from(Array(this._maxPageNumber)
-            .keys())
-          .map((page) => ({
-            page: page + 1,
-            isCurrent: page + 1 === this._currentPage
-          })),
-      }
+    if (this._maxPageNumber < 1) {
+      return
+    }
+
+    return {
+      enablePrev: this._currentPage !== 1,
+      enableNext: this._currentPage !== this._maxPageNumber,
+      pages: limitDisplayNumburOfPagesTo10(this._maxPageNumber, this._currentPage)
     }
   }
 
@@ -78,4 +72,44 @@ module.exports = class extends EventEmitter {
   get _currentPageContent() {
     return this._answerSummary.snapshot.slice((this._currentPage - 1) * this._itemsPerPage, this._currentPage * this._itemsPerPage)
   }
+}
+
+// Limeit display number of pages when number of pages is more than 10.
+function limitDisplayNumburOfPagesTo10(maxPageNumber, currentPage) {
+  // Return a page list containing 1 to maxPageNumber when number of pages is less than 10
+  if (maxPageNumber <= 10) {
+    return Array
+      .from(Array(maxPageNumber)
+        .keys())
+      .map((offset) => offset + 1)
+      .map((page) => ({
+        page,
+        isCurrent: page === currentPage
+      }))
+  }
+
+  return Array
+    .from(Array(10)
+      .keys())
+    .map((offset) => {
+      // Return a page list containing 1 to 10 when curret pages is less than 6
+      // ex. ^1, 2, 3, 4, 5, *6*, 7, 8, 9, 10
+      if (currentPage <= 6) {
+        return 1 + offset
+      }
+
+      // Return a page list containing maxPageNumber - 9 to maxPageNumber when number of page after curret pages is less than 4
+      // ex. 3, 4, 5, 6, 7, *8*, 9, 10, 11, 12$
+      if (maxPageNumber - currentPage <= 4) {
+        return maxPageNumber - 9 + offset
+      }
+
+      // Return a page list containing currentPage - 5 to currentPage + 3
+      // ex. 2, 3, 4, 5, 6, *7*, 8, 9, 10, 11
+      return currentPage - 5 + offset
+    })
+    .map((page) => ({
+      page,
+      isCurrent: page === currentPage
+    }))
 }
