@@ -88,8 +88,10 @@ class LodqaWS < Sinatra::Base
 		# Set a parameter of candidates of the target
 		@targets = get_targets
 
-		# Set a parameter of the default target
+		# Set a parameter of the target
 		@target = params['target'] || @targets.first
+		@endpoint_url = @config[:endpoint_url]
+		@need_proxy = @target == 'biogateway'
 
 		if @query
 			@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
