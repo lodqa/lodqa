@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "npm run browserify",
-    "lint": "eslint src public/js/grapheditor.js",
+    "lint": "eslint src",
     "browserify": "npm-run-all --parallel browserify:*",
     "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
     "browserify:answer": "browserify -d -o public/js/answer.js src/js/answer.js",
