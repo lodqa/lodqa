@@ -224,7 +224,6 @@ class LodqaWS < Sinatra::Base
 
 	def parse_params
 		@config = get_config(params)
-		@read_timeout = params['read_timeout'] || 5
 		@query  = params['query'] unless params['query'].nil?
 	end
 

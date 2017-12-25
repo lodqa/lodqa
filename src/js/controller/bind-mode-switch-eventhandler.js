@@ -29,12 +29,6 @@ module.exports = function(pathname) {
 }
 
 function getReadTimeout() {
-  const form = document.querySelector('#nlqform')
-  if (form.read_timeout) {
-    return form.read_timeout.value
-  }
-
-  // The read_timeout is not chenged in the simple mode or the answer page.
   const parameter = new URL(location.href)
     .searchParams.get('read_timeout')
   if (parameter) {
@@ -44,7 +38,7 @@ function getReadTimeout() {
 
 function getTarget() {
   // A user can select the target at the expert mode.
-  const element = document.querySelector('#target-value')
+  const element = document.querySelector('#nlqform input[name="target"]')
   if (element) {
     return element.value
   }

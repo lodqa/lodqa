@@ -27,21 +27,17 @@
                 <%= erb :'dashboard/header' %>
                 <div id="nlq">
                     <form id="nlqform" action="/answer" method="get" entype="multipart/form-data">
-                        <div>
-                            <div class="query-region">
-                                <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
-                                <button id="search-button" class="search-button">
-                                    <span class="search-button__icon">
-                                        <i class="fa fa-search" aria-hidden="true"></i>
-                                    </span>
-                                </button>
-                            </div>
+                        <div class="query-region">
+                            <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
+                            <button id="search-button" class="search-button">
+                                <span class="search-button__icon">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                </span>
+                            </button>
                         </div>
-                        <div class="nlq-options">
-                            <% if @target %>
-                                <input type="hidden" name="target" value="<%= @target %>">
-                            <% end %>
-                        </div>
+                        <% if @target %>
+                            <input type="hidden" name="target" value="<%= @target %>">
+                        <% end %>
                     </form>
                 </div>
                 <%= erb :'dashboard/main-nav' %>
