@@ -24,7 +24,14 @@
     <div class="target-display">
       <span id="target-display">@<%= @target %></span>
     </div>
-    <%= erb :'dashboard/main-nav' %>
+    <nav id="main-nav">
+      <ul>
+        <li><a id="mode-switch" href="#">Simple</a></li>
+        <li><a href="<%= settings.target_db %>">Targets</a></li>
+        <li><a href="http://www.lodqa.org/docs/intro/">Doc</a></li>
+        <li><a href="https://github.com/lodqa/lodqa">Github</a></li>
+      </ul>
+    </nav>
     <div id="target-box">
       <select name="target" id="target">
         <% @targets.each do |t| %>

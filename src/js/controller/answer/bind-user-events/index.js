@@ -1,4 +1,4 @@
-const bindModeButtonEventhandler = require('../../../controller/bind-mode-button-eventhandler')
+const bindModeSwitchEventhandler = require('../../../controller/bind-mode-switch-eventhandler')
 const toDownloadData = require('./to-download-data')
 const tsvFormatter = require('./tsv-formatter')
 const bindHandlerToShowSparql = require('./bind-handler-to-show-sparql')
@@ -48,5 +48,5 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
     }
   }, true)
   bindHandlerToShowSparql(document, 'lightbox', sparqlInformationContainer)
-  bindModeButtonEventhandler('grapheditor')
+  bindModeSwitchEventhandler('grapheditor')
 }

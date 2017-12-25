@@ -1,8 +1,11 @@
 module.exports = function(pathname) {
-  document.querySelector('#mode-button')
+  document.querySelector('#mode-switch')
     .addEventListener('click', (e) => {
-      // Do not validate the form
+      // Do not validate the form.
       e.stopPropagation()
+
+      // Do not add a # URL to the location history.
+      e.preventDefault()
 
       const form = document.querySelector('#nlqform')
       const parameters = [`read_timeout=${form.read_timeout.value}`]
