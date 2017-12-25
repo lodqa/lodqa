@@ -70,6 +70,7 @@ class LodqaWS < Sinatra::Base
 
 	get '/answer' do
 		parse_params
+		@target = params['target'] if target_exists? params
 
 		applicants = applicants_dataset(params)
 		if applicants.length > 0
