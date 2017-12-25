@@ -15,7 +15,9 @@
             <div id="header">
                 <div class="logo">
                     <% if params['target'] %>
-                      <div class="dashboard__target"><%= params['target'] %></div>
+                      <div class="dashboard__target">
+                        <a class="dashboard__target-link" href="<%= @config[:home] %>"><%= params['target'] %></a>
+                      </div>
                       <div class="logo--with-target">
                           powered by
                           <%= erb :'dashboard/header' %>

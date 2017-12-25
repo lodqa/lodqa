@@ -19,6 +19,10 @@
     background-position:10px 10px, 0 0
 }
 
+.dashboard__target-link:hover {
+    text-decoration: none;
+}
+
 .logo--with-target {
     align-items: baseline;
     color: rgb(62, 58, 160);
