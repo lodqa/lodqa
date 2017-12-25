@@ -9,8 +9,8 @@ module.exports = class {
 function render(dom, model) {
   const quantity = model.snapshot.length
   const template = `
-  ${quantity} answers are found.
-  <a class="download-answers__download-button">download answers</a> in
+  ${quantity} answers found:
+  <a class="download-answers__download-button">download</a> in
   <label for="select-format" class="download-answers__select-format-label">
     <select class="download-answers__select-format">
       <option value="json" selected>json</option>
