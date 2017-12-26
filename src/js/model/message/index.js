@@ -15,11 +15,6 @@ module.exports = class extends EventEmitter {
       this._message = ''
       this.emit('message_update_event')
     })
-
-    loader.on('close', () => {
-      this._message = 'Finish searching.'
-      this.emit('message_update_event')
-    })
   }
 
   get message() {
