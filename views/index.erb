@@ -10,38 +10,48 @@
     <script type="text/javascript" src="js/unhandled-error-message.js"></script>
   </head>
   <body>
-    <div id="dashboard" class="dashboard">
-      <div id="header">
-        <div class="logo">
-          <% if params['target'] %>
-            <div class="dashboard__target">
-              <a class="dashboard__target-link" href="<%= @config[:home] %>"><%= params['target'] %></a>
-            </div>
-            <div class="logo--with-target">
-              powered by <%= erb :'dashboard/header' %>
-            </div>
-          <% else %>
-            <%= erb :'dashboard/header' %>
-          <% end %>
+    <div class="content">
+      <div id="dashboard" class="dashboard">
+        <div id="header">
+          <div class="logo">
+            <% if params['target'] %>
+              <div class="dashboard__target">
+                <a class="dashboard__target-link" href="<%= @config[:home] %>"><%= params['target'] %></a>
+              </div>
+              <div class="logo--with-target">
+                  powered by <%= erb :'dashboard/header' %>
+              </div>
+            <% else %>
+              <%= erb :'dashboard/header' %>
+            <% end %>
+          </div>
+          <%= erb :'dashboard/main-nav' %>
         </div>
-        <%= erb :'dashboard/main-nav' %>
+
+        <div id="nlq">
+            <%= erb :'dashboard/nlq' %>
+        </div>
       </div>
 
-      <div id="nlq">
-        <%= erb :'dashboard/nlq' %>
+      <div class="sample-queries">
+        <ul class="sample-queries__query-list">
+          <% @sample_queries.each do |sample_query| %>
+            <li>
+              <a class="sample-queries__link" href="<%= sample_query[:url] %>"><%= sample_query[:sample_query] %></a>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <div class="footer-upper">
+          The LODQA service is provided by Database Center for Life Science.<br>
+        </div>
+        <div class="footer-lower">
+          Comments & suggestions are welcome. Please contact to : support AT dbcls DOT rois DOT ac DOT jp
+        </div>
       </div>
     </div>
-
-    <div class="sample-queries">
-      <ul class="sample-queries__query-list">
-        <% @sample_queries.each do |sample_query| %>
-          <li>
-            <a class="sample-queries__link" href="<%= sample_query[:url] %>"><%= sample_query[:sample_query] %></a>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-
   </body>
   <script src="js/index.js"></script>
 </html>
