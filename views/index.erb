@@ -1,49 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>LODQA : Question-Answering over Linked Open Data</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-        <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
-        <link href="css/index.css" media="screen" rel="stylesheet" type="text/css">
-        <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
+  <head>
+    <title>LODQA : Question-Answering over Linked Open Data</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+    <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="css/index.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
 
-        <script type="text/javascript" src="js/unhandled-error-message.js"></script>
-    </head>
-    <body>
-
-        <div id="dashboard" class="dashboard">
-            <div id="header">
-                <div class="logo">
-                    <% if params['target'] %>
-                      <div class="dashboard__target">
-                        <a class="dashboard__target-link" href="<%= @config[:home] %>"><%= params['target'] %></a>
-                      </div>
-                      <div class="logo--with-target">
-                          powered by
-                          <%= erb :'dashboard/header' %>
-                      </div>
-                    <% else %>
-                      <%= erb :'dashboard/header' %>
-                    <% end %>
-                </div>
-                <%= erb :'dashboard/main-nav' %>
+    <script type="text/javascript" src="js/unhandled-error-message.js"></script>
+  </head>
+  <body>
+    <div id="dashboard" class="dashboard">
+      <div id="header">
+        <div class="logo">
+          <% if params['target'] %>
+            <div class="dashboard__target">
+              <a class="dashboard__target-link" href="<%= @config[:home] %>"><%= params['target'] %></a>
             </div>
-
-            <div id="nlq">
-                <%= erb :'dashboard/nlq' %>
+            <div class="logo--with-target">
+              powered by <%= erb :'dashboard/header' %>
             </div>
+          <% else %>
+            <%= erb :'dashboard/header' %>
+          <% end %>
         </div>
+        <%= erb :'dashboard/main-nav' %>
+      </div>
 
-        <div class="sample-queries">
-          <ul class="sample-queries__query-list">
-            <% @sample_queries.each do |sample_query| %>
-              <li>
-                <a class="sample-queries__link" href="<%= sample_query[:url] %>"><%= sample_query[:sample_query] %></a>
-              </li>
-            <% end %>
-          </ul>
-        </div>
+      <div id="nlq">
+        <%= erb :'dashboard/nlq' %>
+      </div>
+    </div>
 
-    </body>
-    <script src="js/index.js"></script>
+    <div class="sample-queries">
+      <ul class="sample-queries__query-list">
+        <% @sample_queries.each do |sample_query| %>
+          <li>
+            <a class="sample-queries__link" href="<%= sample_query[:url] %>"><%= sample_query[:sample_query] %></a>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+  </body>
+  <script src="js/index.js"></script>
 </html>
