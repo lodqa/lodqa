@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>LODQA : Question-Answering over Linked Open Data</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
-        <link href="js/vender/codemirror/lib/codemirror.css" rel="stylesheet">
-        <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
-        <link href="css/progress-bar.css" media="screen" rel="stylesheet" type="text/css">
-        <link href="css/answer.css" media="screen" rel="stylesheet" type="text/css">
-        <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
+  <head>
+    <title>LODQA : Question-Answering over Linked Open Data</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+    <link href="js/vender/codemirror/lib/codemirror.css" rel="stylesheet">
+    <link href="css/lodqa.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="css/progress-bar.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="css/answer.css" media="screen" rel="stylesheet" type="text/css">
+    <link href="js/vender/font-awesome/css/font-awesome.css" rel="stylesheet">
 
-        <script src="js/vender/codemirror/lib/codemirror.js"></script>
-        <script src="js/vender/codemirror/mode/sparql/sparql.js"></script>
-        <script src="js/vender/Springy/springy.js"></script>
-        <script src="js/vender/jQuery/dist/jquery.min.js"></script>
-        <script src="js/vender/Springy/springyui.js"></script>
-        <script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
-        <script type="text/javascript" src="js/unhandled-error-message.js"></script>
-    </head>
-    <body>
-        <div id="dashboard" class="dashboard">
-            <div id="header">
-                <%= erb :'dashboard/header' %>
-                <div id="nlq">
-                    <form id="nlqform" action="/answer" method="get" entype="multipart/form-data">
-                        <div class="query-region">
-                            <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
-                            <button id="search-button" class="search-button">
-                                <span class="search-button__icon">
-                                    <i class="fa fa-search" aria-hidden="true"></i>
-                                </span>
-                            </button>
-                        </div>
-                        <% if @target %>
-                            <input type="hidden" name="target" value="<%= @target %>">
-                        <% end %>
-                    </form>
-                </div>
-                <%= erb :'dashboard/main-nav' %>
-            </div>
-            <div class="content">
-              <div class="message"></div>
-              <div class="answer-summary"></div>
-              <div class="answer-summary-pages"></div>
-              <div class="download-answers"></div>
-              <div class="summary-progressbar"></div>
-              <div class="datasets-progressbar"></div>
-              <div class="detail-progressbar"></div>
-            </div>
+    <script src="js/vender/codemirror/lib/codemirror.js"></script>
+    <script src="js/vender/codemirror/mode/sparql/sparql.js"></script>
+    <script src="js/vender/Springy/springy.js"></script>
+    <script src="js/vender/jQuery/dist/jquery.min.js"></script>
+    <script src="js/vender/Springy/springyui.js"></script>
+    <script src="js/vender/eventemitter2/lib/eventemitter2.js"></script>
+    <script type="text/javascript" src="js/unhandled-error-message.js"></script>
+  </head>
+  <body>
+    <div id="dashboard" class="dashboard">
+      <div id="header">
+        <%= erb :'dashboard/header' %>
+        <div id="nlq">
+            <form id="nlqform" action="/answer" method="get" entype="multipart/form-data">
+              <div class="query-region">
+                <input name="query" id="query" type="text" required="required" <% if @query %> value="<%= @query %>" <% end %> placeholder="Enter a natural language query."/>
+                <button id="search-button" class="search-button">
+                  <span class="search-button__icon">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                  </span>
+                </button>
+              </div>
+              <% if @target %>
+                <input type="hidden" name="target" value="<%= @target %>">
+              <% end %>
+            </form>
         </div>
-        <div id="lightbox" class="hidden">
-            <p>Click to close</p>
-            <div class="content"></div>
-        </div>
-    </body>
-    <script type="text/javascript" src="js/answer.js"></script>
+        <%= erb :'dashboard/main-nav' %>
+      </div>
+      <div class="content">
+        <div class="message"></div>
+        <div class="answer-summary"></div>
+        <div class="answer-summary-pages"></div>
+        <div class="download-answers"></div>
+        <div class="summary-progressbar"></div>
+        <div class="datasets-progressbar"></div>
+        <div class="detail-progressbar"></div>
+      </div>
+    </div>
+    <div id="lightbox" class="hidden">
+      <p>Click to close</p>
+      <div class="content"></div>
+    </div>
+  </body>
+  <script type="text/javascript" src="js/answer.js"></script>
 </html>
