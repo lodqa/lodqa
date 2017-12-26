@@ -21,6 +21,15 @@ module Lodqa
         Thread.current.thread_variable_set(:request_id, id)
       end
 
+      def info(message, id = nil, **rest)
+        @log.info "#{{
+          request_id: id || request_id,
+          message: message
+        }
+        .merge(rest)
+        .to_json}"
+      end
+
       def debug(message, id = nil, **rest)
         @log.debug "#{{
           request_id: id || request_id,

@@ -11,7 +11,7 @@ module Lodqa
 
     def initialize(dictionary_url)
       raise ArgumentError, "dictionary_url should be given." if dictionary_url.nil? || dictionary_url.empty?
-      @dictionary = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}
+      @dictionary = RestClient::Resource.new dictionary_url, :headers => {:content_type => :json, :accept => :json}, :timeout => 10
     end
 
     def find(terms)
@@ -52,9 +52,9 @@ module Lodqa
           raise TermFindError, "Term find error to #{request.uri}"
         end
       end
-    rescue RestClient::Exceptions::ReadTimeout => e
-      Logger.debug "A requet to the dictionary was timeout", message: e.message, method: request.method, url: request.uri, requet_body: terms.to_json
-      raise TermFindError, "Term find timeout error to #{request.uri}"
+    rescue RestClient::Exceptions::ReadTimeout
+      Logger.info "A request to the dictionary was timeout", url: @dictionary.url, requet_body: terms.to_json
+      raise TermFindError, "Term find timeout error to #{@dictionary.url}"
     end
   end
 end
