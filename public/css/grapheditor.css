@@ -9,6 +9,8 @@
 
 .dashboard {
     left: 0px;
+    max-height: 97%;
+    overflow: auto;
     position: fixed;
     top: 0px;
     width: 642px;

@@ -21,11 +21,6 @@ a:visited {
     color: #609;
 }
 
-.dashboard {
-    max-height: 97%;
-    overflow: auto;
-}
-
 #header {
     display: flex;
     height: 50px;
