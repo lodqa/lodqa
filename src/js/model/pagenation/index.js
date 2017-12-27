@@ -54,7 +54,7 @@ module.exports = class extends EventEmitter {
   }
 
   get pages() {
-    if (this._maxPageNumber < 1) {
+    if (this._maxPageNumber < 2) {
       return
     }
 
