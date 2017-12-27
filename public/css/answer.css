@@ -9,7 +9,7 @@ body {
 #dashboard {
   height: 100%;
   position: relative;
-  min-height: 500px;
+  min-height: 800px;
 }
 
 #header {
