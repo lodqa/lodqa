@@ -64,7 +64,7 @@ class EnjuAccess::CGIAccessor
         dat = t.split(/\t/, 7)
         token = Hash.new
         token[:idx]  = i - 1   # use 0-oriented index
-        token[:lex]  = dat[1]
+        token[:lex]  = dat[1].force_encoding('UTF-8')
         token[:base] = dat[2]
         token[:pos]  = dat[3]
         token[:cat]  = dat[4]
