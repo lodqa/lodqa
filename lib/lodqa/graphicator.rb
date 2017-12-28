@@ -63,6 +63,12 @@ class Lodqa::Graphicator
   end
 
   def graphicate(parse)
+    # [Exception Handling] Treat the entire sentence as a BNC when no BNC was found
+    if parse[:base_noun_chunks].empty?
+      last_idx = parse[:tokens].last[:idx]
+      parse[:base_noun_chunks] << {head:last_idx, beg:0, end:last_idx}
+    end
+
     nodes = get_nodes(parse)
 
     # index the nodes by their heads
