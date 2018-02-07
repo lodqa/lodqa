@@ -52,13 +52,6 @@ docker-compose up
 
 ## Development
 
-Build Javascript by the [gulp](http://gulpjs.com/).
-Build and watch Javascript filse:
-
-```
-npm start
-```
-
 ### Prerequisites
 
 LODQA depends on some npm packages and some bower packages to develop.
