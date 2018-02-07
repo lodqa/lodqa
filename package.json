@@ -13,7 +13,8 @@
     "eslint-plugin-import": "^2.8.0",
     "handlebars": "^4.0.11",
     "npm-run-all": "^4.1.1",
-    "sparql-fetch-label": "^0.0.1"
+    "sparql-fetch-label": "^0.0.1",
+    "uglify-es": "^3.3.9"
   },
   "homepage": "https://github.com/lodqa/lodqa.git",
   "keywords": [
@@ -29,11 +30,16 @@
   },
   "scripts": {
     "start": "npm run browserify",
+    "bump" : "npm-run-all --parallel bump:*",
     "lint": "eslint src",
     "browserify": "npm-run-all --parallel browserify:*",
     "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
-    "browserify:answer": "browserify -d -o public/js/answer.js src/js/answer.js",
+    "browserify:answer": "browserify -d -o public/js/answer.js src/js/answer.js ",
     "browserify:grapheditor": "browserify -d -o public/js/grapheditor.js src/js/grapheditor.js",
-    "browserify:start-grapheditor": "browserify -d -o public/js/start-grapheditor.js src/js/start-grapheditor.js"
+    "browserify:start-grapheditor": "browserify -d -o public/js/start-grapheditor.js src/js/start-grapheditor.js",
+    "bump:index": "browserify src/js/index.js | uglifyjs > public/js/index.js",
+    "bump:answer": "browserify src/js/answer.js | uglifyjs > public/js/answer.js",
+    "bump:grapheditor": "browserify src/js/grapheditor.js | uglifyjs > public/js/grapheditor.js ",
+    "bump:start-grapheditor": "browserify src/js/start-grapheditor.js | uglifyjs > public/js/start-grapheditor.js"
   }
 }
