@@ -19,9 +19,7 @@ class LodqaWS < Sinatra::Base
 		# set :target_db, 'http://localhost:3000/targets'
 
     enable :logging
-    file = File.new("#{settings.root}/log/#{settings.environment}.log", 'a+')
-    file.sync = true
-    use Rack::CommonLogger, file
+    use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 'daily')
 	end
 
 	before do
