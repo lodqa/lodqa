@@ -71,13 +71,15 @@ module Lodqa
 
                   # Find the answer of the solutions.
                   solutions.each do |solution|
-                    solution.each do |node|
-                      # The answer is instance node of focus node.
-                      if(anchored_pgp[:focus] == node[0].to_s.gsub(/^i/, ''))
-                        label = label(endpoint, node)
-                        ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: node, label: label}.to_json)
+                    solution
+                      .select do |id|
+                        # The answer is instance node of focus node.
+                        anchored_pgp[:focus] == id.to_s.gsub(/^i/, '')
                       end
-                    end
+                      .each do |id, uri|
+                        label = label(endpoint, uri)
+                        ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: [id, uri], label: label}.to_json)
+                      end
                   end
 
                 rescue SparqlEndpointTimeoutError => e
@@ -111,8 +113,8 @@ module Lodqa
         tf.find(keywords)
       end
 
-      def label(endpoint, node)
-        query_for_solution = "select ?label where { <#{node[1]}>  rdfs:label ?label }"
+      def label(endpoint, uri)
+        query_for_solution = "select ?label where { <#{uri}>  rdfs:label ?label }"
         endpoint.query(query_for_solution).map{ |s| s.to_h[:label] }.first
       end
     end
