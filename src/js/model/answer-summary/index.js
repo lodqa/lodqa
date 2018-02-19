@@ -23,22 +23,18 @@ module.exports = class extends EventEmitter {
       dataset,
       anchored_pgp,
       query,
-      answer,
-      label
-    }) => this._addAnswer(dataset, anchored_pgp, query.sparql, answer[1], label))
+      answer
+    }) => this._addAnswer(dataset, anchored_pgp, query.sparql, answer))
   }
 
-  _addAnswer(dataset, anchored_pgp, sparql, url, label) {
+  _addAnswer(dataset, anchored_pgp, sparql, answer) {
     const {
       datasetName,
       datasetNumber,
       sparqlNumber
     } = this._datasetContainer.getSparqlNumer(dataset, sparql)
 
-    this._answerContainer.addAnswer({
-      url,
-      label
-    }, datasetName, datasetNumber, sparqlNumber)
+    this._answerContainer.addAnswer(answer, datasetName, datasetNumber, sparqlNumber)
     this.emit('answer_summary_update_event')
   }
 

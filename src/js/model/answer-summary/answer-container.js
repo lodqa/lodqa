@@ -5,11 +5,9 @@ module.exports = class AnswerContainer {
 
   addAnswer(answer, datasetName, datasetNumber, sparqlNumber) {
     if (!this._answers.has(answer.url)) {
-      this._answers.set(answer.url, {
-        label: answer.label,
-        url: answer.url,
+      this._answers.set(answer.url, Object.assign({}, answer, {
         sparqls: []
-      })
+      }))
     }
 
     const {

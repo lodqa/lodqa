@@ -77,8 +77,10 @@ module Lodqa
                         anchored_pgp[:focus] == id.to_s.gsub(/^i/, '')
                       end
                       .each do |id, uri|
+                        # WebSocket message will be disorderd if additional informations are get ascynchronously
                         label = label(endpoint, uri)
-                        ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: [id, uri], label: label}.to_json)
+                        urls = forwarded_urls(uri)
+                        ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: {uri: uri, label: label, urls: urls}}.to_json)
                       end
                   end
 
@@ -116,6 +118,15 @@ module Lodqa
       def label(endpoint, uri)
         query_for_solution = "select ?label where { <#{uri}>  rdfs:label ?label }"
         endpoint.query(query_for_solution).map{ |s| s.to_h[:label] }.first
+      end
+
+      def forwarded_urls(uri)
+        RestClient.get("http://urilinks.lodqa.org/url/translate.json?query=#{uri}") do |res|
+          reuern nil unless res.code == 200
+
+          JSON.parse(res.body, symbolize_names: true)
+            .sort_by{ |m| [- m[:matching_score], - m[:priority]] }
+        end
       end
     end
   end

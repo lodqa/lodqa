@@ -108,15 +108,29 @@ body {
   color: #1a0dab;
 }
 
-.answer-summary__answer-url {
+.answer-summary__answer-uri {
   height: 21px;
   line-height: 16px;
 }
 
-.answer-summary__answer-url__cite {
+.answer-summary__answer-uri__cite {
   color: #006621;
   font-size: 14px;
   font-style: normal;
+}
+
+.answer-summary__answer-url {
+  background-color: #f2f2f2;
+  border: 1px solid #f2f2f2;
+  border-radius: 4px;
+  box-sizing: border-box;
+  display: inline-block;
+  font-family: arial, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+  margin-top: 3px;
+  padding: 2px 4px 1px 4px;
 }
 
 .answer-summary__sparql-list {
