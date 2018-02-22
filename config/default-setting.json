@@ -1,7 +1,8 @@
 {
 	"target_db":"http://localhost:3000",
 	"description":"It targets DrugBank, SIDER, and Diseasome as included in QALD.",
-	"parser_url":"http://enju.dbcls.jp/?model=GTREC",
+	// "parser_url":"http://bionlp.dbcls.jp/enju",
+	"parser_url":"http://enju-gtrec.dbcls.jp",
 	"endpoint_url":"http://rdf.pubannotation.org/sparql",
 	"ignore_predicates":[],
 	"sortal_predicates":[
