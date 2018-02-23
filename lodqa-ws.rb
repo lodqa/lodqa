@@ -18,8 +18,8 @@ class LodqaWS < Sinatra::Base
 		set :target_db, 'http://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
 
-    enable :logging
-    use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 'daily')
+		enable :logging
+		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
 	end
 
 	before do
