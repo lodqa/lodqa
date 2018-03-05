@@ -10,7 +10,7 @@ module.exports = Handlebars.compile(`
         <cite class="answer-summary__answer-uri__cite">{{uri}}</cite>
       </div>
       {{#each urls}}
-        <a class="answer-summary__answer-url" href="{{url}}" target="_brank">{{name}}</a>
+        <a class="answer-summary__answer-url" href="{{url}}" target="_blank">{{name}}</a>
       {{/each}}
       <div class="answer-summary__sparql-list">
         {{#each sparqls}}
