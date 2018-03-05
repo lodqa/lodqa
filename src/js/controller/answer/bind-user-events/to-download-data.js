@@ -1,6 +1,6 @@
 module.exports = function(answerFilter) {
   return answerFilter.snapshot.map((a) => ({
-    url: a.url,
+    url: a.uri,
     label: a.label
   }))
 }
