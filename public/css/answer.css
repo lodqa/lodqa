@@ -64,9 +64,10 @@ body {
 }
 
 .content {
+  min-height: 30em;
   padding-top: 32px;
   padding-left: 161px;
-  padding-bottom: 10em;
+  padding-bottom: 1em;
 }
 
 .answer-summary {
@@ -336,21 +337,10 @@ body {
 .footer {
   background: #f2f2f2;
   border-top: 1px solid #e4e4e4;
-  color: rgba(0,0,0,.54);
+  color: rgba(0, 0, 0, .54);
   font-size: 15px;
   line-height: 40px;
   min-width: 980px;
-}
-
-.footer--searching {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
-}
-
-.footer--with-answer {
-
 }
 
 .footer-upper {
