@@ -4,15 +4,15 @@ module.exports = class AnswerContainer {
   }
 
   addAnswer(answer, datasetName, datasetNumber, sparqlNumber) {
-    if (!this._answers.has(answer.url)) {
-      this._answers.set(answer.url, Object.assign({}, answer, {
+    if (!this._answers.has(answer.uri)) {
+      this._answers.set(answer.uri, Object.assign({}, answer, {
         sparqls: []
       }))
     }
 
     const {
       sparqls
-    } = this._answers.get(answer.url)
+    } = this._answers.get(answer.uri)
 
     // Add SPARQL of answer unless same SPARQL exits.
     if (
@@ -23,7 +23,7 @@ module.exports = class AnswerContainer {
       }) => dataset === datasetName && parentNumber === datasetNumber && number === sparqlNumber)
         .length === 0
     ) {
-      this._answers.get(answer.url)
+      this._answers.get(answer.uri)
         .sparqls.push({
           dataset: datasetName,
           parentNumber: datasetNumber,
