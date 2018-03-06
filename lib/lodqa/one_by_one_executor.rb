@@ -6,7 +6,7 @@ require 'lodqa/term_finder'
 module Lodqa
   module OneByOneExecutor
     class << self
-      def search_query(ws, applicant, default_parse_url, query, read_timeout)
+      def search_query(ws, applicant, default_parse_url, query, read_timeout, url_forwading_db)
         begin
           # Prepare to cancel
           request_id = Logger.request_id
@@ -79,7 +79,7 @@ module Lodqa
                       .each do |id, uri|
                         # WebSocket message will be disorderd if additional informations are get ascynchronously
                         label = label(endpoint, uri)
-                        urls = forwarded_urls(uri)
+                        urls = forwarded_urls(uri, url_forwading_db)
                         ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: {uri: uri, label: label, urls: urls}}.to_json)
                       end
                   end
@@ -120,11 +120,11 @@ module Lodqa
         endpoint.query(query_for_solution).map{ |s| s.to_h[:label] }.first
       end
 
-      def forwarded_urls(uri)
-        RestClient.get("http://urilinks.lodqa.org/url/translate.json?query=#{uri}") do |res|
+      def forwarded_urls(uri, url_forwading_db)
+        RestClient.get("#{url_forwading_db}/url/translate.json?query=#{uri}") do |res|
           reuern nil unless res.code == 200
 
-          JSON.parse(res.body, symbolize_names: true)
+          JSON.parse(res.body, symbolize_names: true)[:results]
             .sort_by{ |m| [- m[:matching_score], - m[:priority]] }
         end
       end

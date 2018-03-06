@@ -17,6 +17,7 @@ class LodqaWS < Sinatra::Base
 		set :server, 'thin'
 		set :target_db, 'http://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
+		set :url_forwading_db, 'http://docker.for.mac.host.internal:8080'
 
 		enable :logging
 		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
@@ -140,7 +141,7 @@ class LodqaWS < Sinatra::Base
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
 						Lodqa::Async.defer do
-							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']&.to_i
+							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']&.to_i, settings.url_forwading_db
 
 							# Close the web socket when all applicants are finished
 							applicant[:finished] = true
