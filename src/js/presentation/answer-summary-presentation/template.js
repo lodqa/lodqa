@@ -4,7 +4,12 @@ module.exports = Handlebars.compile(`
 <div class="answer-summary__answer-list">
   {{#each this}}
   <div class="answer-summary__answer">
-    <h3 class="answer-summary__answer-label"><a href="{{uri}}" target="_blank">{{label}}</a></h3>
+    <div class="answer-summary__answer-title">
+      <h3 class="answer-summary__answer-title-label">
+        <a href="{{uri}}" target="_blank">{{label}}</a>
+        {{#if first_rendering}}<img class="answer-summary__answer-title-image" src="{{first_rendering.url}}" title="{{first_rendering.title}}" alt="{{first_rendering.title}}">{{/if}}
+      </h3>
+    </div>
     <div class="answer-summary__answer-summary">
       <div class="answer-summary__answer-uri">
         <cite class="answer-summary__answer-uri__cite">{{uri}}</cite>

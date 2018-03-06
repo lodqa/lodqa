@@ -80,7 +80,20 @@ module Lodqa
                         # WebSocket message will be disorderd if additional informations are get ascynchronously
                         label = label(endpoint, uri)
                         urls = forwarded_urls(uri, url_forwading_db)
-                        ws.send({event: :answer, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions, solution: solution, answer: {uri: uri, label: label, urls: urls}}.to_json)
+                        first_rendering = urls.find{ |u| u[:rendering] }&.dig(:rendering)
+
+                        ws.send({
+                          event: :answer,
+                          dataset: applicant[:name],
+                          pgp: pgp,
+                          mappings: mappings,
+                          anchored_pgp: anchored_pgp,
+                          bgp: bgp,
+                          query: query,
+                          solutions: solutions,
+                          solution: solution,
+                          answer: { uri: uri, label: label, urls: urls, first_rendering: first_rendering }
+                        }.to_json)
                       end
                   end
 

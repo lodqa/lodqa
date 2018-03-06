@@ -76,18 +76,19 @@ body {
 }
 
 .answer-summary__answer {
-  height: 70px;
-  margin-bottom: 26px;
 }
 
-.answer-summary__answer-label {
+.answer-summary__answer-title {
+  height: 3em;
+}
+
+.answer-summary__answer-title-label {
   border: none;
   color: #222;
   display: block;
   font-family: arial, sans-serif;
   font-size: 18px;
   font-weight: normal;
-  line-height: 1.6;
   margin: 0;
   overflow: hidden;
   padding: 0;
@@ -95,18 +96,14 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: auto;
+  vertical-align: bottom;
+  height: inherit;
+  display: table-cell;
 }
 
-.answer-summary__answer-label .answer-summary__sparql-link {
-  text-decoration: none;
-}
-
-.answer-summary__answer-label .answer-summary__sparql-link:visited {
-  color: #609;
-}
-
-.answer-summary__answer-label .answer-summary__sparql-link:link {
-  color: #1a0dab;
+.answer-summary__answer-title-image {
+  margin-bottom: -7px;
+  max-height: 100%;
 }
 
 .answer-summary__answer-uri {
