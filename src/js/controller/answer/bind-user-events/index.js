@@ -14,7 +14,7 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
       let formmated
       switch (select.value) {
       case 'json':
-        formmated = encodeURIComponent(JSON.stringify(data,null, 2))
+        formmated = encodeURIComponent(JSON.stringify(data, null, 2))
         break
       case 'tsv':
         formmated = encodeURIComponent(tsvFormatter(data))
