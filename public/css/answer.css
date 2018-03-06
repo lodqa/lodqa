@@ -119,7 +119,15 @@ body {
   font-style: normal;
 }
 
+.answer-summary__answer-url-list {
+  display: flex;
+}
+
 .answer-summary__answer-url {
+  margin-right: 4px;
+}
+
+.answer-summary__answer-url__label {
   background-color: #f2f2f2;
   border: 1px solid #f2f2f2;
   border-radius: 4px;
@@ -131,6 +139,17 @@ body {
   line-height: 20px;
   margin-top: 3px;
   padding: 2px 4px 1px 4px;
+}
+
+.answer-summary__answer-url__image {
+  display: none;
+}
+
+.answer-summary__answer-url:hover .answer-summary__answer-url__image {
+  display: inline;
+  position: fixed;
+  right: 5px;
+  top: 15px;
 }
 
 .answer-summary__sparql-list {
