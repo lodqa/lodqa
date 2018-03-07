@@ -79,8 +79,7 @@ module Lodqa
                       .each do |id, uri|
                         # WebSocket message will be disorderd if additional informations are get ascynchronously
                         label = label(endpoint, uri)
-                        urls = forwarded_urls(uri, url_forwading_db)
-                        first_rendering = urls.find{ |u| u[:rendering] }&.dig(:rendering)
+                        urls, first_rendering = forwarded_urls(uri, url_forwading_db)
 
                         ws.send({
                           event: :answer,
@@ -134,12 +133,19 @@ module Lodqa
       end
 
       def forwarded_urls(uri, url_forwading_db)
-        RestClient.get("#{url_forwading_db}/url/translate.json?query=#{uri}") do |res|
+        urls = RestClient.get("#{url_forwading_db}/url/translate.json?query=#{uri}") do |res|
           return nil unless res.code == 200
 
           JSON.parse(res.body, symbolize_names: true)[:results]
             .sort_by{ |m| [- m[:matching_score], - m[:priority]] }
         end
+
+        first_rendering = urls.find{ |u| u[:rendering] }&.dig(:rendering)
+        [urls, first_rendering]
+
+      rescue Errno::ECONNREFUSED => e
+        Logger.debug "Failed to conntect The URL forwarding DB at #{url_forwading_db}, continue to the next SPARQL", error_message: e.message
+        []
       end
     end
   end
