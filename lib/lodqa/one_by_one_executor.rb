@@ -135,7 +135,7 @@ module Lodqa
 
       def forwarded_urls(uri, url_forwading_db)
         RestClient.get("#{url_forwading_db}/url/translate.json?query=#{uri}") do |res|
-          reuern nil unless res.code == 200
+          return nil unless res.code == 200
 
           JSON.parse(res.body, symbolize_names: true)[:results]
             .sort_by{ |m| [- m[:matching_score], - m[:priority]] }
