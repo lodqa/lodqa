@@ -6,13 +6,20 @@ module.exports = class extends EventEmitter {
   constructor(loader) {
     super()
 
+    this._message = {}
+
     loader.on('open', () => {
-      this._message = '<i class="fa fa-spinner fa-spin fa-fw"></i>'
+      this._message.isWaittingResult = true
+      this.emit('message_update_event')
+    })
+
+    loader.on('gateway_error', (e) => {
+      this._message.error = e
       this.emit('message_update_event')
     })
 
     loader.on('bgp', () => {
-      this._message = ''
+      this._message.isWaittingResult = false
       this.emit('message_update_event')
     })
   }

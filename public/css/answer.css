@@ -73,6 +73,14 @@ body {
   padding-bottom: 1em;
 }
 
+.message {
+  padding-top: 32px;
+}
+
+.message__error {
+  color: transparent;
+}
+
 .answer-summary {
   font-size: 18px;
   width: 600px;

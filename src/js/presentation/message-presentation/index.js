@@ -1,4 +1,5 @@
 const updateDomTree = require('../update-dom-tree')
+const template = require('./template')
 
 module.exports = class {
   constructor(dom, model) {
@@ -7,6 +8,6 @@ module.exports = class {
 }
 
 function render(dom, model) {
-  const html = `${model.message}`
+  const html = template(model.message)
   updateDomTree(dom, html)
 }
