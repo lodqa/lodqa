@@ -4,6 +4,7 @@ const prepareProgressbars = require('./prepare-progressbars')
 const SparqlInformatianContainer = require('../../../model/sparql-information-container')
 const FooterPresentation = require('../../../presentation/footer-presentation')
 const Footer = require('../../../model/footer')
+const AnswerMedia = require('../../../model/answer-media')
 
 module.exports = function(loader) {
   // Message
@@ -23,6 +24,8 @@ module.exports = function(loader) {
   const sparqlInformatianContainer = new SparqlInformatianContainer(loader)
 
   new FooterPresentation(document.querySelector('#footer'), new Footer(loader))
+
+  const answerMedia = new AnswerMedia(loader)
 
   return {
     answerSummary,
