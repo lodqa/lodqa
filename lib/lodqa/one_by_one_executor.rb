@@ -101,15 +101,19 @@ module Lodqa
                   ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: [], error: 'sparql timeout error'}.to_json)
                 rescue SparqlEndpointTemporaryError => e
                   Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
-                  ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: [], errer: 'endopoint temporary error'}.to_json)
+                  ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: [], error_message: 'endopoint temporary error'}.to_json)
                 end
               end
             end
           end
-        rescue SparqlEndpointError => e
-          Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
+        rescue EnjuAccess::EnjuError => e
+          Logger.debug e.message
+          ws.send({event: :gateway_error, dataset: applicant[:name], error_message: 'enju access error'}.to_json)
         rescue TermFindError => e
           Logger.debug e.message
+          ws.send({event: :gateway_error, dataset: applicant[:name], pgp: pgp, error_message: 'dictionary lookup error'}.to_json)
+        rescue SparqlEndpointError => e
+          Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
         rescue => e
           Logger.error e
         end

@@ -3,6 +3,7 @@
 # It takes a plain-English sentence as input and returns parsing results by accessing an Enju cgi server.
 #
 require 'rest-client'
+require 'enju_access/enju_error'
 require 'enju_access/graph'
 
 module EnjuAccess; end unless defined? EnjuAccess
@@ -24,7 +25,7 @@ class EnjuAccess::CGIAccessor
   # It initializes an instance of RestClient::Resource to connect to an Enju cgi server
   def initialize (enju_url)
     @enju = RestClient::Resource.new enju_url
-    raise "The URL of a web service of enju has to be passed as the first argument." unless @enju.instance_of? RestClient::Resource
+    raise EnjuAccess::EnjuError, "The URL of a web service of enju has to be passed as the first argument." unless @enju.instance_of? RestClient::Resource
   end
 
   # It takes a plain-English sentence as input, and
@@ -55,7 +56,8 @@ class EnjuAccess::CGIAccessor
     response = @enju.get :params => {:sentence=>sentence, :format=>'conll'}
     case response.code
     when 200             # 200 means success
-      raise "Empty input." if response.body =~/^Empty line/
+      raise EnjuAccess::EnjuError, "Empty input." if response.body =~/^Empty line/
+      raise EnjuAccess::EnjuError, 'Enju CGI server returns html instead of tsv' if response.headers[:content_type] === 'text/html'
 
       tokens = []
 
@@ -86,7 +88,7 @@ class EnjuAccess::CGIAccessor
 
       [tokens, root]
     else
-      raise "Enju CGI server dose not respond."
+      raise EnjuAccess::EnjuError, "Enju CGI server dose not respond."
     end
   end
 
@@ -134,7 +136,7 @@ class EnjuAccess::CGIAccessor
 
 
   # It returns the index of the "focus word."  For example, for the input
-  # 
+  #
   # What devices are used to treat heart failure?
   #
   # ...it will return 1 (devices).
@@ -160,10 +162,10 @@ class EnjuAccess::CGIAccessor
 end
 
 # From the Ruby documentation:
-# __FILE__ is the magic variable that contains the name of the current file. 
-# $0 is the name of the file used to start the program. This check says “If 
-# this is the main file being used…” This allows a file to be used as a 
-# library, and not to execute code in that context, but if the file is 
+# __FILE__ is the magic variable that contains the name of the current file.
+# $0 is the name of the file used to start the program. This check says “If
+# this is the main file being used…” This allows a file to be used as a
+# library, and not to execute code in that context, but if the file is
 # being used as an executable, then execute that code.
 
 if __FILE__ == $0
