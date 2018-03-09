@@ -16,14 +16,8 @@ module.exports = Handlebars.compile(`
       </div>
       <div class="answer-summary__answer-url-list">
         {{#each urls}}
-          <div class="answer-summary__answer-url">
-            <a class="answer-summary__answer-url__label" href="{{forwarding.url}}" target="_blank">
-              {{#if rendering}}<i class="far fa-image"></i> {{/if}}
-              {{name}}
-            </a>
-            {{#if rendering}}
-              <img class="answer-summary__answer-url__image" src="{{rendering.url}}" title="{{rendering.title}}" alt="{{rendering.title}}">
-            {{/if}}
+          <div class="answer-summary__answer-url" data-rendering="{{rendering}}" data-answer-uri="{{../uri}}" data-url-index="{{@index}}">
+            <a class="answer-summary__answer-url__label" href="{{forwarding.url}}" target="_blank">{{#if rendering}}<i class="far fa-image"></i> {{/if}}{{name}}</a>
           </div>
         {{/each}}
       </div>

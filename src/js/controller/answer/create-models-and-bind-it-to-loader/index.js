@@ -14,7 +14,7 @@ module.exports = function(loader) {
   const answerSummary = prepareAnswerSummary(loader)
 
   // Answer Media
-  prepareAnswerMedia(loader)
+  const answerMedia = prepareAnswerMedia(loader)
 
   // Progress Bars
   const {
@@ -30,6 +30,7 @@ module.exports = function(loader) {
 
   return {
     answerSummary,
+    answerMedia,
     summaryProgress,
     datasetsProgress,
     filterSparqlWithAnswer,

@@ -69,7 +69,7 @@ body {
 .content {
   min-height: 30em;
   padding-top: 80px;
-  padding-left: 161px;
+  padding-left: 82px;
   padding-bottom: 1em;
 }
 
@@ -150,17 +150,6 @@ body {
   padding: 2px 4px 1px 4px;
 }
 
-.answer-summary__answer-url__image {
-  display: none;
-}
-
-.answer-summary__answer-url:hover .answer-summary__answer-url__image {
-  display: inline;
-  position: fixed;
-  right: 5px;
-  top: 80px;
-}
-
 .answer-summary__sparql-list {
   font-family: arial, sans-serif;
   font-size: small;
@@ -196,6 +185,29 @@ body {
   justify-content: space-between;
   margin-bottom: 1em;
   width: 600px;
+}
+
+.answer-media__cantainer {
+  border-radius: 2px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  left: 758px;
+  position: fixed;
+  top: 118px;
+  width: 500px;
+}
+
+.answer-media__title {
+  font-size: 18px;
+  margin-bottom: 15px;
+  margin-left: 15px;
+  margin-top: 15px;
+}
+
+.answer-media__image {
+  margin: 1px;
+  width: calc(100% - 2px);
 }
 
 .download-answers {

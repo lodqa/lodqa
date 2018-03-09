@@ -3,7 +3,7 @@ const toDownloadData = require('./to-download-data')
 const tsvFormatter = require('./tsv-formatter')
 const bindHandlerToShowSparql = require('./bind-handler-to-show-sparql')
 
-module.exports = function bindUserEvents(answerSummary, summaryProgress, datasetsProgress, filterSparqlWithAnswer, sparqlInformationContainer) {
+module.exports = function bindUserEvents(answerSummary, answerMedia, summaryProgress, datasetsProgress, filterSparqlWithAnswer, sparqlInformationContainer) {
   document.addEventListener('click', ({
     target
   }) => {
@@ -47,6 +47,17 @@ module.exports = function bindUserEvents(answerSummary, summaryProgress, dataset
       datasetsProgress.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
     }
   }, true)
+
+  document.addEventListener('mouseenter', ({target}) => {
+    if (target.nodeType ===1 && target.closest('.answer-summary__answer-url')) {
+      const answerUrl = target.closest('.answer-summary__answer-url')
+      if(answerUrl.dataset.rendering){
+        console.log('hi', answerUrl.dataset.answerUri, answerUrl.dataset.urlIndex)
+        answerMedia.select(answerUrl.dataset.answerUri, answerUrl.dataset.urlIndex)
+      }
+    }
+  }, true)
+
   bindHandlerToShowSparql(document, 'lightbox', sparqlInformationContainer)
   bindModeSwitchEventhandler('grapheditor')
 }
