@@ -51,7 +51,8 @@
             2,
             { commonjs: true }
         ],
-        "import/no-dynamic-require": [2]
+        "import/no-dynamic-require": [2],
+        "no-unused-vars": [1]
     },
     "env": {
         "es6": true,
