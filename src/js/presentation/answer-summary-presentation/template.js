@@ -16,9 +16,7 @@ module.exports = Handlebars.compile(`
       </div>
       <div class="answer-summary__answer-url-list">
         {{#each urls}}
-          <div class="answer-summary__answer-url" data-rendering="{{rendering}}" data-answer-uri="{{../uri}}" data-url-index="{{@index}}">
-            <a class="answer-summary__answer-url__label" href="{{forwarding.url}}" target="_blank">{{#if rendering}}<i class="far fa-image"></i> {{/if}}{{name}}</a>
-          </div>
+          <a class="answer-summary__answer-url{{#if rendering.selected}} answer-summary__answer-url--selected{{/if}}"{{#if rendering}} data-answer-uri="{{../uri}}" data-url-index="{{@index}}"{{/if}} href="{{forwarding.url}}" target="_blank">{{#if rendering}}<i class="far fa-image"></i> {{/if}}{{name}}</a>
         {{/each}}
       </div>
       <div class="answer-summary__sparql-list">
@@ -29,5 +27,5 @@ module.exports = Handlebars.compile(`
     </div>
   </div>
   {{/each}}
-</diz>
+</div>
 `)

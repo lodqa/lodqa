@@ -70,7 +70,7 @@ body {
   min-height: 55em;
   padding-top: 80px;
   padding-left: 82px;
-  padding-bottom: 1em;
+  padding-bottom: 5em;
 }
 
 .message {
@@ -133,10 +133,6 @@ body {
 }
 
 .answer-summary__answer-url {
-  margin-right: 4px;
-}
-
-.answer-summary__answer-url__label {
   background-color: #f2f2f2;
   border: 1px solid #f2f2f2;
   border-radius: 4px;
@@ -146,8 +142,13 @@ body {
   font-size: 14px;
   font-weight: normal;
   line-height: 20px;
+  margin-right: 4px;
   margin-top: 3px;
   padding: 2px 4px 1px 4px;
+}
+
+.answer-summary__answer-url--selected, .answer-summary__answer-url--selected:visited {
+  color: red;
 }
 
 .answer-summary__sparql-list {

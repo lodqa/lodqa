@@ -3,7 +3,7 @@ const toDownloadData = require('./to-download-data')
 const tsvFormatter = require('./tsv-formatter')
 const bindHandlerToShowSparql = require('./bind-handler-to-show-sparql')
 
-module.exports = function bindUserEvents(answerSummary, answerMedia, summaryProgress, datasetsProgress, filterSparqlWithAnswer, sparqlInformationContainer) {
+module.exports = function bindUserEvents(answerSummary, mediaSelect, summaryProgress, datasetsProgress, filterSparqlWithAnswer, sparqlInformationContainer) {
   document.addEventListener('click', ({
     target
   }) => {
@@ -29,7 +29,9 @@ module.exports = function bindUserEvents(answerSummary, answerMedia, summaryProg
     }
   })
 
-  document.addEventListener('change', ({target}) => {
+  document.addEventListener('change', ({
+    target
+  }) => {
     if (target.closest('.summary-progressbar__checkbox')) {
       summaryProgress.showDatasets(target.checked)
     }
@@ -43,20 +45,31 @@ module.exports = function bindUserEvents(answerSummary, answerMedia, summaryProg
     }
 
     if (target.closest('.detail-progressbar__sparql__selected-answers-checkbox')) {
-      answerSummary.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
-      datasetsProgress.hideSparql(target.dataset.datasetName, target.dataset.sparqlNumber, target.checked)
-    }
-  }, true)
+      const {
+        datasetName,
+        sparqlNumber
+      } = target.dataset
 
-  document.addEventListener('mouseenter', ({target}) => {
-    if (target.nodeType ===1 && target.closest('.answer-summary__answer-url')) {
+      answerSummary.hideSparql(datasetName, sparqlNumber, target.checked)
+      datasetsProgress.hideSparql(datasetName, sparqlNumber, target.checked)
+    }
+  })
+
+  document.addEventListener('mouseover', ({
+    target
+  }) => {
+    if (target.nodeType === 1 && target.closest('.answer-summary__answer-url')) {
       const answerUrl = target.closest('.answer-summary__answer-url')
-      if(answerUrl.dataset.rendering){
-        console.log('hi', answerUrl.dataset.answerUri, answerUrl.dataset.urlIndex)
-        answerMedia.select(answerUrl.dataset.answerUri, answerUrl.dataset.urlIndex)
+      if (answerUrl.dataset.answerUri) {
+        const {
+          answerUri,
+          urlIndex
+        } = answerUrl.dataset
+
+        mediaSelect.select(answerUri, Number(urlIndex))
       }
     }
-  }, true)
+  })
 
   bindHandlerToShowSparql(document, 'lightbox', sparqlInformationContainer)
   bindModeSwitchEventhandler('grapheditor')

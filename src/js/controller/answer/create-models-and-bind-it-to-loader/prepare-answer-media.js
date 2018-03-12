@@ -1,9 +1,9 @@
-const AnswerMedia = require('../../../model/answer-media')
-const AnswerMediaPresentation = require('../../../presentation/answer-media-presentation')
+const mediaSelect = require('../../../model/answer-media')
+const mediaSelectPresentation = require('../../../presentation/answer-media-presentation')
 
 module.exports = function(loader) {
-  const answerMedia = new AnswerMedia(loader)
-  new AnswerMediaPresentation(document.querySelector('.answer-media'), answerMedia)
+  const mediaSelect = new mediaSelect(loader)
+  new mediaSelectPresentation(document.querySelector('.answer-media'), mediaSelect)
 
-  return answerMedia
+  return mediaSelect
 }

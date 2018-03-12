@@ -10,7 +10,7 @@ const start = require('./controller/answer/start')
   // Create models and bind them to the presentations.
   const {
     answerSummary,
-    answerMedia,
+    mediaSelect,
     summaryProgress,
     datasetsProgress,
     filterSparqlWithAnswer,
@@ -18,7 +18,7 @@ const start = require('./controller/answer/start')
   } = createModelsAndBindItToLoader(loader)
 
   // Bind user's events.
-  bindUserEvents(answerSummary, answerMedia, summaryProgress, datasetsProgress, filterSparqlWithAnswer, sparqlInformatianContainer)
+  bindUserEvents(answerSummary, mediaSelect, summaryProgress, datasetsProgress, filterSparqlWithAnswer, sparqlInformatianContainer)
 
   start(loader)
 })()

@@ -1,6 +1,5 @@
 const prepareMessage = require('./prepare-message')
 const prepareAnswerSummary = require('./prepare-answer-summary')
-const prepareAnswerMedia = require('./prepare-answer-media')
 const prepareProgressbars = require('./prepare-progressbars')
 const SparqlInformatianContainer = require('../../../model/sparql-information-container')
 const FooterPresentation = require('../../../presentation/footer-presentation')
@@ -11,10 +10,7 @@ module.exports = function(loader) {
   prepareMessage(loader)
 
   // Answer Summary
-  const answerSummary = prepareAnswerSummary(loader)
-
-  // Answer Media
-  const answerMedia = prepareAnswerMedia(loader)
+  const [answerSummary, mediaSelect] = prepareAnswerSummary(loader)
 
   // Progress Bars
   const {
@@ -30,7 +26,7 @@ module.exports = function(loader) {
 
   return {
     answerSummary,
-    answerMedia,
+    mediaSelect,
     summaryProgress,
     datasetsProgress,
     filterSparqlWithAnswer,

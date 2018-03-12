@@ -28,6 +28,10 @@ module.exports = class extends EventEmitter {
     this.emit('answer_summary_update_event')
   }
 
+  selectUrl(uri, index){
+    this._answerSummary.selectUrl(uri, index)
+  }
+
   get snapshot() {
     const answers = this._answerSummary.snapshot
 
