@@ -1,4 +1,5 @@
 require 'rest_client'
+require 'lodqa/source_error'
 
 module Lodqa
   module Sources
@@ -13,9 +14,9 @@ module Lodqa
               raise IOError, "Response Error for url: #{target_url}"
             end
           end
-        rescue
-          Logger.error nil, message: "Cannot connect the Configuration Server for #{target_url}"
-          raise IOError, "invalid url #{target_url}"
+        rescue => e
+          Logger.error e, message: "Cannot connect the Configuration Server for #{target_url}"
+          raise SourceError, "invalid url #{target_url}"
         end
       end
     end

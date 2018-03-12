@@ -38,13 +38,17 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/' do
-		logger.info "access /"
-		parse_params
+		begin
+			logger.info "access /"
+			parse_params
 
-		applicants = applicants_dataset(params)
-		@sample_queries = sample_queries_for applicants, params
+			applicants = applicants_dataset(params)
+			@sample_queries = sample_queries_for applicants, params
 
-		erb :index
+			erb :index
+		rescue Lodqa::SourceError
+			[503, 'Failed to connect the Target Database.']
+		end
 	end
 
 	post '/template.json' do
