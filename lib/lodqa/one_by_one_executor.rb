@@ -91,7 +91,7 @@ module Lodqa
                           query: query,
                           solutions: solutions,
                           solution: solution,
-                          answer: { uri: uri, label: label, urls: urls, first_rendering: first_rendering }
+                          answer: { uri: uri, label: label, urls: urls.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
                         }.to_json)
                       end
                   end
