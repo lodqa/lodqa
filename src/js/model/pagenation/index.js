@@ -6,7 +6,7 @@ module.exports = class extends EventEmitter {
   constructor(answerSummary) {
     super()
 
-    this._itemsPerPage = 7
+    this._itemsPerPage = 5
     this._answerSummary = answerSummary
     this._currentPage = 1
     this._maxPageNumber = 0
