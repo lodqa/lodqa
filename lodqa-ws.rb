@@ -17,7 +17,7 @@ class LodqaWS < Sinatra::Base
 		set :server, 'thin'
 		set :target_db, 'http://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
-		set :url_forwading_db, 'http://docker.for.mac.host.internal:8080'
+		set :url_forwading_db, 'http://urilinks.lodqa.org'
 
 		enable :logging
 		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
