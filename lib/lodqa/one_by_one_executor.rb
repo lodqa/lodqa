@@ -91,7 +91,7 @@ module Lodqa
                           query: query,
                           solutions: solutions,
                           solution: solution,
-                          answer: { uri: uri, label: label, urls: urls.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
+                          answer: { uri: uri, label: label, urls: urls&.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
                         }.to_json)
                       end
                   end
@@ -146,10 +146,9 @@ module Lodqa
 
         first_rendering = urls.find{ |u| u[:rendering] }&.dig(:rendering)
         [urls, first_rendering]
-
       rescue Errno::ECONNREFUSED => e
         Logger.debug "Failed to conntect The URL forwarding DB at #{url_forwading_db}, continue to the next SPARQL", error_message: e.message
-        []
+        nil
       end
     end
   end
