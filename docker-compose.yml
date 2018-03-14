@@ -6,3 +6,5 @@ services:
       - 80:9292
     volumes:
       - .:/app
+    environment:
+      - URL_FORWARDING_DB=http://docker.for.mac.host.internal:8080
