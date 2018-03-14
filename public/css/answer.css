@@ -211,6 +211,10 @@ body {
   width: calc(100% - 2px);
 }
 
+.answer-media__audio {
+  width: 100%;
+}
+
 .download-answers {
   margin-bottom: 2em;
 }

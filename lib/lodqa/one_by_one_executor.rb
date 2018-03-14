@@ -144,7 +144,7 @@ module Lodqa
             .sort_by{ |m| [- m[:matching_score], - m[:priority]] }
         end
 
-        first_rendering = urls.find{ |u| u[:rendering] }&.dig(:rendering)
+        first_rendering = urls.find{ |u| u.dig(:rendering, :mime_type)&.start_with? 'image' }&.dig(:rendering)
         [urls, first_rendering]
       rescue Errno::ECONNREFUSED => e
         Logger.debug "Failed to conntect The URL forwarding DB at #{url_forwading_db}, continue to the next SPARQL", error_message: e.message

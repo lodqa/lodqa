@@ -1,6 +1,7 @@
 const {
   EventEmitter
 } = require('events')
+const switchMedia = require('./switch-media')
 
 module.exports = class extends EventEmitter {
   constructor(mediaSelect) {
@@ -19,6 +20,11 @@ module.exports = class extends EventEmitter {
     } = this._mediaSelect.selected
     const answers = this._mediaSelect.snapshot
 
-    return answers.find((a) => a.uri === uri).urls[index].rendering
+    const {
+      rendering
+    } = answers.find((a) => a.uri === uri)
+      .urls[index]
+
+    return switchMedia(rendering)
   }
 }
