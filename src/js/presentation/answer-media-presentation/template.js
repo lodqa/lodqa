@@ -9,5 +9,8 @@ module.exports = Handlebars.compile(`
   {{#if audio}}
   <audio class="answer-media__audio" controls preload="none" src="{{url}}" type="{{mime_type}}"></audio>
   {{/if}}
+  {{#if video}}
+  <video class="answer-media__video" controls src="{{url}}" type="{{mime_type}}"></audio>
+  {{/if}}
 </div>
 `)

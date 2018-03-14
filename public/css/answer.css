@@ -215,6 +215,10 @@ body {
   width: 100%;
 }
 
+.answer-media__video {
+  width: 100%;
+}
+
 .download-answers {
   margin-bottom: 2em;
 }
