@@ -189,6 +189,7 @@ body {
 }
 
 .answer-media__cantainer {
+  background: white;
   border-radius: 2px;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.08);
   display: flex;
@@ -217,6 +218,13 @@ body {
 
 .answer-media__video {
   width: 100%;
+}
+
+.answer-media__text {
+  margin: 0;
+  padding: 5px 8px;
+  white-space: pre-wrap;
+  word-wrap: unset;
 }
 
 .download-answers {

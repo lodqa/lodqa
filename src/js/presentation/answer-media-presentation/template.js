@@ -12,5 +12,8 @@ module.exports = Handlebars.compile(`
   {{#if video}}
   <video class="answer-media__video" controls src="{{url}}" type="{{mime_type}}"></audio>
   {{/if}}
+  {{#if text}}
+  <pre class="answer-media__text">{{text}}</pre>
+  {{/if}}
 </div>
 `)
