@@ -39,6 +39,18 @@ module.exports = class extends EventEmitter {
   }
 
   get snapshot() {
-    return this._answerContainer.snapshot
+    return this._answerContainer.snapshot.map(appendMediaPropertyToUrl)
   }
+}
+
+function appendMediaPropertyToUrl(answer) {
+  answer.urls = answer.urls.map(appendMediaProperty)
+  return answer
+}
+
+function appendMediaProperty(url){
+  if(url.rendering) {
+    url[url.rendering.mime_type.split('/')[0]] = true
+  }
+  return url
 }
