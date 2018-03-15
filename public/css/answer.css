@@ -127,6 +127,7 @@ body {
 
 .answer-summary__answer-url-list {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .answer-summary__answer-url {
@@ -134,7 +135,7 @@ body {
   border: 1px solid #f2f2f2;
   border-radius: 4px;
   box-sizing: border-box;
-  display: inline-block;
+  display: inline-table;
   font-family: arial, sans-serif;
   font-size: 14px;
   font-weight: normal;
