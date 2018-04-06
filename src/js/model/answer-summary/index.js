@@ -44,7 +44,9 @@ module.exports = class extends EventEmitter {
 }
 
 function appendMediaPropertyToUrl(answer) {
-  answer.urls = answer.urls.map(appendMediaProperty)
+  if (answer.urls) {
+    answer.urls = answer.urls.map(appendMediaProperty)
+  }
   return answer
 }
 
