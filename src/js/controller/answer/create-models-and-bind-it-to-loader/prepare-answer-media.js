@@ -1,4 +1,3 @@
-const mediaSelect = require('../../../model/answer-media')
 const mediaSelectPresentation = require('../../../presentation/answer-media-presentation')
 
 module.exports = function(loader) {
