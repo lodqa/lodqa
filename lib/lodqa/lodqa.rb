@@ -87,7 +87,7 @@ module Lodqa
 
         Logger.debug "terms: #{ terms.first.product(*terms.drop(1)) }"
 
-        product(terms.first, *terms.drop(1))
+        terms.first.product(*terms.drop(1))
           .each do |ts|
             anchored_pgp = pgp.dup
             anchored_pgp[:nodes] = pgp[:nodes].dup
@@ -144,12 +144,6 @@ module Lodqa
         end
       end
       nodes_to_delete
-    end
-
-    def product(xs, *yss)
-      Enumerator.new do |p|
-        xs.each{ |x| yss.each{ |ys| ys.each{ |y| p << [x, y]}}}
-      end
     end
   end
 
