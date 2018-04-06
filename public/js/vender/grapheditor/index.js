@@ -800,7 +800,7 @@ function isDeleteIcon(el) {
 
 function isIcon(el, className) {
   // delete icon has children node
-  // ex: <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
+  // ex: <div class="deleteIcon"><i class="far fa-trash-alt"></i></div>
   return el.className === className || el.parentNode.className === className;
 }
 
@@ -2603,7 +2603,7 @@ exports.default = function (container, instance, id, name, callbacks) {
       <div class="sourcePoint"></div>
       <div class="focusIcon"><i class="fa fa-bullseye" aria-hidden="true"></i></div>
       <div class="editIcon"><i class="fa fa-pencil"></i></div>
-      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
+      <div class="deleteIcon"><i class="far fa-trash-alt"></i></div>
       <input class="editInput"></input>
   </div>`);
 
@@ -2863,7 +2863,7 @@ function toEditParam(label) {
   return (0, _toOverlayPalameter2.default)('edit', `
     <div class="edgeEdit">
       <input value="${label}"></input>
-      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
+      <div class="deleteIcon"><i class="far fa-trash-alt"></i></div>
     </div>`);
 }
 module.exports = exports['default'];
@@ -3081,7 +3081,7 @@ exports.default = function (label, selected = false) {
     <div class="edgeLabel ${label ? '' : 'no-text'} ${selected ? 'selected' : ''}">
       <div class="name">${label}</div>
       <div class="editIcon"><i class="fa fa-pencil"></i></div>
-      <div class="deleteIcon"><i class="fa fa-trash-o"></i></div>
+      <div class="deleteIcon"><i class="far fa-trash-alt"></i></div>
     </div>`);
 };
 
@@ -3811,14 +3811,14 @@ exports.default = `
       <td class="text">
         <input value="{{text}}" placeholder="*">
         <button class="find-term-button find-term" title="find term"><i class="fa fa-search"></i></button>
-        <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>
+        <button class="delete-button" title="delete"><i class="far fa-trash-alt"></i></button>
       </td>
       <td class="terms">
           {{#terms}}
           <div data-index={{@index}} class="term {{#if id==hover_term.text && @index==hover_term.index}}hover{{/if}}">
             <input type="checkbox" checked="{{enable}}">
             <input class="term" value="{{value}}">
-            <button class="delete-button" title="delete"><i class="fa fa-trash-o"></i></button>
+            <button class="delete-button" title="delete"><i class="far fa-trash-alt"></i></button>
           </div>
           {{/terms}}
           <div class="add">
@@ -4060,7 +4060,7 @@ exports.default = `
       <th class="text">
         <span class="title">Text</span>
         <button class="find-term-all-button find-term" title="Find terms for all"><i class="fa fa-search"></i></button>
-        <button class="delete-all-button" title="Delete all"><i class="fa fa-trash-o"></i></button>
+        <button class="delete-all-button" title="Delete all"><i class="far fa-trash-alt"></i></button>
       </th>
       <th class="terms">Term</th>
     </tr>
@@ -4074,14 +4074,14 @@ exports.default = `
       <td class="text">
         <input value="{{text}}">
         <button class="find-term-button find-term" title="Find terms"><i class="fa fa-search"></i></button>
-        <button class="delete-button" title="Delete"><i class="fa fa-trash-o"></i></button>
+        <button class="delete-button" title="Delete"><i class="far fa-trash-alt"></i></button>
       </td>
       <td class="terms">
           {{#terms}}
           <div data-index={{@index}} class="term {{#if id==hover_term.text && @index==hover_term.index}}hover{{/if}}">
             <input type="checkbox" checked="{{enable}}">
             <input class="term" value="{{value}}">
-            <button class="delete-button" title="Delete"><i class="fa fa-trash-o"></i></button>
+            <button class="delete-button" title="Delete"><i class="far fa-trash-alt"></i></button>
           </div>
           {{/terms}}
           <div class="add">

@@ -4,6 +4,6 @@
   "dependencies": {
     "jQuery": "^3.2.1",
     "Springy": "https://github.com/shigeruNakajima/springy.git#658208598d65019d36c1de1b6ba26eeb2f67561c",
-    "grapheditor": "^0.7.5"
+    "grapheditor": "^0.8.1"
   }
 }

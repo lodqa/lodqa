@@ -1,14 +1,11 @@
 {
   "name": "grapheditor",
   "description": "graph editor",
-  "version": "0.7.5",
+  "version": "0.8.1",
   "authors": [
     "Jin-Dong Kim <jindong.kim@gmail.com>",
     "Shigeru Nakajima <shigeru.nakajima@luxiar.com>"
   ],
-  "dependencies": {
-    "font-awesome": "~4.3.0"
-  },
   "homepage": "https://github.com/lodqa/grapheditor",
   "ignore": [
     "**/.*",
