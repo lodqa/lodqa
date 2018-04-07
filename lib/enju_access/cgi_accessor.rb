@@ -97,17 +97,22 @@ class EnjuAccess::CGIAccessor
   # It assumes that the last word of a BNC is its head.
   def get_base_noun_chunks (tokens)
     base_noun_chunks = []
-    beg = -1    ## the index of the begining token of the base noun chunk
-    tokens.each do |t|
-      beg = t[:idx] if beg < 0 && NC_CAT.include?(t[:cat])
-      beg = -1 unless NC_CAT.include?(t[:cat])
-      if beg >= 0
-        if t[:args] == nil && NC_HEAD_CAT.include?(t[:cat])
-          base_noun_chunks << {:head => t[:idx], :beg => beg, :end => t[:idx]}
-          beg = -1
-        end
+    beg, head = -1, -1
+    tokens.each_with_index do |t, i|
+      beg  = t[:idx] if beg < 0 && NC_CAT.include?(t[:cat])
+      head = t[:idx] if beg >= 0 && NC_HEAD_CAT.include?(t[:cat]) && t[:args] == nil
+      if beg >= 0 && !NC_CAT.include?(t[:cat])
+        head = t[:idx] if head < 0
+        base_noun_chunks << {:head => head, :beg => beg, :end => tokens[i-1][:idx]}
+        beg, head = -1, -1
       end
     end
+
+    if beg >= 0
+      raise RuntimeError, "Strange parse!" if head < 0
+      base_noun_chunks << {:head => head, :beg => beg, :end => tokens.last[:idx]}
+    end
+
     base_noun_chunks
   end
 
