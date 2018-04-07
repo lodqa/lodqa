@@ -34,8 +34,8 @@ class EnjuAccess::CGIAccessor
   def parse (sentence)
     tokens, root     = get_parse(sentence)
     base_noun_chunks = get_base_noun_chunks(tokens)
-    focus            = get_focus(tokens, base_noun_chunks)
     relations        = get_relations(tokens, base_noun_chunks)
+    focus            = get_focus(tokens, base_noun_chunks, relations)
 
     {
       :tokens => tokens,  # The array of token parses
@@ -140,17 +140,27 @@ class EnjuAccess::CGIAccessor
   # What devices are used to treat heart failure?
   #
   # ...it will return 1 (devices).
-  def get_focus (tokens, base_noun_chunks)
+  def get_focus (tokens, base_noun_chunks, relations)
     # find the wh-word
-    # assumption: one query has one wh-word
-    wh_idx = tokens.index{|t| WH_CAT.include?(t[:cat])}
+    # assumption: one query has only one wh-word
+    wh_token = tokens.find{|t| WH_CAT.include?(t[:cat])}
 
-    focus = if wh_idx
-      wh = tokens[wh_idx][:idx]
-      if tokens[wh][:args]
-        tokens[wh][:args][0][1]
+    focus = if wh_token
+      if wh_token[:args]
+        wh_token[:args][0][1]
       else
-        wh
+        wh_rel = relations.find{|r| r[0] == wh_token[:idx]}
+        if wh_rel && tokens[wh_rel[1][0]][:base] == 'be'
+          # if apposition
+          # remove the wh_token from BNCs
+          base_noun_chunks.delete_at(0)
+          # remove the relation from/to the wh_token
+          relations.delete(wh_rel)
+          # and return the apposition
+          wh_rel[2]
+        else
+          wh_token[:idx]
+        end
       end
     elsif base_noun_chunks.nil? || base_noun_chunks.empty?
       0
