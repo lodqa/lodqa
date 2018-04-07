@@ -83,7 +83,7 @@ class Lodqa::Graphicator
 
     edges = get_edges(parse, node_index)
 
-    post_processing!(edges)
+    post_processing!(nodes, edges)
 
     {
       :nodes => nodes,
@@ -118,8 +118,36 @@ class Lodqa::Graphicator
   end
 
   # post_processing may be dependent on Enju
-  def post_processing!(edges)
+  def post_processing!(nodes, edges)
     # 'and' coordination
     edges.reject!{|e| e[:text] == 'and'}
+
+    # 'have A as B' pattern
+    edges_have_as = edges.find_all{|e| e[:text] == "have as"}
+    unless edges_have_as.empty?
+      pairs_have_as = edges_have_as.group_by{|e| e[:object]}
+      pairs_have_as.each do |obj, pair|
+        edge_have = edges.find do |e|
+          e[:text] == "have" &&
+          ((e[:subject] == pair.first[:subject] && e[:object] == pair.last[:subject]) || (e[:subject] == pair.last[:subject] && e[:object] == pair.first[:subject]))
+        end
+        if edge_have
+          edge_have[:text] = nodes[obj.to_sym][:text]
+          nodes.delete(obj.to_sym)
+        end
+      end
+      edges.reject!{|e| e[:text] == "have as"}
+    end
+
+    # 'have A and B as C' pattern
+    edges_have_and_as = edges.find_all{|e| e[:text] == "have and as"}
+    edges_have_and_as.each do |edge_have_and_as|
+      edges_and_as = edges.find_all{|e| e[:text] == "and as" && e[:object] == edge_have_and_as[:object]}
+      edges_have_and = edges_and_as.map{|edge_and_as| edges.find{|e| e[:text] == "have and" && e[:object] == edge_and_as[:subject]}}
+      edges_have_and.each{|e| e[:text] = nodes[edge_have_and_as[:object].to_sym][:text]}
+      nodes.delete(edge_have_and_as[:object].to_sym)
+    end
+    edges.reject!{|e| e[:text] == "have and as"}
+    edges.reject!{|e| e[:text] == "and as"}
   end
 end
