@@ -145,7 +145,10 @@ class LodqaWS < Sinatra::Base
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
 						Lodqa::Async.defer do
-							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], params['read_timeout']&.to_i, settings.url_forwading_db
+							# Set read_timeout default 60 unless read_timeout parameter.
+							# Because value of params will be empty string when it is not set and ''.to_i returns 0.
+							read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
+							Lodqa::OneByOneExecutor.search_query ws, applicant, config[:parser_url], params['query'], read_timeout, settings.url_forwading_db
 
 							# Close the web socket when all applicants are finished
 							applicant[:finished] = true
