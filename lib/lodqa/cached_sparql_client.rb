@@ -10,7 +10,7 @@ module Lodqa
     def initialize(endpoint_url, endpoint_options = {})
       @endpoint_url = endpoint_url
 
-      endpoint_options[:read_timeout] |= 60
+      endpoint_options[:read_timeout] ||= 60
       # Set default HTTP method to GET.
       # Default HTTP method of SparqlClient is POST.
       # But POST method in HTTP 1.1 may occurs conection broken error.
