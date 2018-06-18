@@ -13,14 +13,6 @@ module Lodqa
 
     def search_query(ws, applicant, default_parse_url, query, read_timeout, url_forwading_db)
       begin
-        # Prepare to cancel
-        request_id = Logger.request_id
-        ws.on :close do
-          Logger.request_id = request_id
-          Logger.debug 'The WebSocket connection is closed.'
-          @cancel_flag = true
-        end
-
         ws.send({event: :datasets, dataset: applicant[:name]}.to_json)
 
         # pgp
