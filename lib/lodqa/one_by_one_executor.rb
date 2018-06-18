@@ -5,15 +5,20 @@ require 'lodqa/term_finder'
 
 module Lodqa
   class OneByOneExecutor
+    attr_accessor :cancel_flag
+
+    def initialize
+      @cancel_flag = false
+    end
+
     def search_query(ws, applicant, default_parse_url, query, read_timeout, url_forwading_db)
       begin
         # Prepare to cancel
         request_id = Logger.request_id
-        cancel_flag = false
         ws.on :close do
           Logger.request_id = request_id
           Logger.debug 'The WebSocket connection is closed.'
-          cancel_flag = true
+          @cancel_flag = true
         end
 
         ws.send({event: :datasets, dataset: applicant[:name]}.to_json)
@@ -36,7 +41,7 @@ module Lodqa
 
         endpoint = CachedSparqlClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
         lodqa.anchored_pgps.each do |anchored_pgp|
-          if cancel_flag
+          if @cancel_flag
             Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
             return
           end
@@ -53,7 +58,7 @@ module Lodqa
           if bgps.any?
             #SPARQL
             bgps.each do |bgp|
-              if cancel_flag
+              if @cancel_flag
                 Logger.debug "Stop during processing an bgp: #{bgp}"
                 return
               end
