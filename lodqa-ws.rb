@@ -157,7 +157,13 @@ class LodqaWS < Sinatra::Base
 								Lodqa::Logger.debug 'The WebSocket connection is closed.'
 								executor.cancel_flag = true
 							end
-							executor.search_query ws, applicant, config[:parser_url], params['query'], read_timeout, settings.url_forwading_db
+
+							# Bind events to send messsage on the WebSocket
+							executor.on :datasets, :pgp, :mappings, :bgp, :sparql, :solutions, :answer, :gateway_error do | event, data |
+								ws.send({event: event}.merge(data).to_json)
+							end
+
+							executor.search_query applicant, config[:parser_url], params['query'], read_timeout, settings.url_forwading_db
 
 							# Close the web socket when all applicants are finished
 							applicant[:finished] = true

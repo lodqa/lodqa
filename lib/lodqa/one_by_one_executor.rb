@@ -9,19 +9,40 @@ module Lodqa
 
     def initialize
       @cancel_flag = false
+      @event_hadlers = {}
+      @event_data = {}
     end
 
-    def search_query(ws, applicant, default_parse_url, query, read_timeout, url_forwading_db)
+    # Bind event handler to events
+    def on(*events, &block)
+      if events.kind_of? Array
+        events.each do |e|
+          @event_hadlers[e] = [] unless @event_hadlers[e]
+          @event_hadlers[e].push(block)
+        end
+      end
+    end
+
+    # Merage previouse event data and call all event handlers.
+    def emit(event, data)
+      # Delete event data after bgp, because events after bgp event are occurred repeatedly.
+      [:query, :solutions, :solution, :answer, :error].each { |key| @event_data.delete key } if event == :bgp
+
+      @event_data = @event_data.merge data
+      @event_hadlers[event]&.each { |h| h.call(event, @event_data) }
+    end
+
+    def search_query(applicant, default_parse_url, query, read_timeout, url_forwading_db)
       begin
-        ws.send({event: :datasets, dataset: applicant[:name]}.to_json)
+        emit :datasets, dataset: applicant[:name]
 
         # pgp
         pgp = pgp(applicant[:parser_url] || default_parse_url, query)
-        ws.send({event: :pgp, dataset: applicant[:name], pgp: pgp}.to_json)
+        emit :pgp, pgp: pgp
 
         # mappings
         mappings = mappings(applicant[:dictionary_url], pgp)
-        ws.send({event: :mappings, dataset: applicant[:name], pgp: pgp, mappings: mappings}.to_json)
+        emit :mappings, mappings: mappings
 
         #Lodqa(anchored_pgp)
         endpoint_options = {
@@ -55,15 +76,15 @@ module Lodqa
                 return
               end
 
-              ws.send({event: :bgp, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp}.to_json)
+              emit :bgp, anchored_pgp: anchored_pgp, bgp: bgp
 
               query = {bgp: bgp, sparql: graph_finder.compose_sparql(bgp, anchored_pgp)}
-              ws.send({event: :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query}.to_json)
+              emit :sparql, query: query
 
               # Get solutions of SPARQL
               begin
                 solutions = endpoint.query(query[:sparql]).map{ |solution| solution.to_h }
-                ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: solutions}.to_json)
+                emit :solutions, solutions: solutions
 
                 # Find the answer of the solutions.
                 solutions.each do |solution|
@@ -77,37 +98,34 @@ module Lodqa
                       label = label(endpoint, uri)
                       urls, first_rendering = forwarded_urls(uri, url_forwading_db)
 
-                      ws.send({
-                        event: :answer,
-                        dataset: applicant[:name],
-                        pgp: pgp,
-                        mappings: mappings,
-                        anchored_pgp: anchored_pgp,
-                        bgp: bgp,
-                        query: query,
-                        solutions: solutions,
-                        solution: solution,
-                        answer: { uri: uri, label: label, urls: urls&.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
-                      }.to_json)
+                      emit :answer,
+                           solution: solution,
+                           answer: { uri: uri, label: label, urls: urls&.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
                     end
                 end
 
               rescue SparqlEndpointTimeoutError => e
                 Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
-                ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: [], error: 'sparql timeout error'}.to_json)
+                emit :solutions,
+                      solutions: [],
+                      error: 'sparql timeout error'
               rescue SparqlEndpointTemporaryError => e
                 Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
-                ws.send({event: :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, query: query, solutions: [], error_message: 'endopoint temporary error'}.to_json)
+                emit :solutions,
+                     solutions: [],
+                     error_message: 'endopoint temporary error'
               end
             end
           end
         end
       rescue EnjuAccess::EnjuError => e
         Logger.debug e.message
-        ws.send({event: :gateway_error, dataset: applicant[:name], error_message: 'enju access error'}.to_json)
+        emit :gateway_error,
+             error_message: 'enju access error'
       rescue TermFindError => e
         Logger.debug e.message
-        ws.send({event: :gateway_error, dataset: applicant[:name], pgp: pgp, error_message: 'dictionary lookup error'}.to_json)
+        emit :gateway_error,
+             error_message: 'dictionary lookup error'
       rescue SparqlEndpointError => e
         Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
       rescue => e
