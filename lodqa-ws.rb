@@ -133,14 +133,17 @@ class LodqaWS < Sinatra::Base
 		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
 
 		# Change value to Logger::DEBUG to log for debugging.
-		Lodqa::Logger.level =  Logger::INFO
+		Lodqa::Logger.level =  Logger::DEBUG
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
 
 		begin
 			ws = Faye::WebSocket.new(env)
 			config = get_config(params)
 
+			# Pass the request id between threads.
+			request_id = Lodqa::Logger.request_id
 			ws.on :open do
+				Lodqa::Logger.request_id = request_id
 				begin
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
