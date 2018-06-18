@@ -8,3 +8,5 @@ services:
       - .:/app
     environment:
       - URL_FORWARDING_DB=http://docker.for.mac.host.internal:8080
+    env_file:
+        - sendgrid.env

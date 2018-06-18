@@ -10,6 +10,7 @@ gem 'faye-websocket'
 gem 'sparql-client'
 
 gem 'app_config'
+gem 'sendgrid-ruby'
 
 group :test do
 	gem 'rack-test'

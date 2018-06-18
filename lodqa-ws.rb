@@ -5,6 +5,7 @@ require 'faye/websocket'
 require 'erb'
 require 'lodqa'
 require 'lodqa/one_by_one_executor'
+require 'lodqa/mail_sender'
 require 'json'
 require 'open-uri'
 require 'cgi/util'
@@ -126,6 +127,39 @@ class LodqaWS < Sinatra::Base
 		headers \
 			"Access-Control-Allow-Origin" => "*",
 			"Access-Control-Allow-Headers" => "Content-Type"
+	end
+
+	# ここにイメージを書いていく
+	get '/query_by_e_mail' do
+		Lodqa::Logger.level =  Logger::INFO
+		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
+
+		begin
+			answers = {}
+			applicants = applicants_dataset(params)
+			applicants.each do | applicant |
+				Lodqa::Async.defer do
+					executor = Lodqa::OneByOneExecutor.new
+
+					# Bind events to gather answers
+					executor.on :answer do | event, data |
+						answers[data[:answer][:uri]] = data[:answer][:label]
+					end
+
+					executor.search_query applicant, get_config(params)[:parser_url], params['query'], 60, settings.url_forwading_db
+
+					# Send email when all applicants are finished
+					applicant[:finished] = true
+					Lodqa::MailSender.send_mail params['to'], params['query'], JSON.pretty_generate(answers.map{ |k, v | {url: k, label: v} }) if applicants.all? { |a| a[:finished] }
+				end
+			end
+		rescue IOError => e
+			Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+		rescue => e
+			Lodqa::Logger.error e
+		end
+
+		return [200, "Recieve query: #{params['query']}"]
 	end
 
 	# Websocket only!
