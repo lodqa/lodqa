@@ -129,7 +129,7 @@ class LodqaWS < Sinatra::Base
 			"Access-Control-Allow-Headers" => "Content-Type"
 	end
 
-	# ここにイメージを書いていく
+	# API to recieve answers by email
 	get '/query_by_e_mail' do
 		Lodqa::Logger.level =  Logger::INFO
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
@@ -159,6 +159,7 @@ class LodqaWS < Sinatra::Base
 			Lodqa::Logger.error e
 		end
 
+		Lodqa::MailSender.send_mail params['to'], params['query'], 'Searching the query have been starting.'
 		return [200, "Recieve query: #{params['query']}"]
 	end
 
