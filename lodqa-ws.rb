@@ -131,6 +131,8 @@ class LodqaWS < Sinatra::Base
 
 	# API to recieve answers by email
 	get '/query_by_e_mail' do
+		raise 'Error: API key for the SendGrid is not set!' unless ENV['SENDGRID_API_KEY']
+
 		Lodqa::Logger.level =  Logger::INFO
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
 
