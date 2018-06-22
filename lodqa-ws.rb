@@ -155,14 +155,16 @@ class LodqaWS < Sinatra::Base
 					Lodqa::MailSender.send_mail params['to'], params['query'], JSON.pretty_generate(answers.map{ |k, v | {url: k, label: v} }) if applicants.all? { |a| a[:finished] }
 				end
 			end
+
+			Lodqa::MailSender.send_mail params['to'], params['query'], 'Searching the query have been starting.'
+			[200, "Recieve query: #{params['query']}"]
 		rescue IOError => e
 			Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+			[500, "Configuration Server retrun error from #{settings.target_db}.json"]
 		rescue => e
 			Lodqa::Logger.error e
+			[500, e.message]
 		end
-
-		Lodqa::MailSender.send_mail params['to'], params['query'], 'Searching the query have been starting.'
-		return [200, "Recieve query: #{params['query']}"]
 	end
 
 	# Websocket only!
