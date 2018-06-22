@@ -137,6 +137,7 @@ class LodqaWS < Sinatra::Base
 		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
 
 		begin
+			start_time = Time.now
 			answers = {}
 			applicants = applicants_dataset(params)
 			applicants.each do | applicant |
@@ -152,7 +153,11 @@ class LodqaWS < Sinatra::Base
 
 					# Send email when all applicants are finished
 					applicant[:finished] = true
-					Lodqa::MailSender.send_mail params['to'], params['query'], JSON.pretty_generate(answers.map{ |k, v | {url: k, label: v} }) if applicants.all? { |a| a[:finished] }
+					if applicants.all? { |a| a[:finished] }
+						body = "Elapsed time: #{Time.at(Time.now - start_time).utc.strftime("%H:%M:%S")}\n\n" +
+						       JSON.pretty_generate(answers.map{ | k, v | {url: k, label: v} })
+						Lodqa::MailSender.send_mail params['to'], params['query'], body
+					end
 				end
 			end
 
