@@ -149,8 +149,17 @@ module Lodqa
 
     def instantiation_ids(pgp)
       iids = {}
+      queue = Queue.new
       pgp[:nodes].each do |id, node|
-        iid = class?(node[:term]) ? 'i' + id.to_s : nil
+        class?(node[:term]) do | err, is_class |
+          iid = is_class ? 'i' + id.to_s : nil
+          queue.push [err, id, iid]
+        end
+      end
+
+      pgp[:nodes].each do
+        err, id, iid = queue.pop
+        raise err if err
         iids[id] = iid unless iid.nil?
       end
 
@@ -192,9 +201,11 @@ module Lodqa
     end
 
     def class?(term)
-      return @endpoint.query(sparql_for(term)).length > 0 if /^http:/.match(term)
+      yield false unless /^http:/.match(term)
 
-      false
+      @endpoint.query_async(sparql_for(term)) do | err, result |
+        yield [err, result ? result.length > 0: false]
+      end
     end
 
     def sparql_for(term)

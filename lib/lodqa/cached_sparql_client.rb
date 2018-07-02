@@ -1,4 +1,5 @@
 require 'sparql/client'
+require 'eventmachine'
 require 'lodqa/sparql_endpoint_error'
 require 'lodqa/sparql_endpoint_temporary_error'
 require 'lodqa/sparql_endpoint_timeout_error'
@@ -18,6 +19,24 @@ module Lodqa
       endpoint_options[:method] ||= :get
       @client = SPARQL::Client.new(endpoint_url, endpoint_options)
       @cache = {}
+    end
+
+    # Query a SPARQL asynchronously.
+    # This function is implemented with threads, so pass back an error in 1st parameter of return values.
+    # example:
+    # client.query_async(sparql) do | err, result |
+    #   if err
+    #     # handle an error
+    #   else
+    #     # handle a result
+    #   end
+    # end
+    def query_async(sparql)
+      EM.defer do
+        yield [nil, query(sparql)]
+      rescue => e
+        yield [e, nil]
+      end
     end
 
     def query(sparql)
