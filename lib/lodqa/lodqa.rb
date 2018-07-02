@@ -59,8 +59,8 @@ module Lodqa
         Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
 
         begin
-          graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, graph_finder_options)
-          graph_finder.bgps.each { |bgp| graph_finder.query_sparql_for anchored_pgp, @endpoint, bgp, proc_solution, -> {@cancel_flag} }
+          graph_finder = GraphFinder.new(@endpoint, @graph_uri, graph_finder_options)
+          graph_finder.bgps(anchored_pgp).each { |bgp| graph_finder.query_sparql_for anchored_pgp, @endpoint, bgp, proc_solution, -> {@cancel_flag} }
         rescue SparqlEndpointTimeoutError => e
           Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
         rescue SparqlEndpointTemporaryError => e
@@ -109,7 +109,7 @@ module Lodqa
       end
 
       Logger.debug "create graph finder"
-      graph_finder = GraphFinder.new(anchored_pgp, @endpoint, @graph_uri, graph_finder_options)
+      graph_finder = GraphFinder.new(@endpoint, @graph_uri, graph_finder_options)
 
       if @cancel_flag
         Logger.debug "Stop during creating SPARQLs for anchored_pgp: #{anchored_pgp}"
@@ -117,7 +117,7 @@ module Lodqa
       end
 
       Logger.debug "return SPARQLs of bgps"
-      graph_finder.bgps.each do |bgp|
+      graph_finder.bgps(anchored_pgp).each do |bgp|
         yield graph_finder.compose_sparql(bgp, anchored_pgp)
       end
     end

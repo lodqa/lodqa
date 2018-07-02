@@ -65,8 +65,8 @@ module Lodqa
             ignore_predicates: applicant[:ignore_predicates],
             sortal_predicates: applicant[:sortal_predicates]
           }
-          graph_finder = GraphFinder.new(anchored_pgp, endpoint, nil, graph_finder_options)
-          bgps = graph_finder.bgps
+          graph_finder = GraphFinder.new(endpoint, nil, graph_finder_options)
+          bgps = graph_finder.bgps anchored_pgp
 
           if bgps.any?
             #SPARQL

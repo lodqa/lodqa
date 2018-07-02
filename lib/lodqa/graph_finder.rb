@@ -13,8 +13,7 @@ module Lodqa
   class GraphFinder
     # This constructor takes the URL of an end point to be searched
     # optionally options can be passed to the server of the end point.
-    def initialize(pgp, endpoint, graph_uri, options)
-      @pgp = pgp
+    def initialize(endpoint, graph_uri, options)
       @endpoint = endpoint
       @graph_uri = graph_uri
       @ignore_predicates = options[:ignore_predicates] || []
@@ -26,11 +25,11 @@ module Lodqa
 
     # It generates bgps by applying variation operations to the pgp.
     # The option _max_hop_ specifies the maximum number of hops to be searched.
-    def bgps
+    def bgps(pgp)
       Enumerator.new do |y|
         generate_inverse_variations(
           generate_split_variations(
-            generate_instantiation_variations(@pgp),
+            generate_instantiation_variations(pgp),
             @max_hop
           )
         )
@@ -39,10 +38,6 @@ module Lodqa
            y << bgp
          end
       end
-    end
-
-    def each_sparql_and_solution(proc_solution, proc_cancel_flag)
-      bgps.each { |bgp| query_sparql_for @pgp, @endpoint, bgp, proc_solution, proc_cancel_flag }
     end
 
     def query_sparql_for(pgp, endpoint, bgp, proc_solution, proc_cancel_flag)
@@ -343,7 +338,7 @@ if __FILE__ == $0
   query_graph = JSON.parse File.read (ARGV[0]) unless ARGV[0].nil?
   max_hop = ARGV[1] unless ARGV[1].nil?
 
-  gf = GraphFinder.new(apgp, endpoint, nil, options)
+  gf = GraphFinder.new(endpoint, nil, options)
   # sparqls = gf.sparqls
   # puts sparqls.join("\n-----\n")
 end
