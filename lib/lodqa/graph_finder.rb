@@ -23,6 +23,11 @@ module Lodqa
       @answer_limit = options[:answer_limit] || 10
     end
 
+    # Genenerate bgps and SPARQLs of each bgp.
+    def sparqls_of(anchored_pgp)
+      bgps(anchored_pgp).each { |bgp| yield [bgp, compose_sparql(bgp, anchored_pgp)] }
+    end
+
     # It generates bgps by applying variation operations to the pgp.
     # The option _max_hop_ specifies the maximum number of hops to be searched.
     def bgps(pgp)
