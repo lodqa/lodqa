@@ -42,45 +42,47 @@ module Lodqa
     end
 
     def each_sparql_and_solution(proc_solution, proc_cancel_flag)
-      bgps.each do |bgp|
-        sparql = compose_sparql(bgp, @pgp)
+      bgps.each { |bgp| query_sparql_for bgp, proc_solution, proc_cancel_flag }
+    end
 
-        Logger.debug "#{sparql}\n++++++++++"
+    def query_sparql_for(bgp, proc_solution, proc_cancel_flag)
+      sparql = compose_sparql(bgp, @pgp)
 
-        begin
-          result = @endpoint.query(sparql)
-          solution = {
-            bgp: bgp,
-            sparql: sparql,
-            solutions: result.map{ |s| s.to_h }
-          }
-          proc_solution.call(solution)
-        rescue SparqlEndpointTimeoutError => e
-          Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
+      Logger.debug "#{sparql}\n++++++++++"
 
-          # Send back error
-          if proc_solution
-            proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-          end
-        rescue SparqlEndpointTemporaryError => e
-          Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
+      begin
+        result = @endpoint.query(sparql)
+        solution = {
+          bgp: bgp,
+          sparql: sparql,
+          solutions: result.map{ |s| s.to_h }
+        }
+        proc_solution.call(solution)
+      rescue SparqlEndpointTimeoutError => e
+        Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
 
-          # Send back error
-          if proc_solution
-            proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-          end
-        ensure
-          if proc_cancel_flag.call
-            Logger.debug "Stop procedure after a sparql query ends"
-            return
-          end
+        # Send back error
+        if proc_solution
+          proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
         end
+      rescue SparqlEndpointTemporaryError => e
+        Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
 
-        Logger.debug "==========\n"
-
-        # TODO http://rdf.pubannotation.org/sparql requires 2 seconds wait ?
-        # sleep 2
+        # Send back error
+        if proc_solution
+          proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
+        end
+      ensure
+        if proc_cancel_flag.call
+          Logger.debug "Stop procedure after a sparql query ends"
+          return
+        end
       end
+
+      Logger.debug "==========\n"
+
+      # TODO http://rdf.pubannotation.org/sparql requires 2 seconds wait ?
+      # sleep 2
     end
 
     def compose_sparql(bgp, pgp)
