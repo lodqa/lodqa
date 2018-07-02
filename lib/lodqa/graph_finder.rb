@@ -41,29 +41,6 @@ module Lodqa
       end
     end
 
-    def each_solution
-      bgps.each do |bgp|
-        sparql = compose_sparql(bgp, @pgp)
-        Logger.debug "#{sparql}\n++++++++++"
-
-        begin
-          result = @endpoint.query(sparql)
-        rescue => detail
-          Logger.debug "#{detail}\n=========="
-          sleep(2)
-          next
-        end
-
-        result.each_solution do |solution|
-          yield(solution)
-        end
-
-        Logger.debug "=========="
-
-        sleep(2)
-      end
-    end
-
     def each_sparql_and_solution(proc_solution, proc_cancel_flag)
       bgps.each do |bgp|
         sparql = compose_sparql(bgp, @pgp)
