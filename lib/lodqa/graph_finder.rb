@@ -42,36 +42,29 @@ module Lodqa
     end
 
     def each_sparql_and_solution(proc_solution, proc_cancel_flag)
-      bgps.each { |bgp| query_sparql_for bgp, proc_solution, proc_cancel_flag }
+      bgps.each { |bgp| query_sparql_for @pgp, @endpoint, bgp, proc_solution, proc_cancel_flag }
     end
 
-    def query_sparql_for(bgp, proc_solution, proc_cancel_flag)
-      sparql = compose_sparql(bgp, @pgp)
+    def query_sparql_for(pgp, endpoint, bgp, proc_solution, proc_cancel_flag)
+      sparql = compose_sparql(bgp, pgp)
 
       Logger.debug "#{sparql}\n++++++++++"
 
       begin
-        result = @endpoint.query(sparql)
-        solution = {
-          bgp: bgp,
-          sparql: sparql,
-          solutions: result.map{ |s| s.to_h }
-        }
-        proc_solution.call(solution)
+        result = endpoint.query(sparql)
+        proc_solution.call bgp: bgp,
+                           sparql: sparql,
+                           solutions: result.map{ |s| s.to_h }
       rescue SparqlEndpointTimeoutError => e
         Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
 
         # Send back error
-        if proc_solution
-          proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-        end
+        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
       rescue SparqlEndpointTemporaryError => e
         Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
 
         # Send back error
-        if proc_solution
-          proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-        end
+        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
       ensure
         if proc_cancel_flag.call
           Logger.debug "Stop procedure after a sparql query ends"
