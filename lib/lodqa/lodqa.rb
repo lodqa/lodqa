@@ -60,7 +60,38 @@ module Lodqa
 
         begin
           graph_finder = GraphFinder.new(@endpoint, @graph_uri, graph_finder_options)
-          graph_finder.bgps(anchored_pgp).each { |bgp| graph_finder.query_sparql_for anchored_pgp, @endpoint, bgp, proc_solution, -> {@cancel_flag} }
+          graph_finder.bgps(anchored_pgp).each do |bgp|
+            sparql = graph_finder.compose_sparql(bgp, anchored_pgp)
+
+            Logger.debug "#{sparql}\n++++++++++"
+
+            begin
+              result = @endpoint.query(sparql)
+              proc_solution.call bgp: bgp,
+                                 sparql: sparql,
+                                 solutions: result.map{ |s| s.to_h }
+            rescue SparqlEndpointTimeoutError => e
+              Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
+
+              # Send back error
+              proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
+            rescue SparqlEndpointTemporaryError => e
+              Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
+
+              # Send back error
+              proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
+            ensure
+              if @cancel_flag
+                Logger.debug "Stop procedure after a sparql query ends"
+                return
+              end
+            end
+
+            Logger.debug "==========\n"
+
+            # TODO http://rdf.pubannotation.org/sparql requires 2 seconds wait ?
+            # sleep 2
+          end
         rescue SparqlEndpointTimeoutError => e
           Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
         rescue SparqlEndpointTemporaryError => e

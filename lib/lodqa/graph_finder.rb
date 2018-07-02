@@ -40,39 +40,6 @@ module Lodqa
       end
     end
 
-    def query_sparql_for(pgp, endpoint, bgp, proc_solution, proc_cancel_flag)
-      sparql = compose_sparql(bgp, pgp)
-
-      Logger.debug "#{sparql}\n++++++++++"
-
-      begin
-        result = endpoint.query(sparql)
-        proc_solution.call bgp: bgp,
-                           sparql: sparql,
-                           solutions: result.map{ |s| s.to_h }
-      rescue SparqlEndpointTimeoutError => e
-        Logger.debug 'Sparql Timeout', error_messsage: e.message, trace: e.backtrace
-
-        # Send back error
-        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-      rescue SparqlEndpointTemporaryError => e
-        Logger.debug 'Sparql Endpoint Error', error_messsage: e.message, trace: e.backtrace
-
-        # Send back error
-        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-      ensure
-        if proc_cancel_flag.call
-          Logger.debug "Stop procedure after a sparql query ends"
-          return
-        end
-      end
-
-      Logger.debug "==========\n"
-
-      # TODO http://rdf.pubannotation.org/sparql requires 2 seconds wait ?
-      # sleep 2
-    end
-
     def compose_sparql(bgp, pgp)
       nodes = pgp[:nodes]
 
