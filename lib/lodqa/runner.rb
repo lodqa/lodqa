@@ -1,5 +1,5 @@
+require 'logger/logger'
 require 'lodqa/lodqa'
-require 'lodqa/logger'
 require 'lodqa/source_channel'
 require 'lodqa/async'
 
@@ -8,18 +8,18 @@ module Lodqa
     class << self
       def start(ws, options)
         # Do not use a thread local variables for request_id, becasue this thread is shared multi requests.
-        request_id = Logger.generate_request_id
-        Logger.debug "Request start #{options[:name]}"
+        request_id = Logger::Logger.generate_request_id
+        Logger::Logger.debug "Request start #{options[:name]}"
 
         lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options[:endpoint_options])
         channel = SourceChannel.new ws, options[:name]
 
-        Logger.debug "Setuped"
+        Logger::Logger.debug "Setuped"
 
-        # Set a request_id to the Logger at the thread of WebSocket events.
+        # Set a request_id to the Logger::Logger at the thread of WebSocket events.
         ws.on :message do |event|
           recieve_data = event.data
-          Logger.debug "on message #{recieve_data}"
+          Logger::Logger.debug "on message #{recieve_data}"
           start_search_solutions request_id, lodqa, recieve_data, channel, options[:graph_finder_options]
         end
       end
@@ -27,7 +27,7 @@ module Lodqa
       private
 
       def start_search_solutions(request_id, lodqa, recieve_data, channel, graph_finder_options)
-        Logger.debug "start #{self.class.name}##{__method__}"
+        Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
         json = JSON.parse(recieve_data, {:symbolize_names => true})
 
@@ -36,7 +36,7 @@ module Lodqa
 
         Async.defer do
           begin
-            Logger.debug "start async func"
+            Logger::Logger.debug "start async func"
 
             channel.start
             channel.send :sparql_count, { count: lodqa.sparqls(graph_finder_options).count }
@@ -46,7 +46,7 @@ module Lodqa
               graph_finder_options
             )
           rescue => e
-            Logger.error e, data: recieve_data
+            Logger::Logger.error e, data: recieve_data
             channel.error e
           ensure
             channel.close
@@ -55,8 +55,8 @@ module Lodqa
       end
 
       def close(request_id, lodqa)
-        Logger.request_id = request_id
-        Logger.debug 'The WebSocket connection is closed.'
+        Logger::Logger.request_id = request_id
+        Logger::Logger.debug 'The WebSocket connection is closed.'
         lodqa.dispose request_id
       end
     end

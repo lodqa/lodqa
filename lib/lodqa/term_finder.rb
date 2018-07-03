@@ -48,12 +48,12 @@ module Lodqa
           JSON.parse(response, symbolize_names: true)
         else
           # request to dictionary is not success
-          Logger.debug "A requet to the dictionary failed", method: request.method, url: request.uri, requet_body: terms.to_json, status: response.code, response_body: response
+          Logger::Logger.debug "A requet to the dictionary failed", method: request.method, url: request.uri, requet_body: terms.to_json, status: response.code, response_body: response
           raise TermFindError, "Term find error to #{request.uri}"
         end
       end
     rescue RestClient::Exceptions::ReadTimeout
-      Logger.info "A request to the dictionary was timeout", url: @dictionary.url, requet_body: terms.to_json
+      Logger::Logger.info "A request to the dictionary was timeout", url: @dictionary.url, requet_body: terms.to_json
       raise TermFindError, "Term find timeout error to #{@dictionary.url}"
     end
   end

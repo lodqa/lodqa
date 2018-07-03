@@ -5,7 +5,7 @@
 require 'json'
 require 'sparql/client'
 require 'pp'
-require 'lodqa/logger'
+require 'logger/logger'
 require 'lodqa/sparql_endpoint_timeout_error'
 require 'lodqa/sparql_endpoint_temporary_error'
 

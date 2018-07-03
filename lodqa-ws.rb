@@ -55,7 +55,7 @@ class LodqaWS < Sinatra::Base
 	post '/template.json' do
 		begin
 			# Change value to Logger::DEBUG to log for debugging.
-			Lodqa::Logger.level = Logger::INFO
+			Logger::Logger.level = Logger::INFO
 
 			parse_params
 
@@ -133,8 +133,8 @@ class LodqaWS < Sinatra::Base
 	get '/query_by_e_mail' do
 		raise 'Error: API key for the SendGrid is not set!' unless ENV['SENDGRID_API_KEY']
 
-		Lodqa::Logger.level =  Logger::INFO
-		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
+		Logger::Logger.level =  Logger::INFO
+		Logger::Logger.request_id = Logger::Logger.generate_request_id
 
 		begin
 			start_time = Time.now
@@ -164,10 +164,10 @@ class LodqaWS < Sinatra::Base
 			Lodqa::MailSender.send_mail params['to'], params['query'], 'Searching the query have been starting.'
 			[200, "Recieve query: #{params['query']}"]
 		rescue IOError => e
-			Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+			Logger::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
 			[500, "Configuration Server retrun error from #{settings.target_db}.json"]
 		rescue => e
-			Lodqa::Logger.error e
+			Logger::Logger.error e
 			[500, e.message]
 		end
 	end
@@ -177,17 +177,17 @@ class LodqaWS < Sinatra::Base
 		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
 
 		# Change value to Logger::DEBUG to log for debugging.
-		Lodqa::Logger.level =  Logger::INFO
-		Lodqa::Logger.request_id = Lodqa::Logger.generate_request_id
+		Logger::Logger.level =  Logger::INFO
+		Logger::Logger.request_id = Logger::Logger.generate_request_id
 
 		begin
 			ws = Faye::WebSocket.new(env)
 			config = get_config(params)
 
 			# Pass the request id between threads.
-			request_id = Lodqa::Logger.request_id
+			request_id = Logger::Logger.request_id
 			ws.on :open do
-				Lodqa::Logger.request_id = request_id
+				Logger::Logger.request_id = request_id
 				begin
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
@@ -198,7 +198,7 @@ class LodqaWS < Sinatra::Base
 							executor = Lodqa::OneByOneExecutor.new
 							# Prepare to cancel
 							ws.on :close do
-								Lodqa::Logger.debug 'The WebSocket connection is closed.'
+								Logger::Logger.debug 'The WebSocket connection is closed.'
 								executor.cancel_flag = true
 							end
 
@@ -215,10 +215,10 @@ class LodqaWS < Sinatra::Base
 						end
 					end
 				rescue IOError => e
-					Lodqa::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+					Logger::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
 					ws.close
 				rescue => e
-					Lodqa::Logger.error e
+					Logger::Logger.error e
 				end
 			end
 		end
@@ -230,7 +230,7 @@ class LodqaWS < Sinatra::Base
 		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
 
 		# Change value to Logger::DEBUG to log for debugging.
-		Lodqa::Logger.level = Logger::INFO
+		Logger::Logger.level = Logger::INFO
 		config = get_config(params)
 
 		begin
@@ -258,7 +258,7 @@ class LodqaWS < Sinatra::Base
 		rescue JSON::ParserError => e
 			[500, "Invalid JSON object from the client."]
 		rescue => e
-			Lodqa::Logger.error e, request: request.env
+			Logger::Logger.error e, request: request.env
 			[500, e.message]
 		end
 	end

@@ -1,6 +1,6 @@
+require 'logger/logger'
 require 'lodqa'
 require 'lodqa/graph_finder'
-require 'lodqa/logger'
 require 'lodqa/term_finder'
 
 module Lodqa
@@ -55,7 +55,7 @@ module Lodqa
         endpoint = CachedSparqlClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
         lodqa.anchored_pgps.each do |anchored_pgp|
           if @cancel_flag
-            Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
+            Logger::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
             return
           end
 
@@ -72,7 +72,7 @@ module Lodqa
             #SPARQL
             bgps.each do |bgp|
               if @cancel_flag
-                Logger.debug "Stop during processing an bgp: #{bgp}"
+                Logger::Logger.debug "Stop during processing an bgp: #{bgp}"
                 return
               end
 
@@ -105,12 +105,12 @@ module Lodqa
                 end
 
               rescue SparqlEndpointTimeoutError => e
-                Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+                Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
                 emit :solutions,
                       solutions: [],
                       error: 'sparql timeout error'
               rescue SparqlEndpointTemporaryError => e
-                Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+                Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
                 emit :solutions,
                      solutions: [],
                      error_message: 'endopoint temporary error'
@@ -119,17 +119,17 @@ module Lodqa
           end
         end
       rescue EnjuAccess::EnjuError => e
-        Logger.debug e.message
+        Logger::Logger.debug e.message
         emit :gateway_error,
              error_message: 'enju access error'
       rescue TermFindError => e
-        Logger.debug e.message
+        Logger::Logger.debug e.message
         emit :gateway_error,
              error_message: 'dictionary lookup error'
       rescue SparqlEndpointError => e
-        Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
+        Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
       rescue => e
-        Logger.error e
+        Logger::Logger.error e
       end
     end
 
@@ -161,7 +161,7 @@ module Lodqa
       first_rendering = urls.find{ |u| u.dig(:rendering, :mime_type)&.start_with? 'image' }&.dig(:rendering)
       [urls, first_rendering]
     rescue Errno::ECONNREFUSED => e
-      Logger.debug "Failed to conntect The URL forwarding DB at #{url_forwading_db}, continue to the next SPARQL", error_message: e.message
+      Logger::Logger.debug "Failed to conntect The URL forwarding DB at #{url_forwading_db}, continue to the next SPARQL", error_message: e.message
       nil
     end
   end
