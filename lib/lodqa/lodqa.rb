@@ -9,7 +9,6 @@ require 'logger/logger'
 require 'lodqa/sources'
 require 'lodqa/pgp_factory'
 require 'lodqa/configuration'
-require 'lodqa/runner'
 
 module Lodqa
   class Lodqa
