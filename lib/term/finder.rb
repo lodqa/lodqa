@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 require 'rest-client'
-require 'sparql/client'
 require 'json'
-require "lodqa/term_find_error.rb"
+require 'term/find_error'
 
-module Lodqa
+module Term
   # An instance of this class is initialized with a dictionary.
-  class TermFinder
+  class Finder
     attr_reader :dictionary
 
     def initialize(dictionary_url)
@@ -49,12 +48,12 @@ module Lodqa
         else
           # request to dictionary is not success
           Logger::Logger.debug "A requet to the dictionary failed", method: request.method, url: request.uri, requet_body: terms.to_json, status: response.code, response_body: response
-          raise TermFindError, "Term find error to #{request.uri}"
+          raise FindError, "Term find error to #{request.uri}"
         end
       end
     rescue RestClient::Exceptions::ReadTimeout
       Logger::Logger.info "A request to the dictionary was timeout", url: @dictionary.url, requet_body: terms.to_json
-      raise TermFindError, "Term find timeout error to #{@dictionary.url}"
+      raise FindError, "Term find timeout error to #{@dictionary.url}"
     end
   end
 end

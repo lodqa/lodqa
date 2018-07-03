@@ -1,7 +1,7 @@
 require 'logger/logger'
+require 'term/finder'
 require 'lodqa'
 require 'lodqa/graph_finder'
-require 'lodqa/term_finder'
 
 module Lodqa
   class OneByOneExecutor
@@ -122,7 +122,7 @@ module Lodqa
         Logger::Logger.debug e.message
         emit :gateway_error,
              error_message: 'enju access error'
-      rescue TermFindError => e
+      rescue Term::FindError => e
         Logger::Logger.debug e.message
         emit :gateway_error,
              error_message: 'dictionary lookup error'
@@ -140,7 +140,7 @@ module Lodqa
     end
 
     def mappings(dictionary_url, pgp)
-      tf = TermFinder.new(dictionary_url)
+      tf = Term::Finder.new(dictionary_url)
       keywords = pgp[:nodes].values.map{|n| n[:text]}.concat(pgp[:edges].map{|e| e[:text]})
       tf.find(keywords)
     end

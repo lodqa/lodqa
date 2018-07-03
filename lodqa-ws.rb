@@ -109,7 +109,7 @@ class LodqaWS < Sinatra::Base
 	post '/termfinder' do
 		config = get_config(params)
 
-		tf = Lodqa::TermFinder.new(config['dictionary_url'])
+		tf = Term::Finder.new(config['dictionary_url'])
 
 		keywords = params['keywords']
 		begin
@@ -119,7 +119,7 @@ class LodqaWS < Sinatra::Base
 				"Access-Control-Allow-Origin" => "*"
 			content_type :json
 			mappings.to_json
-		rescue Lodqa::TermFindError
+		rescue Term::FindError
 			status 502
 		end
 	end
