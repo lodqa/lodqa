@@ -2,14 +2,14 @@
 require 'net/http'
 require 'json'
 require 'enju_access/cgi_accessor'
+require 'logger/logger'
+require 'sparql_client/cacheable_client'
 require 'lodqa/graph_finder'
 require 'lodqa/term_finder'
 require 'logger/logger'
 require 'lodqa/sources'
 require 'lodqa/pgp_factory'
 require 'lodqa/configuration'
-require 'logger/logger'
-require 'lodqa/cached_sparql_client'
 require 'lodqa/runner'
 
 module Lodqa
@@ -21,7 +21,7 @@ module Lodqa
     attr_reader :endpoint
 
     def initialize(ep_url, graph_uri, endpoint_options)
-      @endpoint = CachedSparqlClient.new(ep_url, endpoint_options)
+      @endpoint = SparqlClient::CacheableClient.new(ep_url, endpoint_options)
       @graph_uri = graph_uri
     end
 
@@ -34,7 +34,7 @@ module Lodqa
           anchored_pgps.each do |anchored_pgp|
             to_sparql(anchored_pgp, graph_finder_options){ |sparql| y << sparql}
           end
-        rescue SparqlEndpointError => e
+        rescue SparqlClient::EndpointError => e
           Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
         end
       end
@@ -68,7 +68,7 @@ module Lodqa
                                sparql: sparql,
                                solutions: result.map{ |s| s.to_h }
 
-          rescue SparqlEndpointTimeoutError => e
+          rescue EndpointTimeoutError => e
             Logger::Logger.debug "The SPARQL Endpoint returns a timeout error, continue to the next SPARQL",
                          error_message: e.message,
                          Endpoint: e.endpoint_name,
@@ -77,7 +77,7 @@ module Lodqa
             # Send back error
             proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
 
-          rescue SparqlEndpointTemporaryError => e
+          rescue EndpointTemporaryError => e
             Logger::Logger.debug "The SPARQL Endpoint returns a temporary error, continue to the next SPARQL",
                          error_message: e.message,
                          Endpoint: e.endpoint_name,

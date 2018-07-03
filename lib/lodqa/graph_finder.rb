@@ -3,11 +3,9 @@
 # An instance of the class searches the SPARQL endpoint for a pseudo graph pattern.
 #
 require 'json'
-require 'sparql/client'
-require 'pp'
 require 'logger/logger'
-require 'lodqa/sparql_endpoint_timeout_error'
-require 'lodqa/sparql_endpoint_temporary_error'
+require 'sparql_client/endpoint_timeout_error'
+require 'sparql_client/endpoint_temporary_error'
 
 module Lodqa
   class GraphFinder

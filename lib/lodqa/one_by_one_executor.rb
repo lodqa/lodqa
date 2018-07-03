@@ -52,7 +52,7 @@ module Lodqa
         lodqa.pgp = pgp
         lodqa.mappings = mappings
 
-        endpoint = CachedSparqlClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
+        endpoint = SparqlClient::CacheableClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
         lodqa.anchored_pgps.each do |anchored_pgp|
           if @cancel_flag
             Logger::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
@@ -104,12 +104,12 @@ module Lodqa
                     end
                 end
 
-              rescue SparqlEndpointTimeoutError => e
+              rescue SparqlClient::EndpointTimeoutError => e
                 Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
                 emit :solutions,
                       solutions: [],
                       error: 'sparql timeout error'
-              rescue SparqlEndpointTemporaryError => e
+              rescue SparqlClient::EndpointTemporaryError => e
                 Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
                 emit :solutions,
                      solutions: [],
@@ -126,7 +126,7 @@ module Lodqa
         Logger::Logger.debug e.message
         emit :gateway_error,
              error_message: 'dictionary lookup error'
-      rescue SparqlEndpointError => e
+      rescue SparqlClient::EndpointError => e
         Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
       rescue => e
         Logger::Logger.error e

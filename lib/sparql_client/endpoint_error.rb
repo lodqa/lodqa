@@ -1,5 +1,5 @@
-module Lodqa
-  class SparqlEndpointError < StandardError
+module SparqlClient
+  class EndpointError < StandardError
     attr_reader :endpoint_name
 
     def initialize(e, endpoint_name)

@@ -1,7 +1,7 @@
-require 'lodqa/sparql_endpoint_error'
+require 'sparql_client/endpoint_error'
 
-module Lodqa
-  class SparqlEndpointTemporaryError < SparqlEndpointError
+module SparqlClient
+  class EndpointTemporaryError < EndpointError
     attr_reader :sparql
 
     def initialize(e, endpoint_name, sparql)
