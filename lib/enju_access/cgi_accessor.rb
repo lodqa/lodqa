@@ -23,7 +23,7 @@ class EnjuAccess::CGIAccessor
   WH_CAT      = ["WP", "WDT"]
 
   # It initializes an instance of RestClient::Resource to connect to an Enju cgi server
-  def initialize (enju_url)
+  def initialize(enju_url)
     @enju = RestClient::Resource.new enju_url
     raise EnjuAccess::EnjuError, "The URL of a web service of enju has to be passed as the first argument." unless @enju.instance_of? RestClient::Resource
   end
@@ -31,7 +31,7 @@ class EnjuAccess::CGIAccessor
   # It takes a plain-English sentence as input, and
   # returns a hash that represent various aspects
   # of the PAS and syntactic structure of the sentence.
-  def parse (sentence)
+  def parse(sentence)
     tokens, root     = get_parse(sentence)
     base_noun_chunks = get_base_noun_chunks(tokens)
     relations        = get_relations(tokens, base_noun_chunks)
@@ -49,7 +49,7 @@ class EnjuAccess::CGIAccessor
   private
 
   # It populates the instance variables, tokens and root
-  def get_parse (sentence)
+  def get_parse(sentence)
     return [[], nil] if sentence.nil? || sentence.strip.empty?
     sentence = sentence.strip
 
@@ -95,7 +95,7 @@ class EnjuAccess::CGIAccessor
 
   # It finds base noun chunks from the category pattern.
   # It assumes that the last word of a BNC is its head.
-  def get_base_noun_chunks (tokens)
+  def get_base_noun_chunks(tokens)
     base_noun_chunks = []
     beg, head = -1, -1
     tokens.each_with_index do |t, i|
@@ -118,7 +118,7 @@ class EnjuAccess::CGIAccessor
 
 
   # It finds the shortest path between the head word of any two base noun chunks that are not interfered by other base noun chunks.
-  def get_relations (tokens, base_noun_chunks)
+  def get_relations(tokens, base_noun_chunks)
     graph = Graph.new
     tokens.each do |t|
       if t[:args]
@@ -145,12 +145,12 @@ class EnjuAccess::CGIAccessor
   # What devices are used to treat heart failure?
   #
   # ...it will return 1 (devices).
-  def get_focus (tokens, base_noun_chunks, relations)
+  def get_focus(tokens, base_noun_chunks, relations)
     # find the wh-word
     # assumption: one query has only one wh-word
     wh_token = tokens.find{|t| WH_CAT.include?(t[:cat])}
 
-    focus = if wh_token
+    if wh_token
       if wh_token[:args]
         wh_token[:args][0][1]
       else
