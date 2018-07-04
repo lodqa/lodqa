@@ -47,21 +47,8 @@ module Lodqa
       end
 
       anchored_pgps.each do |anchored_pgp|
-        if @cancel_flag
-          Logger::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
-          return
-        end
-
         proc_anchored_pgp.call(anchored_pgp)
-
-        Logger::Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
-
-        graph_finder = GraphFinder.new(@endpoint, @graph_uri, graph_finder_options)
-        graph_finder.sparqls_of(anchored_pgp) do |bgp, sparql|
-          query_sparql @endpoint, bgp, sparql, proc_solution
-        end
-
-        Logger::Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
+        deal_anchored_pgp anchored_pgp, proc_solution, graph_finder_options, 8
       end
     end
 
@@ -116,44 +103,83 @@ module Lodqa
       end
     end
 
-    def query_sparql(endpoint, bgp, sparql, proc_solution)
+    def deal_anchored_pgp(anchored_pgp, proc_solution, graph_finder_options, parallel)
+      Logger::Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
+
+      if @cancel_flag
+        Logger::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
+        return
+      end
+
+      start = Time.now
+      graph_finder = GraphFinder.new(@endpoint, @graph_uri, graph_finder_options)
+      count, error, success = 0, 0, 0
+      queue = Queue.new
+
+      graph_finder.sparqls_of(anchored_pgp) do |bgp, sparql|
+        query_sparql @endpoint, bgp, sparql, proc_solution, queue
+        count += 1
+
+        if count >= parallel
+          e, s = queue.pop
+          error += 1 if e
+          success += 1 if s
+          count -= 1
+        end
+      end
+
+      count.times do
+        e, s = queue.pop
+        error += 1 if e
+        success += 1 if s
+        count -= 1
+      end
+
+      if (error + success) > 0
+        stats = {
+          parallel: parallel,
+          duration: Time.now - start,
+          sparqls: error + success,
+          error: error,
+          success: success,
+          error_rate: error/(error + success).to_f
+        }
+
+        Logger::Logger.info "Finish stats: #{stats}"
+      end
+
+      Logger::Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
+    end
+
+    def query_sparql(endpoint, bgp, sparql, proc_solution, queue)
       Logger::Logger.debug "#{sparql}\n++++++++++"
 
-      begin
-        result = endpoint.query(sparql)
-        proc_solution.call bgp: bgp,
-                           sparql: sparql,
-                           solutions: result.map{ |s| s.to_h }
+      endpoint.query_async(sparql) do |e, result|
+        handle_result e, bgp, sparql, result, proc_solution
+        queue.push [e, result]
 
-      rescue EndpointTimeoutError => e
-        Logger::Logger.debug "The SPARQL Endpoint returns a timeout error, continue to the next SPARQL",
-                     error_message: e.message,
-                     Endpoint: e.endpoint_name,
-                     SPARQL: sparql
-
-        # Send back error
-        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-
-      rescue EndpointTemporaryError => e
-        Logger::Logger.debug "The SPARQL Endpoint returns a temporary error, continue to the next SPARQL",
-                     error_message: e.message,
-                     Endpoint: e.endpoint_name,
-                     SPARQL: sparql
-
-        # Send back error
-        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-
-      ensure
         if @cancel_flag
           Logger::Logger.debug "Stop procedure after a sparql query ends"
-          return
+          next
         end
       end
 
       Logger::Logger.debug "==========\n"
+    end
 
-      # TODO http://rdf.pubannotation.org/sparql requires 2 seconds wait ?
-      # sleep 2
+    def handle_result(e, bgp, sparql, result, proc_solution)
+      case e
+      when nil
+        proc_solution.call bgp: bgp,
+                           sparql: sparql,
+                           solutions: result.map{ |s| s.to_h }
+      when SparqlClient::EndpointTimeoutError
+        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
+      when SparqlClient::EndpointTemporaryError
+        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
+      else
+        Logger::Logger.error e
+      end
     end
 
     def nodes_to_delete
