@@ -16,10 +16,13 @@ module Lodqa
 
         Logger::Logger.debug "Setuped"
 
-        # Set a request_id to the Logger::Logger at the thread of WebSocket events.
         ws.on :message do |event|
           recieve_data = event.data
+
+          # Set a request_id to the Logger::Logger at the thread of WebSocket events.
+          Logger::Logger.request_id = request_id
           Logger::Logger.debug "on message #{recieve_data}"
+
           start_search_solutions request_id, lodqa, recieve_data, channel, options[:graph_finder_options]
         end
       end
