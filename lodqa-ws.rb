@@ -3,6 +3,7 @@ require 'sinatra/base'
 require 'rest_client'
 require 'faye/websocket'
 require 'erb'
+require 'logger/async'
 require 'lodqa'
 require 'lodqa/one_by_one_executor'
 require 'lodqa/mail_sender'
@@ -141,7 +142,7 @@ class LodqaWS < Sinatra::Base
 			answers = {}
 			applicants = applicants_dataset(params)
 			applicants.each do | applicant |
-				Lodqa::Async.defer do
+				Logger::Async.defer do
 					executor = Lodqa::OneByOneExecutor.new
 
 					# Bind events to gather answers
@@ -191,7 +192,7 @@ class LodqaWS < Sinatra::Base
 				begin
 					applicants = applicants_dataset(params)
 					applicants.each do | applicant |
-						Lodqa::Async.defer do
+						Logger::Async.defer do
 							# Set read_timeout default 60 unless read_timeout parameter.
 							# Because value of params will be empty string when it is not set and ''.to_i returns 0.
 							read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i

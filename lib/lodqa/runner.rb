@@ -1,7 +1,7 @@
+require 'logger/async'
 require 'logger/logger'
 require 'lodqa/lodqa'
 require 'lodqa/source_channel'
-require 'lodqa/async'
 
 module Lodqa
   module Runner
@@ -34,7 +34,7 @@ module Lodqa
         lodqa.pgp = json[:pgp]
         lodqa.mappings = json[:mappings]
 
-        Async.defer do
+        Logger::Async.defer do
           begin
             Logger::Logger.debug "start async func"
 
