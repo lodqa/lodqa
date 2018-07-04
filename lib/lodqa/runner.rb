@@ -16,6 +16,10 @@ module Lodqa
 
         Logger::Logger.debug "Setuped"
 
+        ws.on :close do
+          close request_id, lodqa
+        end
+
         ws.on :message do |event|
           recieve_data = event.data
 
