@@ -26,6 +26,8 @@ module Lodqa
       bgps(anchored_pgp).each { |bgp| yield [bgp, compose_sparql(bgp, anchored_pgp)] }
     end
 
+    private
+
     # It generates bgps by applying variation operations to the pgp.
     # The option _max_hop_ specifies the maximum number of hops to be searched.
     def bgps(pgp)
@@ -91,8 +93,6 @@ module Lodqa
       # query += "}"
       query += "} LIMIT #{@answer_limit}"
     end
-
-    private
 
     def generate_split_variations(bgps, max_hop = 2)
       Enumerator.new do |sbgps|
