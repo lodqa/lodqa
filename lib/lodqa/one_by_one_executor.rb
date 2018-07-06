@@ -26,7 +26,7 @@ module Lodqa
     # Merage previouse event data and call all event handlers.
     def emit(event, data)
       # Delete event data after bgp, because events after bgp event are occurred repeatedly.
-      [:query, :solutions, :solution, :answer, :error].each { |key| @event_data.delete key } if event == :bgp
+      [:query, :solutions, :solution, :answer, :error].each { |key| @event_data.delete key } if event == :sparql
 
       @event_data = @event_data.merge data
       @event_hadlers[event]&.each { |h| h.call(event, @event_data) }
@@ -75,13 +75,11 @@ module Lodqa
               return
             end
 
-            query = {bgp: bgp, sparql: sparql}
-            emit :bgp, anchored_pgp: anchored_pgp, bgp: bgp
-            emit :sparql, query: query
+            emit :sparql, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
 
             # Get solutions of SPARQL
             begin
-              solutions = endpoint.query(query[:sparql]).map{ |solution| solution.to_h }
+              solutions = endpoint.query(sparql).map{ |solution| solution.to_h }
               emit :solutions, solutions: solutions
 
               # Find the answer of the solutions.

@@ -12,19 +12,19 @@ module.exports = class extends EventEmitter {
     this._answerContainer = new AnswerContainer()
 
     // A Dataset with bgp will have SPARQLs
-    loader.on('bgp', ({
-      dataset
-    }) => this._datasetContainer.addDataset(dataset))
     loader.on('sparql', ({
       dataset,
-      query
-    }) => this._datasetContainer.addSparql(dataset, query.sparql))
+      sparql
+    }) => {
+      this._datasetContainer.addDataset(dataset)
+      this._datasetContainer.addSparql(dataset, sparql)
+    })
     loader.on('answer', ({
       dataset,
       anchored_pgp,
-      query,
+      sparql,
       answer
-    }) => this._addAnswer(dataset, anchored_pgp, query.sparql, answer))
+    }) => this._addAnswer(dataset, anchored_pgp, sparql, answer))
   }
 
   _addAnswer(dataset, anchored_pgp, sparql, answer) {

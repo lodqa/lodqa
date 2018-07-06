@@ -18,7 +18,7 @@ module.exports = class extends EventEmitter {
       this.emit('message_update_event')
     })
 
-    loader.on('bgp', () => {
+    loader.on('sparql', () => {
       this._message.isWaittingResult = false
       this.emit('message_update_event')
     })

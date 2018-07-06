@@ -5,7 +5,7 @@ module.exports = class {
     loader.on('sparql', ({
       dataset,
       anchored_pgp,
-      query
+      sparql
     }) => {
       if (!this._datasets.has(dataset)) {
         this._datasets.set(dataset, [])
@@ -13,39 +13,40 @@ module.exports = class {
       this._datasets.get(dataset)
         .push({
           anchoredPgp: anchored_pgp,
-          sparql: query.sparql
+          sparql
         })
     })
 
     loader.on('solutions', ({
       dataset,
-      query,
+      bgp,
+      sparql,
       solutions,
       error
     }) => {
       this._datasets.get(dataset)
-        .filter((sparql) => sparql.sparql === query.sparql)
-        .forEach((sparql) => {
-          sparql.solutions = {
+        .filter((s) => s.sparql === sparql)
+        .forEach((s) => {
+          s.solutions = {
             solutions,
-            bgp: query.bgp
+            bgp
           },
-          sparql.error = error
-          sparql.answers = []
+          s.error = error
+          s.answers = []
         })
     })
 
     loader.on('answer', ({
       dataset,
-      query,
+      sparql,
       answer,
       label
     }) => {
       this._datasets.get(dataset)
-        .filter((sparql) => sparql.sparql === query.sparql)
-        .forEach((sparql) => sparql.answers.push({
+        .filter((s) => s.sparql === sparql)
+        .forEach((s) => s.answers.push({
           url: answer[1],
-          label: label
+          label
         }))
     })
   }

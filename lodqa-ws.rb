@@ -205,7 +205,7 @@ class LodqaWS < Sinatra::Base
 							end
 
 							# Bind events to send messsage on the WebSocket
-							executor.on :datasets, :pgp, :mappings, :bgp, :sparql, :solutions, :answer, :gateway_error do | event, data |
+							executor.on :datasets, :pgp, :mappings, :sparql, :solutions, :answer, :gateway_error do | event, data |
 								ws.send({event: event}.merge(data).to_json)
 							end
 

@@ -11,7 +11,7 @@ module.exports = class extends EventEmitter {
     this._datasets = new Map()
 
     // The number of bpgs is same the number of SPARQLs.
-    loader.on('bgp', ({
+    loader.on('sparql', ({
       dataset,
       bgp
     }) => {
