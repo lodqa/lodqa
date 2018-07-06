@@ -48,7 +48,15 @@ module Lodqa
         endpoint_options = {
           read_timeout: read_timeout
         }
-        lodqa = Lodqa.new(applicant[:endpoint_url], applicant[:graph_uri], endpoint_options)
+        graph_finder_options = {
+          max_hop: applicant[:max_hop],
+          ignore_predicates: applicant[:ignore_predicates],
+          sortal_predicates: applicant[:sortal_predicates]
+        }
+        lodqa = Lodqa.new applicant[:endpoint_url],
+                          endpoint_options,
+                          applicant[:graph_uri],
+                          graph_finder_options
         lodqa.pgp = pgp
         lodqa.mappings = mappings
 
@@ -60,11 +68,6 @@ module Lodqa
           end
 
           #GraphFinder(bgb)
-          graph_finder_options = {
-            max_hop: applicant[:max_hop],
-            ignore_predicates: applicant[:ignore_predicates],
-            sortal_predicates: applicant[:sortal_predicates]
-          }
           graph_finder = GraphFinder.new(endpoint, nil, graph_finder_options)
           bgps = graph_finder.bgps anchored_pgp
 

@@ -11,7 +11,10 @@ module Lodqa
         request_id = Logger::Logger.generate_request_id
         Logger::Logger.debug "Request start #{options[:name]}"
 
-        lodqa = Lodqa.new(options[:endpoint_url], options[:graph_uri], options[:endpoint_options])
+        lodqa = Lodqa.new options[:endpoint_url],
+                          options[:endpoint_options],
+                          options[:graph_uri],
+                          options[:graph_finder_options]
         channel = SourceChannel.new ws, options[:name]
 
         Logger::Logger.debug "Setuped"
@@ -27,13 +30,13 @@ module Lodqa
           Logger::Logger.request_id = request_id
           Logger::Logger.debug "on message #{recieve_data}"
 
-          start_search_solutions request_id, lodqa, recieve_data, channel, options[:graph_finder_options]
+          start_search_solutions request_id, lodqa, recieve_data, channel
         end
       end
 
       private
 
-      def start_search_solutions(request_id, lodqa, recieve_data, channel, graph_finder_options)
+      def start_search_solutions(request_id, lodqa, recieve_data, channel)
         Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
         json = JSON.parse(recieve_data, {:symbolize_names => true})
@@ -46,11 +49,10 @@ module Lodqa
             Logger::Logger.debug "start async func"
 
             channel.start
-            channel.send :sparql_count, { count: lodqa.sparqls(graph_finder_options).count }
+            channel.send :sparql_count, { count: lodqa.sparqls.count }
             lodqa.each_anchored_pgp_and_sparql_and_solution(
               -> data { channel.send :anchored_pgp, data },
-              -> data { channel.send :solution, data },
-              graph_finder_options
+              -> data { channel.send :solution, data }
             )
           rescue => e
             Logger::Logger.error e, data: recieve_data
