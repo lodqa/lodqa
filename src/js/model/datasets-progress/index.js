@@ -13,14 +13,28 @@ module.exports = class extends EventEmitter {
     // The number of bpgs is same the number of SPARQLs.
     loader.on('sparql', ({
       dataset,
-      bgp
+      sparql
     }) => {
       if (!this._datasets.has(dataset)) {
         this._datasets.set(dataset, new DatasetProgress(dataset))
       }
 
       this._datasets.get(dataset)
-        .addBgp(bgp)
+        .addSparql(sparql)
+      this.emit('progress_datasets_update_event')
+
+      if (dataset === this._selectdDataset) {
+        this.emit('progress_selected_dataset_update_event')
+      }
+    })
+
+    // ここに検索開始が追加される予定
+    loader.on('query_sparql', ({
+      dataset,
+      sparql
+    }) => {
+      this._datasets.get(dataset)
+        .startSparql(sparql)
       this.emit('progress_datasets_update_event')
 
       if (dataset === this._selectdDataset) {
@@ -31,12 +45,12 @@ module.exports = class extends EventEmitter {
     loader.on('solutions', ({
       dataset,
       anchored_pgp,
-      bgp,
+      sparql,
       solutions,
       error
     }) => {
       this._datasets.get(dataset)
-        .addSolutions(error, anchored_pgp, bgp, solutions)
+        .finishSparql(error, anchored_pgp, sparql, solutions)
       this.emit('progress_datasets_update_event')
 
       if (dataset === this._selectdDataset) {

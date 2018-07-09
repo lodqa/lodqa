@@ -57,6 +57,13 @@ module Lodqa
         lodqa.mappings = mappings
 
         endpoint = SparqlClient::CacheableClient.new(applicant[:endpoint_url], method: :get, read_timeout: read_timeout)
+
+        parallel = 16
+        start = Time.now
+        count, error, success = 0, 0, 0
+        queue = Queue.new # すべてのSPARQL検索が終わるのを待ち合わせる
+        known_sparql = Set.new # 重複したSPARQLを生成したら検索をスキップする
+
         lodqa.anchored_pgps.each do |anchored_pgp|
           if @cancel_flag
             Logger::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
@@ -71,45 +78,47 @@ module Lodqa
               return
             end
 
+            # Skip querying duplicated SPARQL.
+            next if known_sparql.member? sparql
+            known_sparql << sparql
+
             emit :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
 
             # Get solutions of SPARQL
-            begin
-              solutions = endpoint.query(sparql).map{ |solution| solution.to_h }
-              emit :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions
+            get_solutions_of_sparql_async endpoint, applicant, pgp, mappings, anchored_pgp, bgp, sparql, url_forwading_db, queue
 
-              # Find the answer of the solutions.
-              solutions.each do |solution|
-                solution
-                  .select do |id|
-                    # The answer is instance node of focus node.
-                    anchored_pgp[:focus] == id.to_s.gsub(/^i/, '')
-                  end
-                  .each do |id, uri|
-                    # WebSocket message will be disorderd if additional informations are get ascynchronously
-                    label = label(endpoint, uri)
-                    urls, first_rendering = forwarded_urls(uri, url_forwading_db)
+            # Emit an event to notify starting of querying the SPARQL.
+            emit :query_sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
+            count += 1
 
-                    emit :answer,
-                         dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions,
-                         solution: solution,
-                         answer: { uri: uri, label: label, urls: urls&.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
-                  end
-              end
-
-            rescue SparqlClient::EndpointTimeoutError => e
-              Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
-              emit :solutions,
-                    solutions: [],
-                    error: 'sparql timeout error'
-            rescue SparqlClient::EndpointTemporaryError => e
-              Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
-              emit :solutions,
-                   solutions: [],
-                   error_message: 'endopoint temporary error'
+            if count >= parallel
+              e, s = queue.pop
+              error += 1 if e
+              success += 1 if s
+              count -= 1
             end
           end
         end
+
+        count.times do
+          e, s = queue.pop
+          error += 1 if e
+          success += 1 if s
+        end
+
+        if (error + success) > 0
+          stats = {
+            parallel: parallel,
+            duration: Time.now - start,
+            sparqls: error + success,
+            error: error,
+            success: success,
+            error_rate: error/(error + success).to_f
+          }
+
+          Logger::Logger.info "Finish stats: #{stats}"
+        end
+
       rescue EnjuAccess::EnjuError => e
         Logger::Logger.debug e.message
         emit :gateway_error,
@@ -126,6 +135,50 @@ module Lodqa
     end
 
     private
+
+    def get_solutions_of_sparql_async(endpoint, applicant, pgp, mappings, anchored_pgp, bgp, sparql, url_forwading_db, queue)
+      # Get solutions of SPARQL
+      endpoint.query_async(sparql) do |e, result|
+        case e
+        when nil
+          solutions = result.map{ |solution| solution.to_h }
+
+          emit :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions
+
+          # Find the answer of the solutions.
+          solutions.each do |solution|
+            solution
+              .select { |id| anchored_pgp[:focus] == id.to_s.gsub(/^i/, '') } # The answer is instance node of focus node.
+              .each { |_, uri| get_label_of_url endpoint, applicant, pgp, mappings, anchored_pgp, bgp, sparql, solutions, solution, uri, url_forwading_db }
+          end
+        when SparqlClient::EndpointTimeoutError
+          Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+          emit :solutions,
+                dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: [],
+                error: 'sparql timeout error'
+        when SparqlClient::EndpointTemporaryError
+          Logger::Logger.info "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
+          emit :solutions,
+               dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: [],
+               error_message: 'endopoint temporary error'
+        else
+          Logger::Logger.error e
+        end
+
+        queue.push [e, result]
+      end
+    end
+
+    def get_label_of_url(endpoint, applicant, pgp, mappings, anchored_pgp, bgp, sparql, solutions, solution, uri, url_forwading_db)
+      # WebSocket message will be disorderd if additional informations are get ascynchronously
+      label = label(endpoint, uri)
+      urls, first_rendering = forwarded_urls(uri, url_forwading_db)
+
+      emit :answer,
+           dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions,
+           solution: solution,
+           answer: { uri: uri, label: label, urls: urls&.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
+    end
 
     def pgp(parser_url, query)
       PGPFactory.create parser_url, query

@@ -32,7 +32,6 @@ module.exports = class {
             bgp
           },
           s.error = error
-          s.answers = []
         })
     })
 
@@ -44,10 +43,15 @@ module.exports = class {
     }) => {
       this._datasets.get(dataset)
         .filter((s) => s.sparql === sparql)
-        .forEach((s) => s.answers.push({
-          url: answer[1],
-          label
-        }))
+        .forEach((s) => {
+          if (!s.answers) {
+            s.answers = []
+          }
+          s.answers.push({
+            url: answer[1],
+            label
+          })
+        })
     })
   }
 

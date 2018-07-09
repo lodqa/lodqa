@@ -4,8 +4,10 @@ module.exports = class {
   constructor(name) {
     this.name = name
 
-    this._bgps = []
-    this._progress = null
+    this._sparqls = new Set()
+    this._sparqls_in_progress = new Set()
+    this._sparqls_done = new Set()
+
     this._solutions = []
 
     this.max = 0
@@ -13,31 +15,26 @@ module.exports = class {
     this.show = false
   }
 
-  addBgp(bgp) {
-    this._bgps.push(bgp)
-
-    if (this._bgps.length && !this._progress) {
-      this._progress = this._bgps.shift()
-    }
-
-    this.max += 1
+  addSparql(sparql) {
+    this._sparqls.add(sparql)
+    this.max = this._sparqls.size
   }
 
-  addSolutions(error, anchoredPgp, bgp, solutions) {
-    const expectedBgp = this._progress
+  startSparql(sparql) {
+    this._sparqls_in_progress.add(sparql)
+  }
 
-    if (JSON.stringify(bgp) !== JSON.stringify(expectedBgp)) {
-      console.warn('bpg mismatch!', bgp, expectedBgp)
-    }
+  finishSparql(error, anchoredPgp, sparql, solutions) {
+    // 順序が入れ替わるので、ここでプログレスから消すのはダメっぽい
+    this._sparqls_done.add(sparql)
+    this.value = this._sparqls_done.size
 
     this._solutions.push({
+      sparql,
       error,
       answers: getUniqAnswers(solutions, anchoredPgp.focus),
       visible: true
     })
-
-    this._progress = this._bgps.shift()
-    this.value += 1
   }
 
   hideSparql(sparqlNumber, visible) {
@@ -45,27 +42,43 @@ module.exports = class {
   }
 
   get percentage() {
-    return Math.floor(this.value / this.max * 1000) / 10
+    return Math.floor(this._sparqls_done.size / this._sparqls.size * 1000) / 10
   }
 
   get snapshot() {
-    return this._solutions.map(s => ({
-      hasSolution: true,
-      uniqAnswersLength: s.answers.length,
-      visible: s.visible,
-      error: s.error
+    const ret = []
+    for (const sparql of this._sparqls.values()) {
+      if (this._sparqls_done.has(sparql)) {
+        // The sparql was queried already!
+        if (this._solutions.find((s) => s.sparql === sparql)) {
+          const s = this._solutions.find((s) => s.sparql === sparql)
+          ret.push({
+            hasSolution: true,
+            uniqAnswersLength: s.answers.length,
+            visible: s.visible,
+            error: s.error
+          })
+        } else {
+          console.assert(false, 'All completed sparqs SHOULD have solutions.')
+        }
+      } else if (this._sparqls_in_progress.has(sparql)) {
+        // The sparql is searching now.
+        ret.push({
+          hasSolution: false,
+          isProgress: true
+        })
+      } else {
+        // The sparql is not queried yet.
+        ret.push({
+          hasSolution: false
+        })
+      }
+    }
+
+    return ret.map((s, index) => Object.assign(s, {
+      datasetName: this.name,
+      sparqlNumber: index + 1,
+      sparqlName: index + 1,
     }))
-      .concat(this._progress ? [{
-        hasSolution: false,
-        isProgress: true
-      }] : [])
-      .concat(this._bgps.map(() => ({
-        hasSolution: false
-      })))
-      .map((s, index) => Object.assign(s, {
-        datasetName: this.name,
-        sparqlNumber: index + 1,
-        sparqlName: index + 1,
-      }))
   }
 }
