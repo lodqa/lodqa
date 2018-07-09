@@ -25,11 +25,7 @@ module Lodqa
 
     # Merage previouse event data and call all event handlers.
     def emit(event, data)
-      # Delete event data after bgp, because events after bgp event are occurred repeatedly.
-      [:query, :solutions, :solution, :answer, :error].each { |key| @event_data.delete key } if event == :sparql
-
-      @event_data = @event_data.merge data
-      @event_hadlers[event]&.each { |h| h.call(event, @event_data) }
+      @event_hadlers[event]&.each { |h| h.call(event, data) }
     end
 
     def search_query(applicant, default_parse_url, query, read_timeout, url_forwading_db)
@@ -38,11 +34,11 @@ module Lodqa
 
         # pgp
         pgp = pgp(applicant[:parser_url] || default_parse_url, query)
-        emit :pgp, pgp: pgp
+        emit :pgp, dataset: applicant[:name], pgp: pgp
 
         # mappings
         mappings = mappings(applicant[:dictionary_url], pgp)
-        emit :mappings, mappings: mappings
+        emit :mappings, dataset: applicant[:name], pgp: pgp, mappings: mappings
 
         #Lodqa(anchored_pgp)
         endpoint_options = {
@@ -75,12 +71,12 @@ module Lodqa
               return
             end
 
-            emit :sparql, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
+            emit :sparql, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
 
             # Get solutions of SPARQL
             begin
               solutions = endpoint.query(sparql).map{ |solution| solution.to_h }
-              emit :solutions, solutions: solutions
+              emit :solutions, dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions
 
               # Find the answer of the solutions.
               solutions.each do |solution|
@@ -95,6 +91,7 @@ module Lodqa
                     urls, first_rendering = forwarded_urls(uri, url_forwading_db)
 
                     emit :answer,
+                         dataset: applicant[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions,
                          solution: solution,
                          answer: { uri: uri, label: label, urls: urls&.select{ |u| u[:forwarding][:url].length < 10000 }, first_rendering: first_rendering }
                   end
