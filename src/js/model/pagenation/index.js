@@ -20,8 +20,16 @@ module.exports = class extends EventEmitter {
   set _page(itemCount) {
     const maxPageNumber = Math.ceil(itemCount / this._itemsPerPage)
 
+    // When all items have been hidden, the first page will be re-selected.
+    if (itemCount > 0 && this._currentPage === 0) {
+      this._currentPage = 1
+      this.emit('answer_summary_page_update_event')
+    }
+
     if (this._maxPageNumber !== maxPageNumber) {
       this._maxPageNumber = maxPageNumber
+
+      // When the current page is larger than the max page, it will become to the max page. 
       if (this._maxPageNumber < this._currentPage) {
         this._currentPage = this._maxPageNumber
       }
