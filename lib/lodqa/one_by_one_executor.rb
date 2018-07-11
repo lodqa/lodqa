@@ -1,6 +1,6 @@
 require 'logger/logger'
 require 'term/finder'
-require 'lodqa'
+require 'lodqa/lodqa'
 require 'lodqa/graph_finder'
 
 module Lodqa

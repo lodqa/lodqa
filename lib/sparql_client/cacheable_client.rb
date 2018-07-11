@@ -1,5 +1,4 @@
 require 'sparql/client'
-require 'eventmachine'
 require 'logger/async'
 require 'logger/logger'
 require 'sparql_client/endpoint_error'
