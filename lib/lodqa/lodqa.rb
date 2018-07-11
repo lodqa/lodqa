@@ -115,6 +115,11 @@ module Lodqa
       queue = Queue.new
 
       @graph_finder.sparqls_of(anchored_pgp) do |bgp, sparql|
+        if @cancel_flag
+          Logger::Logger.debug 'Stop procedure before querying a sparql'
+          next
+        end
+
         query_sparql @sparql_client, bgp, sparql, proc_solution, queue
         count += 1
 
@@ -155,11 +160,6 @@ module Lodqa
       endpoint.query_async(sparql) do |e, result|
         handle_result e, bgp, sparql, result, proc_solution
         queue.push [e, result]
-
-        if @cancel_flag
-          Logger::Logger.debug "Stop procedure after a sparql query ends"
-          next
-        end
       end
 
       Logger::Logger.debug "==========\n"
