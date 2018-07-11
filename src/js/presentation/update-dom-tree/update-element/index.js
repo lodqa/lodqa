@@ -12,6 +12,13 @@ module.exports = function(ast, element, parentNode) {
         element.setAttribute(name, value)
       })
 
+    // Remove old attributes.
+    for (const domAttr of element.attributes) {
+      if (!ast.attrs.find((a) => a.name === domAttr.name)) {
+        element.removeAttribute(domAttr.name)
+      }
+    }
+
     updateBooleanAttribute(ast, element, 'checked')
     updateBooleanAttribute(ast, element, 'disabled')
 
