@@ -29,7 +29,7 @@ module.exports = class extends EventEmitter {
     if (this._maxPageNumber !== maxPageNumber) {
       this._maxPageNumber = maxPageNumber
 
-      // When the current page is larger than the max page, it will become to the max page. 
+      // When the current page is larger than the max page, it will become to the max page.
       if (this._maxPageNumber < this._currentPage) {
         this._currentPage = this._maxPageNumber
       }

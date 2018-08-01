@@ -25,7 +25,7 @@ module.exports = class extends EventEmitter {
   }
 
   get currentStatusOfSparqls() {
-    if(!this._showDetail) {
+    if (!this._showDetail) {
       return {
         show: false,
         sparqls: []

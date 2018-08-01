@@ -24,7 +24,7 @@ module.exports = function(solutions, focus) {
 
 function updateLabel(dom, url, label) {
   for (const anchor of dom.querySelectorAll('a')) {
-    if(anchor.href === url && anchor.innerText !==label){
+    if (anchor.href === url && anchor.innerText !== label) {
       anchor.innerText = label
     }
   }

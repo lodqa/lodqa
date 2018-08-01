@@ -36,7 +36,7 @@ module.exports = function(solutions) {
     dom,
     updateLabel(url, label) {
       for (const element of dom.querySelectorAll('a')) {
-        if(element.href === url && element.innerText !==label){
+        if (element.href === url && element.innerText !== label) {
           element.innerText = label
         }
       }

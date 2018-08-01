@@ -12,9 +12,10 @@ module.exports = function(options, className) {
   const link = element.querySelector('a')
   const canvas = element.querySelector('canvas')
   const graph = new Springy.Graph()
-  const springy = $(canvas).springy({
-    graph
-  })
+  const springy = $(canvas)
+    .springy({
+      graph
+    })
 
   updateLinkOnSelect(link, springy)
 

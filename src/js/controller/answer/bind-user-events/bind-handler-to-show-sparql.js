@@ -1,6 +1,6 @@
 const SparqlAndAnswersPresentation = require('../../../presentation/sparql-and-answers-presentation')
 
-module.exports = function (parent, displayAreaDomId, model) {
+module.exports = function(parent, displayAreaDomId, model) {
   // Create and bind a handler to show sparql presentation
   const sparqlAndAnswersPresentation = new SparqlAndAnswersPresentation(displayAreaDomId, () => {})
   const eventHandler = (datasetName, sparqlNumber) => {
@@ -14,7 +14,9 @@ module.exports = function (parent, displayAreaDomId, model) {
     sparqlAndAnswersPresentation.show(sparqlNumber, datasetName, anchoredPgp, sparql, solutions, answers, error)
   }
   document.querySelector('.content')
-    .addEventListener('click', ({target}) => {
+    .addEventListener('click', ({
+      target
+    }) => {
       if (target.closest('.sparql-link')) {
         if (target.dataset.datasetName && target.dataset.sparqlNumber) {
           eventHandler(target.dataset.datasetName, target.dataset.sparqlNumber)

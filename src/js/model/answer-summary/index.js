@@ -50,8 +50,8 @@ function appendMediaPropertyToUrl(answer) {
   return answer
 }
 
-function appendMediaProperty(url){
-  if(url.rendering) {
+function appendMediaProperty(url) {
+  if (url.rendering) {
     url[url.rendering.mime_type.split('/')[0]] = true
   }
   return url

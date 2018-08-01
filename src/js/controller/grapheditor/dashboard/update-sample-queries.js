@@ -12,7 +12,7 @@ module.exports = {
     cache.config = config
     update(cache.config, cache.readTimeout)
   },
-  updateReadTimeout(readTimeout){
+  updateReadTimeout(readTimeout) {
     cache.readTimeout = readTimeout
     update(cache.config, cache.readTimeout)
   }
@@ -31,7 +31,7 @@ function update(config, readTimeout) {
       url.searchParams.set('target', name)
       url.searchParams.set('query', query)
 
-      if(readTimeout) {
+      if (readTimeout) {
         url.searchParams.set('read_timeout', readTimeout)
       }
 

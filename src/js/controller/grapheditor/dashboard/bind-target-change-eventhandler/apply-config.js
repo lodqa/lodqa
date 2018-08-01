@@ -1,4 +1,6 @@
-const { updateConfig } = require('../update-sample-queries')
+const {
+  updateConfig
+} = require('../update-sample-queries')
 
 module.exports = function(config) {
   setTargetDisplay(config)

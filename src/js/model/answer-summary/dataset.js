@@ -1,4 +1,3 @@
-
 module.exports = class Dataset {
   constructor(name, number) {
     this._name = name

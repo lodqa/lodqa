@@ -10,7 +10,7 @@ module.exports = function(pathname) {
       const parameters = []
 
       const readTimeout = getReadTimeout()
-      if(readTimeout){
+      if (readTimeout) {
         parameters.push(`read_timeout=${readTimeout}`)
       }
 

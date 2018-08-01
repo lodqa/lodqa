@@ -11,7 +11,7 @@ module.exports = function(target, target2) {
     .addEventListener('click', (e) => {
       target.classList.toggle('answers-region__answers-table--hide')
 
-      if(target2){
+      if (target2) {
         target2.classList.toggle('answers-region__answers-list--hide')
       }
 

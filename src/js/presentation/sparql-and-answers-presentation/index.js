@@ -29,7 +29,10 @@ module.exports = class {
       sparqlPresentationShow(dom, sparqlNumber, sparql)
       const [list, table, graph] = answersPresentationShow(dom, anchoredPgp, solution)
 
-      for (const {url, label} of answers) {
+      for (const {
+        url,
+        label
+      } of answers) {
         list.updateLabel(url, label)
         table.updateLabel(url, label)
         graph.updateLabel(url, label)

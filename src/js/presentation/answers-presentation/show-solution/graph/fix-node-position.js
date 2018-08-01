@@ -44,7 +44,7 @@ function specialSort(nodeOrder, a, b) {
   return nodeOrder[a.index] - nodeOrder[b.index]
 }
 
-function getOrderWhenThreeNode(edges){
+function getOrderWhenThreeNode(edges) {
   return getNodeOrder(getTwoEdgeNode(countEdge(edges)))
 }
 
@@ -64,8 +64,8 @@ function getTwoEdgeNode(edgeCount) {
 
 function countEdge(edges) {
   return edges.reduce((edgeCount, edge) => {
-    edgeCount[edge.subject] ++
-    edgeCount[edge.object] ++
+    edgeCount[edge.subject]++
+    edgeCount[edge.object]++
     return edgeCount
   }, {
     t1: 0,

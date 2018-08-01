@@ -5,7 +5,8 @@ module.exports = function(mappingsElement) {
 
   const mappings = JSON.parse(mappingsElement.innerHTML)
   const hasTerm = Object.keys(mappings)
-    .filter((key) => mappings[key].filter((term) => term).length > 0)
+    .filter((key) => mappings[key].filter((term) => term)
+      .length > 0)
 
   return Boolean(hasTerm.length)
 }

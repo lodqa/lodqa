@@ -24,7 +24,8 @@ module.exports = class extends EventEmitter {
   _setDefault(answers) {
     const withRendering = answers
       .filter((answer) => answer.urls)
-      .find((answer) => answer.urls.filter((u) => u.rendering).length)
+      .find((answer) => answer.urls.filter((u) => u.rendering)
+        .length)
 
     if (withRendering) {
       this._selected = {
