@@ -37,7 +37,7 @@ module.exports = class {
   }
 
   hideSparql(sparqlNumber, visible) {
-    this._solutions[sparqlNumber - 1].visible = visible
+    findSparql(this._solutions, Number(sparqlNumber)).visible = visible
   }
 
   get percentage() {
@@ -49,8 +49,8 @@ module.exports = class {
     for (const sparql of this._sparqls.values()) {
       if (this._sparqls_done.has(sparql.number)) {
         // The sparql was queried already!
-        if (this._solutions.find((s) => s.sparql.number === sparql.number)) {
-          const s = this._solutions.find((s) => s.sparql.number === sparql.number)
+        if (findSparql(this._solutions, sparql.number)) {
+          const s = findSparql(this._solutions, sparql.number)
           ret.push({
             hasSolution: true,
             uniqAnswersLength: s.answers.length,
@@ -80,4 +80,8 @@ module.exports = class {
       sparqlName: index + 1,
     }))
   }
+}
+
+function findSparql(solutions, sparqlNumber) {
+  return solutions.find((s) => s.sparql.number === sparqlNumber)
 }
