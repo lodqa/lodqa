@@ -1,22 +1,13 @@
 const {
   EventEmitter
 } = require('events')
-const DatasetContainer = require('./dataset-container')
 const AnswerContainer = require('./answer-container')
 
 module.exports = class extends EventEmitter {
   constructor(loader) {
     super()
 
-    this._datasetContainer = new DatasetContainer()
     this._answerContainer = new AnswerContainer()
-
-    // A Dataset with bgp will have SPARQLs
-    loader.on('sparql', ({
-      dataset
-    }) => {
-      this._datasetContainer.addDataset(dataset)
-    })
 
     loader.on('answer', ({
       dataset,
@@ -27,12 +18,7 @@ module.exports = class extends EventEmitter {
   }
 
   _addAnswer(dataset, anchored_pgp, sparql, answer) {
-    const {
-      datasetName,
-      datasetNumber
-    } = this._datasetContainer.getDatasetNumer(dataset)
-
-    this._answerContainer.addAnswer(answer, datasetName, datasetNumber, sparql.number)
+    this._answerContainer.addAnswer(answer, dataset.name, dataset.number, sparql.number)
     this.emit('answer_summary_update_event')
   }
 

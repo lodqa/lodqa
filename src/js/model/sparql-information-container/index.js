@@ -7,10 +7,10 @@ module.exports = class {
       anchored_pgp,
       sparql
     }) => {
-      if (!this._datasets.has(dataset)) {
-        this._datasets.set(dataset, new Map())
+      if (!this._datasets.has(dataset.name)) {
+        this._datasets.set(dataset.name, new Map())
       }
-      setSparql(this._datasets, dataset, sparql, anchored_pgp)
+      setSparql(this._datasets, dataset.name, sparql, anchored_pgp)
     })
 
     loader.on('solutions', ({
@@ -20,7 +20,7 @@ module.exports = class {
       solutions,
       error
     }) => {
-      const s = getSparql(this._datasets, dataset, sparql.number)
+      const s = getSparql(this._datasets, dataset.name, sparql.number)
       Object.assign(
         s, {
           solutions: {
@@ -37,7 +37,7 @@ module.exports = class {
       answer,
       label
     }) => {
-      const s = getSparql(this._datasets, dataset, sparql.number)
+      const s = getSparql(this._datasets, dataset.name, sparql.number)
       Object.assign(
         s, {
           answers: (s.answers || [])

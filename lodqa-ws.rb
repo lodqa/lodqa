@@ -198,7 +198,11 @@ class LodqaWS < Sinatra::Base
 							# Set read_timeout default 60 unless read_timeout parameter.
 							# Because value of params will be empty string when it is not set and ''.to_i returns 0.
 							read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
-							executor = Lodqa::OneByOneExecutor.new applicant, params['query'], parser_url: config[:parser_url], read_timeout: read_timeout, urilinks_url: settings.url_forwading_db
+							executor = Lodqa::OneByOneExecutor.new applicant,
+																										 params['query'],
+																										 parser_url: config[:parser_url],
+																										 read_timeout: read_timeout,
+																										 urilinks_url: settings.url_forwading_db
 							# Prepare to cancel
 							ws.on :close do
 								Logger::Logger.debug 'The WebSocket connection is closed.'
@@ -328,7 +332,7 @@ class LodqaWS < Sinatra::Base
 			[get_config(params)]
 		else
 			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
-		end
+		end.map.with_index(1) { |d, n| d.merge number: n }
 	end
 
 	def sample_queries_for(applicants, params)

@@ -15,15 +15,15 @@ module.exports = class extends EventEmitter {
       dataset,
       sparql
     }) => {
-      if (!this._datasets.has(dataset)) {
-        this._datasets.set(dataset, new DatasetProgress(dataset))
+      if (!this._datasets.has(dataset.name)) {
+        this._datasets.set(dataset.name, new DatasetProgress(dataset.name))
       }
 
-      this._datasets.get(dataset)
+      this._datasets.get(dataset.name)
         .addSparql(sparql)
       this.emit('progress_datasets_update_event')
 
-      if (dataset === this._selectdDataset) {
+      if (dataset.name === this._selectdDataset) {
         this.emit('progress_selected_dataset_update_event')
       }
     })
@@ -32,11 +32,11 @@ module.exports = class extends EventEmitter {
       dataset,
       sparql
     }) => {
-      this._datasets.get(dataset)
+      this._datasets.get(dataset.name)
         .startSparql(sparql)
       this.emit('progress_datasets_update_event')
 
-      if (dataset === this._selectdDataset) {
+      if (dataset.name === this._selectdDataset) {
         this.emit('progress_selected_dataset_update_event')
       }
     })
@@ -48,11 +48,11 @@ module.exports = class extends EventEmitter {
       solutions,
       error
     }) => {
-      this._datasets.get(dataset)
+      this._datasets.get(dataset.name)
         .finishSparql(error, anchored_pgp, sparql, solutions)
       this.emit('progress_datasets_update_event')
 
-      if (dataset === this._selectdDataset) {
+      if (dataset.name === this._selectdDataset) {
         this.emit('progress_selected_dataset_update_event')
       }
     })

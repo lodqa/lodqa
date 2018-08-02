@@ -9,7 +9,8 @@ module Lodqa
   class OneByOneExecutor
     attr_accessor :cancel_flag
 
-    def initialize dataset, query,
+    def initialize dataset,
+                   query,
                    parser_url: 'http://enju-gtrec.dbcls.jp',
                    urilinks_url: 'http://urilinks.lodqa.org',
                    read_timeout: 5,
@@ -48,14 +49,18 @@ module Lodqa
     end
 
     def perform
-      emit :datasets, dataset: @target_dataset[:name]
+      dataset = {
+        name: @target_dataset[:name],
+        number: @target_dataset[:number]
+      }
+      emit :datasets, dataset: dataset
 
       # pgp
-      emit :pgp, dataset: @target_dataset[:name], pgp: pgp
+      emit :pgp, dataset: dataset, pgp: pgp
 
       # mappings
       mappings = mappings(@target_dataset[:dictionary_url], pgp)
-      emit :mappings, dataset: @target_dataset[:name], pgp: pgp, mappings: mappings
+      emit :mappings, dataset: dataset, pgp: pgp, mappings: mappings
 
       # Lodqa(anchored_pgp)
       endpoint_options = {
@@ -107,13 +112,13 @@ module Lodqa
             number: @sparql_count
           }
 
-          emit :sparql, dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
+          emit :sparql, dataset: dataset, pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
 
           # Get solutions of SPARQL
-          get_solutions_of_sparql_async endpoint, pgp, mappings, anchored_pgp, bgp, sparql, queue
+          get_solutions_of_sparql_async endpoint, dataset, pgp, mappings, anchored_pgp, bgp, sparql, queue
 
           # Emit an event to notify starting of querying the SPARQL.
-          emit :query_sparql, dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
+          emit :query_sparql, dataset: dataset, pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
           count += 1
 
           if count >= parallel
@@ -135,7 +140,7 @@ module Lodqa
         stats = {
           parallel: parallel,
           duration: Time.now - start,
-          dataset: @target_dataset[:name],
+          dataset: dataset,
           sparqls: error + success,
           error: error,
           success: success,
@@ -160,30 +165,30 @@ module Lodqa
 
     private
 
-    def get_solutions_of_sparql_async endpoint, pgp, mappings, anchored_pgp, bgp, sparql, queue
+    def get_solutions_of_sparql_async endpoint, dataset, pgp, mappings, anchored_pgp, bgp, sparql, queue
       # Get solutions of SPARQL
       endpoint.query_async(sparql[:query]) do |e, result|
         case e
         when nil
           solutions = result.map(&:to_h)
 
-          emit :solutions, dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions
+          emit :solutions, dataset: dataset, pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions
 
           # Find the answer of the solutions.
           solutions.each do |solution|
             solution
               .select { |id| anchored_pgp[:focus] == id.to_s.gsub(/^i/, '') } # The answer is instance node of focus node.
-              .each { |_, uri| get_label_of_url endpoint, pgp, mappings, anchored_pgp, bgp, sparql, solutions, solution, uri }
+              .each { |_, uri| get_label_of_url endpoint, dataset, pgp, mappings, anchored_pgp, bgp, sparql, solutions, solution, uri }
           end
         when SparqlClient::EndpointTimeoutError
           Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} return a timeout error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
           emit :solutions,
-               dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: [],
+               dataset: dataset, pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: [],
                error: 'sparql timeout error'
         when SparqlClient::EndpointTemporaryError
           Logger::Logger.info "The SPARQL Endpoint #{e.endpoint_name} return a temporary error for #{e.sparql}, continue to the next SPARQL", error_message: e.message
           emit :solutions,
-               dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: [],
+               dataset: dataset, pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: [],
                error_message: 'endopoint temporary error'
         else
           Logger::Logger.error e
@@ -193,13 +198,13 @@ module Lodqa
       end
     end
 
-    def get_label_of_url endpoint, pgp, mappings, anchored_pgp, bgp, sparql, solutions, solution, uri
+    def get_label_of_url endpoint, dataset, pgp, mappings, anchored_pgp, bgp, sparql, solutions, solution, uri
       # WebSocket message will be disorderd if additional informations are get ascynchronously
       label = label(endpoint, uri)
       urls, first_rendering = forwarded_urls(uri)
 
       emit :answer,
-           dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions,
+           dataset: dataset, pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql, solutions: solutions,
            solution: solution,
            answer: { uri: uri, label: label, urls: urls&.select { |u| u[:forwarding][:url].length < 10_000 }, first_rendering: first_rendering }
     end
