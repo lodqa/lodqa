@@ -8,13 +8,9 @@ module.exports = class {
       sparql
     }) => {
       if (!this._datasets.has(dataset)) {
-        this._datasets.set(dataset, [])
+        this._datasets.set(dataset, new Map())
       }
-      this._datasets.get(dataset)
-        .push({
-          anchoredPgp: anchored_pgp,
-          sparql
-        })
+      setSparql(this._datasets, dataset, sparql, anchored_pgp)
     })
 
     loader.on('solutions', ({
@@ -24,14 +20,14 @@ module.exports = class {
       solutions,
       error
     }) => {
-      this._datasets.get(dataset)
-        .filter((s) => s.sparql === sparql)
-        .forEach((s) => {
-          s.solutions = {
+      const s = getSparql(this._datasets, dataset, sparql.number)
+      Object.assign(
+        s, {
+          solutions: {
             solutions,
             bgp
           },
-          s.error = error
+          error: error
         })
     })
 
@@ -41,21 +37,34 @@ module.exports = class {
       answer,
       label
     }) => {
-      this._datasets.get(dataset)
-        .filter((s) => s.sparql === sparql)
-        .forEach((s) => {
-          if (!s.answers) {
-            s.answers = []
-          }
-          s.answers.push({
-            url: answer[1],
-            label
-          })
+      const s = getSparql(this._datasets, dataset, sparql.number)
+      Object.assign(
+        s, {
+          answers: (s.answers || [])
+            .concat([{
+              url: answer[1],
+              label
+            }])
         })
     })
   }
 
   getSparql(dataset, sparqlNumber) {
-    return this._datasets.get(dataset)[sparqlNumber - 1]
+    return getSparql(this._datasets, dataset, Number(sparqlNumber))
   }
+}
+
+function setSparql(datasets, dataset, sparql, anchored_pgp) {
+  return datasets
+    .get(dataset)
+    .set(sparql.number, {
+      anchoredPgp: anchored_pgp,
+      sparql: sparql.query
+    })
+}
+
+function getSparql(datasets, dataset, sparqlNumber) {
+  return datasets
+    .get(dataset)
+    .get(sparqlNumber)
 }

@@ -29,6 +29,8 @@ module Lodqa
       # For event emitting
       @event_hadlers = {}
       @event_data = {}
+
+      @sparql_count = 0
     end
 
     # Bind event handler to events
@@ -89,15 +91,21 @@ module Lodqa
 
         # GraphFinder(bgb)
         graph_finder = GraphFinder.new(endpoint, nil, graph_finder_options)
-        graph_finder.sparqls_of anchored_pgp do |bgp, sparql|
+        graph_finder.sparqls_of anchored_pgp do |bgp, sparql_query|
           if @cancel_flag
             Logger::Logger.debug "Stop during processing an bgp: #{bgp}"
             return
           end
 
           # Skip querying duplicated SPARQL.
-          next if known_sparql.member? sparql
-          known_sparql << sparql
+          next if known_sparql.member? sparql_query
+          known_sparql << sparql_query
+
+          @sparql_count += 1
+          sparql = {
+            query: sparql_query,
+            number: @sparql_count
+          }
 
           emit :sparql, dataset: @target_dataset[:name], pgp: pgp, mappings: mappings, anchored_pgp: anchored_pgp, bgp: bgp, sparql: sparql
 
@@ -154,7 +162,7 @@ module Lodqa
 
     def get_solutions_of_sparql_async endpoint, pgp, mappings, anchored_pgp, bgp, sparql, queue
       # Get solutions of SPARQL
-      endpoint.query_async(sparql) do |e, result|
+      endpoint.query_async(sparql[:query]) do |e, result|
         case e
         when nil
           solutions = result.map(&:to_h)

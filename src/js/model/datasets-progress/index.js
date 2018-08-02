@@ -28,7 +28,6 @@ module.exports = class extends EventEmitter {
       }
     })
 
-    // ここに検索開始が追加される予定
     loader.on('query_sparql', ({
       dataset,
       sparql

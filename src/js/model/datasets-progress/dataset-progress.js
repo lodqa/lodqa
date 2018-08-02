@@ -21,12 +21,11 @@ module.exports = class {
   }
 
   startSparql(sparql) {
-    this._sparqls_in_progress.add(sparql)
+    this._sparqls_in_progress.add(sparql.number)
   }
 
   finishSparql(error, anchoredPgp, sparql, solutions) {
-    // 順序が入れ替わるので、ここでプログレスから消すのはダメっぽい
-    this._sparqls_done.add(sparql)
+    this._sparqls_done.add(sparql.number)
     this.value = this._sparqls_done.size
 
     this._solutions.push({
@@ -48,10 +47,10 @@ module.exports = class {
   get snapshot() {
     const ret = []
     for (const sparql of this._sparqls.values()) {
-      if (this._sparqls_done.has(sparql)) {
+      if (this._sparqls_done.has(sparql.number)) {
         // The sparql was queried already!
-        if (this._solutions.find((s) => s.sparql === sparql)) {
-          const s = this._solutions.find((s) => s.sparql === sparql)
+        if (this._solutions.find((s) => s.sparql.number === sparql.number)) {
+          const s = this._solutions.find((s) => s.sparql.number === sparql.number)
           ret.push({
             hasSolution: true,
             uniqAnswersLength: s.answers.length,
@@ -61,7 +60,7 @@ module.exports = class {
         } else {
           console.assert(false, 'All completed sparqs SHOULD have solutions.')
         }
-      } else if (this._sparqls_in_progress.has(sparql)) {
+      } else if (this._sparqls_in_progress.has(sparql.number)) {
         // The sparql is searching now.
         ret.push({
           hasSolution: false,

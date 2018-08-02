@@ -13,12 +13,11 @@ module.exports = class extends EventEmitter {
 
     // A Dataset with bgp will have SPARQLs
     loader.on('sparql', ({
-      dataset,
-      sparql
+      dataset
     }) => {
       this._datasetContainer.addDataset(dataset)
-      this._datasetContainer.addSparql(dataset, sparql)
     })
+
     loader.on('answer', ({
       dataset,
       anchored_pgp,
@@ -30,11 +29,10 @@ module.exports = class extends EventEmitter {
   _addAnswer(dataset, anchored_pgp, sparql, answer) {
     const {
       datasetName,
-      datasetNumber,
-      sparqlNumber
-    } = this._datasetContainer.getSparqlNumer(dataset, sparql)
+      datasetNumber
+    } = this._datasetContainer.getDatasetNumer(dataset)
 
-    this._answerContainer.addAnswer(answer, datasetName, datasetNumber, sparqlNumber)
+    this._answerContainer.addAnswer(answer, datasetName, datasetNumber, sparql.number)
     this.emit('answer_summary_update_event')
   }
 

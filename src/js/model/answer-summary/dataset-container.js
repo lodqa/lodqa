@@ -13,22 +13,13 @@ module.exports = class DatasetContainer {
     }
   }
 
-  addSparql(dataset, sparql) {
+  getDatasetNumer(dataset) {
     if (this._dataset.has(dataset)) {
       dataset = this._dataset.get(dataset)
-      dataset.addSparql(sparql)
-    }
-  }
-
-  getSparqlNumer(dataset, sparql) {
-    if (this._dataset.has(dataset)) {
-      dataset = this._dataset.get(dataset)
-      const sparqlNumber = dataset.getSparqlNumer(sparql)
 
       return {
         datasetName: dataset.name,
-        datasetNumber: dataset.number,
-        sparqlNumber
+        datasetNumber: dataset.number
       }
     }
   }
