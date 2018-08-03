@@ -15,11 +15,7 @@ module.exports = class extends EventEmitter {
       dataset,
       sparql
     }) => {
-      if (!this._datasets.has(dataset.name)) {
-        this._datasets.set(dataset.name, new DatasetProgress(dataset.name))
-      }
-
-      this._datasets.get(dataset.name)
+      getDataset(this._datasets, dataset.name)
         .addSparql(sparql)
       this.emit('progress_datasets_update_event')
 
@@ -32,7 +28,7 @@ module.exports = class extends EventEmitter {
       dataset,
       sparql
     }) => {
-      this._datasets.get(dataset.name)
+      getDataset(this._datasets, dataset.name)
         .startSparql(sparql)
       this.emit('progress_datasets_update_event')
 
@@ -48,7 +44,7 @@ module.exports = class extends EventEmitter {
       solutions,
       error
     }) => {
-      this._datasets.get(dataset.name)
+      getDataset(this._datasets, dataset.name)
         .finishSparql(error, anchored_pgp, sparql, solutions)
       this.emit('progress_datasets_update_event')
 
@@ -111,4 +107,13 @@ module.exports = class extends EventEmitter {
         show: progress.name === this._selectdDataset
       }))
   }
+}
+
+// Supports out-of-order events
+function getDataset(datasets, name) {
+  if (!datasets.has(name)) {
+    datasets.set(name, new DatasetProgress(name))
+  }
+
+  return datasets.get(name)
 }

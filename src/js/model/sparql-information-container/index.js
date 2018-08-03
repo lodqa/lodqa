@@ -1,3 +1,6 @@
+const setSparql = require('./set-sparql')
+const getSparql = require('./get-sparql')
+
 module.exports = class {
   constructor(loader) {
     this._datasets = new Map()
@@ -6,21 +9,17 @@ module.exports = class {
       dataset,
       anchored_pgp,
       sparql
-    }) => {
-      if (!this._datasets.has(dataset.name)) {
-        this._datasets.set(dataset.name, new Map())
-      }
-      setSparql(this._datasets, dataset.name, sparql, anchored_pgp)
-    })
+    }) => setSparql(this._datasets, dataset.name, sparql, anchored_pgp))
 
     loader.on('solutions', ({
       dataset,
+      anchored_pgp,
       bgp,
       sparql,
       solutions,
       error
     }) => {
-      const s = getSparql(this._datasets, dataset.name, sparql.number)
+      const s = getSparql(this._datasets, dataset.name, sparql, anchored_pgp)
       Object.assign(
         s, {
           solutions: {
@@ -37,7 +36,7 @@ module.exports = class {
       answer,
       label
     }) => {
-      const s = getSparql(this._datasets, dataset.name, sparql.number)
+      const s = getSparql(this._datasets, dataset.name, sparql)
       Object.assign(
         s, {
           answers: (s.answers || [])
@@ -52,19 +51,4 @@ module.exports = class {
   getSparql(dataset, sparqlNumber) {
     return getSparql(this._datasets, dataset, Number(sparqlNumber))
   }
-}
-
-function setSparql(datasets, dataset, sparql, anchored_pgp) {
-  return datasets
-    .get(dataset)
-    .set(sparql.number, {
-      anchoredPgp: anchored_pgp,
-      sparql: sparql.query
-    })
-}
-
-function getSparql(datasets, dataset, sparqlNumber) {
-  return datasets
-    .get(dataset)
-    .get(sparqlNumber)
 }

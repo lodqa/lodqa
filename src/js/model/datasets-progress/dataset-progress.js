@@ -14,15 +14,21 @@ module.exports = class {
   }
 
   addSparql(sparql) {
-    this._sparqls.add(sparql)
+    this._sparqls.add(sparql.number)
     this.max = this._sparqls.size
   }
 
   startSparql(sparql) {
+    // Supports out-of-order events
+    this.addSparql(sparql)
+
     this._sparqls_in_progress.add(sparql.number)
   }
 
   finishSparql(error, anchoredPgp, sparql, solutions) {
+    // Supports out-of-order events
+    this.addSparql(sparql)
+
     this._sparqls_done.set(sparql.number, {
       sparql,
       error,
@@ -43,10 +49,10 @@ module.exports = class {
 
   get snapshot() {
     const ret = []
-    for (const sparql of this._sparqls.values()) {
-      if (this._sparqls_done.has(sparql.number)) {
+    for (const sparqlNumber of this._sparqls.values()) {
+      if (this._sparqls_done.has(sparqlNumber)) {
         // The sparql was queried already!
-        const s = this._sparqls_done.get(sparql.number)
+        const s = this._sparqls_done.get(sparqlNumber)
         ret.push({
           sparqlNumber,
           hasSolution: true,
@@ -54,7 +60,7 @@ module.exports = class {
           visible: s.visible,
           error: s.error
         })
-      } else if (this._sparqls_in_progress.has(sparql.number)) {
+      } else if (this._sparqls_in_progress.has(sparqlNumber)) {
         // The sparql is searching now.
         ret.push({
           sparqlNumber,
