@@ -78,7 +78,7 @@ module.exports = class extends EventEmitter {
 
   hideSparql(dataset, sparqlNumber, show) {
     this._datasets.get(dataset)
-      .hideSparql(sparqlNumber, show)
+      .toggleAnswerVisibility(sparqlNumber, show)
   }
 
   get stateOfSparqlsOfSelectedDataset() {

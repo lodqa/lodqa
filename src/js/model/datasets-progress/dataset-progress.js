@@ -6,9 +6,7 @@ module.exports = class {
 
     this._sparqls = new Set()
     this._sparqls_in_progress = new Set()
-    this._sparqls_done = new Set()
-
-    this._solutions = []
+    this._sparqls_done = new Map()
 
     this.max = 0
     this.value = 0
@@ -25,19 +23,18 @@ module.exports = class {
   }
 
   finishSparql(error, anchoredPgp, sparql, solutions) {
-    this._sparqls_done.add(sparql.number)
-    this.value = this._sparqls_done.size
-
-    this._solutions.push({
+    this._sparqls_done.set(sparql.number, {
       sparql,
       error,
       answers: getUniqAnswers(solutions, anchoredPgp.focus),
       visible: true
     })
+    this.value = this._sparqls_done.size
   }
 
-  hideSparql(sparqlNumber, visible) {
-    findSparql(this._solutions, Number(sparqlNumber)).visible = visible
+  toggleAnswerVisibility(sparqlNumber, visible) {
+    this._sparqls_done.get(Number(sparqlNumber))
+      .visible = visible
   }
 
   get percentage() {
@@ -49,39 +46,33 @@ module.exports = class {
     for (const sparql of this._sparqls.values()) {
       if (this._sparqls_done.has(sparql.number)) {
         // The sparql was queried already!
-        if (findSparql(this._solutions, sparql.number)) {
-          const s = findSparql(this._solutions, sparql.number)
-          ret.push({
-            hasSolution: true,
-            uniqAnswersLength: s.answers.length,
-            visible: s.visible,
-            error: s.error
-          })
-        } else {
-          console.assert(false, 'All completed sparqs SHOULD have solutions.')
-        }
+        const s = this._sparqls_done.get(sparql.number)
+        ret.push({
+          sparqlNumber,
+          hasSolution: true,
+          uniqAnswersLength: s.answers.length,
+          visible: s.visible,
+          error: s.error
+        })
       } else if (this._sparqls_in_progress.has(sparql.number)) {
         // The sparql is searching now.
         ret.push({
+          sparqlNumber,
           hasSolution: false,
           isProgress: true
         })
       } else {
         // The sparql is not queried yet.
         ret.push({
+          sparqlNumber,
           hasSolution: false
         })
       }
     }
 
-    return ret.map((s, index) => Object.assign(s, {
+    return ret.map((s) => Object.assign(s, {
       datasetName: this.name,
-      sparqlNumber: index + 1,
-      sparqlName: index + 1,
+      sparqlName: s.sparqlNumber,
     }))
   }
-}
-
-function findSparql(solutions, sparqlNumber) {
-  return solutions.find((s) => s.sparql.number === sparqlNumber)
 }
