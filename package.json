@@ -5,15 +5,15 @@
   "author": "jdkim",
   "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {
-    "parse5": "^3.0.3"
+    "parse5": "^5.0.0"
   },
   "devDependencies": {
-    "browserify": "^14.5.0",
-    "eslint": "^4.9.0",
-    "eslint-plugin-import": "^2.8.0",
+    "browserify": "^16.2.2",
+    "eslint": "^4.19.1",
+    "eslint-plugin-import": "^2.13.0",
     "handlebars": "^4.0.11",
-    "npm-run-all": "^4.1.1",
-    "sparql-fetch-label": "^0.0.1",
+    "npm-run-all": "^4.1.3",
+    "sparql-fetch-label": "0.0.3",
     "uglify-es": "^3.3.9"
   },
   "homepage": "https://github.com/lodqa/lodqa.git",
@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "npm run browserify",
-    "bump" : "npm-run-all --parallel bump:*",
+    "bump": "npm-run-all --parallel bump:*",
     "lint": "eslint src",
     "browserify": "npm-run-all --parallel browserify:*",
     "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
