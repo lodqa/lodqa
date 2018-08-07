@@ -68,6 +68,7 @@ class LodqaWS < Sinatra::Base
 			raise ArgumentError, "Currently only queries in English is accepted." unless language == 'en'
 
 			template = Lodqa::Graphicator.new(@config[:parser_url]).parse(string).template
+			template = [template]
 
 			headers 'Content-Type' => 'application/json'
 			body template.to_json
