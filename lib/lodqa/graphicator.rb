@@ -26,7 +26,7 @@ class Lodqa::Graphicator
   end
 
   def template
-    pgp2template(graphicate(@parse))
+    pgp2template(pgp)
   end
 
   private
@@ -34,15 +34,24 @@ class Lodqa::Graphicator
   def pgp2template(pgp)
     nodes, edges, focus = pgp[:nodes], pgp[:edges], pgp[:focus].to_sym
 
+    pattern_what = true if nodes[focus][:text].downcase == 'what'
+    pattern_noun = !pattern_what
+    pattern_noun_of = true if !pattern_what && edges.find{|e| e[:subject].to_sym == focus && e[:text] == 'of'}
+
     query  = "SELECT ?#{focus} WHERE {"
-    query += " ?#{focus} ?p0 ?c#{focus} ." unless nodes[focus][:text].downcase == 'what'
+    if pattern_noun_of
+      # do nothing here
+    elsif pattern_noun
+      query += " ?#{focus} ?p0 ?c#{focus} ."
+    end
     query += edges.map.with_index{|e, i| " ?#{e[:subject]} ?p#{i+1} ?#{e[:object]} ."}.join
     query += " }"
 
     slots = []
 
     nodes.each do |k, n|
-      next if k == focus && nodes[focus][:text].downcase == 'what'
+      next if pattern_what && k == focus
+      next if pattern_noun_of && k == focus
 
       v    = (k == focus) ? "c#{k}" : k
       type = (k == focus) ? "rdf:Class" : "rdf:Class|rdf:Resource"
@@ -53,10 +62,16 @@ class Lodqa::Graphicator
       slots << {s:v, p:"verbalization", o:text}
     end
 
-    slots << {s:"p0", p:"is", o:"<http://lodqa.org/vocabulary/sort_of>"} unless nodes[focus][:text].downcase == 'what'
+    slots << {s:"p0", p:"is", o:"<http://lodqa.org/vocabulary/sort_of>"} if pattern_noun && !pattern_noun_of
+
     edges.each_with_index do |e, i|
-      slots << {s:"p#{i+1}", p:"is", o:"rdf:Property"}
-      slots << {s:"p#{i+1}", p:"verbalization", o:e[:text]}
+      if pattern_noun_of && e[:subject].to_sym == focus && e[:text] == 'of'
+        slots << {s:"p#{i+1}", p:"is", o:"rdf:Property"}
+        slots << {s:"p#{i+1}", p:"verbalization", o:nodes[focus][:text]}
+      else
+        slots << {s:"p#{i+1}", p:"is", o:"rdf:Property"}
+        slots << {s:"p#{i+1}", p:"verbalization", o:e[:text]}
+      end
     end
 
     {query:query, slots:slots}
