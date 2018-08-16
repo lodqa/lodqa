@@ -219,6 +219,7 @@ table.list {
 .answers-region {
     margin-left: 5px;
     margin-top: 10px;
+    width: 735px;
 }
 
 .sparql-region {
