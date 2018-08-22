@@ -3,6 +3,11 @@ services:
   uri-forwarding-db:
     build: https://github.com/lodqa/uri-forwarding-db.git
 
+  lodqa_bs:
+    build: https://github.com/lodqa/lodqa_bs.git
+    ports:
+      - 81:3000
+
   lodqa:
     build: .
     ports:
@@ -10,8 +15,11 @@ services:
     volumes:
       - .:/app
     environment:
+      - LODQA=http://lodqa:9292
+      - LODQA_BS=http://lodqa_bs:3000
       - URL_FORWARDING_DB=http://uri-forwarding-db:3000
     env_file:
       - sendgrid.env
     depends_on:
       - uri-forwarding-db
+      - lodqa_bs
