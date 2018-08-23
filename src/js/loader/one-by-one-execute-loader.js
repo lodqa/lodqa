@@ -7,8 +7,8 @@ module.exports = class extends EventEmitter {
     super()
   }
 
-  begin(pathname, query, target, readTimeout) {
-    this._ws = openConnection(this, pathname, query, target, readTimeout)
+  begin(pathname, params) {
+    this._ws = openConnection(this, pathname, params)
   }
 
   stop() {
@@ -18,8 +18,10 @@ module.exports = class extends EventEmitter {
   }
 }
 
-function openConnection(emitter, pathname, query, target, readTimeout) {
-  const ws = new WebSocket(`ws://${location.host}${pathname}?query=${query}&target=${target}&read_timeout=${readTimeout}`)
+function openConnection(emitter, pathname, params) {
+  const queryParameters = toQueryParameters(params)
+  const url = `ws://${location.host}${pathname}${queryParameters ? `?${queryParameters}` : ''}`
+  const ws = new WebSocket(url)
   ws.onopen = () => emitter.emit('open')
   ws.onclose = () => emitter.emit('close')
   ws.onmessage = ({
@@ -31,4 +33,12 @@ function openConnection(emitter, pathname, query, target, readTimeout) {
   }
 
   return ws
+}
+
+function toQueryParameters(paramsMap) {
+  const params = []
+  for (const [key, value] of paramsMap.entries()) {
+    params.push(`${key}=${value}`)
+  }
+  return params.join('&')
 }

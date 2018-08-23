@@ -1,8 +1,10 @@
 module.exports = function(loader) {
   const pathname = '/one_by_one_execute'
   const url = new URLSearchParams(window.location.search)
-  const query = url.get('query') || ''
-  const target = url.get('target') || ''
-  const readTimeout = url.get('read_timeout') || ''
-  loader.begin(pathname, query, target, readTimeout)
+  loader.begin(pathname, new Map([
+    ['query', url.get('query') || ''],
+    ['query_id', url.get('query_id') || ''],
+    ['target', url.get('target') || ''],
+    ['read_timeout', url.get('read_timeout') || '']
+  ]))
 }
