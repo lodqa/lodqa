@@ -187,50 +187,48 @@ class LodqaWS < Sinatra::Base
 		Logger::Logger.level =  Logger::INFO
 		Logger::Logger.request_id = Logger::Logger.generate_request_id
 
-		begin
-			ws = Faye::WebSocket.new(env)
-			config = get_config(params)
+		ws = Faye::WebSocket.new(env)
+		config = get_config(params)
 
-			# Pass the request id between threads.
-			request_id = Logger::Logger.request_id
-			ws.on :open do
-				Logger::Logger.request_id = request_id
-				begin
-					applicants = applicants_dataset(params)
-					applicants.each do | applicant |
-						Logger::Async.defer do
-							# Set read_timeout default 60 unless read_timeout parameter.
-							# Because value of params will be empty string when it is not set and ''.to_i returns 0.
-							read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
-							executor = Lodqa::OneByOneExecutor.new applicant,
-																										 params['query'],
-																										 parser_url: config[:parser_url],
-																										 read_timeout: read_timeout,
-																										 urilinks_url: settings.url_forwading_db
-							# Prepare to cancel
-							ws.on :close do
-								Logger::Logger.debug 'The WebSocket connection is closed.'
-								executor.cancel_flag = true
-							end
-
-							# Bind events to send messsage on the WebSocket
-							executor.on :datasets, :pgp, :mappings, :sparql, :query_sparql, :solutions, :answer, :gateway_error do | event, data |
-								ws.send({event: event}.merge(data).to_json)
-							end
-
-							executor.perform
-
-							# Close the web socket when all applicants are finished
-							applicant[:finished] = true
-							ws.close if applicants.all? { |a| a[:finished] }
+		# Pass the request id between threads.
+		request_id = Logger::Logger.request_id
+		ws.on :open do
+			Logger::Logger.request_id = request_id
+			begin
+				applicants = applicants_dataset(params)
+				applicants.each do | applicant |
+					Logger::Async.defer do
+						# Set read_timeout default 60 unless read_timeout parameter.
+						# Because value of params will be empty string when it is not set and ''.to_i returns 0.
+						read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
+						executor = Lodqa::OneByOneExecutor.new applicant,
+																									 params['query'],
+																									 parser_url: config[:parser_url],
+																									 read_timeout: read_timeout,
+																									 urilinks_url: settings.url_forwading_db
+						# Prepare to cancel
+						ws.on :close do
+							Logger::Logger.debug 'The WebSocket connection is closed.'
+							executor.cancel_flag = true
 						end
+
+						# Bind events to send messsage on the WebSocket
+						executor.on :datasets, :pgp, :mappings, :sparql, :query_sparql, :solutions, :answer, :gateway_error do | event, data |
+							ws.send({event: event}.merge(data).to_json)
+						end
+
+						executor.perform
+
+						# Close the web socket when all applicants are finished
+						applicant[:finished] = true
+						ws.close if applicants.all? { |a| a[:finished] }
 					end
-				rescue IOError => e
-					Logger::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
-					ws.close
-				rescue => e
-					Logger::Logger.error e
 				end
+			rescue IOError => e
+				Logger::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
+				ws.close
+			rescue => e
+				Logger::Logger.error e
 			end
 		end
 
