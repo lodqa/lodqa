@@ -8,7 +8,7 @@
                 </span>
             </button>
         </div>
-        <% if target_exists? params %>
+        <% if present_in? params, :target %>
         <input name="target" type="hidden" value="<%= params['target'] %>"/>
         <% end %>
         <input id="endpoint-url" type="hidden" value="<%= @endpoint_url %>"/>

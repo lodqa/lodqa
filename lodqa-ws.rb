@@ -77,7 +77,7 @@ class LodqaWS < Sinatra::Base
 
 	get '/answer' do
 		parse_params
-		@target = params['target'] if target_exists? params
+		@target = params['target'] if present_in? params, :target
 
 		applicants = applicants_dataset(params)
 		if applicants.length > 0
@@ -296,8 +296,8 @@ class LodqaWS < Sinatra::Base
 
 	private
 
-	def target_exists?(params)
-		!params['target'].nil? && !params['target'].empty?
+	def present_in? hash, name
+		hash[name] && !hash[name].strip.empty?
 	end
 
 	def parse_params
@@ -319,18 +319,18 @@ class LodqaWS < Sinatra::Base
 		config = Lodqa::Configuration.default(settings.root)
 
 		# target name passed through params
-		if target_exists? params
+		if present_in? params, :target
 			target_url = settings.target_db + '/' + params['target'] + '.json'
 			config_add = Lodqa::Configuration.for_target target_url
 			config.merge! config_add unless config_add.nil?
 		end
 
-	  config['dictionary_url'] = params['dictionary_url'] unless params['dictionary_url'].nil? || params['dictionary_url'].strip.empty?
+	  config['dictionary_url'] = params['dictionary_url'] if present_in? params, :dictionary_url
 	  config
 	end
 
 	def applicants_dataset(params)
-		if target_exists? params
+		if present_in? params, :target
 			[get_config(params)]
 		else
 			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
