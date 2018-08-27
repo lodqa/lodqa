@@ -109,13 +109,10 @@ class LodqaWS < Sinatra::Base
 
 	# Command for test: curl -H "content-type:application/json" -d '{"keywords":["drug", "genes"]} http://localhost:9292/termfinder'
 	post '/termfinder' do
-		config = get_config(params)
-
-		tf = Term::Finder.new(config['dictionary_url'])
-
-		keywords = params['keywords']
 		begin
-			mappings = tf.find(keywords)
+			tf = Term::Finder.new params[:dictionary_url]
+			keywords = params[:'keywords']
+			mappings = tf.find keywords
 
 			headers \
 				"Access-Control-Allow-Origin" => "*"
@@ -325,7 +322,6 @@ class LodqaWS < Sinatra::Base
 			config.merge! config_add unless config_add.nil?
 		end
 
-	  config['dictionary_url'] = params['dictionary_url'] if present_in? params, :dictionary_url
 	  config
 	end
 
