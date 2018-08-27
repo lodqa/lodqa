@@ -145,14 +145,18 @@ class LodqaWS < Sinatra::Base
 			applicants = applicants_dataset(params)
 			applicants.each do | applicant |
 				Logger::Async.defer do
-					executor = Lodqa::OneByOneExecutor.new
+					executor = Lodqa::OneByOneExecutor.new applicant,
+																								 params['query'],
+																								 parser_url: get_config(params)[:parser_url],
+																								 read_timeout: 60,
+																								 urilinks_url: settings.url_forwading_db
 
 					# Bind events to gather answers
 					executor.on :answer do | event, data |
 						answers[data[:answer][:uri]] = data[:answer][:label]
 					end
 
-					executor.search_query applicant, get_config(params)[:parser_url], params['query'], 60, settings.url_forwading_db
+					executor.perform
 
 					# Send email when all applicants are finished
 					applicant[:finished] = true
