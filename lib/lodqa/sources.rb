@@ -10,12 +10,12 @@ module Lodqa
             case response.code
             when 200 then JSON.parse response, {:symbolize_names => true}
             else
-              Logger.error nil, message: "Configuration Server retrun an error for #{target_url}", response_code: response.code, response_body: response.body
+              Logger::Logger.error nil, message: "Configuration Server retrun an error for #{target_url}", response_code: response.code, response_body: response.body
               raise IOError, "Response Error for url: #{target_url}"
             end
           end
         rescue => e
-          Logger.error e, message: "Cannot connect the Configuration Server for #{target_url}"
+          Logger::Logger.error e, message: "Cannot connect the Configuration Server for #{target_url}"
           raise SourceError, "invalid url #{target_url}"
         end
       end
