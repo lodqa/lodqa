@@ -45,7 +45,7 @@ class LodqaWS < Sinatra::Base
 			logger.info "access /"
 			parse_params
 
-			applicants = applicants_dataset(params)
+			applicants = applicants_dataset(params[:target])
 			@sample_queries = sample_queries_for applicants, params
 
 			erb :index
@@ -79,7 +79,7 @@ class LodqaWS < Sinatra::Base
 		parse_params
 		@target = params['target'] if present_in? params, :target
 
-		applicants = applicants_dataset(params)
+		applicants = applicants_dataset(params[:target])
 		if applicants.length > 0
 			erb :answer
 		else
@@ -139,7 +139,7 @@ class LodqaWS < Sinatra::Base
 		begin
 			start_time = Time.now
 			answers = {}
-			applicants = applicants_dataset(params)
+			applicants = applicants_dataset(params[:target])
 			applicants.each do | applicant |
 				Logger::Async.defer do
 					executor = Lodqa::OneByOneExecutor.new applicant,
@@ -192,7 +192,7 @@ class LodqaWS < Sinatra::Base
 		ws.on :open do
 			Logger::Logger.request_id = request_id
 			begin
-				applicants = applicants_dataset(params)
+				applicants = applicants_dataset params[:target]
 				applicants.each do | applicant |
 					Logger::Async.defer do
 						# Set read_timeout default 60 unless read_timeout parameter.
@@ -323,9 +323,9 @@ class LodqaWS < Sinatra::Base
 	  default_config
 	end
 
-	def applicants_dataset(params)
-		if present_in? params, :target
-			[config_default_or_for(params[:target])]
+	def applicants_dataset(target)
+		if present? target
+			[config_default_or_for(target)]
 		else
 			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 		end.map.with_index(1) { |d, n| d.merge number: n }
