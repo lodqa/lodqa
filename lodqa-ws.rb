@@ -237,7 +237,7 @@ class LodqaWS < Sinatra::Base
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
-		config = get_config(params)
+		config = config_default_or_for params[:target]
 
 		begin
 			ws = Faye::WebSocket.new(env)
@@ -294,11 +294,11 @@ class LodqaWS < Sinatra::Base
 	private
 
 	def present_in? hash, name
-		hash[name] && !hash[name].strip.empty?
+		present? hash[name]
 	end
 
 	def parse_params
-		@config = get_config(params)
+		@config = config_default_or_for params[:target]
 		@query  = params['query'] unless params['query'].nil?
 	end
 
@@ -311,23 +311,21 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def get_config(params)
-		# default configuration
-		config = Lodqa::Configuration.default(settings.root)
+	def config_default_or_for(target)
+		default_config = Lodqa::Configuration.default(settings.root)
 
-		# target name passed through params
-		if present_in? params, :target
-			target_url = settings.target_db + '/' + params['target'] + '.json'
-			config_add = Lodqa::Configuration.for_target target_url
-			config.merge! config_add unless config_add.nil?
+		if present? target
+			target_url = "#{settings.target_db}/#{target}.json"
+			target_config = Lodqa::Configuration.for_target target_url
+			return default_config.merge target_config
 		end
 
-	  config
+	  default_config
 	end
 
 	def applicants_dataset(params)
 		if present_in? params, :target
-			[get_config(params)]
+			[config_default_or_for(params[:target])]
 		else
 			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 		end.map.with_index(1) { |d, n| d.merge number: n }
@@ -366,5 +364,9 @@ class LodqaWS < Sinatra::Base
 	# Get value from the `config/default-setting.json`.
 	def parser_url
 	  Lodqa::Configuration.default(settings.root)[:parser_url]
+	end
+
+	def present? value
+		value && !value.strip.empty?
 	end
 end
