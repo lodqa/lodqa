@@ -67,7 +67,7 @@ class LodqaWS < Sinatra::Base
 			raise ArgumentError, "The parameter 'string' is missing." unless string
 			raise ArgumentError, "Currently only queries in English is accepted." unless language == 'en'
 
-			template = Lodqa::Graphicator.new(@config[:parser_url]).parse(string).template
+			template = Lodqa::Graphicator.new(parser_url).parse(string).template
 			template = [template]
 
 			headers 'Content-Type' => 'application/json'
@@ -101,7 +101,7 @@ class LodqaWS < Sinatra::Base
 		@need_proxy = @target == 'biogateway'
 
 		if @query
-			@pgp = Lodqa::PGPFactory.create @config[:parser_url], params['query']
+			@pgp = Lodqa::PGPFactory.create parser_url, params['query']
 		end
 
 		erb :grapheditor
@@ -147,7 +147,7 @@ class LodqaWS < Sinatra::Base
 				Logger::Async.defer do
 					executor = Lodqa::OneByOneExecutor.new applicant,
 																								 params['query'],
-																								 parser_url: get_config(params)[:parser_url],
+																								 parser_url: parser_url,
 																								 read_timeout: 60,
 																								 urilinks_url: settings.url_forwading_db
 
@@ -364,5 +364,11 @@ class LodqaWS < Sinatra::Base
 			.flatten
 			.compact
 			.slice(0, 15)
+	end
+
+	# The URL of parser service of natural language.
+	# Get value from the `config/default-setting.json`.
+	def parser_url
+	  Lodqa::Configuration.default(settings.root)[:parser_url]
 	end
 end
