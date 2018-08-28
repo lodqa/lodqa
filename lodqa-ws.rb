@@ -97,7 +97,7 @@ class LodqaWS < Sinatra::Base
 
 		# Set a parameter of the target
 		@target = params['target'] || @targets.first
-		@endpoint_url = @config[:endpoint_url]
+		@endpoint_url = config_default_or_for(@target)[:endpoint_url]
 		@need_proxy = @target == 'biogateway'
 
 		if @query
