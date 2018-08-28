@@ -48,6 +48,7 @@ class LodqaWS < Sinatra::Base
 			applicants = applicants_dataset(params[:target])
 			@sample_queries = sample_queries_for applicants, params
 
+			@config = config_default_or_for params[:target] if present_in params, :target
 			erb :index
 		rescue Lodqa::SourceError
 			[503, 'Failed to connect the Target Database.']
@@ -299,7 +300,6 @@ class LodqaWS < Sinatra::Base
 	end
 
 	def parse_params
-		@config = config_default_or_for params[:target]
 		@query  = params['query'] unless params['query'].nil?
 	end
 
