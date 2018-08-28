@@ -43,7 +43,7 @@ class LodqaWS < Sinatra::Base
 	get '/' do
 		begin
 			logger.info "access /"
-			parse_params
+			set_query_instance_variable
 
 			applicants = applicants_dataset(params[:target])
 			@sample_queries = sample_queries_for applicants, params
@@ -60,7 +60,7 @@ class LodqaWS < Sinatra::Base
 			# Change value to Logger::DEBUG to log for debugging.
 			Logger::Logger.level = Logger::INFO
 
-			parse_params
+			set_query_instance_variable
 
 			string = params['string']
 			language = params['language'] || 'en'
@@ -77,7 +77,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/answer' do
-		parse_params
+		set_query_instance_variable
 		@target = params['target'] if present_in? params, :target
 
 		applicants = applicants_dataset(params[:target])
@@ -91,7 +91,7 @@ class LodqaWS < Sinatra::Base
 
 	get '/grapheditor' do
 		logger.info "access /grapheditor"
-		parse_params
+		set_query_instance_variable
 
 		# Set a parameter of candidates of the target
 		@targets = get_targets
@@ -299,7 +299,7 @@ class LodqaWS < Sinatra::Base
 		present? hash[name]
 	end
 
-	def parse_params
+	def set_query_instance_variable
 		@query  = params['query'] unless params['query'].nil?
 	end
 
