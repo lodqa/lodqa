@@ -234,6 +234,7 @@ class LodqaWS < Sinatra::Base
 
 	get '/solutions' do
 		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
+		return [400, 'target parameter is required'] unless present_in? params, :target
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
