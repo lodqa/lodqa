@@ -48,7 +48,7 @@ class LodqaWS < Sinatra::Base
 			applicants = applicants_dataset(params[:target])
 			@sample_queries = sample_queries_for applicants, params
 
-			@config = config_default_or_for params[:target] if present_in params, :target
+			@config = dataset_config_of params[:target] if present_in? params, :target
 			erb :index
 		rescue Lodqa::SourceError
 			[503, 'Failed to connect the Target Database.']
@@ -98,7 +98,7 @@ class LodqaWS < Sinatra::Base
 
 		# Set a parameter of the target
 		@target = params['target'] || @targets.first
-		@endpoint_url = config_default_or_for(@target)[:endpoint_url]
+		@endpoint_url = dataset_config_of(@target)[:endpoint_url]
 		@need_proxy = @target == 'biogateway'
 
 		if @query
@@ -239,7 +239,7 @@ class LodqaWS < Sinatra::Base
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
-		config = config_default_or_for params[:target]
+		config = dataset_config_of params[:target]
 
 		begin
 			ws = Faye::WebSocket.new(env)
@@ -312,21 +312,13 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def config_default_or_for(target)
-		default_config = Lodqa::Configuration.default(settings.root)
-
-		if present? target
-			target_url = "#{settings.target_db}/#{target}.json"
-			target_config = Lodqa::Configuration.for_target target_url
-			return default_config.merge target_config
-		end
-
-	  default_config
+	def dataset_config_of(target)
+		Lodqa::Configuration.for_target "#{settings.target_db}/#{target}.json"
 	end
 
 	def applicants_dataset(target)
 		if present? target
-			[config_default_or_for(target)]
+			[dataset_config_of(target)]
 		else
 			Lodqa::Sources.applicants_from "#{settings.target_db}.json"
 		end.map.with_index(1) { |d, n| d.merge number: n }
