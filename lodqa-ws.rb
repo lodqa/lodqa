@@ -284,11 +284,17 @@ class LodqaWS < Sinatra::Base
 		WEB_SOCKETS[request_id] = ws
 
 		ws.on :open do
-			url = "#{ENV['LODQA_BS']}/queries/#{query_id}/subscriptions"
-			payload = {
-				callback_url: "#{ENV['LODQA']}/requests/#{request_id}/events"
-			}
-			RestClient::Request.execute method: :post, url: url, payload: payload
+			begin
+				url = "#{ENV['LODQA_BS']}/queries/#{query_id}/subscriptions"
+				payload = {
+					callback_url: "#{ENV['LODQA']}/requests/#{request_id}/events"
+				}
+				RestClient::Request.execute method: :post, url: url, payload: payload
+			rescue RestClient::NotFound
+				ws.send({event: :gateway_error, error_message: 'No runnnig qurey was found'}.to_json)
+			rescue Errno::ECONNREFUSED
+				ws.send({event: :gateway_error, error_message: 'LODQA bot server error'}.to_json)
+			end
 		end
 
 		ws.on(:close) { WEB_SOCKETS.delete request_id }

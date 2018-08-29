@@ -78,7 +78,7 @@ body {
 }
 
 .message__error {
-  color: transparent;
+  color: red;
 }
 
 .answer-summary {
