@@ -81,14 +81,14 @@ module Lodqa
       ex_predicates += @sortal_predicates
 
       unless ex_predicates.empty?
-        p_variables.each {|v| query += %| FILTER (str(?#{v}) NOT IN (#{ex_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
+        p_variables.each {|v| query += %| FILTER (?#{v} NOT IN (#{ex_predicates.map{|s| '<'+s+'>'}.join(', ')}))|}
       end
 
       ## constraintes on s-variables
       s_variables = variables.dup.keep_if{|v| v[0] == 's'}
 
       # s-variables to be bound to sortal predicates
-      s_variables.each {|v| query += %| FILTER (str(?#{v}) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))|}
+      s_variables.each {|v| query += %| FILTER (?#{v} IN (#{@sortal_predicates.map{|s| '<'+s+'>'}.join(', ')}))|}
 
       # query += "}"
       query += "} LIMIT #{@answer_limit}"
@@ -209,7 +209,7 @@ module Lodqa
     def sparql_for(term)
       sparql  = "SELECT ?p\n"
       sparql += "FROM <#{@graph_uri}>\n"  unless @graph_uri.nil? || @graph_uri.empty?
-      sparql += "WHERE {?s ?p <#{term}> FILTER (str(?p) IN (#{@sortal_predicates.map{|s| '"'+s+'"'}.join(', ')}))} LIMIT 1"
+      sparql += "WHERE {?s ?p <#{term}> FILTER (?p IN (#{@sortal_predicates.map{|s| '<'+s+'>'}.join(', ')}))} LIMIT 1"
       sparql
     end
 
