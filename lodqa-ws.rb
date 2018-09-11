@@ -77,7 +77,18 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/answer' do
-		set_query_instance_variable
+		if params['search_id']
+			# Get query from the LODQA_BS
+			begin
+				response = RestClient.get "#{ENV['LODQA_BS']}/searches/#{params['search_id']}"
+				@query = JSON.parse(response.body)['query']
+			rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
+				Logger::Logger.error e
+			end
+		else
+			set_query_instance_variable
+		end
+
 		@target = params['target'] if present_in? params, :target
 
 		applicants = applicants_dataset(params[:target])
