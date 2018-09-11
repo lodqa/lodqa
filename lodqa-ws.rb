@@ -285,7 +285,7 @@ class LodqaWS < Sinatra::Base
 
 		ws.on :open do
 			begin
-				url = "#{ENV['LODQA_BS']}/queries/#{query_id}/subscriptions"
+				url = "#{ENV['LODQA_BS']}/searches/#{query_id}/subscriptions"
 				payload = {
 					callback_url: "#{ENV['LODQA']}/requests/#{request_id}/events"
 				}
