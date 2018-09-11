@@ -189,8 +189,8 @@ class LodqaWS < Sinatra::Base
 
 		# Pass the request id between threads.
 		request_id = Logger::Logger.request_id
-		if present_in? params, :query_id
-			show_progress_in_lodqa_bs ws, request_id, params[:query_id]
+		if present_in? params, :search_id
+			show_progress_in_lodqa_bs ws, request_id, params[:search_id]
 		elsif present_in? params, :query
 			applicants = applicants_dataset params[:target]
 			# Set read_timeout default 60 unless read_timeout parameter.
@@ -280,12 +280,12 @@ class LodqaWS < Sinatra::Base
 
 	private
 
-	def show_progress_in_lodqa_bs ws, request_id, query_id
+	def show_progress_in_lodqa_bs ws, request_id, search_id
 		WEB_SOCKETS[request_id] = ws
 
 		ws.on :open do
 			begin
-				url = "#{ENV['LODQA_BS']}/searches/#{query_id}/subscriptions"
+				url = "#{ENV['LODQA_BS']}/searches/#{search_id}/subscriptions"
 				payload = {
 					callback_url: "#{ENV['LODQA']}/requests/#{request_id}/events"
 				}
