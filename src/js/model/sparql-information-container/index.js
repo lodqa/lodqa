@@ -49,6 +49,8 @@ module.exports = class {
   }
 
   getSparql(dataset, sparqlNumber) {
-    return getSparql(this._datasets, dataset, Number(sparqlNumber))
+    return getSparql(this._datasets, dataset, {
+      number: Number(sparqlNumber)
+    })
   }
 }
