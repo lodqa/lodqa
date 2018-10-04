@@ -385,3 +385,119 @@ body {
 .footer-lower {
   padding-left: 161px;
 }
+
+/* Styles for Smart Phones */
+@media only screen and (max-width: 800px) {
+  input {
+    font-size: large;
+  }
+
+  .button {
+    font-size: 20px;
+  }
+
+  #query {
+    font-size: 24px;
+  }
+
+  #main-nav {
+    display: none;
+  }
+
+  .content {
+    font-size: 1.5em;
+    padding-left: 10px;
+  }
+
+  .answer-summary {
+    font-size: 24px;
+    width: auto;
+  }
+
+  .answer-summary__answer-title {
+    height: 4em;
+    padding-bottom: 0.5em;
+  }
+
+  .answer-summary__answer-title-label {
+    font-size: 24px;
+  }
+
+  .answer-summary__answer-uri {
+    padding-bottom: 0.5em;
+  }
+
+  .answer-summary__answer-uri__cite {
+    font-size: 20px;
+  }
+
+  .answer-summary__answer-url-list {
+    padding-bottom: 0.5em;
+  }
+
+  .answer-summary__answer-url {
+    font-size: 24px;
+    margin-right: 16px;
+    margin-top: 20px;
+  }
+
+  .answer-summary__sparql-list {
+    font-size: 24px;
+    line-height: normal;
+    margin-bottom: 16px;
+    margin-top: 16px;
+  }
+
+  .answer-summary__sparql-list a {
+    margin-right: 16px;
+  }
+
+  .answer-summary-pages {
+    width: auto;
+    padding-right: 10px;
+  }
+
+  .answer-summary-pages__page {
+    width: 40px;
+  }
+
+  .answer-summary-pages__label {
+    font-size: 32px;
+  }
+
+  .download-answers__download-button {
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .download-answers__select-format {
+    font-size: 24px;
+    height: 38px;
+  }
+
+  .summary-progressbar {
+    padding-right: 10px;
+    width: auto;
+  }
+
+  .datasets-progressbar {
+    padding-right: 10px;
+    width: auto;
+  }
+
+  .datasets-progressbar__progressbar {
+    width: calc(100% - 75px);
+  }
+
+  .detail-progressbar__sparql-list {
+    width: 613px;
+  }
+
+  .footer-upper {
+    padding-left: 10px;
+  }
+
+  .footer-lower {
+    padding-left: 10px;
+  }
+}
