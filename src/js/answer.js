@@ -1,11 +1,11 @@
-const OneByOneExecuteLoader = require('./loader/one-by-one-execute-loader')
+const AnswerLoader = require('./loader/answer-loader')
 const createModelsAndBindItToLoader = require('./controller/answer/create-models-and-bind-it-to-loader')
 const bindUserEvents = require('./controller/answer/bind-user-events')
 const start = require('./controller/answer/start')
 
 ;
 (() => {
-  const loader = new OneByOneExecuteLoader()
+  const loader = new AnswerLoader()
 
   // Create models and bind them to the presentations.
   const {
