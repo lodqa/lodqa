@@ -5,7 +5,6 @@ require 'faye/websocket'
 require 'erb'
 require 'lodqa'
 require 'lodqa/one_by_one_executor'
-require 'lodqa/mail_sender'
 require 'lodqa/runner'
 require 'lodqa/bs_client'
 require 'json'
@@ -139,53 +138,6 @@ class LodqaWS < Sinatra::Base
 		headers \
 			"Access-Control-Allow-Origin" => "*",
 			"Access-Control-Allow-Headers" => "Content-Type"
-	end
-
-	# API to recieve answers by email
-	get '/query_by_e_mail' do
-		raise 'Error: API key for the SendGrid is not set!' unless ENV['SENDGRID_API_KEY']
-
-		Logger::Logger.level =  Logger::INFO
-		Logger::Logger.request_id = Logger::Logger.generate_request_id
-
-		begin
-			start_time = Time.now
-			answers = {}
-			applicants = applicants_dataset(params[:target])
-			applicants.each do | applicant |
-				Logger::Async.defer do
-					executor = Lodqa::OneByOneExecutor.new applicant,
-																								 params['query'],
-																								 parser_url: parser_url,
-																								 read_timeout: 60,
-																								 urilinks_url: settings.url_forwading_db
-
-					# Bind events to gather answers
-					executor.on :answer do | event, data |
-						answers[data[:answer][:uri]] = data[:answer][:label]
-					end
-
-					executor.perform
-
-					# Send email when all applicants are finished
-					applicant[:finished] = true
-					if applicants.all? { |a| a[:finished] }
-						body = "Elapsed time: #{Time.at(Time.now - start_time).utc.strftime("%H:%M:%S")}\n\n" +
-						       JSON.pretty_generate(answers.map{ | k, v | {url: k, label: v} })
-						Lodqa::MailSender.send_mail params['to'], params['query'], body
-					end
-				end
-			end
-
-			Lodqa::MailSender.send_mail params['to'], params['query'], 'Searching the query have been starting.'
-			[200, "Recieve query: #{params['query']}"]
-		rescue IOError => e
-			Logger::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
-			[500, "Configuration Server retrun error from #{settings.target_db}.json"]
-		rescue => e
-			Logger::Logger.error e
-			[500, e.message]
-		end
 	end
 
 	# Websocket only!

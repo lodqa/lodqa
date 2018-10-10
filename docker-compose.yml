@@ -18,8 +18,6 @@ services:
       - LODQA=http://lodqa:9292
       - LODQA_BS=http://lodqa_bs:3000
       - URL_FORWARDING_DB=http://uri-forwarding-db:3000
-    env_file:
-      - sendgrid.env
     depends_on:
       - uri-forwarding-db
       - lodqa_bs
