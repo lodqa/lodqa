@@ -3,11 +3,11 @@ require 'sinatra/base'
 require 'rest_client'
 require 'faye/websocket'
 require 'erb'
-require 'logger/async'
 require 'lodqa'
 require 'lodqa/one_by_one_executor'
 require 'lodqa/mail_sender'
 require 'lodqa/runner'
+require 'lodqa/bs_client'
 require 'json'
 require 'open-uri'
 require 'cgi/util'
@@ -221,20 +221,17 @@ class LodqaWS < Sinatra::Base
 		# Because value of params will be empty string when it is not set and ''.to_i returns 0.
 		read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
 
-		search_by_self ws, request_id, parser_url, applicants, read_timeout, params['query']
+		register_query ws, request_id, parser_url, applicants, read_timeout, params['query'], params[:target]
 
 		return ws.rack_response
 	end
-
-
-	WEB_SOCKETS = {}
 
 	post '/requests/:request_id/events' do
 		# The params depends on thread variables.
 		request_id = params[:request_id]
 
 		EM.defer do
-			ws = WEB_SOCKETS[request_id]
+			ws = Lodqa::BSClient.socket_for request_id
 			params[:events].each { | e | ws.send e.to_json } if ws
 		end
 
@@ -304,60 +301,21 @@ class LodqaWS < Sinatra::Base
 	private
 
 	def show_progress_in_lodqa_bs ws, request_id, search_id
-		WEB_SOCKETS[request_id] = ws
-
 		ws.on :open do
-			begin
-				url = "#{ENV['LODQA_BS']}/searches/#{search_id}/subscriptions"
-				payload = {
-					callback_url: "#{ENV['LODQA']}/requests/#{request_id}/events"
-				}
-				RestClient::Request.execute method: :post, url: url, payload: payload
-			rescue RestClient::NotFound
-				ws.send({event: :gateway_error, error_message: 'No runnnig qurey was found'}.to_json)
-			rescue Errno::ECONNREFUSED
-				ws.send({event: :gateway_error, error_message: 'LODQA bot server error'}.to_json)
-			end
+			url = "#{ENV['LODQA_BS']}/searches/#{search_id}/subscriptions"
+			Lodqa::BSClient.subscribe ws, request_id, url
 		end
-
-		ws.on(:close) { WEB_SOCKETS.delete request_id }
 	end
 
-	def search_by_self ws, request_id, parser_url, applicants, read_timeout, query
+	def register_query ws, request_id, parser_url, applicants, read_timeout, query, target
 		ws.on :open do
 			Logger::Logger.request_id = request_id
-			begin
-				applicants.each do | applicant |
-					Logger::Async.defer do
-						executor = Lodqa::OneByOneExecutor.new applicant,
-																									 query,
-																									 parser_url: parser_url,
-																									 read_timeout: read_timeout,
-																									 urilinks_url: settings.url_forwading_db
-						# Prepare to cancel
-						ws.on :close do
-							Logger::Logger.debug 'The WebSocket connection is closed.'
-							executor.cancel_flag = true
-						end
+			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, target
+			next unless res
 
-						# Bind events to send messsage on the WebSocket
-						executor.on :datasets, :pgp, :mappings, :sparql, :query_sparql, :solutions, :answer, :gateway_error do | event, data |
-							ws.send({event: event}.merge(data).to_json)
-						end
-
-						executor.perform
-
-						# Close the web socket when all applicants are finished
-						applicant[:finished] = true
-						ws.close if applicants.all? { |a| a[:finished] }
-					end
-				end
-			rescue IOError => e
-				Logger::Logger.debug e, message: "Configuration Server retrun error from #{settings.target_db}.json"
-				ws.close
-			rescue => e
-				Logger::Logger.error e
-			end
+			data = JSON.parse res
+			subscribe_url = data['subscribe_url']
+			Lodqa::BSClient.subscribe ws, request_id, subscribe_url
 		end
 	end
 
