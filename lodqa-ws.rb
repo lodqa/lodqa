@@ -189,31 +189,43 @@ class LodqaWS < Sinatra::Base
 	end
 
 	# Websocket only!
-	get '/one_by_one_execute' do
+	get '/show_progress' do
 		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
+		return [400] unless present_in? params, :search_id # serach id is requeired
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level =  Logger::INFO
-		Logger::Logger.request_id = Logger::Logger.generate_request_id
 
 		ws = Faye::WebSocket.new(env)
+		request_id = Logger::Logger.generate_request_id
 
-		# Pass the request id between threads.
-		request_id = Logger::Logger.request_id
-		if present_in? params, :search_id
-			show_progress_in_lodqa_bs ws, request_id, params[:search_id]
-		elsif present_in? params, :query
-			applicants = applicants_dataset params[:target]
-			# Set read_timeout default 60 unless read_timeout parameter.
-			# Because value of params will be empty string when it is not set and ''.to_i returns 0.
-			read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
-			search_by_self ws, request_id, parser_url, applicants, read_timeout, params['query']
-		else
-			raise "Do not come here!"
-		end
+		show_progress_in_lodqa_bs ws, request_id, params[:search_id]
 
 		return ws.rack_response
 	end
+
+	# Websocket only!
+	get '/register_query' do
+		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
+		return [400] unless present_in? params, :query # query is requeired
+
+		# Change value to Logger::DEBUG to log for debugging.
+		Logger::Logger.level =  Logger::INFO
+
+		ws = Faye::WebSocket.new(env)
+
+		request_id = Logger::Logger.generate_request_id
+		applicants = applicants_dataset params[:target]
+
+		# Set read_timeout default 60 unless read_timeout parameter.
+		# Because value of params will be empty string when it is not set and ''.to_i returns 0.
+		read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
+
+		search_by_self ws, request_id, parser_url, applicants, read_timeout, params['query']
+
+		return ws.rack_response
+	end
+
 
 	WEB_SOCKETS = {}
 
