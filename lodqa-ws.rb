@@ -182,10 +182,8 @@ class LodqaWS < Sinatra::Base
 		# The params depends on thread variables.
 		request_id = params[:request_id]
 
-		EM.defer do
-			ws = Lodqa::BSClient.socket_for request_id
-			params[:events].each { | e | ws.send e.to_json } if ws
-		end
+		ws = Lodqa::BSClient.socket_for request_id
+		params[:events].each { | e | ws.send e.to_json } if ws
 
 		[200]
 	end
