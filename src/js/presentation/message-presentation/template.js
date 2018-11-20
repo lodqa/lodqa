@@ -6,5 +6,7 @@ module.exports = Handlebars.compile(`
   {{#if error}}
     <span class="message__error"><i class="fa fa-bomb"></i> {{error.error_message}}</span>
   {{/if}}
+{{else}}
+  {{message}}
 {{/if}}
 `)
