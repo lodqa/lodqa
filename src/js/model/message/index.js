@@ -14,7 +14,9 @@ module.exports = class extends EventEmitter {
     })
 
     loader.on('gateway_error', (e) => {
-      this._message.error = e
+      this._message.error = {
+        error_message: `${e.dataset.name}: ${e.state}`
+      }
       this.emit('message_update_event')
     })
 
