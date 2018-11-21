@@ -169,11 +169,7 @@ class LodqaWS < Sinatra::Base
 		request_id = Logger::Logger.generate_request_id
 		applicants = applicants_dataset params[:target]
 
-		# Set read_timeout default 60 unless read_timeout parameter.
-		# Because value of params will be empty string when it is not set and ''.to_i returns 0.
-		read_timeout = params['read_timeout'].empty? ? 60 : params['read_timeout'].to_i
-
-		register_query ws, request_id, parser_url, applicants, read_timeout, params['query'], params[:target]
+		register_query ws, request_id, parser_url, applicants, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params['query'], params[:target]
 
 		return ws.rack_response
 	end
@@ -257,10 +253,10 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_query ws, request_id, parser_url, applicants, read_timeout, query, target
+	def register_query ws, request_id, parser_url, applicants, read_timeout, sparql_limit, answer_limit, query, target
 		ws.on :open do
 			Logger::Logger.request_id = request_id
-			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, target
+			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target
 			next unless res
 
 			data = JSON.parse res

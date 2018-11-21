@@ -9,7 +9,9 @@ module.exports = function(loader) {
     loader.begin('/register_query', new Map([
       ['query', url.get('query')],
       ['target', url.get('target') || ''],
-      ['read_timeout', url.get('read_timeout') || '']
+      ['read_timeout', url.get('read_timeout') || ''],
+      ['sparql_limit', url.get('sparql_limit') || ''],
+      ['answer_limit', url.get('answer_limit') || '']
     ]))
   } else {
     console.error('You need a search_id or query in query parameters.')
