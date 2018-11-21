@@ -18,11 +18,10 @@ module.exports = class extends EventEmitter {
       this.emit('message_update_event')
     })
 
+    // Users can not do anything if looking at backend server errors.
+    // We will output these errors to the development console instead of the browser window.
     loader.on('gateway_error', (e) => {
-      this._message.error = {
-        error_message: `${e.dataset.name}: ${e.state}`
-      }
-      this.emit('message_update_event')
+      console.warn(`${e.dataset.name}: ${e.state}`)
     })
 
     loader.on('sparql', () => {
