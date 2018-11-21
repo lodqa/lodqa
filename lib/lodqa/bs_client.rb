@@ -40,10 +40,10 @@ module Lodqa
       def send_bs_error_on ws
         yield
       rescue RestClient::NotFound
-        ws.send({ event: :gateway_error, error_message: 'No runnnig qurey was found' }.to_json)
+        ws.send({ event: :bs_error, error_message: 'No runnnig qurey was found' }.to_json)
         nil
       rescue Errno::ECONNREFUSED, SocketError
-        ws.send({ event: :gateway_error, error_message: 'LODQA bot server error' }.to_json)
+        ws.send({ event: :bs_error, error_message: 'LODQA bot server error' }.to_json)
         nil
       end
     end
