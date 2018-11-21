@@ -18,7 +18,7 @@ module Lodqa
             sparql_limit: sparql_limit,
             answer_limit: answer_limit,
             target: target,
-            callback_url: "#{ENV['LODQA']}/requests/#{request_id}/hogehoge"
+            callback_url: "#{ENV['LODQA']}/requests/#{request_id}/black_hall"
           }.delete_if { |k, v| v.nil? || v.empty? }
           RestClient::Request.execute method: :post, url: url, payload: payload
         end

@@ -184,6 +184,11 @@ class LodqaWS < Sinatra::Base
 		[200]
 	end
 
+	# Dummy API for a callback URL for LODQA BS
+	post '/requests/:request_id/black_hall' do
+		[200]
+	end
+
 	get '/solutions' do
 		return [400, 'Please use websocket'] unless Faye::WebSocket.websocket?(env)
 		return [400, 'target parameter is required'] unless present_in? params, :target
