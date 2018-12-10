@@ -16,12 +16,12 @@ module.exports = class {
     bindClickOnSideOfLightBoxToCloseIt(lightboxDomId, this.close)
   }
 
-  show(sparqlNumber, datasetName, anchoredPgp, sparql, solution, answers, error) {
+  show(sparqlNumber, datasetName, anchoredPgp, sparql, solutions, answers, error) {
     console.assert(sparqlNumber, 'sparqlNumber is not set')
     console.assert(datasetName, 'datasetName is not set')
     console.assert(anchoredPgp, 'anchoredPgp is not set')
     console.assert(sparql, 'sparql is not set')
-    console.assert(solution, 'solution is not set')
+    console.assert(solutions, 'solutions is not set')
 
     const lightbox = document.querySelector(`#${this.lightboxDomId}`)
     lightbox.classList.remove('hidden')
@@ -31,9 +31,9 @@ module.exports = class {
     const dom = lightbox.querySelector('.content')
     dom.innerHTML = datasetName
 
-    if (solution && solution.solutions.length) {
+    if (solutions && solutions.solutions.length) {
       sparqlPresentationShow(dom, sparqlNumber, sparql)
-      const [list, table, graph] = answersPresentationShow(dom, anchoredPgp, solution)
+      const [list, table, graph] = answersPresentationShow(dom, anchoredPgp, solutions)
 
       for (const {
         url,

@@ -1,4 +1,5 @@
 const setSparql = require('./set-sparql')
+const appendAnswers = require('./append-answers')
 const getSparql = require('./get-sparql')
 
 module.exports = class {
@@ -19,32 +20,28 @@ module.exports = class {
       solutions,
       error
     }) => {
-      const s = getSparql(this._datasets, dataset.name, sparql, anchored_pgp)
-      Object.assign(
-        s, {
-          solutions: {
-            solutions,
-            bgp
-          },
-          error: error
-        })
+      // Supports out-of-order events
+      setSparql(this._datasets, dataset.name, sparql, anchored_pgp, {
+        solutions: {
+          solutions,
+          bgp
+        },
+        error: error
+      })
     })
 
     loader.on('answer', ({
       dataset,
+      anchored_pgp,
       sparql,
       answer,
       label
     }) => {
-      const s = getSparql(this._datasets, dataset.name, sparql)
-      Object.assign(
-        s, {
-          answers: (s.answers || [])
-            .concat([{
-              url: answer[1],
-              label
-            }])
-        })
+      // Supports out-of-order events
+      appendAnswers(this._datasets, dataset.name, sparql, anchored_pgp, [{
+        url: answer[1],
+        label
+      }])
     })
   }
 
