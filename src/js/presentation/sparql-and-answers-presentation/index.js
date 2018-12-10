@@ -17,6 +17,12 @@ module.exports = class {
   }
 
   show(sparqlNumber, datasetName, anchoredPgp, sparql, solution, answers, error) {
+    console.assert(sparqlNumber, 'sparqlNumber is not set')
+    console.assert(datasetName, 'datasetName is not set')
+    console.assert(anchoredPgp, 'anchoredPgp is not set')
+    console.assert(sparql, 'sparql is not set')
+    console.assert(solution, 'solution is not set')
+
     const lightbox = document.querySelector(`#${this.lightboxDomId}`)
     lightbox.classList.remove('hidden')
 
