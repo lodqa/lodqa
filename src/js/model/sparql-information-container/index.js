@@ -33,12 +33,21 @@ module.exports = class {
     loader.on('answer', ({
       dataset,
       anchored_pgp,
+      bgp,
       sparql,
+      solutions,
+      error,
       answer,
       label
     }) => {
       // Supports out-of-order events
-      appendAnswers(this._datasets, dataset.name, sparql, anchored_pgp, [{
+      appendAnswers(this._datasets, dataset.name, sparql, anchored_pgp, {
+        solutions: {
+          solutions,
+          bgp
+        },
+        error: error
+      }, [{
         url: answer[1],
         label
       }])
