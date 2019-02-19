@@ -6,13 +6,13 @@ module.exports = class {
   constructor(loader) {
     this._datasets = new Map()
 
-    loader.on('sparql', ({
+    loader.on('simple:sparql', ({
       dataset,
       anchored_pgp,
       sparql
     }) => setSparql(this._datasets, dataset.name, sparql, anchored_pgp))
 
-    loader.on('solutions', ({
+    loader.on('simple:solutions', ({
       dataset,
       anchored_pgp,
       bgp,
@@ -30,7 +30,7 @@ module.exports = class {
       })
     })
 
-    loader.on('answer', ({
+    loader.on('simple:answer', ({
       dataset,
       anchored_pgp,
       bgp,

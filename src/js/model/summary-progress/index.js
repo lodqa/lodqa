@@ -12,11 +12,11 @@ module.exports = class extends EventEmitter {
     this._datasetsProgress = datasetsProgress
 
     // The number of bpgs is same the number of SPARQLs.
-    loader.on('sparql', () => {
+    loader.on('simple:sparql', () => {
       this._max += 1
       this.emit('progress_summary_update_event')
     })
-    loader.on('solutions', () => {
+    loader.on('simple:solutions', () => {
       this._value += 1
       this.emit('progress_summary_update_event')
     })

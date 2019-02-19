@@ -8,12 +8,12 @@ module.exports = class extends EventEmitter {
 
     const answerSet = new Set()
 
-    loader.on('open', () => {
+    loader.on('simple:ws_open', () => {
       this._state = 'footer--searching'
       this.emit('footer_update_event')
     })
 
-    loader.on('answer', ({
+    loader.on('simple:answer', ({
       answer
     }) => {
       answerSet.add(answer[1])

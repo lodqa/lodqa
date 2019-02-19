@@ -22,8 +22,7 @@ function openConnection(emitter, pathname, params) {
   const queryParameters = toQueryParameters(params)
   const url = `ws://${location.host}${pathname}${queryParameters ? `?${queryParameters}` : ''}`
   const ws = new WebSocket(url)
-  ws.onopen = () => emitter.emit('open')
-  ws.onclose = () => emitter.emit('close')
+  ws.onopen = () => emitter.emit('simple:ws_open')
   ws.onmessage = ({
     data
   }) => {

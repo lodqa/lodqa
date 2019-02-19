@@ -9,7 +9,7 @@ module.exports = class extends EventEmitter {
 
     this._answerContainer = new AnswerContainer()
 
-    loader.on('answer', ({
+    loader.on('simple:answer', ({
       dataset,
       anchored_pgp,
       sparql,

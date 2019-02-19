@@ -11,7 +11,7 @@ module.exports = class extends EventEmitter {
     this._datasets = new Map()
 
     // The number of bpgs is same the number of SPARQLs.
-    loader.on('sparql', ({
+    loader.on('simple:sparql', ({
       dataset,
       sparql
     }) => {
@@ -24,7 +24,7 @@ module.exports = class extends EventEmitter {
       }
     })
 
-    loader.on('query_sparql', ({
+    loader.on('simple:query_sparql', ({
       dataset,
       sparql
     }) => {
@@ -37,7 +37,7 @@ module.exports = class extends EventEmitter {
       }
     })
 
-    loader.on('solutions', ({
+    loader.on('simple:solutions', ({
       dataset,
       anchored_pgp,
       sparql,
