@@ -13,7 +13,7 @@ module Lodqa
 
     def send(event, data = nil)
       data ||= {}
-      data[:event] = event
+      data[:event] = "expert:#{event}"
       @socket.send @data.format data
     end
 

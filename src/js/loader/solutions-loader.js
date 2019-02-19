@@ -10,7 +10,7 @@ module.exports = class extends EventEmitter {
   beginSearch(pgp, mappings, pathname, target, readTimeout, sparqlLimit, answerLimit) {
     this.ws = openConnection(this, pathname, target, readTimeout, sparqlLimit, answerLimit)
 
-    this.once('ws_open', () => {
+    this.once('expert:ws_open', () => {
       this.ws.send(JSON.stringify({
         pgp,
         mappings
@@ -28,13 +28,9 @@ module.exports = class extends EventEmitter {
 function openConnection(emitter, pathname, target, readTimeout, sparqlLimit, answerLimit) {
   const ws = new WebSocket(`ws://${location.host}${pathname}?target=${target}&read_timeout=${readTimeout}&sparql_limit=${sparqlLimit}&answer_limit=${answerLimit}`)
 
-  ws.onopen = function() {
-    emitter.emit('ws_open')
-  }
-  ws.onclose = function() {
-    emitter.emit('ws_close')
-  }
-  ws.onmessage = function(m) {
+  ws.onopen = () => emitter.emit('expert:ws_open')
+  ws.onclose = () => emitter.emit('expert:ws_close')
+  ws.onmessage = (m) => {
     const json = JSON.parse(m.data)
     emitter.emit(json.event, json)
   }

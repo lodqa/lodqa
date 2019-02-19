@@ -1,15 +1,15 @@
 module.exports = function bindModelToLoader(loader, dataset) {
   // Bind self to loader
-  loader.on('start', () => dataset.reset())
-  loader.on('sparql_count', ({
+  loader.on('expert:start', () => dataset.reset())
+  loader.on('expert:sparql_count', ({
     count
   }) => dataset.sparqlsMax = count)
-  loader.on('anchored_pgp', (anchoredPgp) => dataset.anchoredPgp = anchoredPgp)
-  loader.on('solution', (newSolution) => dataset.addSolution(newSolution))
+  loader.on('expert:anchored_pgp', (anchoredPgp) => dataset.anchoredPgp = anchoredPgp)
+  loader.on('expert:solution', (newSolution) => dataset.addSolution(newSolution))
 
-  loader.on('ws_open', () => dataset.progress = true)
-  loader.on('ws_close', () => dataset.progress = false)
-  loader.on('error', (data) => {
+  loader.on('expert:ws_open', () => dataset.progress = true)
+  loader.on('expert:ws_close', () => dataset.progress = false)
+  loader.on('expert:error', (data) => {
     dataset.progress = false
     dataset.errorMessage = data
   })
