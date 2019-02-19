@@ -8,3 +8,6 @@ log/
 node_modules
 npm-debug.log
 sendgrid.env
+
+# RubyMine
+.idea/
