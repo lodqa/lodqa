@@ -205,7 +205,7 @@ class LodqaWS < Sinatra::Base
 			ws = Faye::WebSocket.new(env)
 
 			request_id = Logger::Logger.generate_request_id
-			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], @pgp, @mappings, params[:target]
+			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params[:target]
 
 			ws.rack_response
 		rescue => e
@@ -257,7 +257,7 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, pgp, mappings, target
+	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target
 		ws.on :message do |event|
 			json = JSON.parse(event.data, {:symbolize_names => true})
 
