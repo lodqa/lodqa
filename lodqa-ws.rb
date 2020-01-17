@@ -200,32 +200,14 @@ class LodqaWS < Sinatra::Base
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
-		config = dataset_config_of params[:target]
 
 		begin
 			ws = Faye::WebSocket.new(env)
-			Lodqa::Runner.start(
-				ws,
-				name: config[:name],
-				endpoint_url: config[:endpoint_url],
-				graph_uri: config[:graph_uri],
-				endpoint_options: {
-					read_timeout: params['read_timeout']&.to_i
-				},
-				graph_finder_options: {
-					max_hop: config[:max_hop],
-					ignore_predicates: config[:ignore_predicates],
-					sortal_predicates: config[:sortal_predicates],
-					sparql_limit: params['sparql_limit']&.to_i,
-					answer_limit: params['answer_limit']&.to_i
-				}
-			)
+
+			request_id = Logger::Logger.generate_request_id
+			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params[:target]
 
 			ws.rack_response
-		rescue SPARQL::Client::ServerError => e
-			[502, "SPARQL endpoint does not respond."]
-		rescue JSON::ParserError => e
-			[500, "Invalid JSON object from the client."]
 		rescue => e
 			Logger::Logger.error e, request: request.env
 			[500, e.message]
@@ -267,6 +249,20 @@ class LodqaWS < Sinatra::Base
 		ws.on :open do
 			Logger::Logger.request_id = request_id
 			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target
+			next unless res
+
+			data = JSON.parse res
+			subscribe_url = data['subscribe_url']
+			Lodqa::BSClient.subscribe ws, request_id, subscribe_url
+		end
+	end
+
+	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target
+		ws.on :message do |event|
+			json = JSON.parse(event.data, {:symbolize_names => true})
+
+			Logger::Logger.request_id = request_id
+			res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, json[:pgp], json[:mappings], read_timeout, sparql_limit, answer_limit, target
 			next unless res
 
 			data = JSON.parse res

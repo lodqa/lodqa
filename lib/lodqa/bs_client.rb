@@ -24,6 +24,22 @@ module Lodqa
         end
       end
 
+      def register_pgp_and_mappings ws, request_id, pgp, mappings, read_timeout, sparql_limit, answer_limit, target
+        send_bs_error_on ws do
+          url = "#{ENV['LODQA_BS']}/searches"
+          payload = {
+            pgp: pgp.to_json,
+            mappings: mappings.to_json,
+            read_timeout: read_timeout,
+            sparql_limit: sparql_limit,
+            answer_limit: answer_limit,
+            target: target,
+            callback_url: "#{ENV['LODQA']}/requests/#{request_id}/black_hall"
+          }.delete_if { |k, v| v.nil? || v.empty? }
+          RestClient::Request.execute method: :post, url: url, payload: payload
+        end
+      end
+
       def subscribe ws, request_id, url
         WEB_SOCKETS[request_id] = ws
         ws.on(:close) { WEB_SOCKETS.delete request_id }
