@@ -201,14 +201,17 @@ class LodqaWS < Sinatra::Base
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
 
-		ws = Faye::WebSocket.new(env)
+		begin
+			ws = Faye::WebSocket.new(env)
 
-		request_id = Logger::Logger.generate_request_id
-		applicants = applicants_dataset params[:target]
+			request_id = Logger::Logger.generate_request_id
+			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], @pgp, @mappings, params[:target]
 
-		register_pgp_mappings ws, request_id, parser_url, applicants, params['read_timeout'], params['sparql_limit'], params['answer_limit'], @pgp, @mappings, params[:target]
-
-		return	ws.rack_response
+			ws.rack_response
+		rescue => e
+			Logger::Logger.error e, request: request.env
+			[500, e.message]
+		end
 	end
 
 	# Comman for test: curl 'http://localhost:9292/proxy?endpoint=http://www.semantic-systems-biology.org/biogateway/endpoint&query=select%20%3Flabel%20where%20%7B%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2Fvario%23associated_with%3E%20%20rdfs%3Alabel%20%3Flabel%20%7D'
@@ -254,12 +257,12 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_pgp_mappings ws, request_id, parser_url, applicants, read_timeout, sparql_limit, answer_limit, pgp, mappings, target
+	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, pgp, mappings, target
 		ws.on :message do |event|
 			json = JSON.parse(event.data, {:symbolize_names => true})
 
 			Logger::Logger.request_id = request_id
-			res = Lodqa::BSClient.register_pgp_mappings ws, request_id, json[:pgp].to_json, json[:mappings].to_json, read_timeout, sparql_limit, answer_limit, target
+			res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, json[:pgp], json[:mappings], read_timeout, sparql_limit, answer_limit, target
 			next unless res
 
 			data = JSON.parse res
