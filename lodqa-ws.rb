@@ -200,36 +200,15 @@ class LodqaWS < Sinatra::Base
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
-		config = dataset_config_of params[:target]
 
-		begin
-			ws = Faye::WebSocket.new(env)
-			Lodqa::Runner.start(
-				ws,
-				name: config[:name],
-				endpoint_url: config[:endpoint_url],
-				graph_uri: config[:graph_uri],
-				endpoint_options: {
-					read_timeout: params['read_timeout']&.to_i
-				},
-				graph_finder_options: {
-					max_hop: config[:max_hop],
-					ignore_predicates: config[:ignore_predicates],
-					sortal_predicates: config[:sortal_predicates],
-					sparql_limit: params['sparql_limit']&.to_i,
-					answer_limit: params['answer_limit']&.to_i
-				}
-			)
+		ws = Faye::WebSocket.new(env)
 
-			ws.rack_response
-		rescue SPARQL::Client::ServerError => e
-			[502, "SPARQL endpoint does not respond."]
-		rescue JSON::ParserError => e
-			[500, "Invalid JSON object from the client."]
-		rescue => e
-			Logger::Logger.error e, request: request.env
-			[500, e.message]
-		end
+		request_id = Logger::Logger.generate_request_id
+		applicants = applicants_dataset params[:target]
+
+		register_pgp_mappings ws, request_id, parser_url, applicants, params['read_timeout'], params['sparql_limit'], params['answer_limit'], @pgp, @mappings, params[:target]
+
+		return	ws.rack_response
 	end
 
 	# Comman for test: curl 'http://localhost:9292/proxy?endpoint=http://www.semantic-systems-biology.org/biogateway/endpoint&query=select%20%3Flabel%20where%20%7B%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2Fvario%23associated_with%3E%20%20rdfs%3Alabel%20%3Flabel%20%7D'
@@ -267,6 +246,20 @@ class LodqaWS < Sinatra::Base
 		ws.on :open do
 			Logger::Logger.request_id = request_id
 			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target
+			next unless res
+
+			data = JSON.parse res
+			subscribe_url = data['subscribe_url']
+			Lodqa::BSClient.subscribe ws, request_id, subscribe_url
+		end
+	end
+
+	def register_pgp_mappings ws, request_id, parser_url, applicants, read_timeout, sparql_limit, answer_limit, pgp, mappings, target
+		ws.on :message do |event|
+			json = JSON.parse(event.data, {:symbolize_names => true})
+
+			Logger::Logger.request_id = request_id
+			res = Lodqa::BSClient.register_pgp_mappings ws, request_id, json[:pgp].to_json, json[:mappings].to_json, read_timeout, sparql_limit, answer_limit, target
 			next unless res
 
 			data = JSON.parse res
