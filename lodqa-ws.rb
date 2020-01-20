@@ -11,6 +11,10 @@ require 'json'
 require 'open-uri'
 require 'cgi/util'
 require 'uri'
+require 'logger/async'
+require 'logger/logger'
+require 'lodqa/lodqa'
+require 'lodqa/source_channel'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -200,12 +204,22 @@ class LodqaWS < Sinatra::Base
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
+		config = dataset_config_of params[:target]
 
 		begin
 			ws = Faye::WebSocket.new(env)
+			channel = Lodqa::SourceChannel.new ws, config[:name]
+			lodqa = Lodqa::Lodqa.new config[:endpoint_url],
+												{ read_timeout: params['read_timeout']&.to_i },
+												config[:graph_uri],
+												{
+													max_hop: config[:max_hop], ignore_predicates: config[:ignore_predicates],
+													sortal_predicates: config[:sortal_predicates],
+													sparql_limit: params['sparql_limit']&.to_i, answer_limit: params['answer_limit']&.to_i
+												}
 
 			request_id = Logger::Logger.generate_request_id
-			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params[:target]
+			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params[:target], lodqa, channel
 
 			ws.rack_response
 		rescue => e
@@ -257,9 +271,14 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target
+	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target, lodqa, channel
 		ws.on :message do |event|
 			json = JSON.parse(event.data, {:symbolize_names => true})
+
+			lodqa.pgp = json[:pgp]
+			lodqa.mappings = json[:mappings]
+
+			start_and_sparql_count lodqa, event.data, channel
 
 			Logger::Logger.request_id = request_id
 			res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, json[:pgp], json[:mappings], read_timeout, sparql_limit, answer_limit, target
@@ -268,6 +287,20 @@ class LodqaWS < Sinatra::Base
 			data = JSON.parse res
 			subscribe_url = data['subscribe_url']
 			Lodqa::BSClient.subscribe ws, request_id, subscribe_url
+		end
+	end
+
+	def start_and_sparql_count lodqa, recieve_data, channel
+		Logger::Async.defer do
+			begin
+				channel.start
+				channel.send :sparql_count, { count: lodqa.sparqls.count }
+			rescue => e
+				Logger::Logger.error e, data: recieve_data
+				channel.error e
+			ensure
+				channel.close
+			end
 		end
 	end
 
