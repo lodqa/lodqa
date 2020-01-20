@@ -201,6 +201,7 @@ class LodqaWS < Sinatra::Base
 		params[:events]
 			.map do |e|
 				e['event'] = "expert:#{e['event'].sub(/solutions/, 'solution')}"
+				e['sparql'] = e['sparql']['query'] if e['sparql']
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
