@@ -271,7 +271,6 @@ class LodqaWS < Sinatra::Base
 	end
 
 	def register_pgp_and_mappings ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, request_id
-		Logger::Logger.request_id = request_id
 		res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, pgp, mappings, read_timeout, sparql_limit, answer_limit, target
 
 		data = JSON.parse res
@@ -300,7 +299,7 @@ class LodqaWS < Sinatra::Base
 				channel.start
 				channel.send :sparql_count, { count: lodqa.sparqls.count }
 			rescue => e
-				Logger::Logger.error e, data: { pgp: pgp, mappings: mappings }
+				Logger::Logger.error e, pgp: pgp, mappings: mappings
 				channel.error e
 			ensure
 				channel.close
