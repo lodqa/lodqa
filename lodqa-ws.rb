@@ -206,17 +206,17 @@ class LodqaWS < Sinatra::Base
 		Logger::Logger.level = Logger::INFO
 
 		begin
+			request_id = Logger::Logger.generate_request_id
 			ws = Faye::WebSocket.new(env)
-      request_id = Logger::Logger.generate_request_id
 
 			ws.on :message do |event|
 				json = JSON.parse(event.data, {:symbolize_names => true})
 
 				pgp = json[:pgp]
-	      mappings = json[:mappings]
+				mappings = json[:mappings]
 
 				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, event.data
-	      register_pgp_and_mappings ws, request_id, params[:read_timeout], params[:sparql_limit], params[:answer_limit], params[:target], pgp, mappings
+				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id,
 			end
 
 			ws.rack_response
@@ -269,7 +269,7 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target, pgp, mappings
+	def register_pgp_and_mappings ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, request_id
 		Logger::Logger.request_id = request_id
 		res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, pgp, mappings, read_timeout, sparql_limit, answer_limit, target
 
