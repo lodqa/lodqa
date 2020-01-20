@@ -210,13 +210,14 @@ class LodqaWS < Sinatra::Base
 			ws = Faye::WebSocket.new(env)
 
 			ws.on :message do |event|
+				Logger::Logger.request_id = request_id
 				json = JSON.parse(event.data, {:symbolize_names => true})
 
 				pgp = json[:pgp]
 				mappings = json[:mappings]
 
-				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, event.data
-				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id,
+				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings
+				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id
 			end
 
 			ws.rack_response
@@ -278,7 +279,7 @@ class LodqaWS < Sinatra::Base
 		Lodqa::BSClient.subscribe ws, request_id, subscribe_url
 	end
 
-	def start_and_sparql_count ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, recieve_data
+	def start_and_sparql_count ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings
 		config = dataset_config_of target
 
 		channel = Lodqa::SourceChannel.new ws, config[:name]
@@ -299,7 +300,7 @@ class LodqaWS < Sinatra::Base
 				channel.start
 				channel.send :sparql_count, { count: lodqa.sparqls.count }
 			rescue => e
-				Logger::Logger.error e, data: recieve_data
+				Logger::Logger.error e, data: { pgp: pgp, mappings: mappings }
 				channel.error e
 			ensure
 				channel.close
