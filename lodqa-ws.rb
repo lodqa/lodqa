@@ -206,22 +206,18 @@ class LodqaWS < Sinatra::Base
 		Logger::Logger.level = Logger::INFO
 
 		begin
-			config = dataset_config_of params[:target]
 			ws = Faye::WebSocket.new(env)
-			channel = Lodqa::SourceChannel.new ws, config[:name]
-			lodqa = Lodqa::Lodqa.new config[:endpoint_url],
-												{ read_timeout: params['read_timeout']&.to_i },
-												config[:graph_uri],
-												{
-													max_hop: config[:max_hop], ignore_predicates: config[:ignore_predicates],
-													sortal_predicates: config[:sortal_predicates],
-													sparql_limit: params['sparql_limit']&.to_i, answer_limit: params['answer_limit']&.to_i
-												}
+      request_id = Logger::Logger.generate_request_id
 
-			start_and_sparql_count ws, lodqa, channel
+			ws.on :message do |event|
+				json = JSON.parse(event.data, {:symbolize_names => true})
 
-			request_id = Logger::Logger.generate_request_id
-			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params[:target], lodqa, channel
+				pgp = json[:pgp]
+	      mappings = json[:mappings]
+
+				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, event.data
+	      register_pgp_and_mappings ws, request_id, params[:read_timeout], params[:sparql_limit], params[:answer_limit], params[:target], pgp, mappings
+			end
 
 			ws.rack_response
 		rescue => e
@@ -273,37 +269,40 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target, lodqa, channel
-		ws.on :message do |event|
-			json = JSON.parse(event.data, {:symbolize_names => true})
+	def register_pgp_and_mappings ws, request_id, read_timeout, sparql_limit, answer_limit, target, pgp, mappings
+		Logger::Logger.request_id = request_id
+		res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, pgp, mappings, read_timeout, sparql_limit, answer_limit, target
 
-			Logger::Logger.request_id = request_id
-			res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, json[:pgp], json[:mappings], read_timeout, sparql_limit, answer_limit, target
-			next unless res
-
-			data = JSON.parse res
-			subscribe_url = data['subscribe_url']
-			Lodqa::BSClient.subscribe ws, request_id, subscribe_url
-		end
+		data = JSON.parse res
+		subscribe_url = data['subscribe_url']
+		Lodqa::BSClient.subscribe ws, request_id, subscribe_url
 	end
 
-	def start_and_sparql_count ws, lodqa, channel
-		ws.on :message do |event|
-			json = JSON.parse(event.data, {:symbolize_names => true})
+	def start_and_sparql_count ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, recieve_data
+		config = dataset_config_of target
 
-			lodqa.pgp = json[:pgp]
-			lodqa.mappings = json[:mappings]
+		channel = Lodqa::SourceChannel.new ws, config[:name]
+		lodqa = Lodqa::Lodqa.new config[:endpoint_url],
+											{ read_timeout: read_timeout&.to_i },
+											config[:graph_uri],
+											{
+												max_hop: config[:max_hop], ignore_predicates: config[:ignore_predicates],
+												sortal_predicates: config[:sortal_predicates],
+												sparql_limit: sparql_limit&.to_i, answer_limit: answer_limit&.to_i
+											}
 
-			Logger::Async.defer do
-				begin
-					channel.start
-					channel.send :sparql_count, { count: lodqa.sparqls.count }
-				rescue => e
-					Logger::Logger.error e, data: event.data
-					channel.error e
-				ensure
-					channel.close
-				end
+		lodqa.pgp = pgp
+		lodqa.mappings = mappings
+
+		Logger::Async.defer do
+			begin
+				channel.start
+				channel.send :sparql_count, { count: lodqa.sparqls.count }
+			rescue => e
+				Logger::Logger.error e, data: recieve_data
+				channel.error e
+			ensure
+				channel.close
 			end
 		end
 	end
