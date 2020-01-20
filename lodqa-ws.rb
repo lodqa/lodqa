@@ -204,9 +204,9 @@ class LodqaWS < Sinatra::Base
 
 		# Change value to Logger::DEBUG to log for debugging.
 		Logger::Logger.level = Logger::INFO
-		config = dataset_config_of params[:target]
 
 		begin
+			config = dataset_config_of params[:target]
 			ws = Faye::WebSocket.new(env)
 			channel = Lodqa::SourceChannel.new ws, config[:name]
 			lodqa = Lodqa::Lodqa.new config[:endpoint_url],
@@ -217,6 +217,8 @@ class LodqaWS < Sinatra::Base
 													sortal_predicates: config[:sortal_predicates],
 													sparql_limit: params['sparql_limit']&.to_i, answer_limit: params['answer_limit']&.to_i
 												}
+
+			start_and_sparql_count ws, lodqa, channel
 
 			request_id = Logger::Logger.generate_request_id
 			register_pgp_and_mappings ws, request_id, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params[:target], lodqa, channel
@@ -275,11 +277,6 @@ class LodqaWS < Sinatra::Base
 		ws.on :message do |event|
 			json = JSON.parse(event.data, {:symbolize_names => true})
 
-			lodqa.pgp = json[:pgp]
-			lodqa.mappings = json[:mappings]
-
-			start_and_sparql_count lodqa, event.data, channel
-
 			Logger::Logger.request_id = request_id
 			res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, json[:pgp], json[:mappings], read_timeout, sparql_limit, answer_limit, target
 			next unless res
@@ -290,16 +287,23 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def start_and_sparql_count lodqa, recieve_data, channel
-		Logger::Async.defer do
-			begin
-				channel.start
-				channel.send :sparql_count, { count: lodqa.sparqls.count }
-			rescue => e
-				Logger::Logger.error e, data: recieve_data
-				channel.error e
-			ensure
-				channel.close
+	def start_and_sparql_count ws, lodqa, channel
+		ws.on :message do |event|
+			json = JSON.parse(event.data, {:symbolize_names => true})
+
+			lodqa.pgp = json[:pgp]
+			lodqa.mappings = json[:mappings]
+
+			Logger::Async.defer do
+				begin
+					channel.start
+					channel.send :sparql_count, { count: lodqa.sparqls.count }
+				rescue => e
+					Logger::Logger.error e, data: event.data
+					channel.error e
+				ensure
+					channel.close
+				end
 			end
 		end
 	end
