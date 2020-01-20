@@ -40,13 +40,13 @@ module Lodqa
         end
       end
 
-      def subscribe ws, request_id, url
+      def subscribe ws, request_id, url, mode
         WEB_SOCKETS[request_id] = ws
         ws.on(:close) { WEB_SOCKETS.delete request_id }
 
         send_bs_error_on ws do
           payload = {
-            callback_url: "#{ENV['LODQA']}/requests/#{request_id}/events"
+            callback_url: "#{ENV['LODQA']}/requests/#{request_id}/#{mode}/events"
           }
 
           RestClient::Request.execute method: :post, url: url, payload: payload

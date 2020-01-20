@@ -178,7 +178,7 @@ class LodqaWS < Sinatra::Base
 		return ws.rack_response
 	end
 
-	post '/requests/:request_id/events' do
+	post '/requests/:request_id/simple/events' do
 		# The params depends on thread variables.
 		request_id = params[:request_id]
 
@@ -186,6 +186,21 @@ class LodqaWS < Sinatra::Base
 		params[:events]
 			.map do |e|
 				e['event'] = "simple:#{e['event']}"
+				e
+			end
+			.each { | e | ws.send e.to_json } if ws
+
+		[200]
+	end
+
+	post '/requests/:request_id/expert/events' do
+		# The params depends on thread variables.
+		request_id = params[:request_id]
+
+		ws = Lodqa::BSClient.socket_for request_id
+		params[:events]
+			.map do |e|
+				e['event'] = "expert:#{e['event'].sub(/solutions/, 'solution')}"
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
@@ -266,7 +281,7 @@ class LodqaWS < Sinatra::Base
 
 			data = JSON.parse res
 			subscribe_url = data['subscribe_url']
-			Lodqa::BSClient.subscribe ws, request_id, subscribe_url
+			Lodqa::BSClient.subscribe ws, request_id, subscribe_url, 'simple'
 		end
 	end
 
@@ -275,7 +290,7 @@ class LodqaWS < Sinatra::Base
 
 		data = JSON.parse res
 		subscribe_url = data['subscribe_url']
-		Lodqa::BSClient.subscribe ws, request_id, subscribe_url
+		Lodqa::BSClient.subscribe ws, request_id, subscribe_url, 'expert'
 	end
 
 	def start_and_sparql_count ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings
@@ -301,8 +316,6 @@ class LodqaWS < Sinatra::Base
 			rescue => e
 				Logger::Logger.error e, pgp: pgp, mappings: mappings
 				channel.error e
-			ensure
-				channel.close
 			end
 		end
 	end
