@@ -199,13 +199,12 @@ class LodqaWS < Sinatra::Base
 
 		ws = Lodqa::BSClient.socket_for request_id
 		params[:events]
+			.select { |item| item['event'] == 'solutions' || item['event'] == 'anchored_pgp' }
 			.map do |e|
-				next unless e['event'] == "solutions" || e['event'] == "anchored_pgp"
-				e['event'] = "expert:#{e['event'].gsub(/solutions/, 'solution')}"
+				e['event'] = "expert:#{e['event'].gsub('solutions', 'solution')}"
 				e['sparql'] = e['sparql']['query'] if e['sparql']
 				e
 			end
-			.compact
 			.each { | e | ws.send e.to_json } if ws
 
 		[200]
