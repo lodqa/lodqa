@@ -15,6 +15,7 @@ require 'logger/async'
 require 'logger/logger'
 require 'lodqa/lodqa'
 require 'lodqa/source_channel'
+require 'lodqa/sparqls_count'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -201,7 +202,7 @@ class LodqaWS < Sinatra::Base
 		sparql_numbers = params[:events]
 								.select { |item| item['event'] == 'solutions'}
 								.map do |e|
-									e['sparql']['number'] if e['sparql']
+									e['sparql']['number']
 								end
 		events_sparql_numbers_max = sparql_numbers.max
 
@@ -213,7 +214,7 @@ class LodqaWS < Sinatra::Base
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
-		ws.close if @@sparqls_count == events_sparql_numbers_max
+		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count == events_sparql_numbers_max
 		[200]
 	end
 
@@ -317,12 +318,12 @@ class LodqaWS < Sinatra::Base
 
 		lodqa.pgp = pgp
 		lodqa.mappings = mappings
-		@@sparqls_count = lodqa.sparqls.count
+		Lodqa::SparqlsCount.set_sparql_count(lodqa.sparqls.count)
 
 		Logger::Async.defer do
 			begin
 				channel.start
-				channel.send :sparql_count, { count: @@sparqls_count }
+				channel.send :sparql_count, { count: lodqa.sparqls.count }
 			rescue => e
 				Logger::Logger.error e, pgp: pgp, mappings: mappings
 				channel.error e
