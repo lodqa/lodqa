@@ -198,6 +198,13 @@ class LodqaWS < Sinatra::Base
 		request_id = params[:request_id]
 
 		ws = Lodqa::BSClient.socket_for request_id
+		sparql_numbers = params[:events]
+								.select { |item| item['event'] == 'solutions'}
+								.map do |e|
+									e['sparql']['number'] if e['sparql']
+								end
+		events_sparql_numbers_max = sparql_numbers.max
+
 		params[:events]
 			.select { |item| item['event'] == 'solutions' || item['event'] == 'anchored_pgp' }
 			.map do |e|
@@ -206,7 +213,7 @@ class LodqaWS < Sinatra::Base
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
-
+		ws.close if @@sparqls_count == events_sparql_numbers_max
 		[200]
 	end
 
@@ -310,11 +317,12 @@ class LodqaWS < Sinatra::Base
 
 		lodqa.pgp = pgp
 		lodqa.mappings = mappings
+		@@sparqls_count = lodqa.sparqls.count
 
 		Logger::Async.defer do
 			begin
 				channel.start
-				channel.send :sparql_count, { count: lodqa.sparqls.count }
+				channel.send :sparql_count, { count: @@sparqls_count }
 			rescue => e
 				Logger::Logger.error e, pgp: pgp, mappings: mappings
 				channel.error e
