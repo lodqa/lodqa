@@ -318,7 +318,8 @@ class LodqaWS < Sinatra::Base
 
 		lodqa.pgp = pgp
 		lodqa.mappings = mappings
-		Lodqa::SparqlsCount.set_sparql_count(request_id, lodqa.sparqls.count)
+		Lodqa::SparqlsCount.set_request_id(request_id)
+		Lodqa::SparqlsCount.set_sparql_count(lodqa.sparqls.count)
 
 		Logger::Async.defer do
 			begin
