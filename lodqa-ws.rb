@@ -214,7 +214,7 @@ class LodqaWS < Sinatra::Base
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
-		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count == events_sparql_numbers_max
+		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count == events_sparql_numbers_max && Lodqa::SparqlsCount.get_request_id == request_id
 		[200]
 	end
 
@@ -241,7 +241,7 @@ class LodqaWS < Sinatra::Base
 				pgp = json[:pgp]
 				mappings = json[:mappings]
 
-				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings
+				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id
 				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id
 			end
 
@@ -303,7 +303,7 @@ class LodqaWS < Sinatra::Base
 		Lodqa::BSClient.subscribe ws, request_id, subscribe_url, 'expert'
 	end
 
-	def start_and_sparql_count ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings
+	def start_and_sparql_count ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, request_id
 		config = dataset_config_of target
 
 		channel = Lodqa::SourceChannel.new ws, config[:name]
@@ -318,7 +318,7 @@ class LodqaWS < Sinatra::Base
 
 		lodqa.pgp = pgp
 		lodqa.mappings = mappings
-		Lodqa::SparqlsCount.set_sparql_count(lodqa.sparqls.count)
+		Lodqa::SparqlsCount.set_sparql_count(request_id, lodqa.sparqls.count)
 
 		Logger::Async.defer do
 			begin
