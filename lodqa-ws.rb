@@ -199,10 +199,9 @@ class LodqaWS < Sinatra::Base
 		request_id = params[:request_id]
 
 		ws = Lodqa::BSClient.socket_for request_id
-		events_solutions_and_anchored_pgp = params.dup
-		sparql_numbers_max = events_sparql_numbers_max(params[:events])
+		events_solutions_and_anchored_pgp = Marshal.load(Marshal.dump(params[:events]))
 
-		events_solutions_and_anchored_pgp[:events]
+		events_solutions_and_anchored_pgp
 			.select { |item| item['event'] == 'solutions' || item['event'] == 'anchored_pgp' }
 			.map do |e|
 				e['event'] = "expert:#{e['event'].gsub('solutions', 'solution')}"
@@ -211,6 +210,7 @@ class LodqaWS < Sinatra::Base
 			end
 			.each { | e | ws.send e.to_json } if ws
 
+		sparql_numbers_max = events_sparql_numbers_max(params[:events])
 		if ws && Lodqa::SparqlsCount.get_sparql_count(request_id) == sparql_numbers_max
 			Lodqa::SparqlsCount.delete_sparql_count(request_id)
 			ws.close
