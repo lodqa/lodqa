@@ -272,12 +272,12 @@ class LodqaWS < Sinatra::Base
 	private
 
 	def events_sparql_numbers_max events
-		sparql_numbers = events
-										 .select { |item| item['event'] == 'solutions' }
-										 .map do |e|
-			e['sparql']['number']
-		end
-		sparql_numbers.max
+		events
+			.select { |item| item['event'] == 'solutions' }
+			.map do |e|
+				e['sparql']['number']
+			end
+			.max
 	end
 
 	def show_progress_in_lodqa_bs ws, request_id, search_id
