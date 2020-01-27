@@ -273,10 +273,10 @@ class LodqaWS < Sinatra::Base
 
 	def events_sparql_numbers_max events
 		sparql_numbers = events
-								.select { |item| item['event'] == 'solutions'}
-								.map do |e|
-									e['sparql']['number']
-								end
+										 .select { |item| item['event'] == 'solutions' }
+										 .map do |e|
+			e['sparql']['number']
+		end
 		sparql_numbers.max
 	end
 
