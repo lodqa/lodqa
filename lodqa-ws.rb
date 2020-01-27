@@ -214,7 +214,7 @@ class LodqaWS < Sinatra::Base
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
-		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count == events_sparql_numbers_max && Lodqa::SparqlsCount.get_request_id == request_id
+		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count(request_id) == events_sparql_numbers_max && Lodqa::SparqlsCount.get_request_id(request_id) == request_id
 		[200]
 	end
 
@@ -318,8 +318,7 @@ class LodqaWS < Sinatra::Base
 
 		lodqa.pgp = pgp
 		lodqa.mappings = mappings
-		Lodqa::SparqlsCount.set_request_id(request_id)
-		Lodqa::SparqlsCount.set_sparql_count(lodqa.sparqls.count)
+		Lodqa::SparqlsCount.set_sparql_count(lodqa.sparqls.count, request_id)
 
 		Logger::Async.defer do
 			begin
