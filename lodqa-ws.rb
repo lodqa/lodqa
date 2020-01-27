@@ -199,9 +199,10 @@ class LodqaWS < Sinatra::Base
 		request_id = params[:request_id]
 
 		ws = Lodqa::BSClient.socket_for request_id
+		events_solutions_and_anchored_pgp = params.dup
 		sparql_numbers_max = events_sparql_numbers_max(params[:events])
 
-		params[:events]
+		events_solutions_and_anchored_pgp[:events]
 			.select { |item| item['event'] == 'solutions' || item['event'] == 'anchored_pgp' }
 			.map do |e|
 				e['event'] = "expert:#{e['event'].gsub('solutions', 'solution')}"
