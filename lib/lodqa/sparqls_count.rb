@@ -1,13 +1,8 @@
 module Lodqa
   module SparqlsCount
-    attr_reader :sparql_count, :request_id
 
     @@data = []
     class << self
-      def get_request_id(request_id)
-        @@data.find { |item| item[:request_id] == request_id }&.fetch(:request_id)
-      end
-
       def get_sparql_count(request_id)
         @@data.find { |item| item[:request_id] == request_id }&.fetch(:sparql_count)
       end

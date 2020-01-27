@@ -199,12 +199,7 @@ class LodqaWS < Sinatra::Base
 		request_id = params[:request_id]
 
 		ws = Lodqa::BSClient.socket_for request_id
-		sparql_numbers = params[:events]
-								.select { |item| item['event'] == 'solutions'}
-								.map do |e|
-									e['sparql']['number']
-								end
-		events_sparql_numbers_max = sparql_numbers.max
+		sparql_numbers_max = events_sparql_numbers_max(params[:events])
 
 		params[:events]
 			.select { |item| item['event'] == 'solutions' || item['event'] == 'anchored_pgp' }
@@ -214,7 +209,7 @@ class LodqaWS < Sinatra::Base
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
-		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count(request_id) == events_sparql_numbers_max && Lodqa::SparqlsCount.get_request_id(request_id) == request_id
+		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count(request_id) == sparql_numbers_max
 		[200]
 	end
 
@@ -275,6 +270,16 @@ class LodqaWS < Sinatra::Base
 	end
 
 	private
+
+	def events_sparql_numbers_max events
+		sparql_numbers = events
+								.select { |item| item['event'] == 'solutions'}
+								.map do |e|
+									e['sparql']['number']
+								end
+		puts "sparql_numbers.max:#{sparql_numbers.max}"
+		sparql_numbers.max
+	end
 
 	def show_progress_in_lodqa_bs ws, request_id, search_id
 		ws.on :open do
