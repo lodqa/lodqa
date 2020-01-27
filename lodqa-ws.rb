@@ -209,7 +209,11 @@ class LodqaWS < Sinatra::Base
 				e
 			end
 			.each { | e | ws.send e.to_json } if ws
-		ws.close if ws && Lodqa::SparqlsCount.get_sparql_count(request_id) == sparql_numbers_max
+
+		if ws && Lodqa::SparqlsCount.get_sparql_count(request_id) == sparql_numbers_max
+			Lodqa::SparqlsCount.delete_sparql_count(request_id)
+			ws.close
+		end
 		[200]
 	end
 
