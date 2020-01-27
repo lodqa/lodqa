@@ -277,7 +277,6 @@ class LodqaWS < Sinatra::Base
 								.map do |e|
 									e['sparql']['number']
 								end
-		puts "sparql_numbers.max:#{sparql_numbers.max}"
 		sparql_numbers.max
 	end
 
