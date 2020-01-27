@@ -1,14 +1,14 @@
 module Lodqa
   module SparqlsCount
 
-    @@data = { id_and_count: [] }
+    @@data = {}
     class << self
       def get_sparql_count(request_id)
-        @@data[:id_and_count].find { |item| item[:request_id] == request_id }&.fetch(:sparql_count)
+        @@data[request_id]
       end
 
       def set_sparql_count(count, request_id)
-        @@data[:id_and_count] << { request_id: request_id, sparql_count: count }
+        @@data[request_id] = count
       end
     end
   end
