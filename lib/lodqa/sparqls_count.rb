@@ -11,7 +11,7 @@ module Lodqa
         @@data.delete(request_id)
       end
 
-      def set_sparql_count(count, request_id)
+      def set_sparql_count(request_id, count)
         @@data[request_id] = count
       end
     end
