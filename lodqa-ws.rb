@@ -16,6 +16,7 @@ require 'logger/logger'
 require 'lodqa/lodqa'
 require 'lodqa/source_channel'
 require 'lodqa/sparqls_count'
+require 'lodqa/oauth'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -41,6 +42,13 @@ class LodqaWS < Sinatra::Base
 			end
 
 			params.merge!(json_params) unless json_params.nil?
+		end
+
+		# oauth2でユーザアカウントを取得
+		if params['code']
+			oauth = Lodqa::Oauth.new params['code']
+			# 取得したユーザアカウントをセッション情報として保持する
+			puts oauth.me_account
 		end
 	end
 
