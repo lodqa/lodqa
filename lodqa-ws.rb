@@ -26,6 +26,7 @@ class LodqaWS < Sinatra::Base
 		set :target_db, 'http://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
 		set :url_forwading_db, ENV['URL_FORWARDING_DB'] || 'http://urilinks.lodqa.org'
+		set :mailaddress, ''
 
 		enable :logging
 		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
@@ -48,7 +49,8 @@ class LodqaWS < Sinatra::Base
 		if params['code']
 			oauth = Lodqa::Oauth.new params['code']
 			# 取得したユーザアカウントをセッション情報として保持する
-			puts oauth.me_account
+			settings.mailaddress = oauth.me_account
+			puts settings.mailaddress
 		end
 	end
 
