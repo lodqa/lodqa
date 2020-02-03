@@ -24,25 +24,20 @@ module Lodqa
         'client_secret': "#{ENV['CLIENT_SECRET']}",
         'code': "#{@auth_code}",
         'grant_type': 'authorization_code',
-        'redirect_uri': "#{ENV['REDIRECT_URI']}"
+        'redirect_uri': "#{ENV['LODQA']}"
       )
 
-      begin
-        response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
-          http.request(request)
-        end
+      response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
+        http.request(request)
+      end
 
-        case response.code
-        when '200' then
-          token_info = JSON.parse response.body, { symbolize_names: true }
-          token_info[:access_token]
-        else
-          Logger::Logger.error nil, message: "Configuration Token Server return an error for #{uri}", response_code: response.code, response_body: response.body
-          raise IOError, "Response Error for url: #{uri}"
-          nil
-        end
-      rescue => e
-        Logger::Logger.error e, message: "Cannot connect the Configuration Token Server for #{uri}"
+      case response.code
+      when '200' then
+        token_info = JSON.parse response.body, { symbolize_names: true }
+        token_info[:access_token]
+      else
+        Logger::Logger.error nil, message: "Configuration Token Server return an error for #{uri}", response_code: response.code, response_body: response.body
+        nil
       end
     end
 
@@ -53,22 +48,17 @@ module Lodqa
       request = Net::HTTP::Get.new(uri)
       request["Authorization"] = "Bearer #{token_id}"
 
-      begin
-        response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
-          http.request(request)
-        end
+      response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
+        http.request(request)
+      end
 
-        case response.code
-        when '200' then
-          profile_info = JSON.parse response.body, { symbolize_names: true }
-          profile_info[:emailAddress]
-        else
-          Logger::Logger.error nil, message: "Configuration Profile Server return an error for #{uri}", response_code: response.code, response_body: response.body
-          raise IOError, "Response Error for url: #{uri}"
-          nil
-        end
-      rescue => e
-        Logger::Logger.error e, message: "Cannot connect the Configuration Profile Server for #{uri}"
+      case response.code
+      when '200' then
+        profile_info = JSON.parse response.body, { symbolize_names: true }
+        profile_info[:emailAddress]
+      else
+        Logger::Logger.error nil, message: "Configuration Profile Server return an error for #{uri}", response_code: response.code, response_body: response.body
+        nil
       end
     end
 

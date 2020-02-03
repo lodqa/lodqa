@@ -23,7 +23,6 @@ services:
       - URL_TOKEN=https://accounts.google.com/o/oauth2/token
       - CLIENT_ID=1090809463773-aphb48v6bg0tnhq2cgr301qvm90rtae4.apps.googleusercontent.com
       - CLIENT_SECRET=_lWA_yX1WqE1iOw5e0GU8oWO
-      - REDIRECT_URI=http://lodqa:9292
       - SCOPE=https://www.googleapis.com/auth/gmail.compose
     depends_on:
       - uri-forwarding-db

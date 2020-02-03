@@ -30,7 +30,7 @@
         <li><a href="<%= settings.target_db %>">Targets</a></li>
         <li><a href="http://www.lodqa.org/docs/intro/">Doc</a></li>
         <li><a href="https://github.com/lodqa/lodqa">Github</a></li>
-        <li><a href="#">Login</a></li>
+        <li><a href="<%= ENV['URL_AUTH'] %>?client_id=<%= ENV['CLIENT_ID'] %>&redirect_uri=<%= ENV['LODQA'] %>&scope=<%= ENV['SCOPE'] %>&response_type=code&approval_prompt=force&access_type=offline">Login</a></li>
       </ul>
     </nav>
     <div id="target-box">
