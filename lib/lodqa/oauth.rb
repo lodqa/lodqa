@@ -44,7 +44,7 @@ module Lodqa
     def profile_info token_id
       return nil unless token_id
 
-      uri = URI.parse("#{ENV['URL_PROFILE']}")
+      uri = URI.parse("#{ENV['URL_USERINFO']}")
       request = Net::HTTP::Get.new(uri)
       request["Authorization"] = "Bearer #{token_id}"
 
