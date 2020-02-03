@@ -55,7 +55,7 @@ module Lodqa
       case response.code
       when '200' then
         profile_info = JSON.parse response.body, { symbolize_names: true }
-        profile_info[:emailAddress]
+        profile_info[:email]
       else
         Logger::Logger.error nil, message: "Configuration Profile Server return an error for #{uri}", response_code: response.code, response_body: response.body
         nil
