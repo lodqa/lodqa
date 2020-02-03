@@ -12,8 +12,6 @@ gem 'sparql-client'
 gem 'app_config'
 gem 'sendgrid-ruby'
 
-gem 'oauth2'
-
 group :test do
 	gem 'rack-test'
 	gem 'rspec'
