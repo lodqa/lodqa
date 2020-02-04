@@ -5,7 +5,7 @@
     <li><a href="http://www.lodqa.org/docs/intro/">Doc</a></li>
     <li><a href="https://github.com/lodqa/lodqa">Github</a></li>
     <% if session[:email] == nil %>
-      <li><a href="<%= Const::URL_AUTH %>?client_id=<%= ENV['CLIENT_ID'] %>&redirect_uri=<%= ENV['LODQA'] %>&scope=<%= Const::SCOPE %>&response_type=code&approval_prompt=force&access_type=offline">Login</a></li>
+      <li><a href="<%= Lodqa::Oauth::URL_AUTH %>?client_id=<%= ENV['CLIENT_ID'] %>&redirect_uri=<%= ENV['LODQA'] %>&scope=<%= Lodqa::Oauth::SCOPE %>&response_type=code&approval_prompt=force&access_type=offline">Login</a></li>
     <% else %>
       <li><a href="<%= ENV['LODQA'] %>">Logout</a></li>
     <% end %>

@@ -1,10 +1,14 @@
 require 'net/http'
 require 'uri'
 require 'json'
-require 'lodqa/const'
 
 module Lodqa
   class Oauth
+    URL_AUTH = 'https://accounts.google.com/o/oauth2/auth'
+    URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
+    URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'
+    SCOPE = 'email'
+
     def initialize(code)
       @auth_code = code
     end
@@ -21,7 +25,7 @@ module Lodqa
     #   ユーザーがアプリケーションにアクセス権を付与済みであれば、更新トークンとアクセストークンの取得した承認コードを交換する。
     #   参考URL（https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps?hl=ja）
     def access_token_id
-      uri = URI.parse("#{Const::URL_TOKEN}")
+      uri = URI.parse("#{URL_TOKEN}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
         'client_id': "#{ENV['CLIENT_ID']}",
@@ -57,7 +61,7 @@ module Lodqa
     def token_info_email token_id
       return nil unless token_id
 
-      uri = URI.parse("#{Const::URL_TOKEN_INFO}")
+      uri = URI.parse("#{URL_TOKEN_INFO}")
       request = Net::HTTP::Get.new(uri)
       request['Authorization'] = "Bearer #{token_id}"
 
