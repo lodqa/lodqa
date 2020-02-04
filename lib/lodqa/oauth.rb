@@ -11,7 +11,7 @@ module Lodqa
     def me_account
       return nil unless @auth_code
 
-      profile_info access_token_id
+      token_info_email access_token_id
     end
 
     private
@@ -41,12 +41,12 @@ module Lodqa
       end
     end
 
-    def profile_info token_id
+    def token_info_email token_id
       return nil unless token_id
 
-      uri = URI.parse("#{ENV['URL_USERINFO']}")
+      uri = URI.parse("#{ENV['URL_TOKEN_INFO']}")
       request = Net::HTTP::Get.new(uri)
-      request["Authorization"] = "Bearer #{token_id}"
+      request['Authorization'] = "Bearer #{token_id}"
 
       response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
         http.request(request)
@@ -54,10 +54,10 @@ module Lodqa
 
       case response.code
       when '200' then
-        profile_info = JSON.parse response.body, { symbolize_names: true }
-        profile_info[:email]
+        token_info = JSON.parse response.body, { symbolize_names: true }
+        token_info[:email]
       else
-        Logger::Logger.error nil, message: "Configuration Profile Server return an error for #{uri}", response_code: response.code, response_body: response.body
+        Logger::Logger.error nil, message: "Configuration TokenInfo Server return an error for #{uri}", response_code: response.code, response_body: response.body
         nil
       end
     end
