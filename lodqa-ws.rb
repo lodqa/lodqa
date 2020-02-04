@@ -26,9 +26,9 @@ class LodqaWS < Sinatra::Base
 		set :target_db, 'http://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
 		set :url_forwading_db, ENV['URL_FORWARDING_DB'] || 'http://urilinks.lodqa.org'
-		set :mailaddress, ''
 
 		enable :logging
+		enable :sessions
 		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
 	end
 
@@ -45,12 +45,14 @@ class LodqaWS < Sinatra::Base
 			params.merge!(json_params) unless json_params.nil?
 		end
 
-		# oauth2でユーザアカウントを取得
+		# メールアドレスをセッション情報として保持する
+		# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
 		if params['code']
 			oauth = Lodqa::Oauth.new params['code']
-			# 取得したユーザアカウントをセッション情報として保持する
-			settings.mailaddress = oauth.me_account
-			puts settings.mailaddress
+			# 取得したメールアドレスをセッション情報として保持する
+			session[:email] = oauth.me_account
+		else
+			session[:email] = nil
 		end
 	end
 
