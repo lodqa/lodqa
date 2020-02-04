@@ -8,7 +8,7 @@ module Lodqa
       @auth_code = code
     end
 
-    def me_account
+    def email
       return nil unless @auth_code
 
       token_info_email access_token_id
