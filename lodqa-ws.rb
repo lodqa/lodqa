@@ -51,10 +51,9 @@ class LodqaWS < Sinatra::Base
 			oauth = Lodqa::Oauth.new params['code']
 			# 取得したメールアドレスをセッション情報として保持する
 			session[:email] = oauth.email
+		else
+			session[:email] = nil
 		end
-
-		query = Rack::Utils.parse_nested_query(request.query_string)
-		session[:email] = nil unless query['code']
 	end
 
 	get '/' do
