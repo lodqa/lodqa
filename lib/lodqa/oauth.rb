@@ -30,9 +30,6 @@ module Lodqa
         'redirect_uri': "#{ENV['LODQA']}"
       )
 
-      response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
-        http.request(request)
-      end
       # レスポンス情報の例：
       #   {
       #     "access_token" : "ya29.AHES6ZTtm7SuokEB-RGtbBty9IIlNiP9-eNMMQKtXdMP3sfjL1Fc",
@@ -40,6 +37,9 @@ module Lodqa
       #     "expires_in" : 3600,
       #     "refresh_token" : "1/HKSmLFXzqP0leUihZp2xUt3-5wkU7Gmu2Os_eBnzw74"
       #   }
+      response = Net::HTTP.start(uri.hostname, uri.port, options(uri)) do |http|
+        http.request(request)
+      end
 
       case response.code
       when '200' then
