@@ -51,14 +51,19 @@ class LodqaWS < Sinatra::Base
 			oauth = Lodqa::Oauth.new params['code']
 			# 取得したメールアドレスをセッション情報として保持する
 			session[:email] = oauth.email
-		else
-			session[:email] = nil
+			session[:refresh_token] = oauth.refresh_token
 		end
 	end
 
 	get '/' do
 		begin
-			logger.info "access /"
+			if request.query_string == 'session=nil'
+				session[:email] = nil
+
+				response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
+				session[:refresh_token] = nil if response_code == '200'
+			end
+
 			set_query_instance_variable
 
 			applicants = applicants_dataset(params[:target])

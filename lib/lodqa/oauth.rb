@@ -7,6 +7,7 @@ module Lodqa
     URL_AUTH = 'https://accounts.google.com/o/oauth2/auth'
     URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
     URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'
+    URL_REVOKE= 'https://accounts.google.com/o/oauth2/revoke'
     SCOPE = 'email'
 
     def initialize(code)
@@ -16,7 +17,36 @@ module Lodqa
     def email
       return nil unless @auth_code
 
-      token_info_email access_token_id
+      info = token_info
+      @refresh_token = info[:refresh_token]
+
+      token_info_email info[:access_token]
+    end
+
+    def refresh_token
+      @refresh_token
+    end
+
+    def self.token_revoke refresh_token_id
+      return nil unless refresh_token_id
+
+      uri = URI.parse("#{URL_REVOKE}")
+      request = Net::HTTP::Post.new(uri)
+      request.set_form_data(
+        'token': refresh_token_id
+      )
+
+      response = Net::HTTP.start(uri.hostname, uri.port, { use_ssl: uri.scheme == 'https' }) do |http|
+        http.request(request)
+      end
+
+      case response.code
+      when '200' then
+        response.code
+      else
+        Logger::Logger.error nil, message: "Configuration Revoke Server return an error for #{uri}", response_code: response.code
+        nil
+      end
     end
 
     private
@@ -24,7 +54,7 @@ module Lodqa
     # アクセストークン取得
     #   ユーザーがアプリケーションにアクセス権を付与済みであれば、更新トークンとアクセストークンの取得した承認コードを交換する。
     #   参考URL（https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps?hl=ja）
-    def access_token_id
+    def token_info
       uri = URI.parse("#{URL_TOKEN}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
@@ -48,8 +78,7 @@ module Lodqa
 
       case response.code
       when '200' then
-        token_info = JSON.parse response.body, { symbolize_names: true }
-        token_info[:access_token]
+        JSON.parse response.body, { symbolize_names: true }
       else
         Logger::Logger.error nil, message: "Configuration Token Server return an error for #{uri}", response_code: response.code, response_body: response.body
         nil
