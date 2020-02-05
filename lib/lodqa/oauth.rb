@@ -10,21 +10,20 @@ module Lodqa
     URL_REVOKE= 'https://accounts.google.com/o/oauth2/revoke'
     SCOPE = 'email'
 
-    def initialize(code)
-      @auth_code = code
+    def initialize(auth_code)
+      @token_info = token_info auth_code
     end
 
     def email
-      return nil unless @auth_code
+      return nil unless @token_info
 
-      info = token_info
-      @refresh_token = info[:refresh_token]
-
-      token_info_email info[:access_token]
+      token_info_email @token_info[:access_token]
     end
 
     def refresh_token
-      @refresh_token
+      return nil unless @token_info
+
+      @token_info[:refresh_token]
     end
 
     def self.token_revoke refresh_token_id
@@ -54,13 +53,13 @@ module Lodqa
     # アクセストークン取得
     #   ユーザーがアプリケーションにアクセス権を付与済みであれば、更新トークンとアクセストークンの取得した承認コードを交換する。
     #   参考URL（https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps?hl=ja）
-    def token_info
+    def token_info auth_code
       uri = URI.parse("#{URL_TOKEN}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
         'client_id': "#{ENV['CLIENT_ID']}",
         'client_secret': "#{ENV['CLIENT_SECRET']}",
-        'code': "#{@auth_code}",
+        'code': "#{auth_code}",
         'grant_type': 'authorization_code',
         'redirect_uri': "#{ENV['LODQA']}"
       )

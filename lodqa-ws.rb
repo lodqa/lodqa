@@ -49,15 +49,15 @@ class LodqaWS < Sinatra::Base
 		# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
 		if params['code']
 			oauth = Lodqa::Oauth.new params['code']
-			# 取得したメールアドレスをセッション情報として保持する
-			session[:email] = oauth.email
+			# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
 			session[:refresh_token] = oauth.refresh_token
+			session[:email] = oauth.email
 		end
 	end
 
 	get '/' do
 		begin
-			if request.query_string == 'session=nil'
+			if request.query_string == 'logout=true'
 				session[:email] = nil
 
 				response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
