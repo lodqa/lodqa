@@ -16,6 +16,7 @@ require 'logger/logger'
 require 'lodqa/lodqa'
 require 'lodqa/source_channel'
 require 'lodqa/sparqls_count'
+require 'lodqa/oauth'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -26,6 +27,7 @@ class LodqaWS < Sinatra::Base
 		# set :target_db, 'http://localhost:3000/targets'
 		set :url_forwading_db, ENV['URL_FORWARDING_DB'] || 'http://urilinks.lodqa.org'
 
+		enable :sessions
 		enable :logging
 		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
 	end
@@ -46,7 +48,6 @@ class LodqaWS < Sinatra::Base
 
 	get '/' do
 		begin
-			logger.info "access /"
 			set_query_instance_variable
 
 			applicants = applicants_dataset(params[:target])
@@ -57,6 +58,30 @@ class LodqaWS < Sinatra::Base
 		rescue Lodqa::SourceError
 			[503, 'Failed to connect the Target Database.']
 		end
+	end
+
+	get '/login' do
+		redirect Lodqa::Oauth::URL_AUTH
+	end
+
+	# メールアドレスをセッション情報として保持する
+	# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
+	get '/oauth' do
+		oauth = Lodqa::Oauth.new params[:code]
+		# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
+		session[:refresh_token] = oauth.refresh_token
+		session[:email] = oauth.email
+
+		redirect '/'
+	end
+
+	get '/logout' do
+		session[:email] = nil
+
+		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
+		session[:refresh_token] = nil if response_code == '200'
+
+		redirect '/'
 	end
 
 	post '/template.json' do

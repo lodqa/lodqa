@@ -18,6 +18,8 @@ services:
       - LODQA=http://lodqa:9292
       - LODQA_BS=http://lodqa_bs:3000
       - URL_FORWARDING_DB=http://uri-forwarding-db:3000
+      - CLIENT_ID=1090809463773-aphb48v6bg0tnhq2cgr301qvm90rtae4.apps.googleusercontent.com
+      - CLIENT_SECRET=_lWA_yX1WqE1iOw5e0GU8oWO
     depends_on:
       - uri-forwarding-db
       - lodqa_bs
