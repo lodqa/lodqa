@@ -44,15 +44,6 @@ class LodqaWS < Sinatra::Base
 
 			params.merge!(json_params) unless json_params.nil?
 		end
-
-		# メールアドレスをセッション情報として保持する
-		# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
-		if params['code']
-			oauth = Lodqa::Oauth.new params['code']
-			# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
-			session[:refresh_token] = oauth.refresh_token
-			session[:email] = oauth.email
-		end
 	end
 
 	get '/' do
@@ -73,19 +64,24 @@ class LodqaWS < Sinatra::Base
 		redirect Lodqa::Oauth::URL_AUTH
 	end
 
+	# メールアドレスをセッション情報として保持する
+	# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
+	get '/oauth' do
+		oauth = Lodqa::Oauth.new params[:code]
+		# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
+		session[:refresh_token] = oauth.refresh_token
+		session[:email] = oauth.email
+
+		redirect '/'
+	end
+
 	get '/logout' do
 		session[:email] = nil
 
 		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
 		session[:refresh_token] = nil if response_code == '200'
 
-		set_query_instance_variable
-
-		applicants = applicants_dataset(params[:target])
-		@sample_queries = sample_queries_for applicants, params
-
-		@config = dataset_config_of params[:target] if present_in? params, :target
-		erb :index
+		redirect '/'
 	end
 
 	post '/template.json' do

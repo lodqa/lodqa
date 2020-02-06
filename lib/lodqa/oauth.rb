@@ -6,10 +6,11 @@ module Lodqa
   class Oauth
     LOGIN = "#{ENV['LODQA']}/login"
     LOGOUT = "#{ENV['LODQA']}/logout"
+    REDIRECT_URI="#{ENV['LODQA']}/oauth"
     URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
     URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'
     URL_REVOKE= 'https://accounts.google.com/o/oauth2/revoke'
-    URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA']}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
+    URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
 
     def initialize(auth_code)
       @token_info = token_info auth_code
@@ -62,7 +63,7 @@ module Lodqa
         'client_secret': "#{ENV['CLIENT_SECRET']}",
         'code': "#{auth_code}",
         'grant_type': 'authorization_code',
-        'redirect_uri': "#{ENV['LODQA']}"
+        'redirect_uri': REDIRECT_URI
       )
 
       # レスポンス情報の例：
