@@ -4,6 +4,8 @@ require 'json'
 
 module Lodqa
   class Oauth
+    LOGIN = "#{ENV['LODQA']}/login"
+    LOGOUT = "#{ENV['LODQA']}/logout"
     URL_AUTH = 'https://accounts.google.com/o/oauth2/auth'
     URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
     URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'

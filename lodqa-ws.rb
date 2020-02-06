@@ -57,13 +57,6 @@ class LodqaWS < Sinatra::Base
 
 	get '/' do
 		begin
-			if request.query_string == 'logout=true'
-				session[:email] = nil
-
-				response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
-				session[:refresh_token] = nil if response_code == '200'
-			end
-
 			set_query_instance_variable
 
 			applicants = applicants_dataset(params[:target])
@@ -74,6 +67,26 @@ class LodqaWS < Sinatra::Base
 		rescue Lodqa::SourceError
 			[503, 'Failed to connect the Target Database.']
 		end
+	end
+
+	get '/login' do
+		oauth_url = "#{Lodqa::Oauth::URL_AUTH}?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA']}&scope=#{Lodqa::Oauth::SCOPE}&response_type=code&approval_prompt=force&access_type=offline"
+		redirect oauth_url
+	end
+
+	get '/logout' do
+		session[:email] = nil
+
+		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
+		session[:refresh_token] = nil if response_code == '200'
+
+		set_query_instance_variable
+
+		applicants = applicants_dataset(params[:target])
+		@sample_queries = sample_queries_for applicants, params
+
+		@config = dataset_config_of params[:target] if present_in? params, :target
+		erb :index
 	end
 
 	post '/template.json' do
