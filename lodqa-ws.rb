@@ -70,8 +70,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/login' do
-		oauth_url = "#{Lodqa::Oauth::URL_AUTH}?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA']}&scope=#{Lodqa::Oauth::SCOPE}&response_type=code&approval_prompt=force&access_type=offline"
-		redirect oauth_url
+		redirect Lodqa::Oauth::URL_AUTH
 	end
 
 	get '/logout' do
