@@ -199,7 +199,7 @@ class LodqaWS < Sinatra::Base
 		request_id = Logger::Logger.generate_request_id
 		applicants = applicants_dataset params[:target]
 
-		register_query ws, request_id, parser_url, applicants, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params['query'], params[:target]
+		register_query ws, request_id, parser_url, applicants, params['read_timeout'], params['sparql_limit'], params['answer_limit'], params['query'], params[:target], session[:email] || nil
 
 		return ws.rack_response
 	end
@@ -317,10 +317,10 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_query ws, request_id, parser_url, applicants, read_timeout, sparql_limit, answer_limit, query, target
+	def register_query ws, request_id, parser_url, applicants, read_timeout, sparql_limit, answer_limit, query, target, user_id
 		ws.on :open do
 			Logger::Logger.request_id = request_id
-			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target
+			res = Lodqa::BSClient.register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target, user_id
 			next unless res
 
 			data = JSON.parse res
