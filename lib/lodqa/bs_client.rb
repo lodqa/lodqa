@@ -9,7 +9,7 @@ module Lodqa
         WEB_SOCKETS[request_id]
       end
 
-      def register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target
+      def register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target, user_id
         send_bs_error_on ws do
           url = "#{ENV['LODQA_BS']}/searches"
           payload = {
@@ -18,6 +18,7 @@ module Lodqa
             sparql_limit: sparql_limit,
             answer_limit: answer_limit,
             target: target,
+            user_id: user_id,
             callback_url: "#{ENV['LODQA']}/requests/#{request_id}/black_hall"
           }.delete_if { |k, v| v.nil? || v.empty? }
           RestClient::Request.execute method: :post, url: url, payload: payload
