@@ -267,7 +267,7 @@ class LodqaWS < Sinatra::Base
 				mappings = json[:mappings]
 
 				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id
-				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id, session[:email] || nil
+				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id, session[:email]
 			end
 
 			ws.rack_response
