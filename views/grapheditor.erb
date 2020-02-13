@@ -30,6 +30,11 @@
         <li><a href="<%= settings.target_db %>">Targets</a></li>
         <li><a href="http://www.lodqa.org/docs/intro/">Doc</a></li>
         <li><a href="https://github.com/lodqa/lodqa">Github</a></li>
+        <% if session[:email] == nil %>
+          <li><a href="<%= Lodqa::Oauth::LOGIN %>">Login</a></li>
+        <% else %>
+          <li><a href="<%= Lodqa::Oauth::LOGOUT %>">Logout</a></li>
+        <% end %>
       </ul>
     </nav>
     <div id="target-box">

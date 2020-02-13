@@ -267,7 +267,7 @@ class LodqaWS < Sinatra::Base
 				mappings = json[:mappings]
 
 				start_and_sparql_count ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id
-				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id
+				register_pgp_and_mappings ws, params[:target], params[:read_timeout], params[:sparql_limit], params[:answer_limit], pgp, mappings, request_id, session[:email]
 			end
 
 			ws.rack_response
@@ -329,8 +329,8 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	def register_pgp_and_mappings ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, request_id
-		res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, pgp, mappings, read_timeout, sparql_limit, answer_limit, target
+	def register_pgp_and_mappings ws, target, read_timeout, sparql_limit, answer_limit, pgp, mappings, request_id, user_id
+		res = Lodqa::BSClient.register_pgp_and_mappings ws, request_id, pgp, mappings, read_timeout, sparql_limit, answer_limit, target, user_id
 
 		data = JSON.parse res
 		subscribe_url = data['subscribe_url']
