@@ -67,7 +67,7 @@ class LodqaWS < Sinatra::Base
 	# メールアドレスをセッション情報として保持する
 	# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
 	get '/oauth' do
-		oauth = Lodqa::Oauth.new params[:code]
+		oauth = Lodqa::Oauth.new params[:code], Lodqa::Oauth::REDIRECT_URI
 		# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
 		session[:refresh_token] = oauth.refresh_token
 		session[:email] = oauth.email
@@ -82,6 +82,30 @@ class LodqaWS < Sinatra::Base
 		session[:refresh_token] = nil if response_code == '200'
 
 		redirect '/'
+	end
+
+	get '/expert/login' do
+		redirect Lodqa::Oauth::EXPERT_URL_AUTH
+	end
+
+	# メールアドレスをセッション情報として保持する
+	# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
+	get '/expert_oauth' do
+		oauth = Lodqa::Oauth.new params[:code], Lodqa::Oauth::EXPERT_REDIRECT_URI
+		# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
+		session[:refresh_token] = oauth.refresh_token
+		session[:email] = oauth.email
+
+		redirect '/grapheditor'
+	end
+
+	get '/expert/logout' do
+		session[:email] = nil
+
+		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
+		session[:refresh_token] = nil if response_code == '200'
+
+		redirect '/grapheditor'
 	end
 
 	post '/template.json' do

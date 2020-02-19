@@ -7,13 +7,17 @@ module Lodqa
     LOGIN = "#{ENV['LODQA_OAUTH']}/login"
     LOGOUT = "#{ENV['LODQA_OAUTH']}/logout"
     REDIRECT_URI="#{ENV['LODQA_OAUTH']}/oauth"
+    EXPERT_LOGIN = "#{ENV['LODQA_OAUTH']}/expert/login"
+    EXPERT_LOGOUT = "#{ENV['LODQA_OAUTH']}/expert/logout"
+    EXPERT_REDIRECT_URI="#{ENV['LODQA_OAUTH']}/expert_oauth"
     URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
     URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'
     URL_REVOKE= 'https://accounts.google.com/o/oauth2/revoke'
     URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
+    EXPERT_URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{EXPERT_REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
 
-    def initialize(auth_code)
-      @token_info = token_info auth_code
+    def initialize(auth_code, redirect_uri)
+      @token_info = token_info auth_code, redirect_uri
     end
 
     def email
@@ -55,7 +59,7 @@ module Lodqa
     # アクセストークン取得
     #   ユーザーがアプリケーションにアクセス権を付与済みであれば、更新トークンとアクセストークンの取得した承認コードを交換する。
     #   参考URL（https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps?hl=ja）
-    def token_info auth_code
+    def token_info auth_code, redirect_uri
       uri = URI.parse("#{URL_TOKEN}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
@@ -63,7 +67,7 @@ module Lodqa
         'client_secret': "#{ENV['CLIENT_SECRET']}",
         'code': "#{auth_code}",
         'grant_type': 'authorization_code',
-        'redirect_uri': REDIRECT_URI
+        'redirect_uri': "#{redirect_uri}"
       )
 
       # レスポンス情報の例：
