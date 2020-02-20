@@ -81,6 +81,64 @@ npm i -g bower
 bower install
 ```
 
+### Google authentication procedure
+
+Execute the following ur in the browser and log in with the lodqa specific user account.
+```
+https://console.developers.google.com/
+```
+
+Create a lodqa project.
+Example:
+```
+Lodqa Dialog Management
+```
+
+Click link(Enable APIs and services) to activate the API library:
+ ```
+ Gmail API
+ ```
+
+OAuth consent screen.
+
+User Type:
+```
+ External
+```
+application name:
+```
+Lodqa Dialog Management
+```
+
+Create authentication information(OAuth Client ID).
+Application type:
+```
+Web Application
+```
+After creating an OAuth client, client id and client secret are generated:
+
+client id
+```
+99999999999-xx99x9xx9xxxxxx9x9xx9xx9xxxxxx.apps.googleusercontent.com
+```
+client secret
+```
+xxxxxxxxx9xxxx9xx9x9xx99
+```
+
+Add an approved redirect URI.
+```
+[Same URL as environment variable(LODQA)]/simple_oauth
+[Same URL as environment variable(LODQA)]/expert_oauth
+```
+
+### Added environment variable settings.（lodqa/docker-compose.yml）
+```
+LODQA_OAUTH=[Same URL as environment variable(LODQA)]
+CLIENT_ID=[Generated client id]
+CLIENT_SECRET=[Generated client secret]
+```
+
 ## Deployment
 
 Add additional notes about how to deploy this on a live system
