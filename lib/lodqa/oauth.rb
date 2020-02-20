@@ -4,17 +4,19 @@ require 'json'
 
 module Lodqa
   class Oauth
-    LOGIN = "#{ENV['LODQA_OAUTH']}/login"
-    LOGOUT = "#{ENV['LODQA_OAUTH']}/logout"
-    REDIRECT_URI="#{ENV['LODQA_OAUTH']}/oauth"
-    EXPERT_LOGIN = "#{ENV['LODQA_OAUTH']}/expert/login"
-    EXPERT_LOGOUT = "#{ENV['LODQA_OAUTH']}/expert/logout"
+    SIMPLE_LOGIN = "/simple/login"
+    SIMPLE_LOGOUT = "/simple/logout"
+    SIMPLE_REDIRECT_URI="#{ENV['LODQA_OAUTH']}/simple_oauth"
+    SIMPLE_URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{SIMPLE_REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
+
+    EXPERT_LOGIN = "/expert/login"
+    EXPERT_LOGOUT = "/expert/logout"
     EXPERT_REDIRECT_URI="#{ENV['LODQA_OAUTH']}/expert_oauth"
+    EXPERT_URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{EXPERT_REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
+
     URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
     URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'
     URL_REVOKE= 'https://accounts.google.com/o/oauth2/revoke'
-    URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
-    EXPERT_URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{EXPERT_REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
 
     def initialize(auth_code, redirect_uri)
       @token_info = token_info auth_code, redirect_uri
