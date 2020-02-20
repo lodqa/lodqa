@@ -67,9 +67,9 @@ module Lodqa
       request.set_form_data(
         'client_id': "#{ENV['CLIENT_ID']}",
         'client_secret': "#{ENV['CLIENT_SECRET']}",
-        'code': "#{auth_code}",
+        'code': auth_code,
         'grant_type': 'authorization_code',
-        'redirect_uri': "#{redirect_uri}"
+        'redirect_uri': redirect_uri
       )
 
       # レスポンス情報の例：

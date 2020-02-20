@@ -81,7 +81,14 @@ class LodqaWS < Sinatra::Base
 		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
 		session[:refresh_token] = nil if response_code == '200'
 
-		redirect '/'
+		set_query_instance_variable
+
+		applicants = applicants_dataset(params[:target])
+		@sample_queries = sample_queries_for applicants, params
+
+		@config = dataset_config_of params[:target] if present_in? params, :target
+
+		redirect back
 	end
 
 	get '/expert/login' do
