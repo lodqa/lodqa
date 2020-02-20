@@ -60,14 +60,14 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
-	get '/login' do
-		redirect Lodqa::Oauth::URL_AUTH
+	get '/simple/login' do
+		redirect Lodqa::Oauth::SIMPLE[:url_auth]
 	end
 
 	# メールアドレスをセッション情報として保持する
 	# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
-	get '/oauth' do
-		oauth = Lodqa::Oauth.new params[:code]
+	get '/simple_oauth' do
+		oauth = Lodqa::Oauth.new params[:code], Lodqa::Oauth::SIMPLE[:redirect_uri]
 		# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
 		session[:refresh_token] = oauth.refresh_token
 		session[:email] = oauth.email
@@ -75,13 +75,58 @@ class LodqaWS < Sinatra::Base
 		redirect '/'
 	end
 
-	get '/logout' do
+	get '/simple/logout' do
 		session[:email] = nil
 
 		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
 		session[:refresh_token] = nil if response_code == '200'
 
-		redirect '/'
+		set_query_instance_variable
+
+		applicants = applicants_dataset(params[:target])
+		@sample_queries = sample_queries_for applicants, params
+
+		@config = dataset_config_of params[:target] if present_in? params, :target
+
+		redirect back
+	end
+
+	get '/expert/login' do
+		redirect Lodqa::Oauth::EXPERT[:url_auth]
+	end
+
+	# メールアドレスをセッション情報として保持する
+	# 　画面のLoginリンク押下で、ユーザーがアプリケーションにアクセス権を付与済みであれば、codeパラメータ（承認コード）がredirect_uriに追加される。
+	get '/expert_oauth' do
+		oauth = Lodqa::Oauth.new params[:code], Lodqa::Oauth::EXPERT[:redirect_uri]
+		# 取得したリフレッシュトークンとメールアドレスをセッション情報として保持する
+		session[:refresh_token] = oauth.refresh_token
+		session[:email] = oauth.email
+
+		redirect '/grapheditor'
+	end
+
+	get '/expert/logout' do
+		session[:email] = nil
+
+		response_code = Lodqa::Oauth.token_revoke session[:refresh_token]
+		session[:refresh_token] = nil if response_code == '200'
+
+		set_query_instance_variable
+
+		# Set a parameter of candidates of the target
+		@targets = get_targets
+
+		# Set a parameter of the target
+		@target = params['target'] || @targets.first
+		@endpoint_url = dataset_config_of(@target)[:endpoint_url]
+		@need_proxy = @target == 'biogateway'
+
+		if @query
+			@pgp = Lodqa::PGPFactory.create parser_url, params['query']
+		end
+
+		redirect back
 	end
 
 	post '/template.json' do
