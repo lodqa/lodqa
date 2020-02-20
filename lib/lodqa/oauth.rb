@@ -4,19 +4,23 @@ require 'json'
 
 module Lodqa
   class Oauth
-    SIMPLE_LOGIN = "/simple/login"
-    SIMPLE_LOGOUT = "/simple/logout"
-    SIMPLE_REDIRECT_URI="#{ENV['LODQA_OAUTH']}/simple_oauth"
-    SIMPLE_URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{SIMPLE_REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
-
-    EXPERT_LOGIN = "/expert/login"
-    EXPERT_LOGOUT = "/expert/logout"
-    EXPERT_REDIRECT_URI="#{ENV['LODQA_OAUTH']}/expert_oauth"
-    EXPERT_URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{EXPERT_REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
-
-    URL_TOKEN_INFO = 'https://oauth2.googleapis.com/tokeninfo'
-    URL_TOKEN = 'https://accounts.google.com/o/oauth2/token'
-    URL_REVOKE= 'https://accounts.google.com/o/oauth2/revoke'
+    SIMPLE = {
+      login: '/simple/login',
+      logout: '/simple/logout',
+      redirect_uri: "#{ENV['LODQA_OAUTH']}/simple_oauth",
+      url_auth: "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA_OAUTH']}/simple_oauth&scope=email&response_type=code&approval_prompt=force&access_type=offline"
+    }
+    EXPERT = {
+      login: '/expert/login',
+      logout: '/expert/logout',
+      redirect_uri: "#{ENV['LODQA_OAUTH']}/expert_oauth",
+      url_auth: "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA_OAUTH']}/expert_oauth&scope=email&response_type=code&approval_prompt=force&access_type=offline"
+    }
+    URL = {
+      token_info: 'https://oauth2.googleapis.com/tokeninfo',
+      token: 'https://accounts.google.com/o/oauth2/token',
+      revoke: 'https://accounts.google.com/o/oauth2/revoke'
+    }
 
     def initialize(auth_code, redirect_uri)
       @token_info = token_info auth_code, redirect_uri
@@ -37,7 +41,7 @@ module Lodqa
     def self.token_revoke refresh_token_id
       return nil unless refresh_token_id
 
-      uri = URI.parse("#{URL_REVOKE}")
+      uri = URI.parse("#{URL[:revoke]}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
         'token': refresh_token_id
@@ -62,7 +66,7 @@ module Lodqa
     #   ユーザーがアプリケーションにアクセス権を付与済みであれば、更新トークンとアクセストークンの取得した承認コードを交換する。
     #   参考URL（https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps?hl=ja）
     def token_info auth_code, redirect_uri
-      uri = URI.parse("#{URL_TOKEN}")
+      uri = URI.parse("#{URL[:token]}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
         'client_id': "#{ENV['CLIENT_ID']}",
@@ -97,7 +101,7 @@ module Lodqa
     def token_info_email token_id
       return nil unless token_id
 
-      uri = URI.parse("#{URL_TOKEN_INFO}")
+      uri = URI.parse("#{URL[:token_info]}")
       request = Net::HTTP::Get.new(uri)
       request['Authorization'] = "Bearer #{token_id}"
 

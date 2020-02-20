@@ -5,9 +5,9 @@
     <li><a href="http://www.lodqa.org/docs/intro/">Doc</a></li>
     <li><a href="https://github.com/lodqa/lodqa">Github</a></li>
     <% if session[:email] == nil %>
-      <li><a href="<%= Lodqa::Oauth::SIMPLE_LOGIN %>">Login</a></li>
+      <li><a href="<%= Lodqa::Oauth::SIMPLE[:login] %>">Login</a></li>
     <% else %>
-      <li><a href="<%= Lodqa::Oauth::SIMPLE_LOGOUT %>">Logout</a></li>
+      <li><a href="<%= Lodqa::Oauth::SIMPLE[:logout] %>">Logout</a></li>
     <% end %>
   </ul>
 </nav>
