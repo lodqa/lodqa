@@ -135,6 +135,15 @@ Add an approved redirect URI.
 ### Added environment variable settings.（lodqa/docker-compose.yml）
 ```
 LODQA_OAUTH=[Same URL as environment variable(LODQA)]
+```
+
+### Create .env file.
+```
+cp .env.example .env
+```
+
+### .env file settings.
+```
 CLIENT_ID=[Generated client id]
 CLIENT_SECRET=[Generated client secret]
 ```
