@@ -52,34 +52,7 @@ bundle install
 docker-compose up
 ```
 
-## Development
-
-### Prerequisites
-
-LODQA depends on some npm packages and some bower packages to develop.
-Install them:
-
-### Installing
-Install [Node.js](https://nodejs.org). For exapmle for ubuntu:
-
-```
-curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
-sudo apt-get install -y nodejs
-```
-
-For other operating systems, see [Installing Node.js via package manager | Node.js](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
-
-Install npm packages:
-
-```
-npm install
-```
-
-Install bower packages:
-```
-npm i -g bower
-bower install
-```
+## Deployment
 
 ### Google authentication procedure
 
@@ -148,6 +121,31 @@ CLIENT_ID=[Generated client id]
 CLIENT_SECRET=[Generated client secret]
 ```
 
-## Deployment
+## Development
 
-Add additional notes about how to deploy this on a live system
+### Prerequisites
+
+LODQA depends on some npm packages and some bower packages to develop.
+Install them:
+
+### Installing
+Install [Node.js](https://nodejs.org). For exapmle for ubuntu:
+
+```
+curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+For other operating systems, see [Installing Node.js via package manager | Node.js](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions)
+
+Install npm packages:
+
+```
+npm install
+```
+
+Install bower packages:
+```
+npm i -g bower
+bower install
+```
