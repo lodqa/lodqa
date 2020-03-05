@@ -1,16 +1,13 @@
 LODQA
 =============
-LODQA (Linked Open Data Question-Answering) is a system to generate SPARQL queries from natural language queries.
+It is a web interface service of LODQA.
+
+LODQA (Linked Open Data Question-Answering) is a system to search SPARQL endpoints, using natural langauge queries, from which it generates SPARQL queries, submits them to SPARQL endpoints, collects answers, and present them to the users.
 
 
 Dependency
 ----------
-The Current LODQA system is dependent on two external services:
-
-- [Enju](http://kmcs.nii.ac.jp/enju/) CGI server at [http://bionlp.dbcls.jp/enju](http://bionlp.dbcls.jp/enju).
-- OntoFinder REST WS at [http://ontofinder.dbcls.jp](http://ontofinder.dbcls.jp).
-
-Currently, LODQA is developed and tested in Ruby v2.1.1.
+As LODQA is a web interface service, it works by communicating with LODQA_BS, which acts like an engine of the whole LODQA system.
 
 
 License
