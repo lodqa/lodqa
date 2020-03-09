@@ -4,17 +4,15 @@ require 'json'
 
 module Lodqa
   class Oauth
+    REDIRECT_URI = "#{ENV['LODQA_OAUTH']}/oauth"
+    URL_AUTH = "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{REDIRECT_URI}&scope=email&response_type=code&approval_prompt=force&access_type=offline"
     SIMPLE = {
       login: '/simple/login',
       logout: '/simple/logout',
-      redirect_uri: "#{ENV['LODQA_OAUTH']}/simple_oauth",
-      url_auth: "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA_OAUTH']}/simple_oauth&scope=email&response_type=code&approval_prompt=force&access_type=offline"
     }
     EXPERT = {
       login: '/expert/login',
       logout: '/expert/logout',
-      redirect_uri: "#{ENV['LODQA_OAUTH']}/expert_oauth",
-      url_auth: "https://accounts.google.com/o/oauth2/auth?client_id=#{ENV['CLIENT_ID']}&redirect_uri=#{ENV['LODQA_OAUTH']}/expert_oauth&scope=email&response_type=code&approval_prompt=force&access_type=offline"
     }
     GOOGLE_OAUTH_URL = {
       token_info: 'https://oauth2.googleapis.com/tokeninfo',
@@ -22,8 +20,8 @@ module Lodqa
       revoke: 'https://accounts.google.com/o/oauth2/revoke'
     }
 
-    def initialize(auth_code, redirect_uri)
-      @token_info = token_info auth_code, redirect_uri
+    def initialize(auth_code)
+      @token_info = token_info auth_code
     end
 
     def email
@@ -65,7 +63,7 @@ module Lodqa
     # アクセストークン取得
     #   ユーザーがアプリケーションにアクセス権を付与済みであれば、更新トークンとアクセストークンの取得した承認コードを交換する。
     #   参考URL（https://developers.google.com/youtube/v3/guides/auth/server-side-web-apps?hl=ja）
-    def token_info auth_code, redirect_uri
+    def token_info auth_code
       uri = URI.parse("#{GOOGLE_OAUTH_URL[:token]}")
       request = Net::HTTP::Post.new(uri)
       request.set_form_data(
@@ -73,7 +71,7 @@ module Lodqa
         'client_secret': "#{ENV['CLIENT_SECRET']}",
         'code': auth_code,
         'grant_type': 'authorization_code',
-        'redirect_uri': redirect_uri
+        'redirect_uri': REDIRECT_URI
       )
 
       # レスポンス情報の例：
