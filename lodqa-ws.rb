@@ -61,7 +61,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/simple/login' do
-		session[:mode] = 'simple'
+		session[:mode_before_login] = 'simple'
 		redirect Lodqa::Oauth::URL_AUTH
 	end
 
@@ -74,7 +74,7 @@ class LodqaWS < Sinatra::Base
 		session[:refresh_token] = oauth.refresh_token
 		session[:email] = oauth.email
 
-		if session[:mode] == 'simple'
+		if session[:mode_before_login] == 'simple'
 			redirect '/'
 		else
 			redirect '/grapheditor'
@@ -98,7 +98,7 @@ class LodqaWS < Sinatra::Base
 	end
 
 	get '/expert/login' do
-		session[:mode] = 'expert'
+		session[:mode_before_login] = 'expert'
 		redirect Lodqa::Oauth::URL_AUTH
 	end
 
