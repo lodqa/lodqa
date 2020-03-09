@@ -101,8 +101,7 @@ xxxxxxxxx9xxxx9xx9x9xx99
 
 Add an approved redirect URI.
 ```
-[Same URL as environment variable(LODQA)]/simple_oauth
-[Same URL as environment variable(LODQA)]/expert_oauth
+[Same URL as environment variable(LODQA)]/oauth
 ```
 
 ### Added environment variable settings.（lodqa/docker-compose.yml）
