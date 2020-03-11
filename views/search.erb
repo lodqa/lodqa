@@ -1,0 +1,47 @@
+<head>
+  <title>Queued Search</title>
+  <style>
+    table{
+      width: 50%;
+      border-collapse:separate;
+      border-spacing: 0;
+      font-size: 10pt;
+    }
+
+    table th{
+      text-align: left;
+      background: #cccccc;
+      border: 1px solid #718598;
+      box-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+      width: 20%;
+      padding: 10px 0;
+    }
+
+    table td{
+      text-align: left;
+      border: 1px solid #718598;
+      box-shadow: 0px -3px 5px 1px #eee inset;
+    }
+  </style>
+</head>
+<body>
+  <h1>Search detail</h1>
+  <tr>
+    <td><a href="#" onclick="history.go(-1)">Back</a></td>
+  </tr>
+
+  <table>
+    <tr>
+      <th>Search id</th>
+      <td><%= @search['search_id'] %></td>
+    </tr>
+    <tr>
+      <th>Query</th>
+      <td><%= @search['query'] %></td>
+    </tr>
+    <tr>
+      <th>Referred at</th>
+      <td><%= DateTime.parse(@search['referred_at']).strftime('%Y%m/%d %H:%M') %></td>
+    </tr>
+  </table>
+</body>

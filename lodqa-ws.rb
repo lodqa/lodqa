@@ -146,6 +146,29 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
+	get '/dialogs' do
+		# Get dialogs for email from the LODQA_BS
+		begin
+			response = RestClient.get "#{ENV['LODQA_BS']}/user_histories/#{session[:email]}"
+			@dialogs = JSON.parse(response.body)
+		rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
+			Logger::Logger.error e
+		end
+
+		erb :dialogs if response.code == 200
+	end
+
+	get '/searches/:search_id' do
+		begin
+			response = RestClient.get "#{ENV['LODQA_BS']}/dialog_searches/#{params['search_id']}"
+			@search = JSON.parse(response.body)
+		rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
+			Logger::Logger.error e
+		end
+
+		erb :search if response.code == 200
+	end
+
 	get '/answer' do
 		if params['search_id']
 			# Get query from the LODQA_BS

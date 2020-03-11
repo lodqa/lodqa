@@ -26,6 +26,9 @@
     </div>
     <nav id="main-nav">
       <ul>
+        <% unless session[:email] == nil %>
+          <li><a href="/dialogs">Dialogs</a></li>
+        <% end %>
         <li><a id="mode-switch" href="#">Simple</a></li>
         <li><a href="<%= settings.target_db %>">Targets</a></li>
         <li><a href="http://www.lodqa.org/docs/intro/">Doc</a></li>
