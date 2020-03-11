@@ -354,7 +354,7 @@ class LodqaWS < Sinatra::Base
 	def show_progress_in_lodqa_bs ws, request_id, search_id
 		ws.on :open do
 			url = "#{ENV['LODQA_BS']}/searches/#{search_id}/subscriptions"
-			Lodqa::BSClient.subscribe ws, request_id, url
+			Lodqa::BSClient.subscribe ws, request_id, url, 'simple'
 		end
 	end
 
