@@ -160,7 +160,7 @@ class LodqaWS < Sinatra::Base
 
 	get '/searches/:search_id' do
 		begin
-			response = RestClient.get "#{ENV['LODQA_BS']}/dialog_searches/#{params['search_id']}"
+			response = RestClient.get "#{ENV['LODQA_BS']}/searches/#{params['search_id']}"
 			@search = JSON.parse(response.body)
 		rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
 			Logger::Logger.error e
