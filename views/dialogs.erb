@@ -1,0 +1,62 @@
+<head>
+  <title>Dialog Histories</title>
+  <style>
+    table{
+      width: 70%;
+      border-collapse:separate;
+      border-spacing: 0;
+      font-size: 10pt;
+    }
+
+    table th:first-child{
+      border-radius: 5px 0 0 0;
+    }
+
+    table th:last-child{
+      border-radius: 0 5px 0 0;
+      border-right: 1px solid #3c6690;
+    }
+
+    table th{
+      text-align: center;
+      background: #cccccc;
+      border: 1px solid #718598;
+      box-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+      width: auto;
+      padding: 10px 0;
+    }
+
+    table td{
+      text-align: left;
+      border: 1px solid #718598;
+      box-shadow: 0px -3px 5px 1px #eee inset;
+    }
+
+    </style>
+</head>
+<body>
+  <h1>Dialogs</h1>
+  <tr>
+    <td><a href="#" onclick="history.go(-1)">Back</a></td>
+  </tr>
+
+  <table>
+    <tr>
+      <th>No</th>
+      <th>Latest Created at</th>
+      <th>Query</th>
+      <th>Total</th>
+    </tr>
+
+    <% @dialogs.each_with_index do |dialog, idx| %>
+      <tr>
+        <td><%= idx + 1 %></td>
+        <td><%= DateTime.parse(dialog['latest_created_at']).strftime('%Y/%m/%d %H:%M') %></td>
+        <td><%= dialog['query'] %></td>
+        <td><%= dialog['total_count'] %></td>
+        <td><a href="/searches/<%= dialog['search_id'] %>">Detail</a></td>
+        <td><a href="/answer?search_id=<%= dialog['search_id'] %>">Result</a></td>
+      </tr>
+    <% end %>
+  </table>
+</body>

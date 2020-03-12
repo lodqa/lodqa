@@ -146,6 +146,29 @@ class LodqaWS < Sinatra::Base
 		end
 	end
 
+	get '/dialogs' do
+		# Get dialogs for email from the LODQA_BS
+		begin
+			response = RestClient.get "#{ENV['LODQA_BS']}/user_histories/#{session[:email]}"
+			@dialogs = JSON.parse(response.body)
+		rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
+			Logger::Logger.error e
+		end
+
+		erb :dialogs if response.code == 200
+	end
+
+	get '/searches/:search_id' do
+		begin
+			response = RestClient.get "#{ENV['LODQA_BS']}/searches/#{params['search_id']}"
+			@search = JSON.parse(response.body)
+		rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
+			Logger::Logger.error e
+		end
+
+		erb :search if response.code == 200
+	end
+
 	get '/answer' do
 		if params['search_id']
 			# Get query from the LODQA_BS
@@ -354,7 +377,7 @@ class LodqaWS < Sinatra::Base
 	def show_progress_in_lodqa_bs ws, request_id, search_id
 		ws.on :open do
 			url = "#{ENV['LODQA_BS']}/searches/#{search_id}/subscriptions"
-			Lodqa::BSClient.subscribe ws, request_id, url
+			Lodqa::BSClient.subscribe ws, request_id, url, 'simple'
 		end
 	end
 
