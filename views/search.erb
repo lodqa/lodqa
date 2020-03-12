@@ -40,8 +40,52 @@
       <td><%= @search['query'] %></td>
     </tr>
     <tr>
+      <th>Read timeout</th>
+      <td><%= @search['read_timeout'] %></td>
+    </tr>
+    <tr>
+      <th>SPARQL limit</th>
+      <td><%= @search['sparql_limit'] %></td>
+    </tr>
+    <tr>
+      <th>Answer limit</th>
+      <td><%= @search['answer_limit'] %></td>
+    </tr>
+    <tr>
+      <th>Target</th>
+      <td><%= @search['target'] %></td>
+    </tr>
+    <tr>
+      <th>Private</th>
+      <td><%= @search['private'] %></td>
+    </tr>
+    <tr>
+      <th>State</th>
+      <td><%= @search['state'] %></td>
+    </tr>
+    <tr>
+      <th>Created at</th>
+      <td><%= @search['created_at'] %></td>
+    </tr>
+    <tr>
+      <th>Started at</th>
+      <td><%= @search['started_at'] %></td>
+    </tr>
+    <tr>
+      <th>Finished at</th>
+      <td><%= @search['finished_at'] %></td>
+    </tr>
+    <tr>
       <th>Referred at</th>
-      <td><%= DateTime.parse(@search['referred_at']).strftime('%Y%m/%d %H:%M') %></td>
+      <td><%= @search['referred_at'] %></td>
+    </tr>
+    <tr>
+      <th>Elapsed Time(s)</th>
+      <td><%= @search['elapsed_time'] %></td>
+    </tr>
+    <tr>
+      <th>Number of answers</th>
+      <td><%= @search['number_with_precision'] %></td>
     </tr>
   </table>
 </body>
