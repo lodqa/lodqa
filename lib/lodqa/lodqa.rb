@@ -38,25 +38,6 @@ module Lodqa
       end
     end
 
-    def each_anchored_pgp_and_sparql_and_solution(proc_anchored_pgp, proc_solution)
-      Logger::Logger.debug "start #{self.class.name}##{__method__}"
-
-      if @cancel_flag
-        Logger::Logger.debug "Stop before processing anchored_pgps"
-        return
-      end
-
-      anchored_pgps.each do |anchored_pgp|
-        proc_anchored_pgp.call(anchored_pgp)
-        deal_anchored_pgp anchored_pgp, proc_solution, 8
-      end
-    end
-
-    def dispose(request_id)
-      Logger::Logger.debug "Cancel query for pgp: #{@pgp}", request_id
-      @cancel_flag = true
-    end
-
     def anchored_pgps
       Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
@@ -99,84 +80,6 @@ module Lodqa
       Logger::Logger.debug "return SPARQLs of bgps"
       @graph_finder.sparqls_of(anchored_pgp) do |bgp, sparql|
         yield sparql
-      end
-    end
-
-    def deal_anchored_pgp(anchored_pgp, proc_solution, parallel)
-      Logger::Logger.debug "Query sparqls for anchored_pgp: #{anchored_pgp}"
-
-      if @cancel_flag
-        Logger::Logger.debug "Stop during processing an anchored_pgp: #{anchored_pgp}"
-        return
-      end
-
-      start = Time.now
-      count, error, success = 0, 0, 0
-      queue = Queue.new
-
-      @graph_finder.sparqls_of(anchored_pgp) do |bgp, sparql|
-        if @cancel_flag
-          Logger::Logger.debug 'Stop procedure before querying a sparql'
-          next
-        end
-
-        query_sparql @sparql_client, bgp, sparql, proc_solution, queue
-        count += 1
-
-        if count >= parallel
-          e, s = queue.pop
-          error += 1 if e
-          success += 1 if s
-          count -= 1
-        end
-      end
-
-      count.times do
-        e, s = queue.pop
-        error += 1 if e
-        success += 1 if s
-        count -= 1
-      end
-
-      if (error + success) > 0
-        stats = {
-          parallel: parallel,
-          duration: Time.now - start,
-          sparqls: error + success,
-          error: error,
-          success: success,
-          error_rate: error/(error + success).to_f
-        }
-
-        Logger::Logger.info "Finish stats: #{stats}"
-      end
-
-      Logger::Logger.debug "Finish anchored_pgp: #{anchored_pgp}"
-    end
-
-    def query_sparql(endpoint, bgp, sparql, proc_solution, queue)
-      Logger::Logger.debug "#{sparql}\n++++++++++"
-
-      endpoint.query_async(sparql) do |e, result|
-        handle_result e, bgp, sparql, result, proc_solution
-        queue.push [e, result]
-      end
-
-      Logger::Logger.debug "==========\n"
-    end
-
-    def handle_result(e, bgp, sparql, result, proc_solution)
-      case e
-      when nil
-        proc_solution.call bgp: bgp,
-                           sparql: sparql,
-                           solutions: result.map{ |s| s.to_h }
-      when SparqlClient::EndpointTimeoutError
-        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-      when SparqlClient::EndpointTemporaryError
-        proc_solution.call({bgp: bgp, sparql: sparql, sparql_timeout: {error_message: e}, solutions: []})
-      else
-        Logger::Logger.error e
       end
     end
 
