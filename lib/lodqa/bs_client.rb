@@ -1,5 +1,6 @@
 require 'rest_client'
 require 'logger/logger'
+require 'lodqa/graph_finder'
 
 module Lodqa
   module BSClient
@@ -56,7 +57,8 @@ module Lodqa
         end
       end
 
-      def sparqls pgp, mappings, graph_finder
+      def sparqls pgp, mappings, sparql_client, graph_uri, graph_finder_options
+        graph_finder = GraphFinder.new(sparql_client, graph_uri, graph_finder_options)
         sparqls = []
         anchored_pgps(pgp, mappings).each do |anchored_pgp|
           to_sparql(anchored_pgp, graph_finder){ |sparql| sparqls << sparql }
