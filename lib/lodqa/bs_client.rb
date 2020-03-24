@@ -57,14 +57,14 @@ module Lodqa
         end
       end
 
-      def sparqls pgp, mappings, sparql_client, graph_uri, graph_finder_options
+      def sparqls_count pgp, mappings, sparql_client, graph_uri, graph_finder_options
         graph_finder = GraphFinder.new(sparql_client, graph_uri, graph_finder_options)
         sparqls = []
         anchored_pgps(pgp, mappings).each do |anchored_pgp|
           to_sparql(anchored_pgp, graph_finder){ |sparql| sparqls << sparql }
         end
 
-        sparqls
+        sparqls.count
       end
 
       private

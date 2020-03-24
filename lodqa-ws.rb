@@ -415,12 +415,12 @@ class LodqaWS < Sinatra::Base
 
 		lodqa.pgp = pgp
 		lodqa.mappings = mappings
-		Lodqa::SparqlsCount.set_sparql_count(request_id, lodqa.sparqls.count)
+		Lodqa::SparqlsCount.set_sparql_count(request_id, lodqa.sparqls_count)
 
 		Logger::Async.defer do
 			begin
 				channel.start
-				channel.send :sparql_count, { count: lodqa.sparqls.count }
+				channel.send :sparql_count, { count: lodqa.sparqls_count }
 			rescue => e
 				Logger::Logger.error e, pgp: pgp, mappings: mappings
 				channel.error e

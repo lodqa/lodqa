@@ -25,10 +25,10 @@ module Lodqa
     end
 
     # Return an enumerator to speed up checking the existence of sparqls.
-    def sparqls
+    def sparqls_count
       Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
-      BSClient.sparqls @pgp, @mappings, @sparql_client, @graph_uri, @graph_finder_options
+      BSClient.sparqls_count @pgp, @mappings, @sparql_client, @graph_uri, @graph_finder_options
     end
   end
 end
