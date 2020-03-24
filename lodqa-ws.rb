@@ -15,6 +15,10 @@ require 'logger/logger'
 require 'lodqa/source_channel'
 require 'lodqa/sparqls_count'
 require 'lodqa/oauth'
+require 'lodqa/configuration'
+require 'enju_access/cgi_accessor'
+require 'lodqa/sources'
+require 'lodqa/pgp_factory'
 
 class LodqaWS < Sinatra::Base
 	configure do
