@@ -56,10 +56,13 @@ module Lodqa
         end
       end
 
-      def sparqls pgp, mappings, graph_finder, enum
+      def sparqls pgp, mappings, graph_finder
+        sparqls = []
         anchored_pgps(pgp, mappings).each do |anchored_pgp|
-          to_sparql(anchored_pgp, graph_finder){ |sparql| enum << sparql}
+          to_sparql(anchored_pgp, graph_finder){ |sparql| sparqls << sparql }
         end
+
+        sparqls
       end
 
       private

@@ -28,9 +28,7 @@ module Lodqa
     def sparqls
       Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
-      Enumerator.new do |y|
-        BSClient.sparqls @pgp, @mappings, @graph_finder, y
-      end
+      BSClient.sparqls @pgp, @mappings, @graph_finder
     end
   end
 end
