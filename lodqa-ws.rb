@@ -15,7 +15,6 @@ require 'logger/logger'
 require 'lodqa/source_channel'
 require 'lodqa/sparqls_count'
 require 'lodqa/oauth'
-require 'sparql_client/cacheable_client'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -404,10 +403,10 @@ class LodqaWS < Sinatra::Base
 		config = dataset_config_of target
 
 		channel = Lodqa::SourceChannel.new ws, config[:name]
-		sparql_client = SparqlClient::CacheableClient.new(config[:endpoint_url], { read_timeout: read_timeout&.to_i })
 		sparqls_count = Lodqa::BSClient.sparqls_count pgp,
 											mappings,
-											sparql_client,
+											config[:endpoint_url],
+											{ read_timeout: read_timeout&.to_i },
 											config[:graph_uri],
 											{
 												max_hop: config[:max_hop], ignore_predicates: config[:ignore_predicates],
