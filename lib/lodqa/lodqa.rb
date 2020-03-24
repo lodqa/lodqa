@@ -29,11 +29,7 @@ module Lodqa
       Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
       Enumerator.new do |y|
-        begin
-          BSClient.sparqls @pgp, @mappings, @graph_finder, y
-        rescue SparqlClient::EndpointError => e
-          Logger::Logger.debug "The SPARQL Endpoint #{e.endpoint_name} has a persistent error, continue to the next Endpoint", error_message: e.message
-        end
+        BSClient.sparqls @pgp, @mappings, @graph_finder, y
       end
     end
   end

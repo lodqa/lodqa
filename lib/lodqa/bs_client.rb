@@ -67,25 +67,26 @@ module Lodqa
       def anchored_pgps pgp, mappings
         Logger::Logger.debug "start #{self.class.name}##{__method__}"
 
-        Enumerator.new do |anchored_pgps|
-          pgp[:nodes].delete_if{|n| nodes_to_delete(pgp, mappings).include? n}
-          pgp[:edges].uniq!
-          terms = pgp[:nodes].values.map{|n| mappings[n[:text].to_sym]}
+        anchored_pgps = []
+        pgp[:nodes].delete_if{|n| nodes_to_delete(pgp, mappings).include? n}
+        pgp[:edges].uniq!
+        terms = pgp[:nodes].values.map{|n| mappings[n[:text].to_sym]}
 
-          terms.map!{|t| t.nil? ? [] : t}
+        terms.map!{|t| t.nil? ? [] : t}
 
-          Logger::Logger.debug "terms: #{ terms.first.product(*terms.drop(1)) }"
+        Logger::Logger.debug "terms: #{ terms.first.product(*terms.drop(1)) }"
 
-          terms.first.product(*terms.drop(1))
-            .each do |ts|
-              anchored_pgp = pgp.dup
-              anchored_pgp[:nodes] = pgp[:nodes].dup
-              anchored_pgp[:nodes].each_key{|k| anchored_pgp[:nodes][k] = pgp[:nodes][k].dup}
-              anchored_pgp[:nodes].each_value.with_index{|n, i| n[:term] = ts[i]}
+        terms.first.product(*terms.drop(1))
+          .each do |ts|
+            anchored_pgp = pgp.dup
+            anchored_pgp[:nodes] = pgp[:nodes].dup
+            anchored_pgp[:nodes].each_key{|k| anchored_pgp[:nodes][k] = pgp[:nodes][k].dup}
+            anchored_pgp[:nodes].each_value.with_index{|n, i| n[:term] = ts[i]}
 
-              anchored_pgps << anchored_pgp
-            end
-        end
+            anchored_pgps << anchored_pgp
+          end
+
+        anchored_pgps
       end
 
       def to_sparql(anchored_pgp, graph_finder)
