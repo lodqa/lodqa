@@ -12,10 +12,12 @@ require 'cgi/util'
 require 'uri'
 require 'logger/async'
 require 'logger/logger'
-require 'lodqa/lodqa'
 require 'lodqa/source_channel'
 require 'lodqa/sparqls_count'
 require 'lodqa/oauth'
+require 'lodqa/configuration'
+require 'lodqa/sources'
+require 'lodqa/pgp_factory'
 
 class LodqaWS < Sinatra::Base
 	configure do
@@ -404,7 +406,9 @@ class LodqaWS < Sinatra::Base
 		config = dataset_config_of target
 
 		channel = Lodqa::SourceChannel.new ws, config[:name]
-		lodqa = Lodqa::Lodqa.new config[:endpoint_url],
+		sparqls_count = Lodqa::BSClient.sparqls_count pgp,
+											mappings,
+											config[:endpoint_url],
 											{ read_timeout: read_timeout&.to_i },
 											config[:graph_uri],
 											{
@@ -413,14 +417,12 @@ class LodqaWS < Sinatra::Base
 												sparql_limit: sparql_limit&.to_i, answer_limit: answer_limit&.to_i
 											}
 
-		lodqa.pgp = pgp
-		lodqa.mappings = mappings
-		Lodqa::SparqlsCount.set_sparql_count(request_id, lodqa.sparqls.count)
+		Lodqa::SparqlsCount.set_sparql_count(request_id, sparqls_count)
 
 		Logger::Async.defer do
 			begin
 				channel.start
-				channel.send :sparql_count, { count: lodqa.sparqls.count }
+				channel.send :sparql_count, { count: sparqls_count }
 			rescue => e
 				Logger::Logger.error e, pgp: pgp, mappings: mappings
 				channel.error e

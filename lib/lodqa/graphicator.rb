@@ -4,6 +4,7 @@
 #
 require 'net/http'
 require 'pp'
+require 'enju_access/cgi_accessor'
 
 module Lodqa; end unless defined? Lodqa
 
