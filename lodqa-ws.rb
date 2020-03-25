@@ -406,7 +406,9 @@ class LodqaWS < Sinatra::Base
 		config = dataset_config_of target
 
 		channel = Lodqa::SourceChannel.new ws, config[:name]
-		sparqls_count = Lodqa::BSClient.sparqls_count pgp,
+		sparqls = Lodqa::BSClient.sparqls_count ws,
+											request_id,
+											pgp,
 											mappings,
 											config[:endpoint_url],
 											{ read_timeout: read_timeout&.to_i },
@@ -417,6 +419,7 @@ class LodqaWS < Sinatra::Base
 												sparql_limit: sparql_limit&.to_i, answer_limit: answer_limit&.to_i
 											}
 
+		sparqls_count = JSON.parse(sparqls)['sparqls_count']
 		Lodqa::SparqlsCount.set_sparql_count(request_id, sparqls_count)
 
 		Logger::Async.defer do
