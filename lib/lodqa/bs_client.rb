@@ -56,23 +56,20 @@ module Lodqa
         end
       end
 
-      def sparqls_count pgp, mappings, endpoint_url, endpoint_options, graph_uri, graph_finder_options
-        url = "#{ENV['LODQA_BS']}/sparqls_counts"
-        payload = {
-          pgp: pgp.to_json,
-          mappings: mappings.to_json,
-          endpoint_url: endpoint_url,
-          endpoint_options: endpoint_options.to_json,
-          graph_uri: graph_uri,
-          graph_finder_options: graph_finder_options.to_json
-        }
-
-        begin
+      def sparqls_count ws, pgp, mappings, endpoint_url, endpoint_options, graph_uri, graph_finder_options
+        send_bs_error_on ws do
+          url = "#{ENV['LODQA_BS']}/sparqls_count"
+          payload = {
+            pgp: pgp.to_json,
+            mappings: mappings.to_json,
+            endpoint_url: endpoint_url,
+            endpoint_options: endpoint_options.to_json,
+            graph_uri: graph_uri,
+            graph_finder_options: graph_finder_options.to_json
+          }
           response = RestClient::Request.execute method: :get, url: url, payload: payload
           JSON.parse(response.body)['sparqls_count']
-    		rescue Errno::ECONNREFUSED, Net::OpenTimeout, SocketError => e
-    			Logger::Logger.error e
-    		end
+        end
       end
 
       private
