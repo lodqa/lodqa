@@ -1,7 +1,5 @@
 require 'rest_client'
 require 'logger/logger'
-require 'lodqa/graph_finder'
-require 'sparql_client/cacheable_client'
 
 module Lodqa
   module BSClient
