@@ -406,7 +406,8 @@ class LodqaWS < Sinatra::Base
 		config = dataset_config_of target
 
 		channel = Lodqa::SourceChannel.new ws, config[:name]
-		sparqls_count = Lodqa::BSClient.sparqls_count pgp,
+		sparqls_count = Lodqa::BSClient.sparqls_count ws,
+											pgp,
 											mappings,
 											config[:endpoint_url],
 											{ read_timeout: read_timeout&.to_i },
