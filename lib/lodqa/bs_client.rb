@@ -68,6 +68,7 @@ module Lodqa
             graph_uri: graph_uri,
             graph_finder_options: graph_finder_options.to_json
           }
+          Logger::Logger.debug url, payload
           response = RestClient::Request.execute method: :get, url: url, payload: payload
           JSON.parse(response.body)['sparqls_count']
         end
