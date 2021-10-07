@@ -216,7 +216,7 @@ class LodqaWS < Sinatra::Base
 	# Command for test: curl -H "content-type:application/json" -d '{"keywords":["drug", "genes"]} http://localhost:9292/termfinder'
 	post '/termfinder' do
 		begin
-			tf = Term::Finder.new params[:dictionary_url]
+			tf = Term::Finder.new params[:dictionary_url].gsub('http://','https://')
 			keywords = params[:'keywords']
 			mappings = tf.find keywords
 
