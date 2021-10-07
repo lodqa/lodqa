@@ -115,6 +115,15 @@ module.exports = class Model extends EventEmitter {
 
     this.emit('state_change_event')
   }
+
+  get errorMessage() {
+    return this._errorMessage
+  }
+
+  set errorMessage(message) {
+    this._errorMessage = message
+    this.emit('error')
+  }
 }
 
 function _updateLabel(dataset, url, label) {
