@@ -2,7 +2,7 @@ module.exports = function(loader) {
   const button = document.querySelector('#stop-search')
 
   loader
-    .on('ws_close', () => {
+    .on('expert:ws_close', () => {
       document.querySelector('#begin-search')
         .classList.toggle('hidden')
       document.querySelector('#stop-search')
