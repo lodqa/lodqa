@@ -22,6 +22,7 @@ module Lodqa
             user_id: user_id,
             callback_url: "#{ENV['LODQA']}/requests/#{request_id}/black_hall"
           }.delete_if { |k, v| v.nil? || v.empty? }
+          Logger::Logger.debug url, payload
           RestClient::Request.execute method: :post, url: url, payload: payload
         end
       end
@@ -76,6 +77,9 @@ module Lodqa
 
       def send_bs_error_on ws
         yield
+      rescue RestClient::Forbidden => e
+        ws.send({ event: :bs_error, error_message: e.message }.to_json)
+        nil
       rescue RestClient::NotFound
         ws.send({ event: :bs_error, error_message: 'No runnnig qurey was found' }.to_json)
         nil
