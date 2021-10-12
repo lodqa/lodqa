@@ -91,7 +91,7 @@ DEPENDENCIES
   sparql-client
 
 RUBY VERSION
-   ruby 2.7.4p191
+   ruby 3.0.2p107
 
 BUNDLED WITH
    2.2.29
