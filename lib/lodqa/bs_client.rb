@@ -80,12 +80,15 @@ module Lodqa
         yield
       rescue RestClient::Forbidden => e
         ws.send({ event: :bs_error, error_message: e.message }.to_json)
+        Logger::Logger.error e
         nil
       rescue RestClient::NotFound
         ws.send({ event: :bs_error, error_message: 'No runnnig qurey was found' }.to_json)
+        Logger::Logger.error e
         nil
       rescue Errno::ECONNREFUSED, SocketError
         ws.send({ event: :bs_error, error_message: 'LODQA bot server error' }.to_json)
+        Logger::Logger.error e
         nil
       end
     end
