@@ -1,5 +1,4 @@
 require 'spec_helper'
-require_relative '../lodqa'
 
 enjuURL = "http://bionlp.dbcls.jp/enju/cgi-lilfes/enju"
 dictionaryURL = "http://pubdictionaries.dbcls.jp:80/dictionaries/text_annotation?dictionaries=%5B%22OMIM%22%2C%22UMLS-TUI-URI%22%5D&matching_method=approximate&max_tokens=6&min_tokens=1&threshold=0.6&top_n=0"
@@ -15,7 +14,7 @@ describe "QueryParse", "error-handling in initialization method" do
   end
 
   it "should handle bad enju url" do
-    expect { QueryParse.new(@enju_accessor, @dictionary_accessor, SparqlGenerator.new("http://bionlp.dbcls.jp/enjuuuu", dictionaryURL) }.to raise_error
+    expect { QueryParse.new(@enju_accessor, @dictionary_accessor, SparqlGenerator.new("http://bionlp.dbcls.jp/enjuuuu", dictionaryURL)) }.to raise_error
   end
   it "should handle bad ontofind url" do
     expect { SparqlGenerator.new(enjuURL, "http://dictionary.dbcls.jpppp") }.to raise_error
