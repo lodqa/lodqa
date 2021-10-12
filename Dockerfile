@@ -10,6 +10,7 @@ COPY Gemfile /app
 COPY Gemfile.lock /app
 
 WORKDIR /app
-RUN bundle install --jobs=4 --retry=10 --clean --without test development
+RUN gem install bundler
+RUN /usr/local/bundle/gems/bundler-2.2.29/exe/bundler install --jobs=4 --retry=10 --clean --without test development
 
 CMD ["bundle", "exec", "rackup", "-s", "puma", "-E", "deployment"]
