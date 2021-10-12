@@ -15,6 +15,5 @@ gem 'sendgrid-ruby'
 group :test do
 	gem 'rack-test'
 	gem 'rspec'
-	gem 'factory_girl', "~> 4.0"
 	gem 'simplecov'
 end

@@ -1,11 +1,6 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (5.2.2)
-      concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
     app_config (2.7.0)
     concurrent-ruby (1.1.4)
     connection_pool (2.2.2)
@@ -15,8 +10,6 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     erubis (2.7.0)
     eventmachine (1.2.7)
-    factory_girl (4.9.0)
-      activesupport (>= 3.0.0)
     faye-websocket (0.10.7)
       eventmachine (>= 0.12.0)
       websocket-driver (>= 0.5.1)
@@ -24,14 +17,11 @@ GEM
       concurrent-ruby (~> 1.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    i18n (1.5.3)
-      concurrent-ruby (~> 1.0)
     json (2.1.0)
     link_header (0.0.8)
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2018.0812)
-    minitest (5.11.3)
     mustermann (1.0.3)
     net-http-persistent (3.0.0)
       connection_pool (~> 2.2)
@@ -79,10 +69,7 @@ GEM
     sparql-client (3.0.1)
       net-http-persistent (>= 2.9, < 4)
       rdf (~> 3.0)
-    thread_safe (0.3.6)
     tilt (2.0.9)
-    tzinfo (1.2.5)
-      thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
@@ -96,7 +83,6 @@ PLATFORMS
 DEPENDENCIES
   app_config
   erubis
-  factory_girl (~> 4.0)
   faye-websocket
   puma
   rack-test
