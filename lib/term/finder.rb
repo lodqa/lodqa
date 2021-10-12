@@ -2,6 +2,7 @@
 require 'rest-client'
 require 'json'
 require 'term/find_error'
+require_relative '../Logger/Logger'
 
 module Term
   # An instance of this class is initialized with a dictionary.
