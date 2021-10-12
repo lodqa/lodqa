@@ -24,7 +24,7 @@ describe Term::Finder do
 
   describe "#find" do
     before do
-      @d = Term::Finder.new('http://pubdictionaries.org/find_ids.json?dictionary=DrugBank-QALD,SIDER-QALD,Diseasome-QALD&threshold=0.6')
+      @d = Term::Finder.new('https://pubdictionaries.org/find_ids.json?dictionary=DrugBank-QALD,SIDER-QALD,Diseasome-QALD&threshold=0.6')
       @terms = ["genes", "alzheimer's disease"]
     end
 
