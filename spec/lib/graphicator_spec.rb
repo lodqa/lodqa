@@ -34,7 +34,9 @@ describe Lodqa::Graphicator do
     context "when a sentence is given" do
       it "should produce its parse" do
         parse = @g.parse(@query)
-        expect(parse[:root]).to eq(3)
+        expect(parse.pgp).to include(:edges => [{:object=>"t2", :subject=>"t1", :text=>"associated with"}])
+        expect(parse.pgp).to include(:focus => "t1")
+        expect(parse.pgp).to include(:nodes => {:t1=>{:head=>1, :text=>"genes"}, :t2=>{:head=>6, :text=>"alzheimer disease"}})
       end
     end
   end
