@@ -1,4 +1,4 @@
-FROM ruby:2.5.1-alpine
+FROM ruby:2.7.4-alpine3.14
 
 RUN apk update \
   && apk upgrade \
@@ -10,8 +10,6 @@ COPY Gemfile /app
 COPY Gemfile.lock /app
 
 WORKDIR /app
-RUN gem install bundler
-RUN ln -sf /usr/local/bundle/gems/bundler-2.2.29/exe/bundle /usr/local/bundle/bin/bundle
-RUN bundle install --jobs=4 --retry=10 --clean --without test development
+RUN bundle install --jobs=4 --retry=10
 
 CMD ["bundle", "exec", "rackup", "-s", "puma", "-E", "deployment"]
