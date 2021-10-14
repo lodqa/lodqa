@@ -1,6 +1,7 @@
 {
   "name": "Springy",
   "main": "springy.js",
+  "version": "2.8.0",
   "homepage": "https://github.com/dhotson/springy",
   "authors": [
     "Dennis Hotson <dennis@99designs.com>"
@@ -13,15 +14,13 @@
     "physics"
   ],
   "license": "MIT",
-  "dependencies": {
-    "eventemitter2": "~0.4.14"
-  },
-  "_release": "658208598d",
+  "_release": "2.8.0",
   "_resolution": {
-    "type": "commit",
-    "commit": "658208598d65019d36c1de1b6ba26eeb2f67561c"
+    "type": "version",
+    "tag": "2.8.0",
+    "commit": "62ffcb16c7b1622baf93612d809f4be5880f656c"
   },
-  "_source": "https://github.com/shigeruNakajima/springy.git",
-  "_target": "658208598d65019d36c1de1b6ba26eeb2f67561c",
-  "_originalSource": "https://github.com/shigeruNakajima/springy.git"
+  "_source": "git@github.com:dhotson/springy.git",
+  "_target": "*",
+  "_originalSource": "git@github.com:dhotson/springy.git"
 }
