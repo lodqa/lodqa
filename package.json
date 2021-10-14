@@ -33,21 +33,21 @@
     "url": "https://github.com/lodqa/lodqa.git"
   },
   "scripts": {
-    "start": "npm run browserify",
-    "bump": "npm-run-all --parallel bump:*",
-    "lint": "npx eslint src",
     "browserify": "npm-run-all --parallel browserify:*",
-    "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
     "browserify:answer": "browserify -d -o public/js/answer.js src/js/answer.js ",
     "browserify:grapheditor": "browserify -d -o public/js/grapheditor.js src/js/grapheditor.js",
+    "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
     "browserify:start-grapheditor": "browserify -d -o public/js/start-grapheditor.js src/js/start-grapheditor.js",
-    "bump:index": "browserify src/js/index.js | uglifyjs > public/js/index.js",
+    "bump": "npm-run-all --parallel bump:*",
     "bump:answer": "browserify src/js/answer.js | uglifyjs > public/js/answer.js",
     "bump:grapheditor": "browserify src/js/grapheditor.js | uglifyjs > public/js/grapheditor.js ",
+    "bump:index": "browserify src/js/index.js | uglifyjs > public/js/index.js",
     "bump:start-grapheditor": "browserify src/js/start-grapheditor.js | uglifyjs > public/js/start-grapheditor.js",
-    "postinstall": "npm-run-all copy:*",
     "copy:grapheditor": "cpx 'node_modules/graph-editor/index.{js,css}' 'public/js/vender/grapheditor'",
+    "copy:jquery": "cpx 'node_modules/jquery/dist/jquery.min.js' 'public/js/vender/jQuery/dist'",
     "copy:springy": "cpx 'node_modules/springy/*.js' 'public/js/vender/Springy'",
-    "copy:jquery": "cpx 'node_modules/jquery/dist/jquery.min.js' 'public/js/vender/jQuery/dist'"
+    "lint": "npx eslint src",
+    "postinstall": "npm-run-all copy:*",
+    "start": "npm run browserify"
   }
 }
