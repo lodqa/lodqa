@@ -2,7 +2,6 @@
   "name": "lodqa",
   "version": "0.0.0",
   "dependencies": {
-    "jQuery": "^3.2.1",
-    "Springy": "git@github.com:dhotson/springy.git"
+    "jQuery": "^3.2.1"
   }
 }
