@@ -6,6 +6,7 @@
   "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {
     "graph-editor": "github:lodqa/grapheditor#v0.8.3",
+    "jquery": "^3.6.0",
     "parse5": "^5.1.0",
     "springy": "^2.8.0"
   },
@@ -46,6 +47,7 @@
     "bump:start-grapheditor": "browserify src/js/start-grapheditor.js | uglifyjs > public/js/start-grapheditor.js",
     "postinstall": "npm-run-all copy:*",
     "copy:grapheditor": "cpx 'node_modules/graph-editor/index.{js,css}' 'public/js/vender/grapheditor'",
-    "copy:springy": "cpx 'node_modules/springy/*.js' 'public/js/vender/Springy'"
+    "copy:springy": "cpx 'node_modules/springy/*.js' 'public/js/vender/Springy'",
+    "copy:jquery": "cpx 'node_modules/jquery/dist/jquery.min.js' 'public/js/vender/jQuery/dist'"
   }
 }
