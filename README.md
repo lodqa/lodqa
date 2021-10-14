@@ -121,7 +121,7 @@ CLIENT_SECRET=[Generated client secret]
 
 ### Prerequisites
 
-LODQA depends on some npm packages and some bower packages to develop.
+LODQA depends on some npm packages to develop.
 Install them:
 
 ### Installing
@@ -138,10 +138,4 @@ Install npm packages:
 
 ```
 npm install
-```
-
-Install bower packages:
-```
-npm i -g bower
-bower install
 ```
