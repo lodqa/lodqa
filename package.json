@@ -18,7 +18,7 @@
     "handlebars": "^4.7.7",
     "npm-run-all": "^4.1.5",
     "sparql-fetch-label": "0.0.3",
-    "uglify-es": "^3.3.9"
+    "terser": "^5.9.0"
   },
   "homepage": "https://github.com/lodqa/lodqa.git",
   "keywords": [
@@ -39,10 +39,10 @@
     "browserify:index": "browserify -d -o public/js/index.js src/js/index.js",
     "browserify:start-grapheditor": "browserify -d -o public/js/start-grapheditor.js src/js/start-grapheditor.js",
     "bump": "npm-run-all --parallel bump:*",
-    "bump:answer": "browserify src/js/answer.js | uglifyjs > public/js/answer.js",
-    "bump:grapheditor": "browserify src/js/grapheditor.js | uglifyjs > public/js/grapheditor.js ",
-    "bump:index": "browserify src/js/index.js | uglifyjs > public/js/index.js",
-    "bump:start-grapheditor": "browserify src/js/start-grapheditor.js | uglifyjs > public/js/start-grapheditor.js",
+    "bump:answer": "browserify src/js/answer.js | terser > public/js/answer.js",
+    "bump:grapheditor": "browserify src/js/grapheditor.js | terser > public/js/grapheditor.js ",
+    "bump:index": "browserify src/js/index.js | terser > public/js/index.js",
+    "bump:start-grapheditor": "browserify src/js/start-grapheditor.js | terser > public/js/start-grapheditor.js",
     "copy:grapheditor": "cpx 'node_modules/graph-editor/index.{js,css}' 'public/js/vender/grapheditor'",
     "copy:jquery": "cpx 'node_modules/jquery/dist/jquery.min.js' 'public/js/vender/jQuery/dist'",
     "copy:springy": "cpx 'node_modules/springy/*.js' 'public/js/vender/Springy'",
