@@ -5,7 +5,7 @@
   "author": "jdkim",
   "bugs": "https://github.com/lodqa/lodqa/issues",
   "dependencies": {
-    "graph-editor": "github:lodqa/grapheditor#v0.8.3",
+    "graph-editor": "github:lodqa/grapheditor#v1.0.1",
     "jquery": "^3.6.0",
     "parse5": "^6.0.1",
     "springy": "^2.8.0"
