@@ -19,7 +19,7 @@ Released under the [MIT license](http://opensource.org/licenses/MIT).
 ```
 git clone git@github.com:lodqa/lodqa.git
 cd lodqa
-bundle Install
+bundle install
 bundle exec rackup -s puma -E deployment
 ```
 
