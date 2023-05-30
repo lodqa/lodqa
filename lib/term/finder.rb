@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 require 'rest-client'
 require 'json'
-require 'term/find_error'
-require_relative '../Logger/Logger'
+require_relative './find_error'
+require_relative '../logger/logger'
 
 module Term
   # An instance of this class is initialized with a dictionary.
