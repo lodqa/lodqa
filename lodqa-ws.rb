@@ -30,7 +30,7 @@ class LodqaWS < Sinatra::Base
 
 		enable :sessions
 		enable :logging
-		use Rack::CommonLogger, Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
+		use Rack::CommonLogger, ::Logger.new("#{settings.root}/log/#{settings.environment}.log", 10, 10 * 1024 * 1024)
 	end
 
 	before do
