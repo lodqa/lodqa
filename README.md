@@ -46,7 +46,9 @@ bundle install
 ## Docker guide
 
 ```
-docker-compose up
+touch .env
+docker compose build
+docker compose up
 ```
 
 ## Deployment
