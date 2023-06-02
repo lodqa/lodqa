@@ -4187,79 +4187,81 @@ exports.default = function (ractive) {
 module.exports = exports.default;
 
 },{}],82:[function(require,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TailStream = exports.FunnelStream = exports.ActionTransform = exports.ActionReadable = undefined;
+Object.defineProperty(exports, "ActionReadable", {
+  enumerable: true,
+  get: function () {
+    return _ActionReadable.default;
+  }
+});
+Object.defineProperty(exports, "ActionTransform", {
+  enumerable: true,
+  get: function () {
+    return _ActionTransform.default;
+  }
+});
+Object.defineProperty(exports, "FunnelStream", {
+  enumerable: true,
+  get: function () {
+    return _FunnelStream.default;
+  }
+});
+Object.defineProperty(exports, "TailStream", {
+  enumerable: true,
+  get: function () {
+    return _TailStream.default;
+  }
+});
 
-var _ActionReadable = require('./lib/ActionReadable');
+var _ActionReadable = _interopRequireDefault(require("./lib/ActionReadable.cjs"));
 
-var _ActionReadable2 = _interopRequireDefault(_ActionReadable);
+var _ActionTransform = _interopRequireDefault(require("./lib/ActionTransform.cjs"));
 
-var _ActionTransform = require('./lib/ActionTransform');
+var _FunnelStream = _interopRequireDefault(require("./lib/FunnelStream.cjs"));
 
-var _ActionTransform2 = _interopRequireDefault(_ActionTransform);
-
-var _FunnelStream = require('./lib/FunnelStream');
-
-var _FunnelStream2 = _interopRequireDefault(_FunnelStream);
-
-var _TailStream = require('./lib/TailStream');
-
-var _TailStream2 = _interopRequireDefault(_TailStream);
+var _TailStream = _interopRequireDefault(require("./lib/TailStream.cjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.ActionReadable = _ActionReadable2.default;
-exports.ActionTransform = _ActionTransform2.default;
-exports.FunnelStream = _FunnelStream2.default;
-exports.TailStream = _TailStream2.default;
-},{"./lib/ActionReadable":83,"./lib/ActionTransform":84,"./lib/FunnelStream":85,"./lib/TailStream":86}],83:[function(require,module,exports){
-'use strict';
+},{"./lib/ActionReadable.cjs":83,"./lib/ActionTransform.cjs":84,"./lib/FunnelStream.cjs":85,"./lib/TailStream.cjs":86}],83:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _xtend = require('xtend');
+var _stream = require("stream");
 
-var _xtend2 = _interopRequireDefault(_xtend);
-
-var _stream = require('stream');
-
-var _defaultOption = require('./defaultOption');
-
-var _defaultOption2 = _interopRequireDefault(_defaultOption);
+var _defaultOption = _interopRequireDefault(require("./defaultOption.cjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Convert events from views to actions.
  */
-exports.default = class extends _stream.Readable {
+class _default extends _stream.Readable {
   /**
    * A sub class must set the `name` field.
    * @param {?string} selector - This is selector to specfy the view.
    * @param {?object} option - This is passed to the super class.
    */
   constructor(selector, option) {
-    super((0, _xtend2.default)(_defaultOption2.default, option));
+    super(Object.assign({}, _defaultOption.default, option));
 
     this._bindComponent(selector, action => {
       console.assert(this.name, '"Steram" MUST has the name property when push an "action".');
       console.assert(action.target, 'An "action" MUST has the "target" property.');
       console.assert(action.type, 'An "action" MUST has the "type" property.');
-
-      action = (0, _xtend2.default)(action, {
+      action = Object.assign({}, action, {
         source: [this.name]
       });
-
       if (!this.push(action)) throw new Error('The stream is clogged.');
     });
   }
-
   /**
    * this method must be overridden by sub class.
    * @protected
@@ -4267,40 +4269,41 @@ exports.default = class extends _stream.Readable {
    * @param {?string} selector - This is the first parameter of the constructor.
    * @param {!function(action: Action)} push - A callback function to push a new Action.
    */
+
+
   _bindComponent(selector, push) {}
+
   _read() {}
-};
-module.exports = exports['default'];
-},{"./defaultOption":87,"stream":116,"xtend":160}],84:[function(require,module,exports){
-'use strict';
+
+}
+
+exports.default = _default;
+},{"./defaultOption.cjs":87,"stream":116}],84:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _stream = require('stream');
+var _stream = require("stream");
 
-var _xtend = require('xtend');
-
-var _xtend2 = _interopRequireDefault(_xtend);
-
-var _defaultOption = require('./defaultOption');
-
-var _defaultOption2 = _interopRequireDefault(_defaultOption);
+var _defaultOption = _interopRequireDefault(require("./defaultOption.cjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Call models or views according to recived actions.
  */
-exports.default = class extends _stream.Transform {
+class _default extends _stream.Transform {
   /**
    * @param {?object} option - this is passed to the super class.
    */
   constructor(option) {
-    super((0, _xtend2.default)(_defaultOption2.default, option));
+    super(Object.assign({}, _defaultOption.default, option));
     this._distpatcher = new Map();
   }
+
   _transform(action, encoding, callback) {
     console.assert(Array.isArray(action.source), '"aciton" MUST has the source property as array.');
     console.assert(action.target, 'An "action" MUST has the "target" property.');
@@ -4313,11 +4316,10 @@ exports.default = class extends _stream.Transform {
       this._distpatcher[action.target].get(action.type).forEach(func => func(action, addResult));
     }
 
-    if (!this.push((0, _xtend2.default)(action))) throw new Error('The stream is clogged.');
+    if (!this.push(Object.assign({}, action))) throw new Error('The stream is clogged.');
 
     if (results.length > 0) {
       console.assert(this.name, '"Steram" MUST has the name property when push another "action".');
-
       results.forEach(r => r.then(newAction => pushAction(this, action, newAction)));
     }
 
@@ -4329,6 +4331,8 @@ exports.default = class extends _stream.Transform {
    * @param {!string} target - The target stream will recive actions.
    * @param {!ActionBinding[]} handlers - A set of action type and action handlers.
    */
+
+
   bindActions(target, handlers) {
     console.assert(Array.isArray(handlers), '"handlers" MUST be an array.');
     console.assert(handlers.length, '"handlers" MUST contain at least one handler.');
@@ -4336,12 +4340,13 @@ exports.default = class extends _stream.Transform {
 
     for (let [actionType, handler] of handlers) {
       console.assert(typeof handler === 'function', '"handler" MUST be a function');
-
       bindAction(this._distpatcher, target, actionType, handler);
     }
   }
-};
 
+}
+
+exports.default = _default;
 
 function pushAction(self, sourceAction, newAction) {
   // Forwad action to new target when newAction is string.
@@ -4352,8 +4357,7 @@ function pushAction(self, sourceAction, newAction) {
   }
 
   newAction.source = sourceAction.source.concat([self.name]);
-
-  if (!self.push((0, _xtend2.default)(sourceAction, newAction))) throw new Error('The stream is clogged.');
+  if (!self.push(Object.assign({}, sourceAction, newAction))) throw new Error('The stream is clogged.');
 }
 
 function bindAction(distpatcher, target, actionType, handler) {
@@ -4365,7 +4369,6 @@ function bindAction(distpatcher, target, actionType, handler) {
     distpatcher[target].get(actionType).push(handler);
   }
 }
-
 /**
  * Push function is a callback function to push an additional `Action`.
  * @typedef {function(newAction: object)} PushFunction
@@ -4387,87 +4390,87 @@ function bindAction(distpatcher, target, actionType, handler) {
  * @property {!string} Item[0] - A action type to bind a `ActionHandler`.
  * @property {!ActionHandler} Item[1] - handlers that has arguments of action and function.
  */
-
-module.exports = exports['default'];
-},{"./defaultOption":87,"stream":116,"xtend":160}],85:[function(require,module,exports){
-'use strict';
+},{"./defaultOption.cjs":87,"stream":116}],85:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _stream = require('stream');
+var _stream = require("stream");
 
-var _xtend = require('xtend');
-
-var _xtend2 = _interopRequireDefault(_xtend);
-
-var _defaultOption = require('./defaultOption');
-
-var _defaultOption2 = _interopRequireDefault(_defaultOption);
+var _defaultOption = _interopRequireDefault(require("./defaultOption.cjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Combine actions from multi views to one Steram.
  */
-exports.default = class extends _stream.Transform {
+class _default extends _stream.Transform {
   /**
    * @param {?bool} debug - Print out passing actions to console.log if true.
    * @param {?object} option - This is passed to the super class.
    */
   constructor(debug, option) {
-    super((0, _xtend2.default)(_defaultOption2.default, option));
-
+    super(Object.assign({}, _defaultOption.default, option));
     this._debug = debug;
   }
+
   _transform(action, encoding, done) {
     if (this._debug) console.log('FunnelStream', action);
-
     if (!this.push(action)) throw new Error('The stream is clogged.');
-
     done();
   }
-};
-module.exports = exports['default'];
-},{"./defaultOption":87,"stream":116,"xtend":160}],86:[function(require,module,exports){
-'use strict';
+
+}
+
+exports.default = _default;
+},{"./defaultOption.cjs":87,"stream":116}],86:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _stream = require('stream');
+var _stream = require("stream");
 
-var _defaultOption = require('./defaultOption');
-
-var _defaultOption2 = _interopRequireDefault(_defaultOption);
+var _defaultOption = _interopRequireDefault(require("./defaultOption.cjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Terminate streams.
  */
-exports.default = class extends _stream.Writable {
+class _default extends _stream.Writable {
   /**
    * @param {?bool} debug - Print out passing actions to console.log if true.
    */
   constructor(debug) {
-    super(_defaultOption2.default);
-
+    super(_defaultOption.default);
     this._debug = debug;
   }
+
   _write(action, encoding, done) {
     if (this._debug) console.log('TailStream', action);
     done();
   }
-};
-module.exports = exports['default'];
-},{"./defaultOption":87,"stream":116}],87:[function(require,module,exports){
-module.exports={
-  "objectMode": true
+
 }
 
+exports.default = _default;
+},{"./defaultOption.cjs":87,"stream":116}],87:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = {
+  "objectMode": true
+};
+exports.default = _default;
 },{}],88:[function(require,module,exports){
 'use strict'
 
@@ -53268,25 +53271,4 @@ function version(uuid) {
 
 var _default = version;
 exports.default = _default;
-},{"./validate.js":158}],160:[function(require,module,exports){
-module.exports = extend
-
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (hasOwnProperty.call(source, key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
-
-},{}]},{},[1]);
+},{"./validate.js":158}]},{},[1]);
