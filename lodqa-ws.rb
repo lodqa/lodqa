@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# coding: utf-8
 require 'sinatra/base'
 require 'rest_client'
 require 'faye/websocket'
@@ -24,9 +25,9 @@ class LodqaWS < Sinatra::Base
 		set :root, File.dirname(__FILE__).gsub(/\/lib/, '')
 		set :protection, :except => :frame_options
 		set :server, 'thin'
-		set :target_db, 'http://targets.lodqa.org/targets'
+		set :target_db, 'https://targets.lodqa.org/targets'
 		# set :target_db, 'http://localhost:3000/targets'
-		set :url_forwading_db, ENV['URL_FORWARDING_DB'] || 'http://urilinks.lodqa.org'
+		set :url_forwading_db, ENV['URL_FORWARDING_DB'] || 'https://urilinks.lodqa.org'
 
 		enable :sessions
 		enable :logging

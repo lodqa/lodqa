@@ -20,7 +20,7 @@ module.exports = class extends EventEmitter {
 
 function openConnection(emitter, pathname, params) {
   const queryParameters = toQueryParameters(params)
-  const url = `ws://${location.host}${pathname}${queryParameters ? `?${queryParameters}` : ''}`
+  const url = `wss://${location.host}${pathname}${queryParameters ? `?${queryParameters}` : ''}`
   const ws = new WebSocket(url)
   ws.onopen = () => emitter.emit('simple:ws_open')
   ws.onmessage = ({
