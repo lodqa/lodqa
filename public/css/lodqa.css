@@ -141,8 +141,10 @@ h2 {
     width: 10em;
     border-style: solid;
     border-color: #5555FF;
-    border-width: 0px 0px 2px 10px;
-    padding-left: 2px;
+    border-width: 0px 0px 1px 6px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    padding-left: 4px;
     font-size: medium;
     color: #222288;
 }
@@ -231,7 +233,7 @@ table.list {
 }
 
 .answers-region__title__heading:before {
-    content: '>';
+    content: '> ';
 }
 
 .answers-region__title__heading, .sparql-region__title__heading {
