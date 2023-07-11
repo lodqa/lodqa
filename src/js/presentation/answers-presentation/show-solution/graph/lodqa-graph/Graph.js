@@ -16,9 +16,9 @@ module.exports = function(options, className) {
     .springy({
       graph
     })
-
+/*
   updateLinkOnSelect(link, springy)
-
+*/
   return [graph, element]
 }
 
