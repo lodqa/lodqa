@@ -21,6 +21,7 @@ services:
       - LODQA_BS=http://lodqa-bs:3000
       - URL_FORWARDING_DB=http://uri-forwarding-db:3000
       - LODQA_OAUTH=http://lodqa:9292
+      - WEBSOCKET_SCHEMA=ws
     depends_on:
       - uri-forwarding-db
       - lodqa-bs

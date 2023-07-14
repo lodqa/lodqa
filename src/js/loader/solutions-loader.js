@@ -26,7 +26,7 @@ module.exports = class extends EventEmitter {
 }
 
 function openConnection(emitter, pathname, target, readTimeout, sparqlLimit, answerLimit) {
-  const ws = new WebSocket(`wss://${location.host}${pathname}?target=${target}&read_timeout=${readTimeout}&sparql_limit=${sparqlLimit}&answer_limit=${answerLimit}`)
+  const ws = new WebSocket(`${globalThis.lodqa.webSocketSchema}://${location.host}${pathname}?target=${target}&read_timeout=${readTimeout}&sparql_limit=${sparqlLimit}&answer_limit=${answerLimit}`)
 
   ws.onopen = () => emitter.emit('expert:ws_open')
   ws.onclose = () => emitter.emit('expert:ws_close')
