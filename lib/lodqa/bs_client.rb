@@ -11,8 +11,9 @@ module Lodqa
       end
 
       def register_query ws, request_id, query, read_timeout, sparql_limit, answer_limit, target, user_id
+        host = ENV.fetch('LODQA_BS')
         send_bs_error_on ws do
-          url = "#{ENV['LODQA_BS']}/searches"
+          url = "#{host}/searches"
           payload = {
             query: query,
             read_timeout: read_timeout,
@@ -20,7 +21,7 @@ module Lodqa
             answer_limit: answer_limit,
             target: target,
             user_id: user_id,
-            callback_url: "#{ENV['LODQA']}/requests/#{request_id}/black_hall"
+            callback_url: "#{host}/requests/#{request_id}/black_hall"
           }.delete_if { |k, v| v.nil? || v.empty? }
           Logger::Logger.debug url, payload
           RestClient::Request.execute method: :post, url: url, payload: payload
