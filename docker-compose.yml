@@ -11,7 +11,7 @@ services:
   lodqa:
     build: .
     ports:
-      - 80:9292
+      - 9292:9292
     volumes:
       - .:/app
     env_file:
