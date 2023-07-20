@@ -106,7 +106,10 @@ Add an approved redirect URI.
 ### Added environment variable settings.（lodqa/docker-compose.yml）
 ```
 LODQA_OAUTH=[Same URL as environment variable(LODQA)]
+WEBSOCKET_SCHEMA=ws
 ```
+
+WEBSOCKET_SCHEMA default value is wss. If you use ws, set it to ws.
 
 ### Create .env file.
 ```
